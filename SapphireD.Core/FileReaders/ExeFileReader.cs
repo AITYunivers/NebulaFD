@@ -11,7 +11,7 @@ namespace SapphireD.Core.FileReaders
     {
         public string Name => "Normal EXE";
 
-        public PackageData Package;
+        public PackageData? Package;
         public Dictionary<int, Bitmap> Icons = new Dictionary<int, Bitmap>();
 
         public void LoadGame(string gamePath)
@@ -20,7 +20,7 @@ namespace SapphireD.Core.FileReaders
             loadIcons(gamePath);
 
             var reader = new ByteReader(gamePath, FileMode.Open);
-            readHeader(reader);
+            calculateEntryPoint(reader);
             PackData packData = new PackData();
             packData.Read(reader);
 
@@ -68,21 +68,7 @@ namespace SapphireD.Core.FileReaders
                 Icons.Add(256, Icons.Last().Value.ResizeImage(new Size(256, 256)));
         }
 
-        private int readHeader(ByteReader reader)
-        {
-            var entryPoint = calculateEntryPoint(reader);
-            reader.Seek(entryPoint);
-
-            var firstShort = reader.PeekUInt16();
-            if (firstShort != 0x7777)
-            {
-                SapDCore.Fusion = 1.5f;
-                Logger.Log(this, $"1.5 game detected. First short: {firstShort.ToString("X")}");
-            }
-            return (int)reader.Tell();
-        }
-
-        private int calculateEntryPoint(ByteReader exeReader)
+        private void calculateEntryPoint(ByteReader exeReader)
         {
             var sig = exeReader.ReadAscii(2);
             if (sig != "MZ")
@@ -98,7 +84,6 @@ namespace SapphireD.Core.FileReaders
             for (var i = 0; i < numOfSections; i++)
             {
                 var entry = exeReader.Tell();
-
                 var sectionName = exeReader.ReadAscii();
 
                 if (sectionName == ".extra")
@@ -122,93 +107,19 @@ namespace SapphireD.Core.FileReaders
             }
 
             exeReader.Seek(position);
-
-            return (int)exeReader.Tell();
         }
 
-        public PackageData getPackageData() => Package;
-
+        public PackageData getPackageData() => Package!;
         public Dictionary<int, Bitmap> getIcons() => Icons;
 
         public FileReader Copy()
         {
-            ExeFileReader fileReader = new ExeFileReader();
-            fileReader.Package = Package;
-            fileReader.Icons = Icons;
+            ExeFileReader fileReader = new()
+            {
+                Package = Package,
+                Icons = Icons
+            };
             return fileReader;
-        }
-
-        public class PackData
-        {
-            public List<PackFile> Items = new List<PackFile>();
-            public uint FormatVersion;
-
-            public void Read(ByteReader reader)
-            {
-                long start = reader.Tell();
-                reader.Skip(8);
-
-                uint headerSize = reader.ReadUInt32();
-                Debug.Assert(headerSize == 32);
-                uint dataSize = reader.ReadUInt32();
-
-                reader.Seek((int)(start + dataSize - 32));
-                var uheader = reader.ReadAscii(4);
-                SapDCore.Unicode = uheader != "PAME";
-                reader.Seek(start + 16);
-
-                FormatVersion = reader.ReadUInt32();
-                reader.Skip(4);
-                Debug.Assert(reader.ReadInt32() == 0);
-
-                uint count = reader.ReadUInt32();
-
-                long offset = reader.Tell();
-                for (int i = 0; i < count; i++)
-                {
-                    if (!reader.HasMemory(2)) break;
-                    ushort value = reader.ReadUInt16();
-                    if (!reader.HasMemory(value)) break;
-                    reader.Skip(value * 2);
-                    if (!reader.HasMemory(value)) break;
-                }
-
-                var newHeader = reader.ReadAscii(4);
-                bool hasBingo = newHeader != "PAME" && newHeader != "PAMU";
-                reader.Seek(offset);
-                for (int i = 0; i < count; i++)
-                {
-                    var item = new PackFile();
-                    item.HasBingo = hasBingo;
-                    item.Read(reader);
-                    Items.Add(item);
-                }
-            }
-
-            public class PackFile
-            {
-                public string PackFilename = "ERROR";
-                public byte[] Data;
-                public bool HasBingo;
-                public bool Compressed;
-                public int size;
-                public void Read(ByteReader exeReader)
-                {
-                    ushort len = exeReader.ReadUInt16();
-                    PackFilename = exeReader.ReadYuniversal(len);
-                    exeReader.Skip(4);
-                    size = exeReader.ReadInt32();
-                    if (exeReader.PeekInt16() == -9608)
-                    {
-                        Data = Decompressor.DecompressBlock(exeReader, size);
-                        Compressed = true;
-                    }
-                    else
-                        Data = exeReader.ReadBytes(size);
-
-                    Logger.Log(this, $"New packfile: {PackFilename}" + (Compressed ? " (Compressed)" : ""));
-                }
-            }
         }
     }
 }
