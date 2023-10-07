@@ -1,0 +1,40 @@
+﻿namespace SapphireD.Core.Memory
+{
+    public class BitDict
+    {
+        public string[] Keys;
+        public uint Value { get; set; }
+
+        public BitDict(string[] keys) => Keys = keys;
+        public bool this[string key]
+        {
+            get => GetFlag(key);
+            set => SetFlag(key, value);
+        }
+
+        public bool GetFlag(string key)
+        {
+            int pos = Array.IndexOf(Keys, key);
+            if (pos >= 0)
+                return (Value & ((uint)Math.Pow(2, pos))) != 0;
+            return false;
+        }
+
+        public void SetFlag(string key, bool flag)
+        {
+            if (flag)
+                Value |= (uint)Math.Pow(2, Array.IndexOf(Keys, key));
+            else
+                Value &= ~(uint)Math.Pow(2, Array.IndexOf(Keys, key));
+        }
+
+        public override string ToString()
+        {
+            Dictionary<string, bool> actualKeys = new Dictionary<string, bool>();
+            foreach (var key in Keys)
+                actualKeys[key] = this[key];
+
+            return string.Join(";\n", actualKeys.Select(kv => kv.Key + "=" + kv.Value).ToArray());
+        }
+    }
+}
