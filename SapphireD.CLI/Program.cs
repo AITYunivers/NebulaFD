@@ -2,8 +2,10 @@
 using SapphireD.Core.Utilities;
 using Spectre.Console;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Reflection;
+using Color = Spectre.Console.Color;
 
 namespace SapphireD
 {
@@ -75,14 +77,14 @@ namespace SapphireD
             WaitForFile();
             SelectReader();
             ReadPackage();
-            AnsiConsole.WriteLine($"Reading finished in {readStopwatch.Elapsed.TotalSeconds} seconds");
+            SelectPlugin();
         }
 
         static void WaitForFile()
         {
             AnsiConsole.Clear();
             AnsiConsole.Write(new FigletText("SapphireD").Centered().Color(Color.DeepSkyBlue1));
-            AnsiConsole.Write(new Text("File Path:\n"));
+            AnsiConsole.MarkupLine("[DeepSkyBlue2]File Path:[/]");
             
             string path = Console.ReadLine().Trim().Trim('"');
             if (File.Exists(path))
@@ -108,7 +110,7 @@ namespace SapphireD
                 fileReaderNames.Add(fileReader.Name);
 
             string? selectedReader = AnsiConsole.Prompt(new SelectionPrompt<string>()
-                                            .Title("Select a file-reader.")
+                                            .Title("[DeepSkyBlue2]Select a file-reader.[/]")
                                             .AddChoices(fileReaderNames));
 
             SapDCore.CurrentReader = null;
@@ -139,14 +141,15 @@ namespace SapphireD
             AnsiConsole.Clear();
             AnsiConsole.Write(new FigletText("SapphireD").Centered().Color(Color.DeepSkyBlue1));
             readStopwatch.Restart();
-            AnsiConsole.WriteLine($"Reading game with \"{SapDCore.CurrentReader.Name}\"");
+            AnsiConsole.MarkupLine($"[DeepSkyBlue2]Reading game as \"{SapDCore.CurrentReader.Name}\"[/]");
             Task readTask = new Task(() => SapDCore.CurrentReader.LoadGame(SapDCore.FilePath));
             readTask.Start();
             AnsiConsole.Progress()
                 .Start(ctx =>
                 {
                     // Define tasks
-                    var task1 = ctx.AddTask("[DeepSkyBlue1]Reading chunks[/]", false);
+                    ProgressTask? task1 = ctx.AddTask("[DeepSkyBlue3]Reading chunks[/]", false);
+                    ProgressTask? task2 = null;
 
                     while (!task1.IsFinished)
                     {
@@ -157,15 +160,67 @@ namespace SapphireD
 
                             int count = 0;
                             foreach (Task task in SapDCore.PackageData.ChunkReaders.ToArray())
-                                if ((int)task.Status > 4)
+                                if (task != null && (int)task.Status > 4)
                                     count++;
 
                             task1.Value = count;
                             task1.MaxValue = SapDCore.PackageData.ChunkReaders.Count;
+
+                            if (SapDCore.PackageData.ImageBank != null && SapDCore.PackageData.ImageBank.Images != null)
+                            {
+                                if (task2 == null)
+                                    task2 = ctx.AddTask("[DeepSkyBlue3]Reading images[/]", true);
+
+                                task2.Value = SapDCore.PackageData.ImageBank.Images.Count;
+                                task2.MaxValue = SapDCore.PackageData.ImageBank.ImageCount;
+                            }
                         }
                     }
                 });
             readStopwatch.Stop();
+        }
+
+        static void SelectPlugin()
+        {
+            AnsiConsole.Clear();
+            AnsiConsole.Write(new FigletText("SapphireD").Centered().Color(Color.DeepSkyBlue1));
+
+            AnsiConsole.MarkupLine($"[DeepSkyBlue2]Reading finished in {readStopwatch.Elapsed.TotalSeconds} seconds[/]");
+            List<SapDPlugin> plugins = new();
+            List<string> pluginNames = new()
+            {
+                "Quit"
+            };
+
+            Directory.CreateDirectory("Plugins");
+            foreach (var item in Directory.GetFiles("Plugins", "*.dll"))
+            {
+                var newAsm = Assembly.LoadFrom(Path.GetFullPath(item));
+                foreach (var pluginType in newAsm.GetTypes())
+                    if (pluginType.GetInterface(typeof(SapDPlugin).FullName) != null)
+                    {
+                        SapDPlugin plugin = (SapDPlugin)Activator.CreateInstance(pluginType);
+                        plugins.Add(plugin);
+                        pluginNames.Add(plugin.Name);
+                    }
+            }
+
+            List<string> selectedTasks = AnsiConsole.Prompt(
+                new MultiSelectionPrompt<string>()
+                    .Title("[DeepSkyBlue2]Select a task.[/]")
+                    .InstructionsText(
+                        "[DeepSkyBlue3](Press [DeepSkyBlue1]<space>[/] to select a task, " +
+                        "[DeepSkyBlue1]<enter>[/] to execute)\n(Quit will always execute last.)[/]")
+                    .AddChoices(pluginNames));
+
+
+            foreach (SapDPlugin plugin in plugins)
+                if (selectedTasks.Contains(plugin.Name))
+                    plugin.Execute();
+
+            if (selectedTasks.Contains("Quit"))
+                Environment.Exit(0);
+            else SelectPlugin();
         }
     }
 }

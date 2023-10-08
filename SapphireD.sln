@@ -5,7 +5,11 @@ VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SapphireD.CLI", "SapphireD.CLI\SapphireD.CLI.csproj", "{E5593F2F-4B1B-46F5-B893-4F935CE2366D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SapphireD.Core", "SapphireD.Core\SapphireD.Core.csproj", "{4E60957A-985A-422D-B0A9-C5426977535B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SapphireD.Core", "SapphireD.Core\SapphireD.Core.csproj", "{4E60957A-985A-422D-B0A9-C5426977535B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SapphireD.Plugins", "SapphireD.Plugins", "{044E6E66-F3B5-4034-B627-B4669EB304C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameDumper", "SapphireD.Plugins\InfoDump\GameDumper.csproj", "{6D8F0E12-6E18-4F2F-8066-091CFBCB5B8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +25,16 @@ Global
 		{4E60957A-985A-422D-B0A9-C5426977535B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E60957A-985A-422D-B0A9-C5426977535B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E60957A-985A-422D-B0A9-C5426977535B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D8F0E12-6E18-4F2F-8066-091CFBCB5B8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D8F0E12-6E18-4F2F-8066-091CFBCB5B8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D8F0E12-6E18-4F2F-8066-091CFBCB5B8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D8F0E12-6E18-4F2F-8066-091CFBCB5B8B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6D8F0E12-6E18-4F2F-8066-091CFBCB5B8B} = {044E6E66-F3B5-4034-B627-B4669EB304C9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3866881C-4F53-4C78-957D-AE9D10047618}

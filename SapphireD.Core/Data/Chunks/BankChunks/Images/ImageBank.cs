@@ -4,6 +4,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
 {
     public class ImageBank : Chunk
     {
+        public int ImageCount = 0;
         public Dictionary<uint, Image> Images;
 
         public ImageBank()
@@ -14,15 +15,16 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            SapDCore.PackageData.ImageBank = this;
+
             Images = new();
-            var count = reader.ReadInt();
-            for (int i = 0; i < count; i++)
+            ImageCount = reader.ReadInt();
+            for (int i = 0; i < ImageCount; i++)
             {
                 Image img = Image.NewImage();
                 img.ReadCCN(reader);
                 Images[img.Handle] = img;
             }
-            SapDCore.PackageData.ImageBank = this;
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

@@ -1,8 +1,11 @@
 ﻿using SapphireD.Core.Memory;
+using SapphireD.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -39,6 +42,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
         public Color TransparentColor;
 
         public byte[] ImageData;
+        private Bitmap BitmapCache;
 
         public BitDict Flags = new BitDict(new string[]
         {
@@ -62,6 +66,57 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
             if (SapDCore.Fusion == 2.5f && !SapDCore.Plus && !SapDCore.Android && !SapDCore.iOS)
                 return new Image25();
             return new Image();
+        }
+
+        public Bitmap GetBitmap()
+        {
+            if (BitmapCache == null)
+            {
+                BitmapCache = new Bitmap(Width, Height);
+                var bmpData = BitmapCache.LockBits(new Rectangle(0, 0, Width, Height),
+                                                    ImageLockMode.WriteOnly,
+                                                    PixelFormat.Format32bppArgb);
+
+                byte[] colorArray = null;
+                switch (GraphicMode)
+                {
+                    case 0:
+                        colorArray = ImageTranslator.AndroidMode0ToRGBA(ImageData, Width, Height, false);
+                        break;
+                    case 1:
+                        colorArray = ImageTranslator.AndroidMode1ToRGBA(ImageData, Width, Height, false);
+                        break;
+                    case 2:
+                        colorArray = ImageTranslator.AndroidMode2ToRGBA(ImageData, Width, Height, false);
+                        break;
+                    case 3:
+                        colorArray = ImageTranslator.AndroidMode3ToRGBA(ImageData, Width, Height, false);
+                        break;
+                    case 4:
+                        if (SapDCore.Android)
+                            colorArray = ImageTranslator.AndroidMode4ToRGBA(ImageData, Width, Height, false);
+                        else
+                            colorArray = ImageTranslator.Normal24BitMaskedToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, SapDCore.Fusion == 3f);
+                        break;
+                    case 5:
+                        colorArray = ImageTranslator.AndroidMode5ToRGBA(ImageData, Width, Height, Flags["Alpha"]);
+                        break;
+                    case 6:
+                        colorArray = ImageTranslator.Normal15BitToRGBA(ImageData, Width, Height, false, TransparentColor);
+                        break;
+                    case 7:
+                        colorArray = ImageTranslator.Normal16BitToRGBA(ImageData, Width, Height, false, TransparentColor);
+                        break;
+                    case 8:
+                        colorArray = ImageTranslator.TwoFivePlusToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], SapDCore.Fusion == 3f);
+                        break;
+                }
+
+                Marshal.Copy(colorArray, 0, bmpData.Scan0, colorArray.Length);
+                BitmapCache.UnlockBits(bmpData);
+            }
+
+            return BitmapCache;
         }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
