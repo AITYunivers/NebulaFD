@@ -6,6 +6,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
@@ -97,6 +98,27 @@ namespace SapphireD.Core.Utilities
 
             // Step 3: return the new array.
             return result;
+        }
+
+        public static IEnumerable<Type> TypesImplementingInterface(Type interfaceType, params Type[] desiredConstructorSignature)
+        {
+            if (interfaceType == null) throw new ArgumentNullException("interfaceType");
+            if (!interfaceType.IsInterface) throw new ArgumentOutOfRangeException("interfaceType");
+
+            return AppDomain
+                   .CurrentDomain
+                   .GetAssemblies()
+                   .SelectMany(a => a.GetTypes())
+                   .Where(t => t.IsAssignableFrom(interfaceType))
+                   .Where(t => !t.IsInterface)
+                   .Where(t => t.GetConstructor(desiredConstructorSignature) != null);
+        }
+
+        public static T ConstructInstance<T>(Type t, params object[] parameterList)
+        {
+            Type[] signature = parameterList.Select(p => p.GetType()).ToArray();
+            ConstructorInfo constructor = t.GetConstructor(signature);
+            return (T)constructor.Invoke(parameterList);
         }
     }
 }

@@ -39,6 +39,9 @@ namespace SapphireD.Core.Data
         public SoundBank SoundBank;
         public MusicOffsets MusicOffsets;
 
+        public List<Task> ChunkReaders = new List<Task>();
+        public List<Chunk> Chunks = new();
+
         public void Read(ByteReader reader)
         {
             Logger.Log(this, $"Running {SapDCore.BuildDate} build.");
@@ -57,17 +60,35 @@ namespace SapphireD.Core.Data
             while (reader.HasMemory(8))
             {
                 var newChunk = Chunk.InitChunk(reader);
-                string log = $"Reading Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})";
-                Logger.Log(this, log);
+                Logger.Log(this, $"Reading Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
 
                 if (newChunk.ChunkID == 32494)
                     SapDCore.Seeded = true;
                 if (newChunk.ChunkID == 8787)
                     SapDCore.Plus = true;
 
-                ByteReader chunkReader = new ByteReader(Chunk.ChunkData);
-                newChunk.ReadCCN(chunkReader);
+                Chunks.Add(newChunk);
+                int chunkId = Chunks.Count - 1;
+
+                Task chunkReader = new Task(() =>
+                {
+                    ByteReader chunkReader = new ByteReader(Chunks[chunkId].ChunkData!);
+                    Chunks[chunkId].ReadCCN(chunkReader);
+                    Chunks[chunkId].ChunkData = null;
+                });
+
+                if (newChunk.ChunkID == 0x2224 ||
+                    newChunk.ChunkID == 0x223B ||
+                    newChunk.ChunkID == 0x222E)
+                    chunkReader.RunSynchronously();
+                else
+                    ChunkReaders.Add(chunkReader);
             }
+            foreach (Task chunkReader in ChunkReaders)
+                chunkReader.Start();
+
+            foreach (Task chunkReader in ChunkReaders)
+                chunkReader.Wait();
         }
     }
 }

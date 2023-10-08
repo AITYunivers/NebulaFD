@@ -15,7 +15,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
             ChunkID = 0x2229;
         }
 
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Count = reader.ReadInt();
             Objects = new ObjectInfo[Count];
@@ -31,17 +31,17 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
             SapDCore.PackageData.FrameItems = this;
         }
 
-        public override void ReadMFA(ByteReader reader)
+        public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteCCN(ByteWriter writer)
+        public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteMFA(ByteWriter writer)
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
         }

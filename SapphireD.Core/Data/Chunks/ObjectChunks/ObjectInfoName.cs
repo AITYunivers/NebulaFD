@@ -1,4 +1,5 @@
-﻿using SapphireD.Core.Memory;
+﻿using SapphireD.Core.Data.Chunks.FrameChunks;
+using SapphireD.Core.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,11 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
             ChunkID = 0x4445;
         }
 
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             base.ReadCCN(reader);
 
-            ObjectInfo.curInfo.Name = Value;
+            ((ObjectInfo)extraInfo[0]).Name = Value;
         }
     }
 }

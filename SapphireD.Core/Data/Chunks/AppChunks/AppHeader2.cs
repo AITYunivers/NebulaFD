@@ -14,7 +14,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             ChunkID = 0x2245;
         }
 
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             hdr2Options = reader.ReadInt();
             reader.Skip(10);
@@ -23,17 +23,17 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             SapDCore.PackageData.AppHeader2 = this;
         }
 
-        public override void ReadMFA(ByteReader reader)
+        public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteCCN(ByteWriter writer)
+        public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteMFA(ByteWriter writer)
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
         }

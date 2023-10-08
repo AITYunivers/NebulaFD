@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Spectre.Console" Version="0.47.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SapphireD.Core\SapphireD.Core.csproj" />
   </ItemGroup>
 

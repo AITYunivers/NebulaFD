@@ -29,7 +29,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Fonts
             ChunkName = "Font";
         }
 
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Handle = reader.ReadUInt();
 
@@ -59,17 +59,17 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Fonts
             Name = dataReader.ReadYuniversal(32);
         }
 
-        public override void ReadMFA(ByteReader reader)
+        public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteCCN(ByteWriter writer)
+        public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteMFA(ByteWriter writer)
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
         }

@@ -1,4 +1,5 @@
-﻿using SapphireD.Core.Memory;
+﻿using SapphireD.Core.Data.Chunks.FrameChunks;
+using SapphireD.Core.Memory;
 
 namespace SapphireD.Core.Data.Chunks.ObjectChunks
 {
@@ -16,7 +17,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
             ChunkID = 0x4444;
         }
 
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Handle = reader.ReadShort();
             Type = reader.ReadShort();
@@ -25,20 +26,20 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
             InkEffect = reader.ReadInt();
             InkEffectParam = reader.ReadInt();
 
-            ObjectInfo.curInfo.Header = this;
+            ((ObjectInfo)extraInfo[0]).Header = this;
         }
 
-        public override void ReadMFA(ByteReader reader)
+        public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteCCN(ByteWriter writer)
+        public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteMFA(ByteWriter writer)
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
         }

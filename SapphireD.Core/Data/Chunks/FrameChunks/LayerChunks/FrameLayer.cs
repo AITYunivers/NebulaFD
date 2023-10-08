@@ -16,7 +16,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.LayerChunks
             ChunkName = "FrameLayer";
         }
 
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Options = reader.ReadInt();
             XCoefficient = reader.ReadFloat();
@@ -26,17 +26,17 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.LayerChunks
             Name = reader.ReadYuniversal();
         }
 
-        public override void ReadMFA(ByteReader reader)
+        public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteCCN(ByteWriter writer)
+        public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteMFA(ByteWriter writer)
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
         }

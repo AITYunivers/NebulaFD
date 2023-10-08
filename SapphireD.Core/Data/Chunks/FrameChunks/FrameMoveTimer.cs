@@ -10,11 +10,11 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             ChunkID = 0x3347;
         }
 
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             base.ReadCCN(reader);
 
-            Frame.curFrame.FrameMoveTimer = Value;
+            ((Frame)extraInfo[0]).FrameMoveTimer = Value;
         }
     }
 }

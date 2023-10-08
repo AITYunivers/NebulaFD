@@ -11,7 +11,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
         public int VersionMs;
         public short Handle;
 
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             long start = reader.Tell();
 
@@ -27,17 +27,17 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             reader.Seek(start + size);
         }
 
-        public override void ReadMFA(ByteReader reader)
+        public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteCCN(ByteWriter writer)
+        public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteMFA(ByteWriter writer)
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
         }

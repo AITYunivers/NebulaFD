@@ -26,27 +26,27 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             ChunkID = 0x3334;
         }
 
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Width = reader.ReadInt();
             Height = reader.ReadInt();
             Background = reader.ReadColor();
             Flags.Value = reader.ReadUInt();
 
-            Frame.curFrame.FrameHeader = this;
+            ((Frame)extraInfo[0]).FrameHeader = this;
         }
 
-        public override void ReadMFA(ByteReader reader)
+        public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteCCN(ByteWriter writer)
+        public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteMFA(ByteWriter writer)
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
         }

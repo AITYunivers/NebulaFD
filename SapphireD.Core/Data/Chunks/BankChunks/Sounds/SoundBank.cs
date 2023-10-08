@@ -12,7 +12,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Sounds
             ChunkID = 0x6668;
         }
 
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Sounds = new();
             var count = reader.ReadInt();
@@ -25,17 +25,17 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Sounds
             SapDCore.PackageData.SoundBank = this;
         }
 
-        public override void ReadMFA(ByteReader reader)
+        public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteCCN(ByteWriter writer)
+        public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteMFA(ByteWriter writer)
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
         }

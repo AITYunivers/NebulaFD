@@ -12,7 +12,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Fonts
             ChunkID = 0x6667;
         }
 
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Fonts = new();
             var count = reader.ReadInt();
@@ -25,17 +25,17 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Fonts
             SapDCore.PackageData.FontBank = this;
         }
 
-        public override void ReadMFA(ByteReader reader)
+        public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteCCN(ByteWriter writer)
+        public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteMFA(ByteWriter writer)
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
         }

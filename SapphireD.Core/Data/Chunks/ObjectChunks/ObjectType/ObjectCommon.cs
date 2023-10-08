@@ -34,7 +34,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectType
             ChunkName = "ObjectCommon";
         }
 
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Qualifiers = new short[8];
 
@@ -59,17 +59,17 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectType
             int FadeOutOffset = reader.ReadShort();
         }
 
-        public override void ReadMFA(ByteReader reader)
+        public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteCCN(ByteWriter writer)
+        public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteMFA(ByteWriter writer)
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
         }

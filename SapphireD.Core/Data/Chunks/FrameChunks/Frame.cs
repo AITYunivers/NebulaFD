@@ -5,8 +5,6 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 {
     public class Frame : Chunk
     {
-        public static Frame curFrame;
-
         public FrameHeader FrameHeader;
         public string FrameName = string.Empty;
         public FrameLayers FrameLayers;
@@ -20,9 +18,8 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             ChunkID = 0x3333;
         }
 
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            curFrame = this;
             string log = string.Empty;
 
             while (reader.HasMemory(8))
@@ -31,8 +28,9 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                 log = $"Reading Frame Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})";
                 Logger.Log(this, log);
 
-                ByteReader chunkReader = new ByteReader(ChunkData);
-                newChunk.ReadCCN(chunkReader);
+                ByteReader chunkReader = new ByteReader(newChunk.ChunkData!);
+                newChunk.ReadCCN(chunkReader, this);
+                newChunk.ChunkData = null;
             }
 
             SapDCore.PackageData.Frames.Add(this);
@@ -40,17 +38,17 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             Logger.Log(this, log, color: ConsoleColor.Green);
         }
 
-        public override void ReadMFA(ByteReader reader)
+        public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteCCN(ByteWriter writer)
+        public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteMFA(ByteWriter writer)
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
         }

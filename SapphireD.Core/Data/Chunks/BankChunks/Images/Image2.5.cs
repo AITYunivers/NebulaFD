@@ -4,7 +4,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
 {
     public class Image25 : Image
     {
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Handle = reader.ReadUInt();
             if (SapDCore.Build >= 284)

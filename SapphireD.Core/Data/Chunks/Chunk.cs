@@ -10,7 +10,7 @@ namespace SapphireD.Core.Data.Chunks
         private short chunkID;
         public short ChunkID { get { return chunkID; } set { chunkID = value; } }
         public int ChunkSize;
-        public static byte[] ChunkData;
+        public byte[]? ChunkData;
 
         public static Chunk InitChunk(ByteReader byteReader)
         {
@@ -19,26 +19,31 @@ namespace SapphireD.Core.Data.Chunks
             int size = byteReader.ReadInt32();
             var rawData = byteReader.ReadBytes(size);
             var dataReader = new ByteReader(rawData);
+            byte[] newData = new byte[0];
 
-            switch (flag)
+            if (size > 0)
             {
-                default:
-                    ChunkData = dataReader.ReadBytes(size);
-                    break;
-                case 1:
-                    ChunkData = Decompressor.Decompress(dataReader, out var DecompressedSize);
-                    break;
-                case 2:
-                    ChunkData = dataReader.ReadBytes(size);
-                    Decryption.TransformChunk(ChunkData);
-                    break;
-                case 3:
-                    ChunkData = Decryption.DecodeMode3(dataReader.ReadBytes(size), id, out DecompressedSize);
-                    break;
+                switch (flag)
+                {
+                    default:
+                        newData = dataReader.ReadBytes(size);
+                        break;
+                    case 1:
+                        newData = Decompressor.Decompress(dataReader, out var DecompressedSize);
+                        break;
+                    case 2:
+                        newData = dataReader.ReadBytes(size);
+                        Decryption.TransformChunk(newData);
+                        break;
+                    case 3:
+                        newData = Decryption.DecodeMode3(dataReader.ReadBytes(size), id, out DecompressedSize);
+                        break;
+                }
             }
 
             Chunk newChunk = ChunkJumpTable(id);
             newChunk.ChunkSize = size;
+            newChunk.ChunkData = newData;
 
             if (dataReader == null)
                 Logger.Log(newChunk, $"Chunk data is null for chunk {newChunk.ChunkName} with flag {flag}");
@@ -53,10 +58,10 @@ namespace SapphireD.Core.Data.Chunks
             throw new NotImplementedException();
         }
 
-        public abstract void ReadCCN(ByteReader reader);
-        public abstract void WriteCCN(ByteWriter writer);
-        public abstract void ReadMFA(ByteReader reader);
-        public abstract void WriteMFA(ByteWriter writer);
+        public abstract void ReadCCN(ByteReader reader, params object[] extraInfo);
+        public abstract void WriteCCN(ByteWriter writer, params object[] extraInfo);
+        public abstract void ReadMFA(ByteReader reader, params object[] extraInfo);
+        public abstract void WriteMFA(ByteWriter writer, params object[] extraInfo);
 
         public static Chunk ChunkJumpTable(short id)
         {

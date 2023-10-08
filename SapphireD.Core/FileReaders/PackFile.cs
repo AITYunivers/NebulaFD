@@ -12,7 +12,8 @@ namespace SapphireD.Core.FileReaders
 
         public void Read(ByteReader exeReader)
         {
-            PackFilename = exeReader.ReadYuniversal(exeReader.ReadUInt16());
+            var len = exeReader.ReadUInt16();
+            PackFilename = exeReader.ReadYuniversal(len);
             exeReader.Skip(4);
             DataSize = exeReader.ReadInt32();
 

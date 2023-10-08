@@ -12,7 +12,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             ChunkID = 0x222B;
         }
 
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             var count = reader.Size() / 2;
             FrameHandleIndex = new short[count];
@@ -23,17 +23,17 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             SapDCore.PackageData.FrameHandles = FrameHandleIndex;
         }
 
-        public override void ReadMFA(ByteReader reader)
+        public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteCCN(ByteWriter writer)
+        public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
 
         }
 
-        public override void WriteMFA(ByteWriter writer)
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
         }

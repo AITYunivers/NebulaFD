@@ -16,7 +16,6 @@ namespace SapphireD.Core.FileReaders
 
         public void LoadGame(string gamePath)
         {
-            SapDCore.CurrentReader = this;
             loadIcons(gamePath);
 
             var reader = new ByteReader(gamePath, FileMode.Open);

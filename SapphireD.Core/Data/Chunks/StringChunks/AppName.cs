@@ -10,7 +10,7 @@ namespace SapphireD.Core.Data.Chunks.StringChunks
             ChunkID = 0x2224;
         }
 
-        public override void ReadCCN(ByteReader reader)
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             base.ReadCCN(reader);
 

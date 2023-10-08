@@ -15,7 +15,7 @@ namespace SapphireD
         public static bool iOS;
 
         public static int Build;
-        public static bool Unicode;
+        public static bool Unicode = true;
 
         public static string FilePath = string.Empty;
         public static string Parameters = string.Empty;
