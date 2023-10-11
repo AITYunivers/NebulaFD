@@ -5,8 +5,8 @@ namespace SapphireD.Core.FileReaders
 {
     public class PackFile
     {
-        public string? PackFilename;
-        public byte[]? Data;
+        public string PackFilename = string.Empty;
+        public byte[] Data = new byte[0];
         public int DataSize;
         public bool Compressed;
 
@@ -26,7 +26,7 @@ namespace SapphireD.Core.FileReaders
                 DataSize -= PackFilename.Length + 1;
             }
 
-            if (reader.PeekInt16() == -9608)
+            if (reader.PeekShort() == -9608)
             {
                 Data = Decompressor.DecompressBlock(reader, DataSize);
                 Compressed = true;

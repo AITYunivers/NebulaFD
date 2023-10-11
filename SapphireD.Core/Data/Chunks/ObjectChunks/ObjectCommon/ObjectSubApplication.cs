@@ -14,7 +14,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public int Height;
         public short Version;
         public short StartFrame;
-        public string Name;
+        public string Name = string.Empty;
 
         public ObjectSubApplication()
         {

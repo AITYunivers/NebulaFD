@@ -2,10 +2,8 @@
 
 namespace SapphireD.Core.Data.Chunks.AppChunks
 {
-    public class Protection : Chunk
+    public class Protection : DataChunk
     {
-        public byte[]? Data;
-
         public Protection()
         {
             ChunkName = "Protection";
@@ -14,9 +12,9 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Data = reader.ReadBytes();
+            base.ReadCCN(reader, extraInfo);
 
-            SapDCore.PackageData.Protection = this;
+            SapDCore.PackageData.Protection = Value;
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

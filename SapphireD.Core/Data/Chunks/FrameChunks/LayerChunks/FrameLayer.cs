@@ -9,7 +9,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.LayerChunks
         public float YCoefficient;
         public int BackdropCount;
         public int BackdropIndex;
-        public string Name;
+        public string Name = string.Empty;
 
         public FrameLayer()
         {

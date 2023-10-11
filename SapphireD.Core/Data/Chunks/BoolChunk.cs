@@ -18,7 +18,7 @@ namespace SapphireD.Core.Data.Chunks
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteInt32(Value ? 1 : 0);
+            writer.WriteInt(Value ? 1 : 0);
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)

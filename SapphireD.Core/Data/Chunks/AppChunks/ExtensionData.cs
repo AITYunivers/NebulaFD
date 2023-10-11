@@ -5,7 +5,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
     public class ExtensionData : Chunk
     {
         public int DataSize;
-        public byte[]? Data;
+        public byte[] Data = new byte[0];
 
         public ExtensionData()
         {

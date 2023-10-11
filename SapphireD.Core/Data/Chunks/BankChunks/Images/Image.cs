@@ -39,10 +39,10 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
         public short HotspotY;
         public short ActionPointX;
         public short ActionPointY;
-        public Color TransparentColor;
+        public Color TransparentColor = Color.Black;
 
-        public byte[] ImageData;
-        private Bitmap BitmapCache;
+        public byte[] ImageData = new byte[0];
+        private Bitmap BitmapCache = new(1, 1);
 
         public BitDict Flags = new BitDict(new string[]
         {

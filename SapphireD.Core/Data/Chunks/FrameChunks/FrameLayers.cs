@@ -12,7 +12,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 {
     public class FrameLayers : Chunk
     {
-        public FrameLayer[] Layers;
+        public FrameLayer[] Layers = new FrameLayer[0];
 
         public FrameLayers()
         {

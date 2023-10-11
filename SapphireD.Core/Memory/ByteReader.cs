@@ -1,5 +1,4 @@
-﻿using System.Buffers.Binary;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Text;
 
 namespace SapphireD.Core.Memory
@@ -10,45 +9,64 @@ namespace SapphireD.Core.Memory
         public ByteReader(Stream input, Encoding encoding) : base(input, encoding){}
         public ByteReader(byte[] data) : base(new MemoryStream(data)){}
         public ByteReader(string path, FileMode fileMode) : base(new FileStream(path, fileMode)){}
-        public void Seek(Int64 offset, SeekOrigin seekOrigin = SeekOrigin.Begin)=>BaseStream.Seek(offset, seekOrigin);
-        public void Skip(Int64 count)=>BaseStream.Seek(count, SeekOrigin.Current);
-        public Int64 Tell()=>BaseStream.Position;
-        public Int64 Size()=>BaseStream.Length;
-        public bool HasMemory(int size)=>Size() - Tell() >= size;
+        public void Seek(long offset, SeekOrigin seekOrigin = SeekOrigin.Begin) => BaseStream.Seek(offset, seekOrigin);
+        public void Skip(long count) => BaseStream.Seek(count, SeekOrigin.Current);
+        public long Tell() => BaseStream.Position;
+        public long Size() => BaseStream.Length;
+        public bool HasMemory(int size) => Size() - Tell() >= size;
 
-
-
-        public UInt16 PeekUInt16()
-        {
-            UInt16 value = ReadUInt16();
-            Seek(-2, SeekOrigin.Current);
-            return value;
-        }
         public byte PeekByte()
         {
             byte value = ReadByte();
-            Seek(-1, SeekOrigin.Current);
+            Skip(-1);
             return value;
         }
-        public Int16 PeekInt16()
+
+        public ushort PeekUInt16()
         {
-            Int16 value = ReadInt16();
-            Seek(-2, SeekOrigin.Current);
+            ushort value = ReadUShort();
+            Skip(-2);
             return value;
         }
 
-
-        public Int32 PeekInt32()
+        public short PeekInt16()
         {
-            Int32 value = ReadInt32();
-            Seek(-4, SeekOrigin.Current);
+            short value = ReadShort();
+            Skip(-2);
             return value;
         }
 
-        public short ReadShort() => ReadInt16();
+        public uint PeekUInt32()
+        {
+            uint value = ReadUInt();
+            Skip(-4);
+            return value;
+        }
+
+        public int PeekInt32()
+        {
+            int value = ReadInt();
+            Skip(-4);
+            return value;
+        }
+
+        public float PeekSingle()
+        {
+            float value = ReadFloat();
+            Skip(-4);
+            return value;
+        }
+
+        public ushort PeekUShort() => PeekUInt16();
+        public short PeekShort() => PeekInt16();
+        public uint PeekUInt() => PeekUInt32();
+        public int PeekInt() => PeekInt32();
+        public float PeekFloat() => PeekSingle();
+
         public ushort ReadUShort() => ReadUInt16();
-        public int ReadInt() => ReadInt32();
+        public short ReadShort() => ReadInt16();
         public uint ReadUInt() => ReadUInt32();
+        public int ReadInt() => ReadInt32();
         public float ReadFloat() => ReadSingle();
 
         public string ReadAscii(int length = -1)
@@ -136,7 +154,8 @@ namespace SapphireD.Core.Memory
 
         public override byte[] ReadBytes(int count = -1)
         {
-            if (count == -1) return base.ReadBytes((int)this.Size());
+            if (count == -1)
+                return base.ReadBytes((int)Size());
             return base.ReadBytes(count);
         }
     }

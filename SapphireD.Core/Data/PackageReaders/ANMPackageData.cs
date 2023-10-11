@@ -11,7 +11,7 @@ namespace SapphireD.Core.Data.PackageReaders
         public List<Task> ChunkReaders = new();
         public List<Chunk> Chunks = new();
 
-        public int ChunksLoaded = 0;
+        public int ChunksLoaded;
 
         public override void Read(ByteReader reader)
         {

@@ -22,7 +22,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Fonts
         public byte ClipPrecision;
         public byte Quality;
         public byte PitchAndFamily;
-        public string Name;
+        public string Name = string.Empty;
 
         public Font()
         {

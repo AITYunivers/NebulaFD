@@ -12,7 +12,7 @@
 
     public class BitDict
     {
-        public string[] Keys;
+        public string[] Keys = new string[0];
         public uint Value { get; set; }
 
         public BitDict(string[] keys) => Keys = keys;

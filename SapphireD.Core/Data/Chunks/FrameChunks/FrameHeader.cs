@@ -13,9 +13,9 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
     {
         public int Width;
         public int Height;
-        public Color Background;
+        public Color Background = Color.White;
 
-        public BitDict Flags = new BitDict(new string[]      // Flags
+        public BitDict Flags = new BitDict(new string[] // Flags
         {
             "1", "2", "3", "4", "5"
         });

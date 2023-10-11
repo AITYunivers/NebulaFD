@@ -8,14 +8,14 @@ namespace SapphireD.Core.FileReaders
 
         public void Read(ByteReader reader)
         {
-            if (reader.PeekInt32() == 2004318071)
+            if (reader.PeekInt() == 2004318071)
                 reader.Skip(28);        // Multimedia Fusion 2 or above
-            else if (reader.PeekInt32() == 32639)
+            else if (reader.PeekInt() == 32639)
             {
                 SapDCore.Fusion = 1.5f; // Multimedia Fusion 1.5
                 SapDCore._unicode = false;
             }
-            else if (reader.PeekInt16() == 1)
+            else if (reader.PeekShort() == 1)
             {
                 SapDCore.Fusion = 1.1f; // The Games Factory
                 SapDCore._unicode = false;

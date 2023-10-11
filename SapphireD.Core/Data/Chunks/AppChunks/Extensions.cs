@@ -9,7 +9,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 {
     public class Extensions : Chunk
     {
-        public Extension[] Exts; // Color Mode
+        public Extension[] Exts = new Extension[0]; // Color Mode
         public ushort Conditions;
 
         public Extensions()

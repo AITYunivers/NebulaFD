@@ -9,16 +9,16 @@ namespace SapphireD.Core.Memory
         {
             var writer = new ByteWriter(new MemoryStream());
             var compressed = CompressBlock(buffer);
-            writer.WriteInt32(buffer.Length);
-            writer.WriteInt32(compressed.Length);
+            writer.WriteInt(buffer.Length);
+            writer.WriteInt(compressed.Length);
             writer.WriteBytes(compressed);
             return writer;
         }
 
         public static byte[] Decompress(ByteReader exeReader, out int decompressed)
         {
-            var decompSize = exeReader.ReadInt32();
-            var compSize = exeReader.ReadInt32();
+            var decompSize = exeReader.ReadInt();
+            var compSize = exeReader.ReadInt();
             decompressed = decompSize;
             return DecompressBlock(exeReader, compSize);
         }

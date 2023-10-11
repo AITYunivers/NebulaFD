@@ -9,12 +9,11 @@ namespace SapphireD.Core.FileReaders
     {
         public string Name => "MFA";
 
-        public MFAPackageData? Package;
+        public MFAPackageData Package = new();
         public Dictionary<int, Bitmap> Icons = new Dictionary<int, Bitmap>();
 
         public void LoadGame(ByteReader fileReader, string filePath)
         {
-            Package = new MFAPackageData();
             Package.Read(fileReader);
         }
 

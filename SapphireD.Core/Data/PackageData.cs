@@ -38,13 +38,13 @@ namespace SapphireD.Core.Data
         public GlobalStrings GlobalStrings = new();         // 0x2233
         public Extensions Extensions = new();               // 0x2234
         public AppIcon AppIcon = new();                     // 0x2235
-        public SerialNumber SerialNumber = new();           // 0x2237
+        public byte[] SerialNumber = new byte[0];           // 0x2237
         public BinaryFiles BinaryFiles = new();             // 0x2238
         public string Copyright = string.Empty;             // 0x223B
         public GlobalValueNames GlobalValueNames = new();   // 0x223C
         public GlobalStringNames GlobalStringNames = new(); // 0x223D
         public bool ExeOnly;                                // 0x2240
-        public Protection Protection = new();               // 0x2242
+        public byte[] Protection = new byte[0];             // 0x2242
         public AppHeader2 AppHeader2 = new();               // 0x2245
         public int AppCodePage;                             // 0x2246
         public List<Frame> Frames = new();                  // 0x3333

@@ -189,7 +189,7 @@ namespace SapphireD.Core.Utilities
             {
                 for (int x = 0; x < width; x++)
                 {
-                    UInt16 newShort = (ushort)(imageData[position] | imageData[position + 1] << 8);
+                    ushort newShort = (ushort)(imageData[position] | imageData[position + 1] << 8);
                     byte r = (byte)((newShort & 31744) >> 10);
                     byte g = (byte)((newShort & 992) >> 5);
                     byte b = (byte)((newShort & 31));

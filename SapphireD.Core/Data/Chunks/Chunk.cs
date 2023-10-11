@@ -5,14 +5,14 @@ namespace SapphireD.Core.Data.Chunks
 {
     public abstract class Chunk
     {
-        private static int chunkIndex = 0;
+        private static int chunkIndex;
 
-        private string chunkName;
-        public string ChunkName { get { return chunkName; } set { chunkName = value; } }
-        private short chunkID;
-        public short ChunkID { get { return chunkID; } set { chunkID = value; } }
+        private string _chunkName = string.Empty;
+        public string ChunkName { get { return _chunkName; } set { _chunkName = value; } }
+        private short _chunkID;
+        public short ChunkID { get { return _chunkID; } set { _chunkID = value; } }
         public int ChunkSize;
-        public byte[]? ChunkData;
+        public byte[] ChunkData = new byte[0];
 
         public static Chunk InitChunk(ByteReader byteReader)
         {

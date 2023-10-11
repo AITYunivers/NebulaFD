@@ -2,7 +2,7 @@
 {
     public static class Decryption
     {
-        public static byte[] _decryptionKey;
+        public static byte[] DecryptionKey = new byte[0];
         public static byte MagicChar = 54;
 
         public static byte[] KeyString(string str)
@@ -45,14 +45,14 @@
             bytes.AddRange(KeyString(data1 ?? ""));
             bytes.AddRange(KeyString(data2 ?? ""));
             bytes.AddRange(KeyString(data3 ?? ""));
-            _decryptionKey = MakeKeyCombined(bytes.ToArray());
-            InitDecryptionTable(_decryptionKey, Decryption.MagicChar);
+            DecryptionKey = MakeKeyCombined(bytes.ToArray());
+            InitDecryptionTable(DecryptionKey, MagicChar);
         }
 
         public static byte[] DecodeMode3(byte[] chunkData, int chunkId, out int decompressed)
         {
             var reader = new ByteReader(chunkData);
-            var decompressedSize = reader.ReadUInt32();
+            var decompressedSize = reader.ReadUInt();
 
             var rawData = reader.ReadBytes((int)reader.Size());
 
@@ -63,7 +63,7 @@
 
             using (var data = new ByteReader(rawData))
             {
-                var compressedSize = data.ReadUInt32();
+                var compressedSize = data.ReadUInt();
                 decompressed = (int)decompressedSize;
                 return Decompressor.DecompressBlock(data, (int)compressedSize);
             }

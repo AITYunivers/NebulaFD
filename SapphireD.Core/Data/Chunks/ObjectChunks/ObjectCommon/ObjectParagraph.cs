@@ -11,7 +11,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         });
 
         public ushort FontHandle;
-        public string Value;
+        public string Value = string.Empty;
         public Color Color = Color.White;
 
         public ObjectParagraph()

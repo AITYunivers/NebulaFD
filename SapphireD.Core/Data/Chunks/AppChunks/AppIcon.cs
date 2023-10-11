@@ -16,7 +16,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            reader.Seek(reader.PeekInt32());
+            reader.Seek(reader.ReadInt());
             Palette = new();
             for (int i = 0; i < 16 * 16; i++)
             {

@@ -1,5 +1,4 @@
 ﻿using SapphireD.Core.Memory;
-using SapphireD.Core.Utilities;
 
 namespace SapphireD.Core.Data.Chunks.BankChunks.Sounds
 {
@@ -10,8 +9,8 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Sounds
         public uint References;
         public int Flags;
         public int Frequency;
-        public string Name;
-        public byte[] Data;
+        public string Name = string.Empty;
+        public byte[] Data = new byte[0];
         public bool Compressed = true;
 
         public Sound()

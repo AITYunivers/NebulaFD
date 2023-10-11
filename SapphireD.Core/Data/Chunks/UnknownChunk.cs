@@ -13,7 +13,7 @@ namespace SapphireD.Core.Data.Chunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            //Logger.Log(this, "Unknown Chunk: 0x" + ChunkID.ToString("X"));
+            Logger.Log(this, "Unknown Chunk: 0x" + ChunkID.ToString("X"));
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

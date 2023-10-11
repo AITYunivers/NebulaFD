@@ -47,12 +47,12 @@ namespace TinyInflate
 
     public class TinfData
     {
-        public byte[] source;
+        public byte[] source = new byte[0];
         public int sourceIndex;
         public uint tag;
         public uint bitcount;
 
-        public byte[] dest;
+        public byte[] dest = new byte[0];
         public int destIndex;
         public uint destLen;
 

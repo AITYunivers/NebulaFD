@@ -2,7 +2,6 @@
 using SapphireD.Core.Data.PackageReaders;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
-using System.Diagnostics;
 using System.Drawing;
 using TsudaKageyu;
 
@@ -12,19 +11,14 @@ namespace SapphireD.Core.FileReaders
     {
         public string Name => "Normal EXE";
 
-        public CCNPackageData? Package;
+        public CCNPackageData Package = new();
         public Dictionary<int, Bitmap> Icons = new Dictionary<int, Bitmap>();
 
         public void LoadGame(ByteReader fileReader, string filePath)
         {
             loadIcons(filePath);
-
             calculateEntryPoint(fileReader);
-            PackData packData = new PackData();
-            packData.Read(fileReader);
-
-            Package = new CCNPackageData();
-            Package.PackData = packData;
+            Package.PackData.Read(fileReader);
             Package.Read(fileReader);
         }
 

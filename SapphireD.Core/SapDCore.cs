@@ -7,7 +7,7 @@ namespace SapphireD
 {
     public static class SapDCore
     {
-        public const string BuildDate = "7/19/23";
+        public const string BuildDate = "10/11/23";
         public static FigletText ConsoleFiglet = new FigletText("SapphireD").Centered().Color(Color.DeepSkyBlue1);
         public static Rule ConsoleRule = new Rule().RuleStyle("DeepSkyBlue2");
 
@@ -24,7 +24,7 @@ namespace SapphireD
 
         public static string FilePath = string.Empty;
         public static string Parameters = string.Empty;
-        public static FileReader CurrentReader;
+        public static FileReader? CurrentReader;
         public static PackageData PackageData => CurrentReader.getPackageData();
 
         public static void Init()

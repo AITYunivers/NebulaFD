@@ -9,12 +9,11 @@ namespace SapphireD.Core.FileReaders
     {
         public string Name => "ANM";
 
-        public ANMPackageData? Package;
+        public ANMPackageData Package = new();
         public Dictionary<int, Bitmap> Icons = new Dictionary<int, Bitmap>();
 
         public void LoadGame(ByteReader fileReader, string filePath)
         {
-            Package = new ANMPackageData();
             Package.AppName = Path.GetFileNameWithoutExtension(filePath);
             Package.Read(fileReader);
         }

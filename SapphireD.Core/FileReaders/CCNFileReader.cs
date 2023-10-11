@@ -9,21 +9,15 @@ namespace SapphireD.Core.FileReaders
     {
         public string Name => Unpacked ? "Unpacked EXE" : "CCN";
 
-        public CCNPackageData? Package;
+        public CCNPackageData Package = new();
         public Dictionary<int, Bitmap> Icons = new Dictionary<int, Bitmap>();
 
         public bool Unpacked;
 
         public void LoadGame(ByteReader fileReader, string filePath)
         {
-            Package = new CCNPackageData();
-
             if (Unpacked)
-            {
-                PackData packData = new PackData();
-                packData.Read(fileReader);
-                Package.PackData = packData;
-            }
+                Package.PackData.Read(fileReader);
 
             Package.Read(fileReader);
         }

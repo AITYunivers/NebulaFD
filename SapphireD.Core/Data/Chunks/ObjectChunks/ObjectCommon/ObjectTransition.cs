@@ -12,9 +12,9 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         public int ID;
         public int Duration;
-        public Color Color;
+        public Color Color = Color.Black;
 
-        public string FileName;
+        public string FileName = string.Empty;
         public long FileOffset;
 
         public ObjectTransition()

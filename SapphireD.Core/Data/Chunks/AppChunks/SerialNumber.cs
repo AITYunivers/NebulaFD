@@ -2,10 +2,8 @@
 
 namespace SapphireD.Core.Data.Chunks.AppChunks
 {
-    public class SerialNumber : Chunk
+    public class SerialNumber : DataChunk
     {
-        public byte[]? Data;
-
         public SerialNumber()
         {
             ChunkName = "SerialNumber";
@@ -14,9 +12,9 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Data = reader.ReadBytes();
+            base.ReadCCN(reader, extraInfo);
 
-            SapDCore.PackageData.SerialNumber = this;
+            SapDCore.PackageData.SerialNumber = Value;
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

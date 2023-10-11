@@ -9,12 +9,11 @@ namespace SapphireD.Core.FileReaders
     {
         public string Name => "AGMI";
 
-        public AGMIPackageData? Package;
+        public AGMIPackageData Package = new();
         public Dictionary<int, Bitmap> Icons = new Dictionary<int, Bitmap>();
 
         public void LoadGame(ByteReader fileReader, string filePath)
         {
-            Package = new AGMIPackageData();
             Package.AppName = Path.GetFileNameWithoutExtension(filePath);
             Package.Read(fileReader);
         }

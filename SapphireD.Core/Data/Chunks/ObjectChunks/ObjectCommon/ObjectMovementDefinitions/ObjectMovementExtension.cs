@@ -6,7 +6,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDef
     {
         public string FileName;
         public int ID;
-        public byte[] Data;
+        public byte[] Data = new byte[0];
 
         public ObjectMovementExtension()
         {
