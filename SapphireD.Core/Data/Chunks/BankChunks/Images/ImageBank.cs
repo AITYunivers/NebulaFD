@@ -1,11 +1,21 @@
 ﻿using SapphireD.Core.Memory;
+using System.Drawing;
 
 namespace SapphireD.Core.Data.Chunks.BankChunks.Images
 {
     public class ImageBank : Chunk
     {
-        public int ImageCount = 0;
-        public Dictionary<uint, Image> Images;
+        // AGMIBank
+        public int GraphicMode;
+        public short PaletteVersion;
+        public short PaletteEntries;
+        public List<Color> Palette = new();
+
+        // ImageBank
+        public int ImageCount;
+        public Dictionary<uint, Image> Images = new();
+        public static int LoadedImageCount;
+        public static List<Task> TaskManager = new();
 
         public ImageBank()
         {
@@ -17,7 +27,9 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
         {
             SapDCore.PackageData.ImageBank = this;
 
-            Images = new();
+            LoadedImageCount = 0;
+            TaskManager.Clear();
+
             ImageCount = reader.ReadInt();
             for (int i = 0; i < ImageCount; i++)
             {
@@ -25,11 +37,26 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
                 img.ReadCCN(reader);
                 Images[img.Handle] = img;
             }
+
+            foreach (Task task in TaskManager)
+                task.Wait();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
+            GraphicMode = reader.ReadInt();
+            PaletteVersion = reader.ReadShort();
+            PaletteEntries = reader.ReadShort();
+            for (int i = 0; i < PaletteEntries; i++)
+                Palette.Add(reader.ReadColor());
 
+            ImageCount = reader.ReadInt();
+            for (int i = 0; i < ImageCount; i++)
+            {
+                Image img = Image.NewImage();
+                img.ReadMFA(reader);
+                Images[img.Handle] = img;
+            }
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

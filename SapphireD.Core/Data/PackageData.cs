@@ -6,89 +6,60 @@ using SapphireD.Core.Data.Chunks.BankChunks.Images;
 using SapphireD.Core.Data.Chunks.BankChunks.Sounds;
 using SapphireD.Core.Data.Chunks.FrameChunks;
 using SapphireD.Core.Data.Chunks.ObjectChunks;
+using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
+using SapphireD.Core.FileReaders;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 
 namespace SapphireD.Core.Data
 {
-    public class PackageData
+    public abstract class PackageData
     {
+        public PackData PackData = new();
+
         public string Header = string.Empty;
         public short RuntimeVersion;
         public short RuntimeSubversion;
         public int ProductVersion;
         public int ProductBuild;
 
-        public string AppName = string.Empty;
-        public string EditorFilename = string.Empty;
-        public string TargetFilename = string.Empty;
-        public string Copyright = string.Empty;
-        public AppHeader AppHeader;
-        public AppHeader2 AppHeader2;
-        public int AppCodePage;
-        public Extensions Extensions;
-        public FrameItems FrameItems;
-        public short[] FrameHandles;
-        public List<Frame> Frames;
+        public AppHeader AppHeader = new();                 // 0x2223
+        public string AppName = string.Empty;               // 0x2224
+        public string Author = string.Empty;                // 0x2225
+        public MenuBar MenuBar = new();                     // 0x2226
+        public string ExtensionsPath = string.Empty;        // 0x2227
+        public FrameItems FrameItems = new();               // 0x2229 & 0x223F
+        public short[] FrameHandles = new short[0];         // 0x222B
+        public ExtensionData ExtensionData = new();         // 0x222C
+        public string EditorFilename = string.Empty;        // 0x222E
+        public string TargetFilename = string.Empty;        // 0x222F
+        public TransitionFile TransitionFile = new();       // 0x2231
+        public GlobalValues GlobalValues = new();           // 0x2232
+        public GlobalStrings GlobalStrings = new();         // 0x2233
+        public Extensions Extensions = new();               // 0x2234
+        public AppIcon AppIcon = new();                     // 0x2235
+        public SerialNumber SerialNumber = new();           // 0x2237
+        public BinaryFiles BinaryFiles = new();             // 0x2238
+        public string Copyright = string.Empty;             // 0x223B
+        public GlobalValueNames GlobalValueNames = new();   // 0x223C
+        public GlobalStringNames GlobalStringNames = new(); // 0x223D
+        public bool ExeOnly;                                // 0x2240
+        public Protection Protection = new();               // 0x2242
+        public AppHeader2 AppHeader2 = new();               // 0x2245
+        public int AppCodePage;                             // 0x2246
+        public List<Frame> Frames = new();                  // 0x3333
+        public ObjectAnimations ObjectAnimations = new();   // 0x4449
+        public AnimationOffsets AnimationOffsets = new();   // 0x444A
 
-        public ImageOffsets ImageOffsets;
-        public ImageBank ImageBank;
-        public FontOffsets FontOffsets;
-        public FontBank FontBank;
-        public SoundOffsets SoundOffsets;
-        public SoundBank SoundBank;
-        public MusicOffsets MusicOffsets;
+        public ImageOffsets ImageOffsets = new();           // 0x5555
+        public FontOffsets FontOffsets = new();             // 0x5556
+        public SoundOffsets SoundOffsets = new();           // 0x5557
+        public MusicOffsets MusicOffsets = new();           // 0x5558
+        public ImageBank ImageBank = new();                 // 0x6666
+        public FontBank FontBank = new();                   // 0x6667
+        public SoundBank SoundBank = new();                 // 0x6668
 
-        public List<Task> ChunkReaders = new List<Task>();
-        public List<Chunk> Chunks = new();
-
-        public void Read(ByteReader reader)
-        {
-            Logger.Log(this, $"Running {SapDCore.BuildDate} build.");
-            Header = reader.ReadAscii(4);
-            SapDCore.Unicode = Header != "PAME";
-            Logger.Log(this, "Game Header: " + Header);
-
-            RuntimeVersion = (short)reader.ReadUInt16();
-            RuntimeSubversion = (short)reader.ReadUInt16();
-            ProductVersion = reader.ReadInt32();
-            ProductBuild = reader.ReadInt32();
-            SapDCore.Build = ProductBuild;
-            Logger.Log(this, "Fusion Build: " + ProductBuild);
-
-            Frames = new List<Frame>();
-            while (reader.HasMemory(8))
-            {
-                var newChunk = Chunk.InitChunk(reader);
-                Logger.Log(this, $"Reading Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
-
-                if (newChunk.ChunkID == 32494)
-                    SapDCore.Seeded = true;
-                if (newChunk.ChunkID == 8787)
-                    SapDCore.Plus = true;
-
-                Chunks.Add(newChunk);
-                int chunkId = Chunks.Count - 1;
-
-                Task chunkReader = new Task(() =>
-                {
-                    ByteReader chunkReader = new ByteReader(Chunks[chunkId].ChunkData!);
-                    Chunks[chunkId].ReadCCN(chunkReader);
-                    Chunks[chunkId].ChunkData = null;
-                });
-
-                if (newChunk.ChunkID == 0x2224 ||
-                    newChunk.ChunkID == 0x223B ||
-                    newChunk.ChunkID == 0x222E)
-                    chunkReader.RunSynchronously();
-                else
-                    ChunkReaders.Add(chunkReader);
-            }
-            foreach (Task chunkReader in ChunkReaders)
-                chunkReader.Start();
-
-            foreach (Task chunkReader in ChunkReaders)
-                chunkReader.Wait();
-        }
+        public abstract void Read(ByteReader reader);
+        public abstract void CliUpdate();
     }
 }

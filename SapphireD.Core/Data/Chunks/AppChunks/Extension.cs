@@ -11,6 +11,11 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
         public int VersionMs;
         public short Handle;
 
+        public Extension()
+        {
+            ChunkName = "Extension";
+        }
+
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             long start = reader.Tell();

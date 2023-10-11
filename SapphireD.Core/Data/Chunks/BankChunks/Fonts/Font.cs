@@ -61,7 +61,26 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Fonts
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
+            Handle = reader.ReadUInt();
 
+            Checksum = reader.ReadInt();
+            References = reader.ReadInt();
+            var size = reader.ReadInt();
+
+            Height = reader.ReadInt();
+            Width = reader.ReadInt();
+            Escapement = reader.ReadInt();
+            Orientation = reader.ReadInt();
+            Weight = reader.ReadInt();
+            Italic = reader.ReadByte();
+            Underline = reader.ReadByte();
+            StrikeOut = reader.ReadByte();
+            CharSet = reader.ReadByte();
+            OutPrecision = reader.ReadByte();
+            ClipPrecision = reader.ReadByte();
+            Quality = reader.ReadByte();
+            PitchAndFamily = reader.ReadByte();
+            Name = reader.ReadYuniversal(32);
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

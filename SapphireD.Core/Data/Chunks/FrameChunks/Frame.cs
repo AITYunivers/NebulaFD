@@ -5,12 +5,16 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 {
     public class Frame : Chunk
     {
-        public FrameHeader FrameHeader;
-        public string FrameName = string.Empty;
-        public FrameLayers FrameLayers;
-        public FrameRect FrameRect;
-        public int FrameMoveTimer;
-        public FrameEffects FrameEffects;
+        public FrameHeader FrameHeader = new();       // 0x3334
+        public string FrameName = string.Empty;       // 0x3335
+        public string FramePassword = string.Empty;   // 0x3336
+        public FramePalette FramePalette = new();     // 0x3337
+        public FrameInstances FrameInstances = new(); // 0x3338
+        public FrameLayers FrameLayers = new();       // 0x3341
+        public FrameRect FrameRect = new();           // 0x3342
+        public short FrameSeed;                       // 0x3344
+        public int FrameMoveTimer;                    // 0x3347
+        public FrameEffects FrameEffects = new();     // 0x3349
 
         public Frame()
         {

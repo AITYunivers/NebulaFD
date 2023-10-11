@@ -12,7 +12,8 @@ namespace SapphireD.Plugins.GameDumper
         public void Execute()
         {
             AnsiConsole.Clear();
-            AnsiConsole.Write(new FigletText("SapphireD").Centered().Color(Color.DeepSkyBlue1));
+            AnsiConsole.Write(SapDCore.ConsoleFiglet);
+            AnsiConsole.Write(SapDCore.ConsoleRule);
 
             AnsiConsole.Progress().Start(ctx =>
             {
@@ -24,16 +25,20 @@ namespace SapphireD.Plugins.GameDumper
                 {
                     if (SapDCore.PackageData.ImageBank != null)
                     {
+                        if (SapDCore.PackageData.ImageBank.Images.Count == 0)
+                            return;
+
                         if (!task.IsStarted)
                             task.StartTask();
 
                         task.Value = progress;
                         task.MaxValue = SapDCore.PackageData.ImageBank.Images.Count;
 
-                        foreach (Image image in SapDCore.PackageData.ImageBank.Images.Values.ToArray())
+                        Image[] images = SapDCore.PackageData.ImageBank.Images.Values.ToArray();
+                        for (int i = 0; i < images.Length; i++)
                         {
                             Directory.CreateDirectory(path);
-                            image.GetBitmap().Save(path + "\\" + image.Handle + ".png");
+                            images[i].GetBitmap().Save(path + "\\" + images[i].Handle + ".png");
                             task.Value = ++progress;
                         }
                     }

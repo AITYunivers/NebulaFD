@@ -11,7 +11,8 @@ namespace SapphireD.Plugins.GameDumper
         public void Execute()
         {
             AnsiConsole.Clear();
-            AnsiConsole.Write(new FigletText("SapphireD").Centered().Color(Color.DeepSkyBlue1));
+            AnsiConsole.Write(SapDCore.ConsoleFiglet);
+            AnsiConsole.Write(SapDCore.ConsoleRule);
 
             AnsiConsole.Progress().Start(ctx =>
             {
@@ -23,16 +24,20 @@ namespace SapphireD.Plugins.GameDumper
                 {
                     if (SapDCore.PackageData.SoundBank != null)
                     {
+                        if (SapDCore.PackageData.SoundBank.Sounds.Count == 0)
+                            return;
+
                         if (!task.IsStarted)
                             task.StartTask();
 
                         task.Value = progress;
                         task.MaxValue = SapDCore.PackageData.SoundBank.Sounds.Count;
 
-                        foreach (Sound sound in SapDCore.PackageData.SoundBank.Sounds.Values.ToArray())
+                        Sound[] sounds = SapDCore.PackageData.SoundBank.Sounds.Values.ToArray();
+                        for (int i = 0; i < sounds.Length; i++)
                         {
                             Directory.CreateDirectory(path);
-                            File.WriteAllBytes(path + "\\" + sound.Name + GetExtension(sound.Data), sound.Data);
+                            File.WriteAllBytes(path + "\\" + sounds[i].Name + GetExtension(sounds[i].Data), sounds[i].Data);
                             task.Value = ++progress;
                         }
                     }

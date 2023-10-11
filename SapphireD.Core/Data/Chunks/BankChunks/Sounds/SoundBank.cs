@@ -4,7 +4,8 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Sounds
 {
     public class SoundBank : Chunk
     {
-        public Dictionary<uint, Sound> Sounds;
+        public int Count;
+        public Dictionary<uint, Sound> Sounds = new();
 
         public SoundBank()
         {
@@ -14,9 +15,8 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Sounds
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Sounds = new();
-            var count = reader.ReadInt();
-            for (int i = 0; i < count; i++)
+            Count = reader.ReadInt();
+            for (int i = 0; i < Count; i++)
             {
                 Sound snd = new Sound();
                 snd.ReadCCN(reader);
@@ -27,7 +27,13 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Sounds
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            Count = reader.ReadInt();
+            for (int i = 0; i < Count; i++)
+            {
+                Sound snd = new Sound();
+                snd.ReadMFA(reader);
+                Sounds[snd.Handle] = snd;
+            }
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

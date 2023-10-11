@@ -1,5 +1,15 @@
 ﻿namespace SapphireD.Core.Memory
 {
+    public static class ByteFlag
+    {
+        public static bool GetFlag(uint flagbyte, int pos)
+        {
+            uint mask = (uint)(1 << pos);
+            uint result = flagbyte & mask;
+            return result == mask;
+        }
+    }
+
     public class BitDict
     {
         public string[] Keys;

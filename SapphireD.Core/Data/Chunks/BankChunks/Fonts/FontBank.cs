@@ -4,7 +4,8 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Fonts
 {
     public class FontBank : Chunk
     {
-        public Dictionary<uint, Font> Fonts;
+        public int Count;
+        public Dictionary<uint, Font> Fonts = new();
 
         public FontBank()
         {
@@ -14,9 +15,8 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Fonts
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Fonts = new();
-            var count = reader.ReadInt();
-            for (int i = 0; i < count; i++)
+            Count = reader.ReadInt();
+            for (int i = 0; i < Count; i++)
             {
                 Font fnt = new Font();
                 fnt.ReadCCN(reader);
@@ -27,7 +27,13 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Fonts
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            Count = reader.ReadInt();
+            for (int i = 0; i < Count; i++)
+            {
+                Font fnt = new Font();
+                fnt.ReadMFA(reader);
+                Fonts[fnt.Handle] = fnt;
+            }
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

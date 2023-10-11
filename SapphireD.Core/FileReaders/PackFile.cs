@@ -10,19 +10,28 @@ namespace SapphireD.Core.FileReaders
         public int DataSize;
         public bool Compressed;
 
-        public void Read(ByteReader exeReader)
+        public void Read(ByteReader reader)
         {
-            var len = exeReader.ReadUInt16();
-            PackFilename = exeReader.ReadYuniversal(len);
-            exeReader.Skip(4);
-            DataSize = exeReader.ReadInt32();
-
-            if (exeReader.PeekInt16() == -9608)
+            if (SapDCore.Fusion > 1.5f)
             {
-                Data = Decompressor.DecompressBlock(exeReader, DataSize);
+                short len = reader.ReadShort();
+                PackFilename = reader.ReadYuniversal(len);
+                DataSize = reader.ReadInt();
+                DataSize = reader.ReadInt();
+            }
+            else
+            {
+                DataSize = reader.ReadInt();
+                PackFilename = reader.ReadYuniversal();
+                DataSize -= PackFilename.Length + 1;
+            }
+
+            if (reader.PeekInt16() == -9608)
+            {
+                Data = Decompressor.DecompressBlock(reader, DataSize);
                 Compressed = true;
             }
-            else Data = exeReader.ReadBytes(DataSize);
+            else Data = reader.ReadBytes(DataSize);
 
             Logger.Log(this, $"New packfile: {PackFilename}" + (Compressed ? " (Compressed)" : ""));
         }

@@ -5,6 +5,8 @@ namespace SapphireD.Core.Data.Chunks
 {
     public abstract class Chunk
     {
+        private static int chunkIndex = 0;
+
         private string chunkName;
         public string ChunkName { get { return chunkName; } set { chunkName = value; } }
         private short chunkID;
@@ -29,14 +31,17 @@ namespace SapphireD.Core.Data.Chunks
                         newData = dataReader.ReadBytes(size);
                         break;
                     case 1:
-                        newData = Decompressor.Decompress(dataReader, out var DecompressedSize);
+                        if (SapDCore.Fusion > 1.5f)
+                            newData = Decompressor.Decompress(dataReader, out var DecompressedSize1);
+                        else
+                            newData = Decompressor.DecompressOPF(dataReader, out var DecompressedSize2);
                         break;
                     case 2:
                         newData = dataReader.ReadBytes(size);
                         Decryption.TransformChunk(newData);
                         break;
                     case 3:
-                        newData = Decryption.DecodeMode3(dataReader.ReadBytes(size), id, out DecompressedSize);
+                        newData = Decryption.DecodeMode3(dataReader.ReadBytes(size), id, out var DecompressedSize3);
                         break;
                 }
             }
@@ -44,6 +49,9 @@ namespace SapphireD.Core.Data.Chunks
             Chunk newChunk = ChunkJumpTable(id);
             newChunk.ChunkSize = size;
             newChunk.ChunkData = newData;
+
+            if (!ChunkList.ChunkJumpTable.ContainsKey(id))
+                File.WriteAllBytes($"Chunks\\[{chunkIndex++}] Chunk-{string.Format("0x{0:X}", id)}.bin", newChunk.ChunkData);
 
             if (dataReader == null)
                 Logger.Log(newChunk, $"Chunk data is null for chunk {newChunk.ChunkName} with flag {flag}");

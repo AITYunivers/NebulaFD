@@ -1,10 +1,10 @@
 ﻿using SapphireD.Core.Memory;
 
-namespace SapphireD.Core.Data.Chunks.StringChunks
+namespace SapphireD.Core.Data.Chunks.AppChunks
 {
-    public class AppName : StringChunk
+    public class ExeOnly : BoolChunk
     {
-        public AppName()
+        public ExeOnly()
         {
             ChunkName = "AppName";
             ChunkID = 0x2224;
@@ -12,9 +12,9 @@ namespace SapphireD.Core.Data.Chunks.StringChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            base.ReadCCN(reader);
+            Value = reader.ReadByte() != 0;
 
-            SapDCore.PackageData.AppName = Value;
+            SapDCore.PackageData.ExeOnly = Value;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using SapphireD.Core.Memory;
 
-namespace SapphireD.Core.Data.Chunks.StringChunks
+namespace SapphireD.Core.Data.Chunks.AppChunks
 {
     public class EditorFilename : StringChunk
     {

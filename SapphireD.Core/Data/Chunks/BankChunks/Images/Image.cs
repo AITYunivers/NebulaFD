@@ -63,9 +63,11 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
 
         public static Image NewImage()
         {
-            if (SapDCore.Fusion == 2.5f && !SapDCore.Plus && !SapDCore.Android && !SapDCore.iOS)
-                return new Image25();
-            return new Image();
+            if (SapDCore.MFA)
+                return new ImageMFA();
+            else if (SapDCore.Plus)
+                return new Image25Plus();
+            return new Image25();
         }
 
         public Bitmap GetBitmap()
@@ -96,16 +98,16 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
                         if (SapDCore.Android)
                             colorArray = ImageTranslator.AndroidMode4ToRGBA(ImageData, Width, Height, false);
                         else
-                            colorArray = ImageTranslator.Normal24BitMaskedToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, SapDCore.Fusion == 3f);
+                            colorArray = ImageTranslator.Normal24BitMaskedToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"], SapDCore.Fusion == 3f);
                         break;
                     case 5:
-                        colorArray = ImageTranslator.AndroidMode5ToRGBA(ImageData, Width, Height, Flags["Alpha"]);
+                        colorArray = ImageTranslator.AndroidMode5ToRGBA(ImageData, Width, Height, Flags["Alpha"], Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                         break;
                     case 6:
                         colorArray = ImageTranslator.Normal15BitToRGBA(ImageData, Width, Height, false, TransparentColor);
                         break;
                     case 7:
-                        colorArray = ImageTranslator.Normal16BitToRGBA(ImageData, Width, Height, false, TransparentColor);
+                        colorArray = ImageTranslator.Normal16BitToRGBA(ImageData, Width, Height, false, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                         break;
                     case 8:
                         colorArray = ImageTranslator.TwoFivePlusToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], SapDCore.Fusion == 3f);

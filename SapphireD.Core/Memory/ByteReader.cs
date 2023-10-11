@@ -99,8 +99,25 @@ namespace SapphireD.Core.Memory
             return str;
         }
 
+        public string ReadAutoYuniversal()
+        {
+            short len = ReadShort();
+            Skip(2);
+            if (SapDCore.Unicode)
+                return ReadWideString(len);
+            else
+                return ReadAscii(len);
+        }
+
         public string ReadYuniversal(int len = -1)
         {
+            if (SapDCore._unicode == null)
+            {
+                Skip(1);
+                SapDCore._unicode = ReadByte() == 0;
+                Skip(-2);
+            }
+
             if (SapDCore.Unicode)
                 return ReadWideString(len); 
             else

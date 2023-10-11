@@ -1,4 +1,5 @@
 ﻿using SapphireD.Core.Data;
+using SapphireD.Core.Data.PackageReaders;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 using System.Diagnostics;
@@ -7,24 +8,24 @@ using TsudaKageyu;
 
 namespace SapphireD.Core.FileReaders
 {
-    public class ExeFileReader : FileReader
+    public class EXEFileReader : FileReader
     {
         public string Name => "Normal EXE";
 
-        public PackageData? Package;
+        public CCNPackageData? Package;
         public Dictionary<int, Bitmap> Icons = new Dictionary<int, Bitmap>();
 
-        public void LoadGame(string gamePath)
+        public void LoadGame(ByteReader fileReader, string filePath)
         {
-            loadIcons(gamePath);
+            loadIcons(filePath);
 
-            var reader = new ByteReader(gamePath, FileMode.Open);
-            calculateEntryPoint(reader);
+            calculateEntryPoint(fileReader);
             PackData packData = new PackData();
-            packData.Read(reader);
+            packData.Read(fileReader);
 
-            Package = new PackageData();
-            Package.Read(reader);
+            Package = new CCNPackageData();
+            Package.PackData = packData;
+            Package.Read(fileReader);
         }
 
         private void loadIcons(string gamePath)
@@ -95,8 +96,8 @@ namespace SapphireD.Core.FileReaders
                 if (i >= numOfSections - 1)
                 {
                     exeReader.Seek(entry + 16);
-                    var size = exeReader.ReadUInt32();
-                    var address = exeReader.ReadUInt32(); //Pointer to raw data
+                    var size = exeReader.ReadInt();
+                    var address = exeReader.ReadInt(); //Pointer to raw data
 
                     position = (int)(address + size);
                     break;
@@ -113,7 +114,7 @@ namespace SapphireD.Core.FileReaders
 
         public FileReader Copy()
         {
-            ExeFileReader fileReader = new()
+            EXEFileReader fileReader = new()
             {
                 Package = Package,
                 Icons = Icons

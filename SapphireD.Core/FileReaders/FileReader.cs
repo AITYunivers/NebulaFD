@@ -1,4 +1,5 @@
 ﻿using SapphireD.Core.Data;
+using SapphireD.Core.Memory;
 using System.Drawing;
 
 namespace SapphireD.Core.FileReaders
@@ -8,7 +9,7 @@ namespace SapphireD.Core.FileReaders
         string Name { get; }
 
         PackageData getPackageData();
-        void LoadGame(string gamePath);
+        void LoadGame(ByteReader fileReader, string filePath);
         Dictionary<int, Bitmap> getIcons();
         FileReader Copy();
     }

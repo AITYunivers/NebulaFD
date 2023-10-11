@@ -37,14 +37,26 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Sounds
             }
             else
                 soundData = new ByteReader(reader.ReadBytes(decompressedSize));
-            Name = Utilities.Utilities.ClearName(soundData.ReadWideString(nameLength).Trim());
+            Name = Utilities.Utilities.ClearName(soundData.ReadYuniversal(nameLength).Trim());
             if (Flags == 33) soundData.Seek(0);
             Data = soundData.ReadBytes();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            Handle = reader.ReadUInt() - 1;
+            Checksum = reader.ReadInt();
+            References = reader.ReadUInt();
+            int decompressedSize = reader.ReadInt();
+            Flags = reader.ReadByte();
+            reader.Skip(3);
+            Frequency = reader.ReadInt();
+            int nameLength = reader.ReadInt();
+            ByteReader soundData;
+            soundData = new ByteReader(reader.ReadBytes(decompressedSize));
+            Name = Utilities.Utilities.ClearName(soundData.ReadWideString(nameLength).Trim());
+            if (Flags == 33) soundData.Seek(0);
+            Data = soundData.ReadBytes();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
