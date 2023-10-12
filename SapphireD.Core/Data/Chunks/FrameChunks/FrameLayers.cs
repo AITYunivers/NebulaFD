@@ -22,14 +22,11 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            int count = reader.ReadInt();
-            Layers = new FrameLayer[count];
-
-            for (int i = 0; i < count; i++)
+            Layers = new FrameLayer[reader.ReadInt()];
+            for (int i = 0; i < Layers.Length; i++)
             {
-                FrameLayer layer = new FrameLayer();
-                layer.ReadCCN(reader);
-                Layers[i] = layer;
+                Layers[i] = new FrameLayer();
+                Layers[i].ReadCCN(reader);
             }
 
             ((Frame)extraInfo[0]).FrameLayers = this;
@@ -37,7 +34,12 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            Layers = new FrameLayer[reader.ReadInt()];
+            for (int i = 0; i < Layers.Length; i++)
+            {
+                Layers[i] = new FrameLayer();
+                Layers[i].ReadMFA(reader);
+            }
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

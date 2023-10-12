@@ -28,7 +28,13 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDef
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
+            base.ReadCCN(reader, extraInfo);
 
+            Speed = reader.ReadShort();
+            Bounce = reader.ReadShort();
+            Angles = reader.ReadShort();
+            Security = reader.ReadShort();
+            Decelerate = reader.ReadShort();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

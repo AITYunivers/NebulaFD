@@ -26,7 +26,11 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDef
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            Control = (short)extraInfo[1];
+            Type = (short)extraInfo[2];
+            Move = (byte)extraInfo[3];
+            Opt = (byte)extraInfo[4];
+            StartingDirection = (int)extraInfo[5];
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

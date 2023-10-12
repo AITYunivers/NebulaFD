@@ -43,8 +43,8 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public ObjectSubApplication ObjectSubApplication = new();
         public ObjectExtension ObjectExtension = new();
         public ObjectValue ObjectValue = new();
-        public ObjectTransition ObjectTransitionIn = new();
-        public ObjectTransition ObjectTransitionOut = new();
+        public TransitionChunk ObjectTransitionIn = new();
+        public TransitionChunk ObjectTransitionOut = new();
 
         public ObjectCommon()
         {

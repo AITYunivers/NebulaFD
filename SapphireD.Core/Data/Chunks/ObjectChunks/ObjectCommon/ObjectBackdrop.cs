@@ -1,5 +1,4 @@
-﻿
-using SapphireD.Core.Memory;
+﻿using SapphireD.Core.Memory;
 
 namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 {

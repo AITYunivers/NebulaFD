@@ -4,7 +4,11 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.LayerChunks
 {
     public class FrameLayer : Chunk
     {
-        public int Options;
+        public BitDict Options = new BitDict(new string[]
+        {
+            "1", "2", "3", "4", "5"
+        });
+
         public float XCoefficient;
         public float YCoefficient;
         public int BackdropCount;
@@ -18,7 +22,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.LayerChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Options = reader.ReadInt();
+            Options.Value = reader.ReadUInt();
             XCoefficient = reader.ReadFloat();
             YCoefficient = reader.ReadFloat();
             BackdropCount = reader.ReadInt();
@@ -28,7 +32,10 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.LayerChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            Name = reader.ReadAutoYuniversal();
+            Options.Value = reader.ReadUInt();
+            XCoefficient = reader.ReadFloat();
+            YCoefficient = reader.ReadFloat();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

@@ -5,6 +5,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
     public class ObjectAlterableStrings : Chunk
     {
         public string[] AlterableStrings = new string[0];
+        public string[] AlterableStringNames = new string[0];
 
         public ObjectAlterableStrings()
         {
@@ -20,7 +21,14 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            AlterableStrings = new string[reader.ReadInt()];
+            AlterableStringNames = new string[AlterableStrings.Length];
+            for (int i = 0; i < AlterableStrings.Length; i++)
+            {
+                AlterableStringNames[i] = reader.ReadAutoYuniversal();
+                reader.Skip(4);
+                AlterableStrings[i] = reader.ReadAutoYuniversal();
+            }
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

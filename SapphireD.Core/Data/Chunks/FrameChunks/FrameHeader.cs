@@ -38,7 +38,10 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            Width = reader.ReadInt();
+            Height = reader.ReadInt();
+            Background = reader.ReadColor();
+            Flags.Value = reader.ReadUInt();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

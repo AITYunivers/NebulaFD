@@ -4,6 +4,7 @@ using SapphireD.Core.Data.Chunks.BankChunks.Fonts;
 using SapphireD.Core.Data.Chunks.BankChunks.Images;
 using SapphireD.Core.Data.Chunks.BankChunks.Sounds;
 using SapphireD.Core.Data.Chunks.FrameChunks;
+using SapphireD.Core.Data.Chunks.MFAChunks;
 using SapphireD.Core.Data.Chunks.ObjectChunks;
 using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 
@@ -13,6 +14,16 @@ namespace SapphireD.Core.Data.Chunks
     {
         public static Dictionary<short, Type> ChunkJumpTable = new Dictionary<short, Type>()
         {
+            { 0x0016, typeof(MFACounterFlags)     },
+            { 0x0021, typeof(FrameRect)           },
+            //0x0025         FrameLayerEffects
+            { 0x0027, typeof(FrameMoveTimer)      },
+            { 0x0028, typeof(FrameEffects)        },
+            //0x002D         ObjectEffects
+            { 0x0039, typeof(MFAAltFlags)         },
+            { 0x003A, typeof(MFAAltValueIndex)    },
+            { 0x003B, typeof(MFAAltStringIndex)   },
+            { 0x003C, typeof(MFAAltFlagIndex)     },
             //0x1122         Preview
             //0x2222         MiniHeader
             { 0x2223, typeof(AppHeader)           },
@@ -85,8 +96,8 @@ namespace SapphireD.Core.Data.Chunks
             { 0x3338, typeof(FrameInstances)      },
             //0x3339         FrameFadeInStuff
             //0x333A         FrameFadeOutStuff
-            //0x333B         FrameFadeIn
-            //0x333C         FrameFadeOut
+            { 0x333B, typeof(FrameTransitionIn)   },
+            { 0x333C, typeof(FrameTransitionOut)  },
             //0x333D         FrameEvents
             //0x333E         FramePlayHeader
             //0x333F         FrameExtraItems

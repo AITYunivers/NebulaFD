@@ -47,13 +47,13 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             while (true)
             {
                 MenuItem menuItem = new MenuItem();
-                menuItem.ReadCCN(reader);
+                menuItem.ReadMFA(reader);
 
-                if (ByteFlag.GetFlag(menuItem.Flags, 4))
+                if (menuItem.Flags["4"])
                     menuItem.Items = ReadMenuItems(reader);
 
                 menuItems.Add(menuItem);
-                if (ByteFlag.GetFlag(menuItem.Flags, 7))
+                if (menuItem.Flags["7"])
                     break;
             }
             return menuItems;
@@ -61,20 +61,19 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            long start = reader.Tell();
-            int size = reader.ReadInt();
-            reader.Skip(4);
-            int menuOffset = reader.ReadInt32();
-            int menuSize = reader.ReadInt32();
-            int accelOffset = reader.ReadInt32();
-            int accelSize = reader.ReadInt32();
+            uint mainSize = reader.ReadUInt();
+            long startOffset = reader.Tell();
+            uint headerSize = reader.ReadUInt();
+            int menuOffset = reader.ReadInt();
+            int menuSize = reader.ReadInt();
+            if (menuSize == 0) return;
+            int accelOffset = reader.ReadInt();
+            int accelSize = reader.ReadInt();
 
-            reader.Seek(start + menuOffset);
-            reader.Skip(4);
-            if (menuSize > 0)
-                Items = ReadMenuItems(reader);
+            reader.Seek(startOffset + menuOffset + 4);
+            Items = ReadMenuItems(reader);
 
-            reader.Seek(start + accelOffset);
+            reader.Seek(startOffset + accelOffset);
             for (int i = 0; i < accelSize / 8; i++)
             {
                 AccelShift.Add(reader.ReadByte());
@@ -83,7 +82,8 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
                 AccelId.Add(reader.ReadInt16());
                 reader.Skip(2);
             }
-            reader.Seek(start + size);
+
+            reader.Seek(startOffset + mainSize);
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

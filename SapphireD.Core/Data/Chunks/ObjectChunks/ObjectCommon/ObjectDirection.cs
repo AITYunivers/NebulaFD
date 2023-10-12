@@ -4,11 +4,12 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 {
     public class ObjectDirection : Chunk
     {
-        public byte MinimumSpeed;
-        public byte MaximumSpeed;
-        public short Repeat;
-        public short RepeatFrame;
-        public short[] Frames = new short[0];
+        public int Index;
+        public int MinimumSpeed;
+        public int MaximumSpeed;
+        public int Repeat;
+        public int RepeatFrame;
+        public int[] Frames = new int[0];
 
         public ObjectDirection()
         {
@@ -22,14 +23,22 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             Repeat = reader.ReadShort();
             RepeatFrame = reader.ReadShort();
 
-            Frames = new short[reader.ReadShort()];
+            Frames = new int[reader.ReadShort()];
             for (int i = 0; i < Frames.Length; i++)
                 Frames[i] = reader.ReadShort();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
+            Index = reader.ReadInt();
+            MinimumSpeed = reader.ReadInt();
+            MaximumSpeed = reader.ReadInt();
+            Repeat = reader.ReadInt();
+            RepeatFrame = reader.ReadInt();
 
+            Frames = new int[reader.ReadInt()];
+            for (int i = 0; i < Frames.Length; i++)
+                Frames[i] = reader.ReadInt();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

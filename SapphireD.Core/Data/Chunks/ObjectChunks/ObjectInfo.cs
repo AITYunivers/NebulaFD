@@ -10,6 +10,11 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
         public string Name = string.Empty;
         public ObjectProperties Properties = new();
 
+        public ObjectInfo()
+        {
+            ChunkName = "ObjectInfo";
+        }
+
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             while (true)

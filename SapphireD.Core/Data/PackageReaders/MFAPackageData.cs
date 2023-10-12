@@ -1,6 +1,6 @@
-﻿using SapphireD.Core.Data.Chunks;
-using SapphireD.Core.Data.Chunks.BankChunks.Images;
+﻿using SapphireD.Core.Data.Chunks.BankChunks.Images;
 using SapphireD.Core.Data.Chunks.FrameChunks;
+using SapphireD.Core.Data.Chunks.MFAChunks;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 using Spectre.Console;
@@ -10,6 +10,10 @@ namespace SapphireD.Core.Data.PackageReaders
     public class MFAPackageData : PackageData
     {
         public ImageBank IconBank = new();
+        public MFAQualifiers Qualifiers = new();
+        public new MFAExtensions Extensions = new();
+        public int[] FrameOffsets = new int[0];
+
         public bool Finished;
 
         public override void Read(ByteReader reader)
@@ -73,7 +77,6 @@ namespace SapphireD.Core.Data.PackageReaders
             reader.ReadAutoYuniversal();
             reader.ReadAutoYuniversal();
             reader.Skip(4);
-
             BinaryFiles.ReadMFA(reader);
 
             var playerCount = reader.ReadInt();
@@ -93,13 +96,39 @@ namespace SapphireD.Core.Data.PackageReaders
             }
 
             MenuBar.ReadMFA(reader);
-
             AppHeader.WindowMenu = reader.ReadInt();
 
             // Menu Images (Not implemented yet)
             reader.Skip(reader.ReadInt() * 8);
 
+            GlobalValues.ReadMFA(reader, GlobalValueNames);
+            GlobalStrings.ReadMFA(reader, GlobalStringNames);
 
+            // Global Events (Not implemented yet)
+            reader.Skip(reader.ReadInt());
+
+            AppHeader.GraphicMode = (short)reader.ReadInt();
+            reader.Skip(reader.ReadInt() * 4); // Icon Images
+            Qualifiers.ReadMFA(reader);
+            Extensions.ReadMFA(reader);
+
+            if (reader.PeekInt() > 900)
+                reader.Skip(2);
+
+            FrameOffsets = new int[reader.ReadInt()];
+            for (int i = 0; i < FrameOffsets.Length; i++)
+                FrameOffsets[i] = reader.ReadInt();
+            int returnOffset = reader.ReadInt();
+
+            foreach (int offset in FrameOffsets)
+            {
+                reader.Seek(offset);
+                Frame frame = new Frame();
+                frame.ReadMFA(reader);
+                Frames.Add(frame);
+            }
+
+            reader.Seek(returnOffset);
 
             Finished = true;
         }
@@ -110,13 +139,21 @@ namespace SapphireD.Core.Data.PackageReaders
             {
                 ProgressTask? mainTask = ctx.AddTask("[DeepSkyBlue3]Reading MFA[/]");
                 mainTask.Value = 0;
-                mainTask.MaxValue = 6;
+                mainTask.MaxValue = 7;
                 ProgressTask? secondaryTask = ctx.AddTask("[DeepSkyBlue3]Reading Font Bank[/]");
 
                 while (!mainTask.IsFinished)
                 {
                     if (Finished)
+                        mainTask.Value = 7;
+                    else if (Frames.Count > 0)
+                    {
                         mainTask.Value = 6;
+
+                        secondaryTask.Description = "[DeepSkyBlue3]Reading Frames[/]";
+                        secondaryTask.Value = Frames.Count;
+                        secondaryTask.MaxValue = FrameOffsets.Length;
+                    }
                     else if (BinaryFiles.Count > 0)
                     {
                         mainTask.Value = 5;

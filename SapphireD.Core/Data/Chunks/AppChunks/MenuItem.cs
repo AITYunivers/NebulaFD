@@ -1,12 +1,15 @@
 ﻿using SapphireD.Core.Memory;
-using System.Drawing;
 
 namespace SapphireD.Core.Data.Chunks.AppChunks
 {
     public class MenuItem : Chunk
     {
+        public BitDict Flags = new BitDict(new string[]
+        {
+            "0", "1", "2", "3", "4", "5", "6", "7"
+        });
+
         public string Name = string.Empty;
-        public ushort Flags;
         public ushort ID;
         public string Mnemonic = string.Empty;
 
@@ -19,11 +22,11 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Flags = reader.ReadUInt16();
-            if (!ByteFlag.GetFlag(Flags, 4))
-                ID = reader.ReadUInt16();
+            Flags.Value = reader.ReadUShort();
+            if (!Flags["4"])
+                ID = reader.ReadUShort();
 
-            Name = reader.ReadWideString();
+            Name = reader.ReadYuniversal();
             for (int i = 0; i < Name.Length; i++)
             {
                 if (Name[i] == '&')
@@ -37,7 +40,20 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
+            Flags.Value = reader.ReadUShort();
+            if (!Flags["4"])
+                ID = reader.ReadUShort();
 
+            Name = reader.ReadYuniversal();
+            for (int i = 0; i < Name.Length; i++)
+            {
+                if (Name[i] == '&')
+                {
+                    Mnemonic = Name[i + 1].ToString();
+                    Name = Name.Replace("&", "");
+                    break;
+                }
+            }
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

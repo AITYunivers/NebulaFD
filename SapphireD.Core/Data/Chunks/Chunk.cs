@@ -1,4 +1,5 @@
-﻿using SapphireD.Core.Memory;
+﻿using SapphireD.Core.Data.Chunks.AppChunks;
+using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 
 namespace SapphireD.Core.Data.Chunks
@@ -58,6 +59,22 @@ namespace SapphireD.Core.Data.Chunks
             else if (dataReader.BaseStream.Length == 0 && id != 32639)
                 Logger.Log(newChunk, $"Chunk data is empty for chunk {newChunk.ChunkName} with flag {flag}");
 
+            return newChunk;
+        }
+
+        public static Chunk InitMFAChunk(ByteReader byteReader)
+        {
+            short id = byteReader.ReadByte();
+            if (id == 0) return new Last();
+            int size = byteReader.ReadInt32();
+            var data = byteReader.ReadBytes(size);
+
+            Chunk newChunk = ChunkJumpTable(id);
+            newChunk.ChunkSize = size;
+            newChunk.ChunkData = data;
+
+            if (!ChunkList.ChunkJumpTable.ContainsKey(id))
+                File.WriteAllBytes($"Chunks\\[{chunkIndex++}] MFAChunk-{string.Format("0x{0:X}", id)}.bin", newChunk.ChunkData);
             return newChunk;
         }
 

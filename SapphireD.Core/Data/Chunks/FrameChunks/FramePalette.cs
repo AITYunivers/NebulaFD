@@ -6,7 +6,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
     public class FramePalette : Chunk
     {
         public short PaletteVersion;
-        public short PaletteEntries;
+        public int PaletteEntries;
         public List<Color> Palette = new();
 
         public FramePalette()
@@ -27,7 +27,9 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            PaletteEntries = reader.ReadInt();
+            for (int i = 0; i < PaletteEntries; i++)
+                Palette.Add(reader.ReadColor());
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

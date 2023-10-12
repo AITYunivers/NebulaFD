@@ -1,22 +1,28 @@
 ﻿using SapphireD.Core.Memory;
 
-namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDefinitions
+namespace SapphireD.Core.Data.Chunks.MFAChunks
 {
-    public class ObjectMovementStatic : ObjectMovementDefinition
+    public class MFAFrameInfo : Chunk
     {
-        public ObjectMovementStatic()
+        public int Handle;
+        public int EditorX;
+        public int EditorY;
+        public int Stamp;
+        public int EditorLayer;
+
+        public MFAFrameInfo()
         {
-            ChunkName = "ObjectMovementStatic";
+            ChunkName = "MFAFrameInfo";
         }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            base.ReadCCN(reader, extraInfo);
+
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            base.ReadCCN(reader, extraInfo);
+
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

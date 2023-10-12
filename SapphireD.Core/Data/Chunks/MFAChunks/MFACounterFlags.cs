@@ -1,36 +1,35 @@
 ﻿using SapphireD.Core.Memory;
-using System.Drawing;
 
-namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
+namespace SapphireD.Core.Data.Chunks.MFAChunks
 {
-    public class ObjectParagraph : Chunk
+    public class MFACounterFlags : Chunk
     {
         public BitDict Flags = new BitDict(new string[]
         {
             "1", "2", "3", "4", "5"
         });
 
-        public ushort FontHandle;
-        public string Value = string.Empty;
-        public Color Color = Color.White;
+        public byte FixedDigits;
+        public byte SignificantDigits;
+        public byte DecimalPoints;
 
-        public ObjectParagraph()
+        public MFACounterFlags()
         {
-            ChunkName = "ObjectParagraph";
+            ChunkName = "MFACounterFlags";
+            ChunkID = 0x0016;
         }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            FontHandle = reader.ReadUShort();
-            Flags.Value = reader.ReadUShort();
-            Color = reader.ReadColor();
-            Value = reader.ReadYuniversal();
+
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            Value = reader.ReadAutoYuniversal();
-            Flags.Value = reader.ReadUInt();
+            Flags.Value = reader.ReadByte();
+            FixedDigits = reader.ReadByte();
+            SignificantDigits = reader.ReadByte();
+            DecimalPoints = reader.ReadByte();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

@@ -4,6 +4,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 {
     public class ObjectAnimation : Chunk
     {
+        public string Name = string.Empty;
         public ObjectDirection[] Directions = new ObjectDirection[0];
 
         public ObjectAnimation()
@@ -33,7 +34,13 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            Name = reader.ReadAutoYuniversal();
+            Directions = new ObjectDirection[reader.ReadInt()];
+            for (int i = 0; i < Directions.Length; i++)
+            {
+                Directions[i] = new ObjectDirection();
+                Directions[i].ReadMFA(reader);
+            }
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

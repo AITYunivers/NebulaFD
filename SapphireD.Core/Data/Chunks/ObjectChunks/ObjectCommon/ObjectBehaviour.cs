@@ -1,29 +1,26 @@
 ﻿using SapphireD.Core.Memory;
 
-namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDefinitions
+namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 {
-    public class ObjectMovementExtension : ObjectMovementDefinition
+    public class ObjectBehaviour : Chunk
     {
-        public string FileName;
-        public int ID;
+        public string Name = string.Empty;
         public byte[] Data = new byte[0];
 
-        public ObjectMovementExtension()
+        public ObjectBehaviour()
         {
-            ChunkName = "ObjectMovementExtension";
+            ChunkName = "ObjectBehaviour";
         }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            base.ReadCCN(reader, extraInfo);
 
-            reader.Skip(14);
-            Data = reader.ReadBytes((int)extraInfo[0] - 14);
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            Data = reader.ReadBytes((int)extraInfo[0] + 12);
+            Name = reader.ReadAutoYuniversal();
+            Data = reader.ReadBytes(reader.ReadInt());
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

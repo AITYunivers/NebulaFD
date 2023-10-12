@@ -25,7 +25,14 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            Strings = new string[reader.ReadInt()];
+            ((GlobalStringNames)extraInfo[0]).Names = new string[Strings.Length];
+            for (int i = 0; i < Strings.Length; i++)
+            {
+                ((GlobalStringNames)extraInfo[0]).Names[i] = reader.ReadAutoYuniversal();
+                reader.Skip(4); // Type (Always string)
+                Strings[i] = reader.ReadAutoYuniversal();
+            }
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

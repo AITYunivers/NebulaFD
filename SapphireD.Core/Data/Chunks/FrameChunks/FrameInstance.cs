@@ -1,4 +1,5 @@
 ﻿using SapphireD.Core.Memory;
+using System.Drawing;
 
 namespace SapphireD.Core.Data.Chunks.FrameChunks
 {

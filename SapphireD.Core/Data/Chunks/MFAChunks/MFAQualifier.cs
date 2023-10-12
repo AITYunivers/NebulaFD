@@ -1,22 +1,26 @@
 ﻿using SapphireD.Core.Memory;
 
-namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDefinitions
+namespace SapphireD.Core.Data.Chunks.MFAChunks
 {
-    public class ObjectMovementStatic : ObjectMovementDefinition
+    public class MFAQualifier : Chunk
     {
-        public ObjectMovementStatic()
+        public string Name = string.Empty;
+        public int Handle;
+
+        public MFAQualifier()
         {
-            ChunkName = "ObjectMovementStatic";
+            ChunkName = "MFAQualifier";
         }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            base.ReadCCN(reader, extraInfo);
+
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            base.ReadCCN(reader, extraInfo);
+            Name = reader.ReadYuniversal(reader.ReadInt());
+            Handle = reader.ReadInt();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
