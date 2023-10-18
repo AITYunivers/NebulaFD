@@ -42,7 +42,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
         public Color TransparentColor = Color.Black;
 
         public byte[] ImageData = new byte[0];
-        private Bitmap BitmapCache = new(1, 1);
+        private Bitmap? BitmapCache = null;
 
         public BitDict Flags = new BitDict(new string[]
         {
