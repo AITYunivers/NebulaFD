@@ -1,4 +1,5 @@
-﻿using SapphireD.Core.Data.Chunks.MFAChunks;
+﻿using SapphireD.Core.Data.Chunks.AppChunks;
+using SapphireD.Core.Data.Chunks.MFAChunks;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 
@@ -12,10 +13,11 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
         public FramePalette FramePalette = new();             // 0x3337
         public FrameInstances FrameInstances = new();         // 0x3338
         public FrameTransitionIn FrameTransitionIn = new();   // 0x333B
-        public FrameTransitionOut FrameTransitionOut = new(); // 0x333B
+        public FrameTransitionOut FrameTransitionOut = new(); // 0x333C
+        public FrameEvents FrameEvents = new();               // 0x333D
         public FrameLayers FrameLayers = new();               // 0x3341
         public FrameRect FrameRect = new();                   // 0x3342
-        public short FrameSeed;                               // 0x3344
+        public int FrameSeed;                                 // 0x3344
         public int FrameMoveTimer;                            // 0x3347
         public FrameEffects FrameEffects = new();             // 0x3349
 
@@ -75,7 +77,28 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             if (reader.ReadByte() == 1)
                 FrameTransitionOut.ReadMFA(reader);
 
+            MFAFrameInfo.Objects = new MFAObjectInfo[reader.ReadInt()];
+            for (int i = 0; i < MFAFrameInfo.Objects.Length; i++)
+            {
+                MFAFrameInfo.Objects[i] = new MFAObjectInfo();
+                MFAFrameInfo.Objects[i].ReadMFA(reader);
+            }
+
+            MFAFrameInfo.Folders.ReadMFA(reader);
             FrameInstances.ReadMFA(reader);
+            FrameEvents.ReadMFA(reader);
+
+            while (true)
+            {
+                Chunk newChunk = InitMFAChunk(reader);
+                Logger.Log(this, $"Reading MFA Object Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
+
+                ByteReader chunkReader = new ByteReader(newChunk.ChunkData!);
+                newChunk.ReadMFA(chunkReader, this);
+                newChunk.ChunkData = new byte[0];
+                if (newChunk is Last)
+                    break;
+            }
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

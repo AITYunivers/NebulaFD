@@ -1,29 +1,36 @@
 ﻿using SapphireD.Core.Memory;
 
-namespace SapphireD.Core.Data.Chunks
+namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 {
-    public abstract class IntChunk : Chunk
+    public class Qualifier : Chunk
     {
-        public int Value;
+        public ushort ObjectInfo;
+        public short Type;
+
+        public Qualifier()
+        {
+            ChunkName = "Qualifier";
+        }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Value = reader.ReadInt();
+            ObjectInfo = reader.ReadUShort();
+            Type = reader.ReadShort();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            Value = reader.ReadInt();
+
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteInt(Value);
+
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteInt(Value);
+
         }
     }
 }

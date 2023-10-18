@@ -6,7 +6,6 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
     public class FrameInstances : Chunk
     {
         public FrameInstance[] Instances = new FrameInstance[0];
-        public MFAObjectInfo[] MFAObjects = new MFAObjectInfo[0];
 
         public FrameInstances()
         {
@@ -28,11 +27,11 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            MFAObjects = new MFAObjectInfo[reader.ReadInt()];
-            for (int i = 0; i < MFAObjects.Length; i++)
+            Instances = new FrameInstance[reader.ReadInt()];
+            for (int i = 0; i < Instances.Length; i++)
             {
-                MFAObjects[i] = new MFAObjectInfo();
-                MFAObjects[i].ReadMFA(reader);
+                Instances[i] = new FrameInstance();
+                Instances[i].ReadMFA(reader);
             }
         }
 

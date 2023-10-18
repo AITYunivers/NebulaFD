@@ -2,7 +2,7 @@
 
 namespace SapphireD.Core.Data.Chunks.FrameChunks
 {
-    public class FrameSeed : ShortChunk
+    public class FrameSeed : IntChunk
     {
         public FrameSeed()
         {
@@ -12,7 +12,14 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            base.ReadCCN(reader);
+            Value = reader.ReadShort();
+
+            ((Frame)extraInfo[0]).FrameSeed = Value;
+        }
+
+        public override void ReadMFA(ByteReader reader, params object[] extraInfo)
+        {
+            base.ReadMFA(reader);
 
             ((Frame)extraInfo[0]).FrameSeed = Value;
         }

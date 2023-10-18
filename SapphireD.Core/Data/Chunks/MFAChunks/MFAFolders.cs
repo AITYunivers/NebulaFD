@@ -1,21 +1,14 @@
-﻿using SapphireD.Core.Data.Chunks.ObjectChunks;
-using SapphireD.Core.Memory;
+﻿using SapphireD.Core.Memory;
 
 namespace SapphireD.Core.Data.Chunks.MFAChunks
 {
-    public class MFAFrameInfo : Chunk
+    public class MFAFolders : Chunk
     {
-        public int Handle;
-        public int EditorX;
-        public int EditorY;
-        public int Stamp;
-        public int EditorLayer;
-        public MFAObjectInfo[] Objects = new MFAObjectInfo[0];
-        public MFAFolders Folders = new();
+        public MFAFolder[] Folders = new MFAFolder[0];
 
-        public MFAFrameInfo()
+        public MFAFolders()
         {
-            ChunkName = "MFAFrameInfo";
+            ChunkName = "MFAFolders";
         }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
@@ -25,7 +18,12 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            Folders = new MFAFolder[reader.ReadInt()];
+            for (int i = 0; i < Folders.Length; i++)
+            {
+                Folders[i] = new MFAFolder();
+                Folders[i].ReadMFA(reader);
+            }
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

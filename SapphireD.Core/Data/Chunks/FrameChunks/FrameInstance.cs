@@ -5,13 +5,18 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 {
     public class FrameInstance : Chunk
     {
-        public ushort Handle;
-        public ushort ObjectInfo;
+        public BitDict Flags = new BitDict(new string[]
+        {
+            "1", "2", "3", "4", "5"
+        });
+
+        public uint Handle;
+        public uint ObjectInfo;
         public int PositionX;
         public int PositionY;
-        public short ParentType;
-        public short ParentHandle;
-        public short Layer;
+        public uint ParentType;
+        public uint ParentHandle;
+        public uint Layer;
         public short InstanceValue;
 
         public FrameInstance()
@@ -25,15 +30,23 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             ObjectInfo = reader.ReadUShort();
             PositionX = reader.ReadInt();
             PositionY = reader.ReadInt();
-            ParentType = reader.ReadShort();
-            ParentHandle = reader.ReadShort();
-            Layer = reader.ReadShort();
+            ParentType = reader.ReadUShort();
+            ParentHandle = reader.ReadUShort();
+            Layer = reader.ReadUShort();
             InstanceValue = reader.ReadShort();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            PositionX = reader.ReadInt();
+            PositionY = reader.ReadInt();
+            Layer = reader.ReadUInt();
+            Handle = reader.ReadUInt();
+            Flags.Value = reader.ReadUShort();
+            InstanceValue = reader.ReadShort();
+            ParentType = reader.ReadUInt();
+            ObjectInfo = reader.ReadUInt();
+            ParentHandle = reader.ReadUInt();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

@@ -16,10 +16,20 @@ namespace SapphireD.Core.Data.Chunks
         {
             { 0x0016, typeof(MFACounterFlags)     },
             { 0x0021, typeof(FrameRect)           },
+            //0x0022         FrameDemoPath
+            { 0x0023, typeof(FrameSeed)           },
             //0x0025         FrameLayerEffects
+            //0x0026
             { 0x0027, typeof(FrameMoveTimer)      },
-            { 0x0028, typeof(FrameEffects)        },
+            //0x0028         FrameEffects
+            //0x002A
+            //0x002B
+            //0x002C
             //0x002D         ObjectEffects
+            //0x002E
+            //0x002F
+            //0x0030
+            //0x0031         FrameInclude
             { 0x0039, typeof(MFAAltFlags)         },
             { 0x003A, typeof(MFAAltValueIndex)    },
             { 0x003B, typeof(MFAAltStringIndex)   },
@@ -98,7 +108,7 @@ namespace SapphireD.Core.Data.Chunks
             //0x333A         FrameFadeOutStuff
             { 0x333B, typeof(FrameTransitionIn)   },
             { 0x333C, typeof(FrameTransitionOut)  },
-            //0x333D         FrameEvents
+            { 0x333D, typeof(FrameEvents)         },
             //0x333E         FramePlayHeader
             //0x333F         FrameExtraItems
             //0x3340         FrameExtraInstances
@@ -106,7 +116,7 @@ namespace SapphireD.Core.Data.Chunks
             { 0x3342, typeof(FrameRect)           },
             //0x3343         FrameDemoPath
             { 0x3344, typeof(FrameSeed)           },
-            //0x3345         FrameLayerEffects
+            { 0x3345, typeof(FrameLayerEffects)   },
             //0x3346         FrameBluRayOptions
             { 0x3347, typeof(FrameMoveTimer)      },
             //0x3348         FrameMosiacTable

@@ -1,11 +1,12 @@
 ﻿using SapphireD.Core.Data.Chunks.AppChunks;
+using SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks;
 using SapphireD.Core.Data.Chunks.ObjectChunks;
 using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 using System.Drawing;
 
-namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
+namespace SapphireD.Core.Data.Chunks.MFAChunks
 {
     public class MFAObjectInfo : Chunk
     {
@@ -55,7 +56,7 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
 
                 ByteReader chunkReader = new ByteReader(newChunk.ChunkData!);
                 newChunk.ReadMFA(chunkReader, this);
-                newChunk.ChunkData = null;
+                newChunk.ChunkData = new byte[0];
                 if (newChunk is Last)
                     break;
             }

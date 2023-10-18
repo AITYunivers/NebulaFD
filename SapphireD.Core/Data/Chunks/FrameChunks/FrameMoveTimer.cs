@@ -16,5 +16,12 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
             ((Frame)extraInfo[0]).FrameMoveTimer = Value;
         }
+
+        public override void ReadMFA(ByteReader reader, params object[] extraInfo)
+        {
+            base.ReadMFA(reader);
+
+            ((Frame)extraInfo[0]).FrameMoveTimer = Value;
+        }
     }
 }

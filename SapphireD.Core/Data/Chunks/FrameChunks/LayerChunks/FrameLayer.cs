@@ -14,6 +14,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.LayerChunks
         public int BackdropCount;
         public int BackdropIndex;
         public string Name = string.Empty;
+        public FrameLayerEffect Effect = new FrameLayerEffect();
 
         public FrameLayer()
         {

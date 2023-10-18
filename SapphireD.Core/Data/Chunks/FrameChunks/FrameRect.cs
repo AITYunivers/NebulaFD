@@ -1,11 +1,4 @@
 ﻿using SapphireD.Core.Memory;
-using SapphireD.Core.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SapphireD.Core.Data.Chunks.FrameChunks
 {
@@ -34,7 +27,12 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
+            left = reader.ReadInt();
+            top = reader.ReadInt();
+            right = reader.ReadInt();
+            bottom = reader.ReadInt();
 
+            ((Frame)extraInfo[0]).FrameRect = this;
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

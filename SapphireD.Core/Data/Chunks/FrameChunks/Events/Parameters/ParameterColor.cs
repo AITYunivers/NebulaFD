@@ -1,0 +1,20 @@
+﻿using SapphireD.Core.Memory;
+using System.Drawing;
+
+namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
+{
+    public class ParameterColor : ParameterChunk
+    {
+        public Color Color;
+
+        public ParameterColor()
+        {
+            ChunkName = "ParameterColor";
+        }
+
+        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
+        {
+            Color = reader.ReadColor();
+        }
+    }
+}
