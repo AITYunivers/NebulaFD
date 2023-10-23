@@ -47,7 +47,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             Name = reader.ReadYuniversal();
             for (int i = 0; i < Name.Length; i++)
             {
-                if (Name[i] == '&')
+                if (Name[i] == '&' && i + 1 < Name.Length)
                 {
                     Mnemonic = Name[i + 1].ToString();
                     Name = Name.Replace("&", "");

@@ -120,6 +120,13 @@ namespace SapphireD.Core.Utilities
         }
 
         public static string ToHex(this Color c) => $"#{c.R:X2}{c.G:X2}{c.B:X2}";
+
+        public static string Trim(this string s, params char[] chars)
+        {
+            foreach (char c in chars)
+                s.Trim(c);
+            return s;
+        }
     }
 }
 

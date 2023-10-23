@@ -1,4 +1,5 @@
 ﻿using SapphireD.Core.Data.Chunks.BankChunks.Images;
+using SapphireD.Core.Data.PackageReaders;
 using SapphireD.Core.Utilities;
 using Spectre.Console;
 
@@ -33,6 +34,8 @@ namespace SapphireD.Plugins.GameDumper
 
                         task.Value = progress;
                         task.MaxValue = SapDCore.PackageData.ImageBank.Images.Count;
+                        if (SapDCore.PackageData is MFAPackageData && (SapDCore.PackageData as MFAPackageData).IconBank != null)
+                            task.MaxValue += (SapDCore.PackageData as MFAPackageData).IconBank.Images.Count;
 
                         Image[] images = SapDCore.PackageData.ImageBank.Images.Values.ToArray();
                         for (int i = 0; i < images.Length; i++)
@@ -40,6 +43,20 @@ namespace SapphireD.Plugins.GameDumper
                             Directory.CreateDirectory(path);
                             images[i].GetBitmap().Save(path + "\\" + images[i].Handle + ".png");
                             task.Value = ++progress;
+                        }
+
+                        if (SapDCore.PackageData is MFAPackageData && (SapDCore.PackageData as MFAPackageData).IconBank != null)
+                        {
+                            if ((SapDCore.PackageData as MFAPackageData).IconBank.Images.Count == 0)
+                                return;
+
+                            images = (SapDCore.PackageData as MFAPackageData).IconBank.Images.Values.ToArray();
+                            for (int i = 0; i < images.Length; i++)
+                            {
+                                Directory.CreateDirectory(path + "\\Icons");
+                                images[i].GetBitmap().Save(path + "\\Icons\\" + images[i].Handle + ".png");
+                                task.Value = ++progress;
+                            }
                         }
                     }
                     else

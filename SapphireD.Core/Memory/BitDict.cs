@@ -15,7 +15,7 @@
         public string[] Keys = new string[0];
         public uint Value { get; set; }
 
-        public BitDict(string[] keys) => Keys = keys;
+        public BitDict(params string[] keys) => Keys = keys;
         public bool this[string key]
         {
             get => GetFlag(key);

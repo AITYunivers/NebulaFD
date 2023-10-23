@@ -5,15 +5,23 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 {
     public class ObjectShape : Chunk
     {
-        public short BorderSize;
+        public BitDict LineFlags = new BitDict(new string[]
+        {
+            "1", "2", "3", "4", "5"
+        });
+
+        public BitDict GradientFlags = new BitDict(new string[]
+        {
+            "1", "2", "3", "4", "5"
+        });
+
+        public int BorderSize;
         public Color BorderColor = Color.White;
-        public short ShapeType;
-        public short FillType;
-        public short LineFlags;
+        public int ShapeType;
+        public int FillType;
         public Color Color1 = Color.White;
         public Color Color2 = Color.White;
-        public short GradientFlags;
-        public short Image;
+        public int Image;
 
         public ObjectShape()
         {
@@ -28,14 +36,14 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             FillType = reader.ReadShort();
 
             if (ShapeType == 1)
-                LineFlags = reader.ReadShort();
+                LineFlags.Value = reader.ReadUShort();
             else if (FillType == 1)
                 Color1 = reader.ReadColor();
             else if (FillType == 2)
             {
                 Color1 = reader.ReadColor();
                 Color2 = reader.ReadColor();
-                GradientFlags = reader.ReadShort();
+                GradientFlags.Value = reader.ReadUShort();
             }
 
             Image = reader.ReadShort();

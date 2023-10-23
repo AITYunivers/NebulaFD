@@ -90,8 +90,8 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
             while (true)
             {
-                Chunk newChunk = InitMFAChunk(reader);
-                Logger.Log(this, $"Reading MFA Object Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
+                Chunk newChunk = InitMFAChunk(reader, false);
+                Logger.Log(this, $"Reading MFA Frame Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
 
                 ByteReader chunkReader = new ByteReader(newChunk.ChunkData!);
                 newChunk.ReadMFA(chunkReader, this);

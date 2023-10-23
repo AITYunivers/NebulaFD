@@ -49,7 +49,7 @@ namespace SapphireD.Core.Data.Chunks
             //0x222D         ExtraExtensions
             { 0x222E, typeof(EditorFilename)      },
             { 0x222F, typeof(TargetFilename)      },
-            //0x2230         AppDocs
+            { 0x2230, typeof(HelpFile)            },
             { 0x2231, typeof(TransitionFile)      },
             { 0x2232, typeof(GlobalValues)        },
             { 0x2233, typeof(GlobalStrings)       },
@@ -59,7 +59,7 @@ namespace SapphireD.Core.Data.Chunks
             { 0x2237, typeof(SerialNumber)        },
             { 0x2238, typeof(BinaryFiles)         },
             //0x2239         MenuImages
-            //0x223A         About
+            { 0x223A, typeof(About)               },
             { 0x223B, typeof(Copyright)           },
             { 0x223C, typeof(GlobalValueNames)    },
             { 0x223D, typeof(GlobalStringNames)   },
@@ -70,7 +70,7 @@ namespace SapphireD.Core.Data.Chunks
             { 0x2242, typeof(Protection)          },
             //0x2243         Shaders
             //0x2244
-            { 0x2245, typeof(AppHeader2)          },
+            { 0x2245, typeof(ExtendedHeader)      },
             { 0x2246, typeof(AppCodePage)         },
             //0x2247         FrameOffset
             //0x2248         AdMobID

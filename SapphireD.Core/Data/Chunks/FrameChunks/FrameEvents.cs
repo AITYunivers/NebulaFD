@@ -24,6 +24,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
         public ushort Version;
         public ushort FrameType;
         public Comment[] Comments = new Comment[0];
+        public EventGroup[] EventGroups = new EventGroup[0];
         public EventObject[] EventObjects = new EventObject[0];
         public int EditorData;
         public ushort ConditionWidth;
@@ -94,13 +95,24 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            Version = reader.ReadUShort();
-            FrameType = reader.ReadUShort();
+            long endOffset = 0;
+            if (extraInfo.Length == 0)
+            {
+                Version = reader.ReadUShort();
+                FrameType = reader.ReadUShort();
+            }
+            else
+            {
+                endOffset = reader.ReadUInt();
+                if (endOffset == 0) return;
+                else endOffset += reader.Tell() - 4;
+            }
+
             while (true)
             {
                 string identifier = reader.ReadAscii(4);
 
-                if (identifier == "Evts")
+                if (identifier == "Evts" || identifier == "STVE")
                 {
                     long endPosition = reader.Tell() + reader.ReadInt();
                     while (reader.Tell() < endPosition)
@@ -110,7 +122,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                         Events.Add(newEvent);
                     }
                 }
-                else if (identifier == "Rems")
+                else if (identifier == "Rems" || identifier == "SMER")
                 {
                     Comments = new Comment[reader.ReadInt()];
                     for (int i = 0; i < Comments.Length; i++)
@@ -119,7 +131,17 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                         Comments[i].ReadMFA(reader);
                     }
                 }
-                else if (identifier == "EvOb")
+                else if (identifier == "SPRG")
+                {
+                    EventGroups = new EventGroup[reader.ReadInt()];
+                    reader.Skip(4); // Max Handle
+                    for (int i = 0; i < EventGroups.Length; i++)
+                    {
+                        EventGroups[i] = new EventGroup();
+                        EventGroups[i].ReadMFA(reader);
+                    }
+                }
+                else if (identifier == "EvOb" || identifier == "SJBO")
                 {
                     EventObjects = new EventObject[reader.ReadInt()];
                     for (int i = 0; i < EventObjects.Length; i++)
@@ -184,11 +206,14 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                     EventLineY = reader.ReadUInt();
                     EventLineType = reader.ReadUInt();
                 }
-                else if (identifier == "E2Ts")
+                else if (identifier == "E2Ts" || identifier == "TYAL")
                     reader.Skip(reader.ReadInt());
                 else if (identifier == "!DNE")
                     break;
             }
+
+            if (extraInfo.Length > 0)
+                reader.Seek(endOffset);
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

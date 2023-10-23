@@ -62,7 +62,7 @@ namespace SapphireD.Core.Data.Chunks
             return newChunk;
         }
 
-        public static Chunk InitMFAChunk(ByteReader byteReader)
+        public static Chunk InitMFAChunk(ByteReader byteReader, bool writeToFile = true)
         {
             short id = byteReader.ReadByte();
             if (id == 0) return new Last();
@@ -73,7 +73,7 @@ namespace SapphireD.Core.Data.Chunks
             newChunk.ChunkSize = size;
             newChunk.ChunkData = data;
 
-            if (!ChunkList.ChunkJumpTable.ContainsKey(id))
+            if (writeToFile && !ChunkList.ChunkJumpTable.ContainsKey(id))
                 File.WriteAllBytes($"Chunks\\[{chunkIndex++}] MFAChunk-{string.Format("0x{0:X}", id)}.bin", newChunk.ChunkData);
             return newChunk;
         }

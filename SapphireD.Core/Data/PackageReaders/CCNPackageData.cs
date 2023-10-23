@@ -49,12 +49,12 @@ namespace SapphireD.Core.Data.PackageReaders
 
                 Task chunkReader = new Task(() =>
                 {
-                    try
+                    //try
                     {
                         ByteReader chunkReader = new ByteReader(Chunks[chunkId].ChunkData!);
                         Chunks[chunkId].ReadCCN(chunkReader);
                     }
-                    catch {}
+                    //catch {}
                     Chunks[chunkId].ChunkData = new byte[0];
                     ChunksLoaded++;
                 });

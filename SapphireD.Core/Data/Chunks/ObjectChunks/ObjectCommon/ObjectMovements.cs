@@ -15,6 +15,9 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         {
             long StartOffset = reader.Tell();
 
+            if (SapDCore.Fusion <= 2.0f)
+                return;
+
             Movements = new ObjectMovement[reader.ReadInt()];
             for (int i = 0; i < Movements.Length; i++)
             {

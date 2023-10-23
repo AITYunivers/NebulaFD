@@ -16,6 +16,7 @@ namespace SapphireD.Core.Data
     public abstract class PackageData
     {
         public PackData PackData = new();
+        public string ModulesDir = string.Empty;
 
         public string Header = string.Empty;
         public short RuntimeVersion;
@@ -29,6 +30,7 @@ namespace SapphireD.Core.Data
         public MenuBar MenuBar = new();                     // 0x2226
         public string ExtensionsPath = string.Empty;        // 0x2227
         public FrameItems FrameItems = new();               // 0x2229 & 0x223F
+        public string HelpFile = string.Empty;              // 0x2230
         public short[] FrameHandles = new short[0];         // 0x222B
         public ExtensionData ExtensionData = new();         // 0x222C
         public string EditorFilename = string.Empty;        // 0x222E
@@ -40,12 +42,13 @@ namespace SapphireD.Core.Data
         public AppIcon AppIcon = new();                     // 0x2235
         public byte[] SerialNumber = new byte[0];           // 0x2237
         public BinaryFiles BinaryFiles = new();             // 0x2238
+        public string About = string.Empty;                 // 0x223A
         public string Copyright = string.Empty;             // 0x223B
         public GlobalValueNames GlobalValueNames = new();   // 0x223C
         public GlobalStringNames GlobalStringNames = new(); // 0x223D
         public bool ExeOnly;                                // 0x2240
         public byte[] Protection = new byte[0];             // 0x2242
-        public AppHeader2 AppHeader2 = new();               // 0x2245
+        public ExtendedHeader ExtendedHeader = new();       // 0x2245
         public int AppCodePage;                             // 0x2246
         public List<Frame> Frames = new();                  // 0x3333
         public ObjectAnimations ObjectAnimations = new();   // 0x4449

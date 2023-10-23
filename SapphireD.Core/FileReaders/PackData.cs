@@ -10,7 +10,7 @@ namespace SapphireD.Core.FileReaders
         {
             if (reader.PeekInt() == 2004318071)
                 reader.Skip(28);        // Multimedia Fusion 2 or above
-            else if (reader.PeekInt() == 32639)
+            else if (reader.PeekInt() == 32639 || reader.PeekInt() == 8748)
             {
                 SapDCore.Fusion = 1.5f; // Multimedia Fusion 1.5
                 SapDCore._unicode = false;

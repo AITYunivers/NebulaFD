@@ -13,8 +13,8 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public int Width;
         public int Height;
         public short Player;
-        public short DisplayType;
-        public short Font;
+        public uint DisplayType;
+        public uint Font;
         public int[] Frames = new int[0];
         public ObjectShape Shape = new();
 
@@ -29,9 +29,9 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             Width = reader.ReadInt();
             Height = reader.ReadInt();
             Player = reader.ReadShort();
-            DisplayType = reader.ReadShort();
+            DisplayType = reader.ReadUShort();
             Flags.Value = reader.ReadUShort();
-            Font = reader.ReadShort();
+            Font = reader.ReadUShort();
 
             switch (DisplayType)
             {

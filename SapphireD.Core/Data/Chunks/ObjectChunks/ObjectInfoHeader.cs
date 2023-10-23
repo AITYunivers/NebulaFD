@@ -5,11 +5,15 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
 {
     public class ObjectInfoHeader : Chunk
     {
-        public short Handle;
-        public short Type;
-        public short Flags;
+        public BitDict Flags = new BitDict(new string[]
+        {
+            "1", "2", "3", "4", "5"
+        });
+
+        public int Handle;
+        public int Type;
         public int InkEffect;
-        public int InkEffectParam;
+        public uint InkEffectParam;
 
         public ObjectInfoHeader()
         {
@@ -21,10 +25,10 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
         {
             Handle = reader.ReadShort();
             Type = reader.ReadShort();
-            Flags = reader.ReadShort();
+            Flags.Value = reader.ReadUShort();
             reader.ReadShort();
             InkEffect = reader.ReadInt();
-            InkEffectParam = reader.ReadInt();
+            InkEffectParam = reader.ReadUInt();
 
             ((ObjectInfo)extraInfo[0]).Header = this;
         }

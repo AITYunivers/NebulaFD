@@ -20,6 +20,9 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
             Index = new int[reader.ReadInt()];
+            if (reader.Size() != (Index.Length * 4) + 4)
+                return;
+
             for (int i = 0; i < Index.Length; i++)
                 Index[i] = reader.ReadInt();
         }

@@ -1,31 +1,28 @@
 ﻿using SapphireD.Core.Memory;
-using System.Drawing;
 
-namespace SapphireD.Core.Data.Chunks.AppChunks
+namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
 {
-    public class AppHeader2 : Chunk
+    public class EventGroup : Chunk
     {
-        public int hdr2Options;       // Options
-        public short hdr2Orientation; // Orientation
+        public short Handle;
+        public string Name = string.Empty;
+        public string UUID = string.Empty;
 
-        public AppHeader2()
+        public EventGroup()
         {
-            ChunkName = "AppHeader2";
-            ChunkID = 0x2245;
+            ChunkName = "EventGroup";
         }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            hdr2Options = reader.ReadInt();
-            reader.Skip(10);
-            hdr2Orientation = reader.ReadShort();
 
-            SapDCore.PackageData.AppHeader2 = this;
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            Handle = reader.ReadShort();
+            Name = reader.ReadAutoYuniversal();
+            UUID = reader.ReadWideString(75).Trim();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

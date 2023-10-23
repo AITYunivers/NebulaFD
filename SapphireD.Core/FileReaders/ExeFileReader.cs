@@ -1,8 +1,10 @@
-﻿using SapphireD.Core.Data;
+﻿using Ressy;
+using SapphireD.Core.Data;
 using SapphireD.Core.Data.PackageReaders;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 using System.Drawing;
+using System.Text;
 using TsudaKageyu;
 
 namespace SapphireD.Core.FileReaders
@@ -18,6 +20,20 @@ namespace SapphireD.Core.FileReaders
         {
             loadIcons(filePath);
             calculateEntryPoint(fileReader);
+
+            if (!fileReader.HasMemory(1)) // Check for Unpacked
+            {
+                var portableExecutable = new PortableExecutable(filePath);
+                foreach (var identifier in portableExecutable.GetResourceIdentifiers())
+                    if (identifier.Type.Code == 6 && identifier.Name.Code == 11)
+                    {
+                        Package.ModulesDir = Encoding.Unicode.GetString(portableExecutable.GetResource(identifier).Data).Trim('\b', '\0');
+                        break;
+                    }
+
+                fileReader = new ByteReader(Path.ChangeExtension(filePath, "dat"), FileMode.Open);
+            }
+
             Package.PackData.Read(fileReader);
             Package.Read(fileReader);
         }
@@ -29,21 +45,9 @@ namespace SapphireD.Core.FileReaders
 
             foreach (var icon in icos)
             {
-                if (IconUtil.GetBitCount(icon) == 8)
-                    Icons.TryAdd(icon.Width + 1, icon.ToBitmap());
-                else
+                if (IconUtil.GetBitCount(icon) != 8)
                     Icons.TryAdd(icon.Width, icon.ToBitmap());
             }
-
-            // 256c 16x16
-            if (!Icons.ContainsKey(17))
-                Icons.Add(17, Icons.Last().Value.ResizeImage(new Size(16, 16)));
-            // 256c 32x32
-            if (!Icons.ContainsKey(33))
-                Icons.Add(33, Icons.Last().Value.ResizeImage(new Size(32, 32)));
-            // 256c 48x48
-            if (!Icons.ContainsKey(49))
-                Icons.Add(49, Icons.Last().Value.ResizeImage(new Size(48, 48)));
 
             // 32-Bit 16x16
             if (!Icons.ContainsKey(16))

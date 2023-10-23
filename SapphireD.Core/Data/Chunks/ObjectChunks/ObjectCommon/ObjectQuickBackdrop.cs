@@ -5,8 +5,8 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
     public class ObjectQuickBackdrop : ObjectProperties
     {
         public int Size;
-        public short ObstacleType;
-        public short CollisionType;
+        public uint ObstacleType;
+        public uint CollisionType;
         public int Width;
         public int Height;
         public ObjectShape Shape = new();
@@ -19,8 +19,8 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Size = reader.ReadInt();
-            ObstacleType = reader.ReadShort();
-            CollisionType = reader.ReadShort();
+            ObstacleType = reader.ReadUShort();
+            CollisionType = reader.ReadUShort();
             Width = reader.ReadInt();
             Height = reader.ReadInt();
             Shape.ReadCCN(reader);

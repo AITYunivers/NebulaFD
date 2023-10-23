@@ -1,6 +1,6 @@
 ﻿using SapphireD.Core.Memory;
 
-namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
+namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 {
     public class EventObject : Chunk
     {
@@ -17,7 +17,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
         public uint ItemHandle;
         public uint InstanceHandle;
         public string Code = string.Empty;
-        public string IconBuffer = string.Empty;
+        public byte[] IconBuffer = new byte[0];
         public ushort SystemQualifier;
 
         public EventObject()
@@ -48,7 +48,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
                 case 2:
                     Code = reader.ReadAscii(4);
                     if (Code == "OIC2")
-                        IconBuffer = reader.ReadAutoYuniversal();
+                        IconBuffer = reader.ReadBytes(reader.ReadInt());
                     break;
                 case 3:
                     SystemQualifier = reader.ReadUShort();

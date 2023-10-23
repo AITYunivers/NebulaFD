@@ -20,12 +20,10 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            int ExtensionCount = reader.ReadUShort();
+            Exts = new Extension[reader.ReadUShort()];
             Conditions = reader.ReadUShort();
 
-            Exts = new Extension[reader.ReadUShort()];
-
-            for (int i = 0; i < ExtensionCount; i++)
+            for (int i = 0; i < Exts.Length; i++)
             {
                 Extension ext = new Extension();
                 ext.ReadCCN(reader);
