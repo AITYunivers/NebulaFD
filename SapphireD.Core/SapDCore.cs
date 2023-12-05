@@ -7,7 +7,7 @@ namespace SapphireD
 {
     public static class SapDCore
     {
-        public const string BuildDate = "10/11/23";
+        public const string BuildDate = "12/5/23";
         public static FigletText ConsoleFiglet = new FigletText("SapphireD").Centered().Color(Color.DeepSkyBlue1);
         public static Rule ConsoleRule = new Rule().RuleStyle("DeepSkyBlue2");
 
@@ -39,21 +39,21 @@ namespace SapphireD
 
             if (Fusion == 0)
                 str = "KNP";
-            else if (Fusion > 0 && Fusion < 1.0f)
+            else if (Fusion == 0.1f)
                 str = "CNC";
             else if (Fusion == 1.0f)
-                str = "MMF 1.0";
-            else if (Fusion >= 1.1 && Fusion < 1.5f)
-                str = "TGF 1.0";
-            else if (Fusion >= 1.5f && Fusion < 2.0f)
+                str = "MMF 1";
+            else if (Fusion == 1.1)
+                str = "TGF 1";
+            else if (Fusion == 1.5f)
                 str = "MMF 1.5";
             else if (Fusion == 2.0f)
                 str = "MMF 2";
-            else if (Fusion >= 2.1f && Fusion < 2.5f)
+            else if (Fusion == 2.1f)
                 str = "TGF 2";
-            else if (Fusion >= 2.5f && Fusion < 3.0f)
+            else if (Fusion == 2.5f)
                 str = "CTF 2.5";
-            else if (Fusion >= 3)
+            else if (Fusion == 3)
                 str = "F3";
 
             if (Seeded)
