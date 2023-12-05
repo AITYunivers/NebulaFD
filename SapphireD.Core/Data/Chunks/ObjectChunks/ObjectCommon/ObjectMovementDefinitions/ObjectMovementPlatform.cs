@@ -47,7 +47,12 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDef
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteShort(Speed);
+            writer.WriteShort(Acceleration);
+            writer.WriteShort(Deceleration);
+            writer.WriteShort(JumpControl);
+            writer.WriteShort(Gravity);
+            writer.WriteShort(Jump);
         }
     }
 }

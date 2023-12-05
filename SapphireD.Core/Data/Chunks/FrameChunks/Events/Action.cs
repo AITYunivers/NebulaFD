@@ -4,15 +4,21 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 {
     public class Action : Chunk
     {
-        public BitDict Flags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict EventFlags = new BitDict( // Flags
+            "Repeat",         // Repeat
+            "Done",           // Done
+            "Default",        // Default
+            "DoneBeforeFade", // Done Before Fade In
+            "NotDoneInStart", // Not Done In Start
+            "Always",         // Always
+            "Bad",            // Bad
+            "BadObject"       // Bad Object
+        );
 
-        public BitDict OtherFlags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict OtherFlags = new BitDict( // Other Flags
+            "Negated", "", "", "", "", // Not
+            "NoInterdependence"        // No Object Interdependence
+        );
 
         public short ObjectType;
         public short Num;
@@ -34,7 +40,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             Num = reader.ReadShort();
             ObjectInfo = reader.ReadUShort();
             ObjectInfoList = reader.ReadUShort();
-            Flags.Value = reader.ReadByte();
+            EventFlags.Value = reader.ReadByte();
             OtherFlags.Value = reader.ReadByte();
             Parameters = new Parameter[reader.ReadByte()];
             DefType = reader.ReadByte();
@@ -60,7 +66,23 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            ByteWriter actWriter = new ByteWriter(new MemoryStream());
+            actWriter.WriteShort(ObjectType);
+            actWriter.WriteShort(Num);
+            actWriter.WriteUShort(ObjectInfo);
+            actWriter.WriteUShort(ObjectInfoList);
+            actWriter.WriteByte((byte)EventFlags.Value);
+            actWriter.WriteByte((byte)OtherFlags.Value);
+            actWriter.WriteByte((byte)Parameters.Length);
+            actWriter.WriteByte(DefType);
 
+            foreach (Parameter parameter in Parameters)
+                parameter.WriteMFA(actWriter);
+
+            writer.WriteUShort((ushort)actWriter.Tell());
+            writer.WriteWriter(actWriter);
+            actWriter.Flush();
+            actWriter.Close();
         }
     }
 }

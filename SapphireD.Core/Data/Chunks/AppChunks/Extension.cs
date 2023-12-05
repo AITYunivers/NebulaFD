@@ -5,11 +5,12 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
     public class Extension : Chunk
     {
         public string Name = string.Empty;
+        public string FileName = string.Empty;
         public string SubType = string.Empty;
         public int MagicNumber;
         public int VersionLs;
         public int VersionMs;
-        public short Handle;
+        public int Handle;
 
         public Extension()
         {
@@ -25,9 +26,8 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             MagicNumber = reader.ReadInt();
             VersionLs = reader.ReadInt();
             VersionMs = reader.ReadInt();
-            Name = reader.ReadYuniversal();
-            int pos = Name.LastIndexOf('.');
-            Name = Name.Substring(0, pos);
+            FileName = reader.ReadYuniversal();
+            Name = FileName[..FileName.LastIndexOf('.')];
             SubType = reader.ReadYuniversal();
             reader.Seek(start + size);
         }
@@ -44,7 +44,12 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteInt(Handle);
+            writer.WriteAutoYunicode(Name);
+            writer.WriteAutoYunicode(FileName);
+            writer.WriteInt(MagicNumber);
+            writer.WriteAutoYunicode(SubType);
+            writer.WriteInt(1);
         }
     }
 }

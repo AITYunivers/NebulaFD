@@ -4,10 +4,9 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
 {
     public class ParameterSample : ParameterChunk
     {
-        public BitDict Flags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict SampleFlags = new BitDict( // Sample Flags
+            "Uninteruptable" // Uninteruptable
+        );
 
         public short Handle;
         public string Name = string.Empty;
@@ -20,8 +19,15 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Handle = reader.ReadShort();
-            Flags.Value = reader.ReadUShort();
+            SampleFlags.Value = reader.ReadUShort();
             Name = reader.ReadYuniversal();
+        }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            writer.WriteShort(Handle);
+            writer.WriteUShort((ushort)SampleFlags.Value);
+            writer.WriteUnicode(Name, true);
         }
     }
 }

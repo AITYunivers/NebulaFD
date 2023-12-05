@@ -39,7 +39,9 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteInt(PaletteEntries);
+            foreach (Color col in Palette)
+                writer.WriteColor(col);
         }
     }
 }

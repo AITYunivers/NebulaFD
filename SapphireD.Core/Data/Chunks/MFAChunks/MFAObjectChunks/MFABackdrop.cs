@@ -6,7 +6,7 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
     {
         public uint ObstacleType;
         public uint CollisionType;
-        public int Image;
+        public uint Image;
 
         public MFABackdrop()
         {
@@ -17,7 +17,14 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
         {
             ObstacleType = reader.ReadUInt();
             CollisionType = reader.ReadUInt();
-            Image = reader.ReadInt();
+            Image = reader.ReadUInt();
+        }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            writer.WriteUInt(ObstacleType);
+            writer.WriteUInt(CollisionType);
+            writer.WriteUInt(Image);
         }
     }
 }

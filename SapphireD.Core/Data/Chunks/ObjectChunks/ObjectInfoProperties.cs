@@ -1,22 +1,23 @@
 ﻿using SapphireD.Core.Memory;
 
-namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDefinitions
+namespace SapphireD.Core.Data.Chunks.ObjectChunks
 {
-    public class ObjectMovementStatic : ObjectMovementDefinition
+    public class ObjectInfoProperties : Chunk
     {
-        public ObjectMovementStatic()
+        public ObjectInfoProperties()
         {
-            ChunkName = "ObjectMovementStatic";
+            ChunkName = "ObjectInfoProperties";
+            ChunkID = 0x4446;
         }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            base.ReadCCN(reader, extraInfo);
+
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            base.ReadCCN(reader, extraInfo);
+
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
@@ -26,7 +27,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDef
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteBytes(new byte[14]);
+
         }
     }
 }

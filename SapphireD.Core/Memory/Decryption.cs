@@ -3,7 +3,6 @@
     public static class Decryption
     {
         public static byte[] DecryptionKey = new byte[0];
-        public static byte MagicChar = 54;
 
         public static byte[] KeyString(string str)
         {
@@ -25,8 +24,8 @@
             int dataLen = data.Length;
             Array.Resize(ref data, 256);
 
-            byte lastKeyByte = MagicChar;
-            byte v34 = MagicChar;
+            byte lastKeyByte = 0;
+            byte v34 = 0;
 
             for (int i = 0; i <= dataLen; i++)
             {
@@ -46,7 +45,7 @@
             bytes.AddRange(KeyString(data2 ?? ""));
             bytes.AddRange(KeyString(data3 ?? ""));
             DecryptionKey = MakeKeyCombined(bytes.ToArray());
-            InitDecryptionTable(DecryptionKey, MagicChar);
+            InitDecryptionTable(DecryptionKey);
         }
 
         public static byte[] DecodeMode3(byte[] chunkData, int chunkId, out int decompressed)
@@ -72,15 +71,15 @@
         private static byte[] decodeBuffer = new byte[256];
         public static bool valid;
 
-        public static bool InitDecryptionTable(byte[] magic_key, byte magic_char)
+        public static bool InitDecryptionTable(byte[] magic_key)
         {
             for (int i = 0; i < 256; i++)
                 decodeBuffer[i] = (byte)i;
 
             Func<byte, byte> rotate = (byte value) => (byte)((value << 7) | (value >> 1));
 
-            byte accum = magic_char;
-            byte hash = magic_char;
+            byte accum = 0;
+            byte hash = 0;
 
             bool never_reset_key = true;
 
@@ -99,7 +98,7 @@
 
                 if (hash == magic_key[key])
                 {
-                    hash = rotate(magic_char);
+                    hash = rotate(0);
                     key = 0;
 
                     never_reset_key = false;

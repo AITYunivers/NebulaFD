@@ -33,7 +33,9 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteInt(Folders.Length);
+            foreach (MFAFolder folder in Folders)
+                folder.WriteMFA(writer);
         }
     }
 }

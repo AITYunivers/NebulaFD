@@ -5,4 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "I'm aware Bitmaps only work on windows.", Scope = "namespaceanddescendants", Target = "SapphireD")]
+//[assembly: SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "I'm aware Bitmaps only work on windows.", Scope = "namespaceanddescendants", Target = "SapphireD")]

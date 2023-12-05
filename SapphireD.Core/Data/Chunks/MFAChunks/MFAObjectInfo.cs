@@ -4,27 +4,35 @@ using SapphireD.Core.Data.Chunks.ObjectChunks;
 using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
+using Spectre.Console.Rendering;
+using System.Diagnostics;
 using System.Drawing;
 
 namespace SapphireD.Core.Data.Chunks.MFAChunks
 {
     public class MFAObjectInfo : Chunk
     {
-        public BitDict Flags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict ObjectFlags = new BitDict( // Object Flags
+            "LoadOnCall", "",         // Load on call
+            "GlobalObject", "",       // Global Object
+            "NoEditorSync",           // Editor synchronization: No
+            "NameTypeEditorSync", "", // Editor synchronization: Same name and type
+            "NoAutoUpdate"            // Auto-update Disabled
+        );
 
         public int ObjectType;
         public int Handle;
         public string Name = string.Empty;
-        public Color Transparent;
+        public bool Transparent;
         public int InkEffect;
         public uint InkEffectParameter;
         public int AntiAliasing;
         public int IconType;
         public int IconHandle;
         public MFAObjectLoader ObjectLoader = new();
+
+        // Chunks
+        public MFACounterFlags? CounterFlags = null; // 0x16
 
         public MFAObjectInfo()
         {
@@ -41,11 +49,11 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
             ObjectType = reader.ReadInt();
             Handle = reader.ReadInt();
             Name = reader.ReadAutoYuniversal();
-            Transparent = reader.ReadColor();
+            Transparent = reader.ReadInt() == 1;
             InkEffect = reader.ReadInt();
             InkEffectParameter = reader.ReadUInt();
             AntiAliasing = reader.ReadInt();
-            Flags.Value = reader.ReadUInt();
+            ObjectFlags.Value = reader.ReadUInt();
             IconType = reader.ReadInt();
             IconHandle = reader.ReadInt();
 
@@ -63,21 +71,26 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
 
             switch (ObjectType)
             {
-                case 0:
+                case 0: // Quick Backdrop
                     ObjectLoader = new MFAQuickBackdrop();
                     break;
-                case 1:
+                case 1: // Backdrop
                     ObjectLoader = new MFABackdrop();
                     break;
-                case 2:
+                case 2: // Active
                     ObjectLoader = new MFAActive();
                     break;
-                case 3:
+                case 3: // String
+                case 4: // Question & Answer
                     ObjectLoader = new MFAString();
                     break;
-                case 7:
+                case 5: // Score
+                case 6: // Lives
+                case 7: // Counter
                     ObjectLoader = new MFACounter();
                     break;
+                case 8: // Formatted Text
+                case 9: // Sub-Application
                 default:
                     ObjectLoader = new MFAExtensionObject();
                     break;
@@ -92,7 +105,51 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            writer.WriteInt(ObjectType);
+            writer.WriteInt(Handle);
+            writer.WriteAutoYunicode(Name);
+            writer.WriteInt(Transparent ? 1 : 0);
+            writer.WriteInt(InkEffect);
+            writer.WriteUInt(InkEffectParameter);
+            writer.WriteInt(AntiAliasing);
+            writer.WriteUInt(ObjectFlags.Value);
+            writer.WriteInt(IconType);
+            writer.WriteInt(IconHandle);
 
+            ByteWriter? chunkWriter = null;
+            if (CounterFlags != null)
+            {
+                writer.WriteByte((byte)CounterFlags.ChunkID);
+                chunkWriter = new ByteWriter(new MemoryStream());
+                chunkWriter.WriteByte((byte)CounterFlags.CounterFlags.Value);
+                chunkWriter.WriteByte(CounterFlags.FixedDigits);
+                chunkWriter.WriteByte(CounterFlags.SignificantDigits);
+                chunkWriter.WriteByte(CounterFlags.DecimalPoints);
+                writer.WriteInt((int)chunkWriter.Tell());
+                writer.WriteWriter(chunkWriter);
+                chunkWriter.Flush();
+                chunkWriter.Close();
+            }
+            writer.WriteByte(0); // Last Chunk
+
+            ObjectLoader.WriteMFA(writer);
+        }
+
+        public void SyncFlags(BitDict CCNFlags)
+        {
+            ObjectFlags.Value = 32; // Default Value
+            ObjectFlags["LoadOnCall"] = CCNFlags["LoadOnCall"];
+            ObjectFlags["GlobalObject"] = CCNFlags["GlobalObject"];
+
+            /*public BitDict ObjectFlags = new BitDict( // Object Flags
+                "NoEditorSync",           // Editor synchronization: No
+                "NameTypeEditorSync", "", // Editor synchronization: Same name and type
+                "NoAutoUpdate"            // Auto-update Disabled
+            );*/
+
+            /*public BitDict ObjectFlags = new BitDict( // Object Flags
+                "DontCreateAtStart"         // Create at start Disabled
+            );*/
         }
     }
 }

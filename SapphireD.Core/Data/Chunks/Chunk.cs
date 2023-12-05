@@ -17,9 +17,9 @@ namespace SapphireD.Core.Data.Chunks
 
         public static Chunk InitChunk(ByteReader byteReader)
         {
-            short id = byteReader.ReadInt16();
-            short flag = byteReader.ReadInt16();
-            int size = byteReader.ReadInt32();
+            short id = byteReader.ReadShort();
+            short flag = byteReader.ReadShort();
+            int size = byteReader.ReadInt();
             var rawData = byteReader.ReadBytes(size);
             var dataReader = new ByteReader(rawData);
             byte[] newData = new byte[0];
@@ -34,8 +34,8 @@ namespace SapphireD.Core.Data.Chunks
                     case 1:
                         if (SapDCore.Fusion > 1.5f)
                             newData = Decompressor.Decompress(dataReader, out var DecompressedSize1);
-                        else
-                            newData = Decompressor.DecompressOPF(dataReader, out var DecompressedSize2);
+                        //else
+                            //newData = Decompressor.DecompressOPF(dataReader, out var DecompressedSize2);
                         break;
                     case 2:
                         newData = dataReader.ReadBytes(size);
@@ -66,7 +66,7 @@ namespace SapphireD.Core.Data.Chunks
         {
             short id = byteReader.ReadByte();
             if (id == 0) return new Last();
-            int size = byteReader.ReadInt32();
+            int size = byteReader.ReadInt();
             var data = byteReader.ReadBytes(size);
 
             Chunk newChunk = ChunkJumpTable(id);

@@ -4,10 +4,24 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.LayerChunks
 {
     public class FrameLayer : Chunk
     {
-        public BitDict Options = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict LayerFlags = new BitDict( // Layer Flags
+            "", "", "DontSaveBackground", "", "", // Save Background Disabled
+            "WrapHorizontally",                   // Wrap Horizontally
+            "WrapVertically",                     // Wrap Vertically
+            "PrevEffect", "", "", "",             // Same effect as previous layer
+            "", "", "", "", "", "",               //
+            "HiddenAtStart"                       // Visible at start Disabled
+        );
+
+        public BitDict MFALayerFlags = new BitDict( // Layer Flags
+            "Visible",            // Visible
+            "Locked", "",         // Locked
+            "HiddenAtStart",      // Visible at start Disabled
+            "DontSaveBackground", // Save Background Disabled
+            "WrapHorizontally",   // Wrap Horizontally
+            "WrapVertically",     // Wrap Vertically
+            "PrevEffect"          // Same effect as previous layer
+        );
 
         public float XCoefficient;
         public float YCoefficient;
@@ -23,7 +37,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.LayerChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Options.Value = reader.ReadUInt();
+            LayerFlags.Value = reader.ReadUInt();
             XCoefficient = reader.ReadFloat();
             YCoefficient = reader.ReadFloat();
             BackdropCount = reader.ReadInt();
@@ -34,7 +48,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.LayerChunks
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
             Name = reader.ReadAutoYuniversal();
-            Options.Value = reader.ReadUInt();
+            MFALayerFlags.Value = reader.ReadUInt();
             XCoefficient = reader.ReadFloat();
             YCoefficient = reader.ReadFloat();
         }
@@ -46,7 +60,37 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.LayerChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            writer.WriteAutoYunicode(Name);
+            writer.WriteUInt(MFALayerFlags.Value);
+            writer.WriteFloat(XCoefficient);
+            writer.WriteFloat(YCoefficient);
+        }
 
+        public void SyncFlags(bool fromMFA = false)
+        {
+            if (!fromMFA)
+            {
+                MFALayerFlags.Value = 1; // Default Value
+                MFALayerFlags["HiddenAtStart"] = LayerFlags["HiddenAtStart"];
+                MFALayerFlags["DontSaveBackground"] = LayerFlags["DontSaveBackground"];
+                MFALayerFlags["WrapHorizontally"] = LayerFlags["WrapHorizontally"];
+                MFALayerFlags["WrapVertically"] = LayerFlags["WrapVertically"];
+                MFALayerFlags["PrevEffect"] = LayerFlags["PrevEffect"];
+            }
+            else
+            {
+                LayerFlags.Value = 16; // Default Value
+                LayerFlags["DontSaveBackground"] = MFALayerFlags["DontSaveBackground"];
+                LayerFlags["WrapHorizontally"] = MFALayerFlags["WrapHorizontally"];
+                LayerFlags["WrapVertically"] = MFALayerFlags["WrapVertically"];
+                LayerFlags["PrevEffect"] = MFALayerFlags["PrevEffect"];
+                LayerFlags["HiddenAtStart"] = MFALayerFlags["HiddenAtStart"];
+            }
+
+            /*public BitDict MFALayerFlags = new BitDict( // Layer Flags
+                "Visible",            // Visible
+                "Locked", "",         // Locked
+            );*/
         }
     }
 }

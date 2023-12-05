@@ -1,33 +1,33 @@
 ﻿using SapphireD.Core.Memory;
-using System.Drawing;
+using System.Diagnostics;
 
 namespace SapphireD.Core.Data.Chunks.AppChunks
 {
     public class ExtendedHeader : Chunk
     {
         public BitDict Flags = new BitDict(
-            "KeepScreenRatio", "1",
-            "AntiAliasingWhenResizing", "2", "3",
-            "RightToLeftReading", "4",
-            "RightToLeftLayout", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18",
-            "DontOptimizeStrings", "19", "20", "21",
-            "DontIgnoreDestroy",
-            "DisableIME",
-            "ReduceCPUUsage", "22",
-            "PremultipliedAlpha",
-            "OptimizePlaySample");
+            "KeepScreenRatio", "",                   // Keep screen ratio
+            "AntiAliasing", "", "",                  // Anti-aliasing when resizing
+            "RightToLeftReading", "",                // Right-to-left reading
+            "RightToLeftLayout", "", "", "", "", "", // Right-to-left layout
+            "", "", "", "", "", "", "", "", "",      //
+            "DontOptimizeStrings", "", "", "",       // Optimize string objects Disabled
+            "DontIgnoreDestroyFar",                  // Ignore "Destroy if too far" option if "Inactivate if too far" is set to No Disabled
+            "DisableIME",                            // Disable IME
+            "ReduceCPUUsage", "",                    // Reduce CPU Usage
+            "PremultipliedAlpha",                    // Premultiplied alpha
+            "OptimizePlaySample"                     // Optimize 'Play Sample'
+        );
 
         public BitDict CompressionFlags = new BitDict(
-            "CompressionLevelMax",
-            "CompressSounds",
-            "IncludeExternalFiles",
-            "NoAutoImageFilters",
-            "NoAutoSoundFilters", "1", "2", "3",
-            "DontDisplayBuildWarning",
-            "OptimizeImageSize");
-
-        public BitDict ViewFlags = new BitDict("1");
-        public BitDict NewFlags = new BitDict("1");
+            "CompressionLevelMax",            // Compression Level: Maximum
+            "CompressSounds",                 // Compress Sounds
+            "IncludeExternalFiles",           // Include external files
+            "NoAutoImageFilters",             // Image Filters: Automatic Disabled
+            "NoAutoSoundFilters", "", "", "", // Sound Filters: Automatic Disabled
+            "DontDisplayBuildWarning",        // Display build warning messages Disabled
+            "OptimizeImageSize"               // Optimize image size in RAM
+        );
 
         public byte BuildType;
         public int ScreenRatio;
@@ -47,8 +47,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             CompressionFlags.Value = reader.ReadUInt();
             ScreenRatio = reader.ReadShort();
             ScreenAngle = reader.ReadShort();
-            ViewFlags.Value = reader.ReadUShort();
-            NewFlags.Value = reader.ReadUShort();
+            reader.Skip(4);
 
             SapDCore.PackageData.ExtendedHeader = this;
         }

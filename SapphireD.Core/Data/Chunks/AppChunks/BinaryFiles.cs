@@ -32,7 +32,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             for (int i = 0; i < Count; i++)
             {
                 BinaryFile item = new BinaryFile();
-                item.ReadCCN(reader);
+                item.ReadMFA(reader);
                 Items.Add(item);
             }
         }
@@ -44,7 +44,9 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteInt(Count);
+            foreach (BinaryFile item in Items)
+                item.WriteMFA(writer);
         }
     }
 }

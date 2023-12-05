@@ -1,10 +1,4 @@
-﻿using SapphireD.Core.Data.Chunks.FrameChunks;
-using SapphireD.Core.Memory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SapphireD.Core.Memory;
 
 namespace SapphireD.Core.Data.Chunks.ObjectChunks
 {

@@ -34,10 +34,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Fonts
             Handle = reader.ReadUInt();
 
             ByteReader dataReader = null;
-            if (Compressed)
-            {
-                dataReader = Decompressor.DecompressAsReader(reader, out var decompSize);
-            }
+            if (Compressed) dataReader = Decompressor.DecompressAsReader(reader, out var decompSize);
             else dataReader = reader;
             Checksum = dataReader.ReadInt();
             References = dataReader.ReadInt();
@@ -90,7 +87,25 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Fonts
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            writer.WriteUInt(Handle);
+            writer.WriteInt(Checksum);
+            writer.WriteInt(References);
+            writer.WriteInt(0);
 
+            writer.WriteInt(Height);
+            writer.WriteInt(Width);
+            writer.WriteInt(Escapement);
+            writer.WriteInt(Orientation);
+            writer.WriteInt(Weight);
+            writer.WriteByte(Italic);
+            writer.WriteByte(Underline);
+            writer.WriteByte(StrikeOut);
+            writer.WriteByte(CharSet);
+            writer.WriteByte(OutPrecision);
+            writer.WriteByte(ClipPrecision);
+            writer.WriteByte(Quality);
+            writer.WriteByte(PitchAndFamily);
+            writer.WriteUnicode(Name, 32);
         }
     }
 }

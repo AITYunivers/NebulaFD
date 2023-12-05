@@ -43,7 +43,9 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Sounds
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteInt(Count);
+            foreach (Sound snd in Sounds.Values)
+                snd.WriteMFA(writer);
         }
     }
 }

@@ -1,15 +1,10 @@
 ﻿using SapphireD.Core.Memory;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.Reflection.Metadata;
-using System.Xml.Linq;
 
 namespace SapphireD.Core.Data.Chunks.AppChunks
 {
     public class Extensions : Chunk
     {
-        public Extension[] Exts = new Extension[0]; // Color Mode
+        public Extension[] Exts = new Extension[0];
         public ushort Conditions;
 
         public Extensions()
@@ -45,7 +40,9 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteInt(Exts.Length);
+            foreach (Extension ext in Exts)
+                ext.WriteMFA(writer);
         }
     }
 }

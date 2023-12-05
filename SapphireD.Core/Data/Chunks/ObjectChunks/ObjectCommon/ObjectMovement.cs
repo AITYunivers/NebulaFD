@@ -130,7 +130,33 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            writer.WriteAutoYunicode(Name);
+            ByteWriter mvntWriter = new ByteWriter(new MemoryStream());
 
+            if (MovementDefinition is ObjectMovementExtension)
+            {
+                ObjectMovementExtension ExtensionDefinition = (ObjectMovementExtension)MovementDefinition;
+                writer.WriteAutoYunicode(ExtensionDefinition.FileName);
+                writer.WriteInt(ExtensionDefinition.ID);
+            }
+            else
+            {
+                writer.WriteAutoYunicode("");
+                writer.WriteInt(0);
+                mvntWriter.WriteShort(Player);
+                mvntWriter.WriteShort(Type);
+                mvntWriter.WriteByte(Move);
+                mvntWriter.WriteByte(Opt);
+                mvntWriter.WriteShort(0);
+                mvntWriter.WriteInt(StartingDirection);
+            }
+
+            MovementDefinition.WriteMFA(mvntWriter);
+
+            writer.WriteInt((int)mvntWriter.Tell());
+            writer.WriteWriter(mvntWriter);
+            mvntWriter.Flush();
+            mvntWriter.Close();
         }
     }
 }

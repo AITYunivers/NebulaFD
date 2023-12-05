@@ -8,7 +8,9 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDef
         public short Fx;
         public short Dy;
         public short Fy;
-        public short Flags;
+        public BitDict MouseFlags = new BitDict( // Mouse Flags
+            
+        );
 
         public ObjectMovementMouse()
         {
@@ -23,7 +25,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDef
             Fx = reader.ReadShort();
             Dy = reader.ReadShort();
             Fy = reader.ReadShort();
-            Flags = reader.ReadShort();
+            MouseFlags.Value = reader.ReadUShort();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -34,7 +36,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDef
             Fx = reader.ReadShort();
             Dy = reader.ReadShort();
             Fy = reader.ReadShort();
-            Flags = reader.ReadShort();
+            MouseFlags.Value = reader.ReadUShort();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
@@ -44,7 +46,11 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDef
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteShort(Dx);
+            writer.WriteShort(Fx);
+            writer.WriteShort(Dy);
+            writer.WriteShort(Fy);
+            writer.WriteUShort((ushort)MouseFlags.Value);
         }
     }
 }

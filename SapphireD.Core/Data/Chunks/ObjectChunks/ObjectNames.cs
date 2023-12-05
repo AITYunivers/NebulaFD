@@ -1,18 +1,21 @@
 ﻿using SapphireD.Core.Memory;
 
-namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
+namespace SapphireD.Core.Data.Chunks.ObjectChunks
 {
-    public class ObjectProperties : Chunk
+    public class ObjectNames : Chunk
     {
-        public ObjectProperties()
+        public ObjectNames()
         {
-            ChunkName = "ObjectProperties";
-            ChunkID = 0x4446;
+            ChunkName = "ObjectNames";
+            ChunkID = 0x2254;
         }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-
+            int curHandle = 0;
+            FrameItems listItems = SapDCore.PackageData.FrameItems;
+            while (reader.Size() > reader.Tell())
+                listItems.Items[curHandle++].Name = reader.ReadYuniversal();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

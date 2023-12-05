@@ -7,7 +7,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
     public class FrameItems : Chunk
     {
         public int Count;
-        public ObjectInfo[] Objects = new ObjectInfo[0];
+        public Dictionary<int, ObjectInfo> Items = new Dictionary<int, ObjectInfo>();
 
         public FrameItems()
         {
@@ -18,12 +18,12 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Count = reader.ReadInt();
-            Objects = new ObjectInfo[Count];
 
             for (int oi = 0; oi < Count; oi++)
             {
-                Objects[oi] = new ObjectInfo();
-                Objects[oi].ReadCCN(reader);
+                ObjectInfo newOI = new ObjectInfo();
+                newOI.ReadCCN(reader);
+                Items.Add(newOI.Header.Handle, newOI);
             }
 
             SapDCore.PackageData.FrameItems = this;

@@ -17,5 +17,11 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
             Delay = reader.ReadInt();
             Compteur = reader.ReadInt();
         }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            writer.WriteInt(Delay);
+            writer.WriteInt(Compteur);
+        }
     }
 }

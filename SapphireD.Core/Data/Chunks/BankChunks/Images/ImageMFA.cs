@@ -20,7 +20,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
             Flags.Value = newReader.ReadByte();
             newReader.ReadInt16();
             HotspotX = newReader.ReadInt16();
-            HotspotX = newReader.ReadInt16();
+            HotspotY = newReader.ReadInt16();
             ActionPointX = newReader.ReadInt16();
             ActionPointY = newReader.ReadInt16();
             TransparentColor = newReader.ReadColor();

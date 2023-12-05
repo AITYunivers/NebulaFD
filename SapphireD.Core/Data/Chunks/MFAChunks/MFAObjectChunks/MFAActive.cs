@@ -25,5 +25,15 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
                 Animations[i].ReadMFA(reader);
             }
         }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            base.WriteMFA(writer, extraInfo);
+
+            writer.WriteByte(1);
+            writer.WriteInt(Animations.Length);
+            foreach (ObjectAnimation animation in Animations)
+                animation.WriteMFA(writer);
+        }
     }
 }

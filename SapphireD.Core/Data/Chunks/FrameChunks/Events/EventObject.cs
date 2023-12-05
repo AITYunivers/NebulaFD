@@ -4,10 +4,9 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 {
     public class EventObject : Chunk
     {
-        public BitDict Flags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict EvtObjFlags = new BitDict( // Event Object Flags
+            ""
+        );
 
         public int Handle;
         public ushort ObjectType;
@@ -37,7 +36,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             ItemType = reader.ReadUShort();
             Name = reader.ReadAutoYuniversal();
             TypeName = reader.ReadAutoYuniversal();
-            Flags.Value = reader.ReadUShort();
+            EvtObjFlags.Value = reader.ReadUShort();
 
             switch (ObjectType)
             {
@@ -63,7 +62,31 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            writer.WriteInt(Handle);
+            writer.WriteUShort(ObjectType);
+            writer.WriteUShort(ItemType);
+            writer.WriteAutoYunicode(Name);
+            writer.WriteAutoYunicode(TypeName);
+            writer.WriteUShort((ushort)EvtObjFlags.Value);
 
+            switch (ObjectType)
+            {
+                case 1:
+                    writer.WriteUInt(ItemHandle);
+                    writer.WriteUInt(InstanceHandle);
+                    break;
+                case 2:
+                    writer.WriteAscii(Code);
+                    if (Code == "OIC2")
+                    {
+                        writer.WriteInt(IconBuffer.Length);
+                        writer.WriteBytes(IconBuffer);
+                    }
+                    break;
+                case 3:
+                    writer.WriteUShort(SystemQualifier);
+                    break;
+            }
         }
     }
 }

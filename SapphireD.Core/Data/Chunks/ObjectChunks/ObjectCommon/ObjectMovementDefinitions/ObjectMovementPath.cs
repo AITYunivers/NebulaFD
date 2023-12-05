@@ -72,7 +72,25 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDef
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            writer.WriteShort(NodeCount);
+            writer.WriteShort(MinimumSpeed);
+            writer.WriteShort(MaximumSpeed);
+            writer.WriteByte(Loop);
+            writer.WriteByte(Reposition);
+            writer.WriteByte(Reverse);
+            writer.WriteByte(0);
 
+            foreach (ObjectMovementPathNode node in PathNodes)
+            {
+                ByteWriter nodeWriter = new ByteWriter(new MemoryStream());
+                node.WriteMFA(nodeWriter);
+
+                writer.WriteByte(0);
+                writer.WriteByte((byte)nodeWriter.Tell());
+                writer.WriteWriter(nodeWriter);
+                nodeWriter.Flush();
+                nodeWriter.Close();
+            }
         }
     }
 }

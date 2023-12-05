@@ -17,7 +17,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             var pkgData = SapDCore.PackageData;
             pkgData.EditorFilename = Value;
 
-            if (SapDCore.Build > 284)
+            if (SapDCore.Build > 285)
                 Decryption.MakeKey(pkgData.AppName, pkgData.Copyright, Value);
             else
                 Decryption.MakeKey(Value, pkgData.AppName, pkgData.Copyright);

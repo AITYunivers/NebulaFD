@@ -4,10 +4,24 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 {
     public class Event : Chunk
     {
-        public BitDict Flags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict EventFlags = new BitDict( // Event Flags
+            "Once",         // Once
+            "NotAlways",    // Not Always
+            "Repeat",       // Repeat
+            "NoMore",       // No More
+            "Shuffle",      // Shuffle
+            "EditorMark",   // Editor Mark
+            "HasChildren",  // Has Children
+            "Break",        // Break
+            "BreakPoint",   // Break Point
+            "AlwaysClean",  // Always Clean
+            "HasOr",        // Or In Group
+            "HasStop",      // Stop In Group
+            "HasOrLogical", // Or Logical
+            "Grouped",      // Grouped
+            "Inactive",     // Inactive
+            "Has Parent"    // Has Parent
+        );
 
         public Condition[] Conditions = new Condition[0];
         public Action[] Actions = new Action[0];
@@ -28,7 +42,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 
             Conditions = new Condition[reader.ReadByte()];
             Actions = new Action[reader.ReadByte()];
-            Flags.Value = reader.ReadUShort();
+            EventFlags.Value = reader.ReadUShort();
 
             if (SapDCore.Build >= 284 && !(SapDCore.MFA || SapDCore.Android && SapDCore.Build == 287))
             {
@@ -65,7 +79,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 
             Conditions = new Condition[reader.ReadByte()];
             Actions = new Action[reader.ReadByte()];
-            Flags.Value = reader.ReadUShort();
+            EventFlags.Value = reader.ReadUShort();
             Restricted = reader.ReadShort();
             RestrictCpt = reader.ReadShort();
             Identifier = reader.ReadShort();
@@ -93,7 +107,25 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            ByteWriter evtWriter = new ByteWriter(new MemoryStream());
+            evtWriter.WriteByte((byte)Conditions.Length);
+            evtWriter.WriteByte((byte)Actions.Length);
+            evtWriter.WriteUShort((ushort)EventFlags.Value);
+            evtWriter.WriteShort((short)Restricted);
+            evtWriter.WriteShort((short)RestrictCpt);
+            evtWriter.WriteShort(Identifier);
+            evtWriter.WriteShort(Undo);
 
+            foreach (Condition cond in Conditions)
+                cond.WriteMFA(evtWriter);
+
+            foreach (Action act in Actions)
+                act.WriteMFA(evtWriter);
+
+            writer.WriteShort((short)(evtWriter.Tell() * -1));
+            writer.WriteWriter(evtWriter);
+            evtWriter.Flush();
+            evtWriter.Close();
         }
     }
 }

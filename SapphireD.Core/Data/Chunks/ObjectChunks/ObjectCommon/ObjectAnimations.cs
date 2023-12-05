@@ -4,7 +4,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 {
     public class ObjectAnimations : Chunk
     {
-        public ObjectAnimation[] Animations = new ObjectAnimation[0];
+        public List<ObjectAnimation> Animations = new List<ObjectAnimation>();
 
         public ObjectAnimations()
         {
@@ -22,14 +22,15 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             for (int i = 0; i < Count; i++)
                 Offsets[i] = reader.ReadShort();
 
-            Animations = new ObjectAnimation[Count];
+            Animations = new List<ObjectAnimation>();
             for (int i = 0; i < Count; i++)
             {
-                Animations[i] = new ObjectAnimation();
                 if (Offsets[i] != 0)
                 {
                     reader.Seek(StartOffset + Offsets[i]);
-                    Animations[i].ReadCCN(reader);
+                    ObjectAnimation anim = new ObjectAnimation();
+                    anim.ReadCCN(reader);
+                    Animations.Add(anim);
                 }
             }
 

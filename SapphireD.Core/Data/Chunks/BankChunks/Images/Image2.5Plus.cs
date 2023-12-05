@@ -30,6 +30,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
                 var target = new byte[decompSizePlus];
                 LZ4Codec.Decode(rawImg, target);
                 ImageData = target;
+                ImageBank.LoadedImageCount++;
             });
 
             task.RunSynchronously();

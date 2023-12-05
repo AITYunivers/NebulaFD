@@ -42,7 +42,9 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteInt(Instances.Length);
+            foreach (FrameInstance instance in Instances)
+                instance.WriteMFA(writer);
         }
     }
 }

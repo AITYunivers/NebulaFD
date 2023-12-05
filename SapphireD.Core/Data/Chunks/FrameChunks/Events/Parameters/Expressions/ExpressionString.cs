@@ -4,7 +4,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
 {
     public class ExpressionString : ExpressionChunk
     {
-        public string Value;
+        public string Value = string.Empty;
 
         public ExpressionString()
         {
@@ -14,6 +14,11 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Value = reader.ReadYuniversal();
+        }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            writer.WriteUnicode(Value, true);
         }
     }
 }

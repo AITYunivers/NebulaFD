@@ -1,14 +1,15 @@
-﻿using SapphireD.Core.Data.Chunks.AppChunks;
-using SapphireD.Core.Data.Chunks;
+﻿using SapphireD.Core.Data.Chunks;
+using SapphireD.Core.Data.Chunks.AppChunks;
 using SapphireD.Core.Data.Chunks.BankChunks.Images;
 using SapphireD.Core.Data.Chunks.FrameChunks;
 using SapphireD.Core.Data.Chunks.MFAChunks;
+using SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks;
+using SapphireD.Core.Data.Chunks.ObjectChunks;
+using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 using Spectre.Console;
-using SapphireD.Core.Data.Chunks.ObjectChunks;
-using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
-using SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks;
+using System.Diagnostics;
 
 #pragma warning disable CS8602
 namespace SapphireD.Core.Data.PackageReaders
@@ -21,7 +22,7 @@ namespace SapphireD.Core.Data.PackageReaders
         public string Version = string.Empty;
         public FrameEvents GlobalEvents = new FrameEvents();
         public MFAQualifiers Qualifiers = new();
-        public new MFAExtensions Extensions = new();
+        public MFAExtensions MFAExtensions = new();
         public int[] FrameOffsets = new int[0];
 
         public bool Finished;
@@ -76,6 +77,7 @@ namespace SapphireD.Core.Data.PackageReaders
             AppHeader.BorderColor = reader.ReadColor();
             AppHeader.DisplayFlags.Value = reader.ReadUInt();
             AppHeader.GraphicFlags.Value = reader.ReadUInt();
+            AppHeader.SyncFlags(true);
             HelpFile = reader.ReadAutoYuniversal();
             reader.ReadAutoYuniversal();
             AppHeader.InitScore = (reader.ReadInt() + 1) * -1;
@@ -112,7 +114,7 @@ namespace SapphireD.Core.Data.PackageReaders
             AppHeader.GraphicMode = (short)reader.ReadInt();
             reader.Skip(reader.ReadInt() * 4); // Icon Images
             Qualifiers.ReadMFA(reader);
-            Extensions.ReadMFA(reader);
+            MFAExtensions.ReadMFA(reader);
 
             if (reader.PeekInt() > 900)
                 reader.Skip(2);
@@ -145,18 +147,29 @@ namespace SapphireD.Core.Data.PackageReaders
             }
 
             FinishParsing();
-
             Finished = true;
         }
 
         public void FinishParsing()
         {
+            Extensions.Exts = new Extension[MFAExtensions.Extensions.Length];
+            for (int i = 0; i < Extensions.Exts.Length; i++)
+            {
+                Extensions.Exts[i] = new Extension();
+                Extensions.Exts[i].Handle = MFAExtensions.Extensions[i].Handle;
+                Extensions.Exts[i].Name = MFAExtensions.Extensions[i].Name;
+                Extensions.Exts[i].FileName = MFAExtensions.Extensions[i].FileName;
+                Extensions.Exts[i].MagicNumber = MFAExtensions.Extensions[i].Magic;
+                Extensions.Exts[i].SubType = MFAExtensions.Extensions[i].SubType;
+            }
+
+            Dictionary<int, ObjectInfo> frameItems = new Dictionary<int, ObjectInfo>();
             foreach (Frame frame in Frames)
             {
                 foreach (MFAObjectInfo oI in frame.MFAFrameInfo.Objects)
                 {
                     ObjectInfo newOI = new ObjectInfo();
-                    newOI.Header.Flags = oI.Flags;
+                    newOI.Header.SyncFlags(oI.ObjectFlags);
                     newOI.Header.Handle = oI.Handle;
                     newOI.Header.Type = oI.ObjectType;
                     newOI.Header.InkEffect = oI.InkEffect;
@@ -170,17 +183,21 @@ namespace SapphireD.Core.Data.PackageReaders
                             MFAQuickBackdrop? oldOQB = oI.ObjectLoader as MFAQuickBackdrop;
                             newOQB.ObstacleType = oldOQB.ObstacleType;
                             newOQB.CollisionType = oldOQB.CollisionType;
-                            newOQB.Width = oldOQB.Width;
-                            newOQB.Height = oldOQB.Height;
+                            newOQB.Shape.LineFlags.Value = 0; // Default Value
+                            newOQB.Shape.LineFlags["FlipX"] = oldOQB.Width < 0;
+                            newOQB.Shape.LineFlags["FlipY"] = oldOQB.Height < 0;
+                            newOQB.Width = oldOQB.Width * (newOQB.Shape.LineFlags["FlipX"] ? -1 : 1);
+                            newOQB.Height = oldOQB.Height * (newOQB.Shape.LineFlags["FlipY"] ? -1 : 1);
                             newOQB.Shape.BorderSize = oldOQB.BorderSize;
                             newOQB.Shape.BorderColor = oldOQB.BorderColor;
                             newOQB.Shape.ShapeType = oldOQB.Shape;
                             newOQB.Shape.FillType = oldOQB.FillType;
-                            newOQB.Shape.LineFlags = oldOQB.Flags;
                             newOQB.Shape.Color1 = oldOQB.Color1;
                             newOQB.Shape.Color2 = oldOQB.Color2;
-                            newOQB.Shape.GradientFlags = oldOQB.Flags;
+                            newOQB.Shape.VerticalGradient = oldOQB.QuickBkdFlags["VerticalGradient"];
                             newOQB.Shape.Image = oldOQB.Image;
+
+                            newOI.Properties = newOQB;
                             break;
                         case 1:
                             ObjectBackdrop newOBD = new ObjectBackdrop();
@@ -188,10 +205,15 @@ namespace SapphireD.Core.Data.PackageReaders
                             newOBD.ObstacleType = oldOBD.ObstacleType;
                             newOBD.CollisionType = oldOBD.CollisionType;
                             newOBD.Image = oldOBD.Image;
+
+                            newOI.Properties = newOBD;
                             break;
                         default:
                             ObjectCommon newOC = new ObjectCommon();
                             MFAObjectLoader? oldOC = oI.ObjectLoader;
+                            newOC.ObjectFlags = oldOC.ObjectFlags;
+                            newOC.ObjectFlags["CCNCheck"] = true;
+                            newOC.NewObjectFlags = oldOC.NewObjectFlags;
                             newOC.BackColor = oldOC.Background;
                             newOC.Qualifiers = oldOC.Qualifiers;
                             newOC.ObjectAlterableValues = oldOC.AlterableValues;
@@ -203,7 +225,7 @@ namespace SapphireD.Core.Data.PackageReaders
                             switch (oI.ObjectType)
                             {
                                 case 2:
-                                    newOC.ObjectAnimations.Animations = (oldOC as MFAActive).Animations;
+                                    newOC.ObjectAnimations.Animations = (oldOC as MFAActive).Animations.ToList();
                                     break;
                                 case 3:
                                     newOC.ObjectParagraphs.Width = (oldOC as MFAString).Width;
@@ -211,7 +233,6 @@ namespace SapphireD.Core.Data.PackageReaders
                                     newOC.ObjectParagraphs.Paragraphs = (oldOC as MFAString).Paragraphs;
                                     break;
                                 case 7:
-                                    newOC.ObjectCounter.Flags = (oldOC as MFACounter).Flags;
                                     newOC.ObjectCounter.DisplayType = (oldOC as MFACounter).DisplayType;
                                     newOC.ObjectCounter.Width = (oldOC as MFACounter).Width;
                                     newOC.ObjectCounter.Height = (oldOC as MFACounter).Height;
@@ -220,6 +241,17 @@ namespace SapphireD.Core.Data.PackageReaders
                                     newOC.ObjectValue.Initial = (oldOC as MFACounter).Value;
                                     newOC.ObjectValue.Minimum = (oldOC as MFACounter).Minimum;
                                     newOC.ObjectValue.Maximum = (oldOC as MFACounter).Maximum;
+
+                                    if (oI.CounterFlags != null)
+                                    {
+                                        newOC.ObjectCounter.IntDigitPadding = oI.CounterFlags.CounterFlags["IntFixedDigitCount"];
+                                        newOC.ObjectCounter.FloatWholePadding = oI.CounterFlags.CounterFlags["FloatFixedWholeCount"];
+                                        newOC.ObjectCounter.FloatDecimalPadding = oI.CounterFlags.CounterFlags["FloatFixedDecimalCount"];
+                                        newOC.ObjectCounter.FloatPadding = oI.CounterFlags.CounterFlags["FloatPadLeft"];
+                                        newOC.ObjectCounter.IntDigitCount = oI.CounterFlags.FixedDigits;
+                                        newOC.ObjectCounter.FloatWholeCount = oI.CounterFlags.SignificantDigits;
+                                        newOC.ObjectCounter.FloatDecimalCount = oI.CounterFlags.DecimalPoints;
+                                    }
                                     break;
                                 default:
                                     newOC.ObjectExtension.ExtensionVersion = (oldOC as MFAExtensionObject).Version;
@@ -228,10 +260,18 @@ namespace SapphireD.Core.Data.PackageReaders
                                     newOC.ObjectExtension.ExtensionData = (oldOC as MFAExtensionObject).Data;
                                     break;
                             }
+
+                            newOI.Properties = newOC;
                             break;
                     }
+
+                    if (!frameItems.ContainsKey(newOI.Header.Handle))
+                        frameItems.Add(newOI.Header.Handle, newOI);
                 }
             }
+
+            FrameItems.Count = frameItems.Count;
+            FrameItems.Items = frameItems;
         }
 
         public override void CliUpdate()
@@ -247,7 +287,7 @@ namespace SapphireD.Core.Data.PackageReaders
                 {
                     if (Finished)
                         mainTask.Value = 7;
-                    else if (Frames.Count > 0)
+                    else if (FrameOffsets.Length > 0)
                     {
                         mainTask.Value = 6;
 

@@ -1,9 +1,4 @@
 ﻿using SapphireD.Core.Memory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SapphireD.Core.Data.Chunks.AppChunks
 {
@@ -40,7 +35,10 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteShort((short)FileName.Length);
+            writer.WriteUnicode(FileName);
+            writer.WriteInt(FileData.Length);
+            writer.WriteBytes(FileData);
         }
     }
 }

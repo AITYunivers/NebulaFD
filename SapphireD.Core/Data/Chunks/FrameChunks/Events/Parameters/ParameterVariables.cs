@@ -41,5 +41,15 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
                 MaskDouble <<= 4;
             }
         }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            writer.WriteInt(Flags);
+            writer.WriteInt(FlagMasks);
+            writer.WriteInt(FlagValues);
+
+            foreach (ParameterVariable variable in Variables)
+                variable.WriteMFA(writer);
+        }
     }
 }

@@ -6,10 +6,15 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
 {
     public class MFAString : MFAObjectLoader
     {
-        public BitDict Flags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict StringFlags = new BitDict( // String Flags
+            "HoriCenter",               // Alignment Horizontal: Center
+            "HoriRight",                // Alignment Horizontal: Right
+            "VertCenter",               // Alignment Vertical: Center
+            "VertBottom",               // Alignment Vertical: Bottom
+            "", "", "", "", "", "", "", //
+            "", "", "", "", "", "",     //
+            "RightToLeft"               // Right-to-left reading
+        );
 
         public int Width;
         public int Height;
@@ -31,7 +36,7 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
             Height = reader.ReadInt();
             Font = reader.ReadInt();
             Color = reader.ReadColor();
-            Flags.Value = reader.ReadUInt();
+            StringFlags.Value = reader.ReadUInt();
             reader.Skip(4);
 
             Paragraphs = new ObjectParagraph[reader.ReadUInt()];
@@ -40,6 +45,22 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
                 Paragraphs[i] = new ObjectParagraph();
                 Paragraphs[i].ReadMFA(reader);
             }
+        }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            base.WriteMFA(writer, extraInfo);
+
+            writer.WriteInt(Width);
+            writer.WriteInt(Height);
+            writer.WriteInt(Font);
+            writer.WriteColor(Color);
+            writer.WriteUInt(StringFlags.Value);
+            writer.WriteInt(0);
+
+            writer.WriteInt(Paragraphs.Length);
+            foreach (ObjectParagraph paragraph in Paragraphs)
+                paragraph.WriteMFA(writer);
         }
     }
 }

@@ -26,7 +26,8 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
             Name = reader.ReadAutoYuniversal();
             FileName = reader.ReadAutoYuniversal();
             Magic = reader.ReadInt();
-            SubType = reader.ReadYuniversal(reader.ReadInt());
+            SubType = reader.ReadAutoYuniversal();
+            reader.Skip(4);
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

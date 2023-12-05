@@ -39,5 +39,27 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
             Private = reader.ReadInt();
             Data = reader.ReadBytes(DataSize - 20);
         }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            base.WriteMFA(writer, extraInfo);
+
+            writer.WriteInt(Type);
+            if (Type == -1)
+            {
+                writer.WriteAutoYunicode(Name);
+                writer.WriteAutoYunicode(FileName);
+                writer.WriteUInt(Magic);
+                writer.WriteAutoYunicode(SubType);
+            }
+
+            writer.WriteInt(Data.Length + 20);
+            writer.WriteInt(0);
+            writer.WriteInt(0);
+            writer.WriteInt(Version);
+            writer.WriteInt(ID);
+            writer.WriteInt(Private);
+            writer.WriteBytes(Data);
+        }
     }
 }

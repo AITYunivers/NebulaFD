@@ -47,5 +47,26 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
             Expression.ReadCCN(reader);
             reader.Seek(endPosition);
         }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            ByteWriter expWriter = new ByteWriter(new MemoryStream());
+            expWriter.WriteShort(ObjectType);
+            expWriter.WriteShort(Num);
+
+            if (ObjectType > 1 || ObjectType == -7)
+            {
+                expWriter.WriteUShort(ObjectInfo);
+                expWriter.WriteShort(ObjectInfoList);
+            }
+
+            Expression.WriteMFA(expWriter);
+
+            writer.WriteInt((int)expWriter.Tell());
+            writer.WriteWriter(expWriter);
+
+            expWriter.Flush();
+            expWriter.Close();
+        }
     }
 }

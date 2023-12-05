@@ -4,10 +4,12 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
 {
     public class MFACounterFlags : Chunk
     {
-        public BitDict Flags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict CounterFlags = new BitDict( // Counter Flags
+            "IntFixedDigitCount",     // Fixed number of digits
+            "FloatFixedWholeCount",   // Number of significant digits
+            "FloatFixedDecimalCount", // Number of digits after decimal point
+            "FloatPadLeft"            // Add 0's to the left
+        );
 
         public byte FixedDigits;
         public byte SignificantDigits;
@@ -26,10 +28,12 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            Flags.Value = reader.ReadByte();
+            CounterFlags.Value = reader.ReadByte();
             FixedDigits = reader.ReadByte();
             SignificantDigits = reader.ReadByte();
             DecimalPoints = reader.ReadByte();
+
+            (extraInfo[0] as MFAObjectInfo).CounterFlags = this;
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

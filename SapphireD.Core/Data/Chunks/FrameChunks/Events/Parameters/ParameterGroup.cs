@@ -4,10 +4,10 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
 {
     public class ParameterGroup : ParameterChunk
     {
-        public BitDict Flags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict GroupFlags = new BitDict( // Group Flags
+            "InactiveOnStart", // Active when frame starts Disabled
+            "Closed"           // Closed
+        );
 
         public short ID;
         public string Name = string.Empty;
@@ -19,9 +19,16 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Flags.Value = reader.ReadUShort();
+            GroupFlags.Value = reader.ReadUShort();
             ID = reader.ReadShort();
             Name = reader.ReadYuniversal();
+        }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            writer.WriteUShort((ushort)GroupFlags.Value);
+            writer.WriteShort(ID);
+            writer.WriteUnicode(Name, true);
         }
     }
 }

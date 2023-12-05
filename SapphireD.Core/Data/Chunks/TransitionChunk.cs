@@ -5,15 +5,11 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 {
     public class TransitionChunk : Chunk
     {
-        public BitDict Flags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
-
         public string ModuleName = string.Empty;
         public int Module;
         public int ID;
         public int Duration;
+        public bool UseColor;
         public Color Color = Color.Black;
 
         public string FileName = string.Empty;
@@ -31,7 +27,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             Module = reader.ReadInt();
             ID = reader.ReadInt();
             Duration = reader.ReadInt();
-            Flags.Value = reader.ReadUInt();
+            UseColor = reader.ReadInt() != 0;
             Color = reader.ReadColor();
 
             int NameOffset = reader.ReadInt();
@@ -51,7 +47,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             Module = reader.ReadInt();
             ID = reader.ReadInt();
             Duration = reader.ReadInt();
-            Flags.Value = reader.ReadUInt();
+            UseColor = reader.ReadInt() != 0;
             Color = reader.ReadColor();
             ParameterData = reader.ReadBytes(reader.ReadInt());
         }
@@ -63,7 +59,15 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteAutoYunicode(ModuleName);
+            writer.WriteAutoYunicode(FileName);
+            writer.WriteInt(Module);
+            writer.WriteInt(ID);
+            writer.WriteInt(Duration);
+            writer.WriteInt(UseColor ? 1 : 0);
+            writer.WriteColor(Color);
+            writer.WriteInt(ParameterData.Length);
+            writer.WriteBytes(ParameterData);
         }
     }
 }

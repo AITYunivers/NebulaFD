@@ -42,7 +42,13 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteInt(AlterableValues.Length);
+            for (int i = 0; i < AlterableValues.Length; i++)
+            {
+                writer.WriteAutoYunicode(AlterableValueNames[i]);
+                writer.WriteInt(0);
+                writer.WriteInt(AlterableValues[i]);
+            }
         }
     }
 }

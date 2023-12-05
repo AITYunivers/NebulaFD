@@ -38,6 +38,7 @@ namespace SapphireD.Core.Memory
 
         public void WriteBytes(byte[] value) => Write(value);
         public void WriteSingle(float value) => Write(value);
+        public void WriteFloat(float value) => Write(value);
         public void WriteDouble(double value) => Write(value);
         public void WriteString(string value) => Write(value);
 
@@ -48,11 +49,34 @@ namespace SapphireD.Core.Memory
         }*/
 
 
-        public void WriteAscii(string value) => WriteBytes(Encoding.ASCII.GetBytes(value));
+        public void WriteAscii(string value, bool appendZero = false)
+        {
+            WriteBytes(Encoding.ASCII.GetBytes(value));
+            if (appendZero) WriteByte(0);
+        }
+        public void WriteAscii(string value, int length)
+        {
+            byte[] toWrite = Encoding.ASCII.GetBytes(value);
+            Array.Resize(ref toWrite, length);
+            WriteBytes(toWrite);
+        }
         public void WriteUnicode(string value, bool appendZero = false)
         {
             WriteBytes(Encoding.Unicode.GetBytes(value));
             if (appendZero) WriteShort(0);
+        }
+        public void WriteUnicode(string value, int length)
+        {
+            byte[] toWrite = Encoding.Unicode.GetBytes(value);
+            Array.Resize(ref toWrite, length * 2);
+            WriteBytes(toWrite);
+        }
+
+        public void WriteAutoYunicode(string value)
+        {
+            WriteShort((short)value.Length);
+            WriteShort(-32768);
+            WriteUnicode(value);
         }
 
         public void WriteColor(Color color)

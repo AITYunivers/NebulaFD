@@ -3,22 +3,41 @@ using System.Drawing;
 
 namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 {
-    public class ObjectCommon : ObjectProperties
+    public class ObjectCommon : ObjectInfoProperties
     {
-        public BitDict Flags = new BitDict(new string[]       // Flags
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict ObjectFlags = new BitDict( // Object Flags
+            "DisplayInFront",         // Display In Front (Unused?)
+            "Background",             // Background
+            "SaveBackground",         // Save Background
+            "RunBeforeFadeIn",        // Run Before Fade In
+            "HasMovements",           // Has Movements
+            "HasAnimations",          // Has Animations
+            "TabStop",                // Tab Stop Focus
+            "WindowProcess",          // Is Window Process
+            "HasAlterables",          // Has Alterable Values, Strings, and Flags
+            "HasSprites",             // Uses Images
+            "InternalSaveBackground", // Interal Save Background
+            "DontFollowFrame",        // Follow the frame Disabled
+            "DisplayAsBackground",    // Display as background
+            "DontDestroyIfTooFar",    // Destroy object if too far from frame Disabled
+            "DontInactivateIfTooFar", // Inactivate if too far from window: No
+            "InactivateIfTooFar",     // Inactivate if too far from window: Yes
+            "HasText",                // Uses Text
+            "CreateAtStart", "", "",  // Create at start
+            "DontResetFrameDuration"  // Do not reset current frame duration when the animation is modified
+        );
 
-        public BitDict NewFlags = new BitDict(new string[]    // New Flags
-        {
-            "1", "2", "3", "4", "5"
-        });
-
-        public BitDict Preferences = new BitDict(new string[] // Preferences
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict NewObjectFlags = new BitDict( // New Object Flags
+            "DontSaveBackground",     // Save background Disabled
+            "WipeWithColor",          // Wipe with color
+            "DontUseFineDetection",   // Use fine detection Disabled / Collision with Box 
+            "VisibleAtStart",         // Visible at start
+            "SolidObstacle",          // Obstacle Type: Obstacle
+            "PlatformObstacle",       // Obstacle Type: Platform
+            "LadderObstacle",         // Obstacle Type: Ladder
+            "AutomaticRotations",     // Automatic Rotations Enabled
+            "InitializeFlags"         // Initialize Flags
+        );
 
         public short[] Qualifiers = new short[8];
         public string Identifier = string.Empty;
@@ -85,14 +104,14 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
                 ExtensionOffset = reader.ReadShort();
                 ValueOffset = reader.ReadShort();
             }
-            Flags.Value = reader.ReadUInt();
+            ObjectFlags.Value = reader.ReadUInt();
             for (int i = 0; i < 8; i++)
                 Qualifiers[i] = reader.ReadShort();
             DataOffset = reader.ReadShort();
             AlterableValuesOffset = reader.ReadShort();
             AlterableStringsOffset = reader.ReadShort();
-            NewFlags.Value = reader.ReadUShort();
-            Preferences.Value = reader.ReadUShort();
+            NewObjectFlags.Value = reader.ReadUShort();
+            reader.Skip(2);
             Identifier = reader.ReadAscii(4);
             BackColor = reader.ReadColor();
             TransitionInOffset = reader.ReadInt();

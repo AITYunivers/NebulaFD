@@ -2,14 +2,14 @@
 
 namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 {
-    public class ObjectBackdrop : ObjectProperties
+    public class ObjectBackdrop : ObjectInfoProperties
     {
         public int Size;
         public uint ObstacleType;
         public uint CollisionType;
         public int Width;
         public int Height;
-        public int Image;
+        public uint Image;
 
         public ObjectBackdrop()
         {
@@ -23,7 +23,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             CollisionType = reader.ReadUShort();
             Width = reader.ReadInt();
             Height = reader.ReadInt();
-            Image = reader.ReadShort();
+            Image = reader.ReadUShort();
 
             ((ObjectInfo)extraInfo[0]).Properties = this;
         }

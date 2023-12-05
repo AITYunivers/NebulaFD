@@ -6,10 +6,9 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 {
     public class FrameEvents : Chunk
     {
-        public BitDict OptionFlags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict OptionFlags = new BitDict( // Option Flags
+            "BreakChild" // Break Child
+        );
 
         public short MaxObjects;
         public short MaxObjectInfos;
@@ -183,12 +182,6 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                             Folders[i] = reader.ReadAutoYuniversal();
                     }
                 }
-                else if (identifier == "EvEd")
-                {
-                    reader.Skip(2);
-                    TimeListData = reader.ReadBytes(reader.ReadUShort() * 6);
-                    reader.Skip(2);
-                }
                 else if (identifier == "EvTs")
                 {
                     reader.Skip(2);
@@ -223,7 +216,80 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            writer.WriteUShort(1030);
+            writer.WriteUShort(0);
 
+            if (Events.Count > 0)
+            {
+                writer.WriteAscii("Evts");
+                writer.WriteInt(0);
+                /*ByteWriter evtsWriter = new ByteWriter(new MemoryStream());
+                foreach (Event evt in Events)
+                    evt.WriteMFA(evtsWriter);
+                writer.WriteInt((int)evtsWriter.Tell());
+                writer.WriteWriter(evtsWriter);*/
+            }
+
+            if (EventObjects.Length > 0)
+            {
+                writer.WriteAscii("EvOb");
+                writer.WriteInt(EventObjects.Length);
+                foreach (EventObject obj in EventObjects)
+                    obj.WriteMFA(writer);
+            }
+
+            if (Comments.Length > 0)
+            {
+                writer.WriteAscii("Rems");
+                writer.WriteInt(Comments.Length);
+                foreach (Comment comment in Comments)
+                    comment.WriteMFA(writer);
+            }
+
+            writer.WriteAscii("EvEd");
+            {
+                writer.WriteShort(-1);
+                writer.WriteShort((short)ObjectTypes.Length);
+
+                foreach (ushort type in ObjectTypes)
+                    writer.WriteUShort(type);
+                foreach (ushort handle in ObjectHandles)
+                    writer.WriteUShort(handle);
+                foreach (ushort flag in ObjectFlags)
+                    writer.WriteUShort(flag);
+
+                writer.WriteUShort((ushort)Folders.Length);
+                foreach (string folder in Folders)
+                    writer.WriteAutoYunicode(folder);
+            }
+
+            writer.WriteAscii("EvTs");
+            {
+                writer.WriteInt(10);
+                writer.WriteBytes(new byte[18]);
+            }
+
+            writer.WriteAscii("EvLs");
+            {
+                writer.WriteInt(10);
+                writer.WriteBytes(new byte[14]);
+            }
+
+            writer.WriteAscii("E2Ts");
+            {
+                writer.WriteInt(8);
+                writer.WriteBytes(new byte[8]);
+            }
+
+            writer.WriteAscii("EvCs");
+            {
+                writer.WriteInt(EditorData);
+                writer.WriteUShort(ConditionWidth);
+                writer.WriteShort(ObjectHeight);
+                writer.WriteBytes(new byte[12]);
+            }
+
+            writer.WriteAscii("!DNE");
         }
     }
 }

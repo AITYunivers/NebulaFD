@@ -39,6 +39,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             {
                 Layers[i] = new FrameLayer();
                 Layers[i].ReadMFA(reader);
+                Layers[i].SyncFlags(true);
             }
         }
 
@@ -49,7 +50,12 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteInt(Layers.Length);
+            foreach (FrameLayer layer in Layers)
+            {
+                layer.SyncFlags();
+                layer.WriteMFA(writer);
+            }
         }
     }
 }

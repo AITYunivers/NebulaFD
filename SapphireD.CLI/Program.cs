@@ -72,8 +72,8 @@ namespace SapphireD
                 fileReaderNames.Add(fileReader.Name);
 
             string? selectedReader = AnsiConsole.Prompt(new SelectionPrompt<string>()
-                                            .Title("[DeepSkyBlue2]Select a file-reader.[/]")
-                                            .AddChoices(fileReaderNames));
+                                                .Title("[DeepSkyBlue2]Select a file-reader.[/]")
+                                                .AddChoices(fileReaderNames));
 
             SapDCore.CurrentReader = null;
             foreach (FileReader fileReader in fileReaders)

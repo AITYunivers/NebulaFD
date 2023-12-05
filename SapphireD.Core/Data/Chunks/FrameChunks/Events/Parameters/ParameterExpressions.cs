@@ -27,5 +27,15 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
                 Expressions.Add(newExpression);
             }
         }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            writer.WriteShort(Comparison);
+
+            foreach (ParameterExpression expression in Expressions)
+                expression.WriteMFA(writer);
+
+            writer.WriteInt(0); // Final Expression
+        }
     }
 }

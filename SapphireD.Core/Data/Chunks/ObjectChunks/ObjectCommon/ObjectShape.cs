@@ -5,15 +5,10 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 {
     public class ObjectShape : Chunk
     {
-        public BitDict LineFlags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
-
-        public BitDict GradientFlags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict LineFlags = new BitDict( // Line Flags
+            "FlipX", // Flipped on X-Axis
+            "FlipY"  // Flipped on Y-Axis
+        );
 
         public int BorderSize;
         public Color BorderColor = Color.White;
@@ -21,7 +16,8 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public int FillType;
         public Color Color1 = Color.White;
         public Color Color2 = Color.White;
-        public int Image;
+        public bool VerticalGradient;
+        public uint Image;
 
         public ObjectShape()
         {
@@ -43,10 +39,10 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             {
                 Color1 = reader.ReadColor();
                 Color2 = reader.ReadColor();
-                GradientFlags.Value = reader.ReadUShort();
+                VerticalGradient = reader.ReadShort() != 0;
             }
 
-            Image = reader.ReadShort();
+            Image = reader.ReadUShort();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

@@ -14,7 +14,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
         {
             base.ReadCCN(reader);
 
-            SapDCore.PackageData.EditorFilename = Value;
+            SapDCore.PackageData.ExtensionsPath = Value;
         }
     }
 }

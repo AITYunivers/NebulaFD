@@ -17,5 +17,11 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
             Button = reader.ReadByte();
             IsDouble = reader.ReadByte();
         }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            writer.WriteByte(Button);
+            writer.WriteByte(IsDouble);
+        }
     }
 }

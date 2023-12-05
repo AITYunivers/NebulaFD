@@ -2,7 +2,7 @@
 
 namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 {
-    public class ObjectQuickBackdrop : ObjectProperties
+    public class ObjectQuickBackdrop : ObjectInfoProperties
     {
         public int Size;
         public uint ObstacleType;

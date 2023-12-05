@@ -9,7 +9,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public int MaximumSpeed;
         public int Repeat;
         public int RepeatFrame;
-        public int[] Frames = new int[0];
+        public uint[] Frames = new uint[0];
 
         public ObjectDirection()
         {
@@ -23,9 +23,9 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             Repeat = reader.ReadShort();
             RepeatFrame = reader.ReadShort();
 
-            Frames = new int[reader.ReadShort()];
+            Frames = new uint[reader.ReadShort()];
             for (int i = 0; i < Frames.Length; i++)
-                Frames[i] = reader.ReadShort();
+                Frames[i] = reader.ReadUShort();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -36,9 +36,9 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             Repeat = reader.ReadInt();
             RepeatFrame = reader.ReadInt();
 
-            Frames = new int[reader.ReadInt()];
+            Frames = new uint[reader.ReadInt()];
             for (int i = 0; i < Frames.Length; i++)
-                Frames[i] = reader.ReadInt();
+                Frames[i] = reader.ReadUInt();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
@@ -48,7 +48,15 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            writer.WriteInt(Index);
+            writer.WriteInt(MinimumSpeed);
+            writer.WriteInt(MaximumSpeed);
+            writer.WriteInt(Repeat);
+            writer.WriteInt(RepeatFrame);
 
+            writer.WriteInt(Frames.Length);
+            foreach (uint frame in Frames)
+                writer.WriteUInt(frame);
         }
     }
 }

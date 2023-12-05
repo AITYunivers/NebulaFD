@@ -1,5 +1,8 @@
 ﻿using SapphireD.Core.Data.Chunks.AppChunks;
 using SapphireD.Core.Data.Chunks.MFAChunks;
+using SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks;
+using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
+using SapphireD.Core.Data.Chunks.ObjectChunks;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 
@@ -54,6 +57,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             MFAFrameInfo.Handle = reader.ReadInt();
             FrameName = reader.ReadAutoYuniversal();
             FrameHeader.ReadMFA(reader);
+            FrameHeader.SyncFlags(true);
 
             // Max Objects
             reader.Skip(4);
@@ -108,7 +112,159 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            writer.WriteInt((int)extraInfo[0]);
+            writer.WriteAutoYunicode(FrameName);
+            FrameHeader.SyncFlags();
+            FrameHeader.WriteMFA(writer);
+            writer.WriteInt(1000); // Max Objects
+            writer.WriteAutoYunicode(FramePassword);
 
+            // No clue, Ibs header
+            writer.WriteInt(0);
+
+            writer.WriteInt(FrameHeader.Width / 2);
+            writer.WriteInt(FrameHeader.Height / 2);
+            FramePalette.WriteMFA(writer);
+            writer.WriteInt(73); // Stamp
+            writer.WriteInt(0); // Active Layer
+            FrameLayers.WriteMFA(writer);
+
+            writer.WriteByte(string.IsNullOrEmpty(FrameTransitionIn.ModuleName) ? (byte)0 : (byte)1);
+            if (!string.IsNullOrEmpty(FrameTransitionIn.ModuleName))
+                FrameTransitionIn.WriteMFA(writer);
+
+            writer.WriteByte(string.IsNullOrEmpty(FrameTransitionOut.ModuleName) ? (byte)0 : (byte)1);
+            if (!string.IsNullOrEmpty(FrameTransitionOut.ModuleName))
+                FrameTransitionOut.WriteMFA(writer);
+
+            Dictionary<uint, MFAObjectInfo> objectInfos = new Dictionary<uint, MFAObjectInfo>();
+            foreach (FrameInstance instance in FrameInstances.Instances)
+                if (!objectInfos.ContainsKey(instance.ObjectInfo))
+                {
+                    MFAObjectInfo newOI = new MFAObjectInfo();
+                    ObjectInfo oI = SapDCore.PackageData.FrameItems.Items[(int)instance.ObjectInfo];
+                    newOI.SyncFlags(oI.Header.ObjectFlags);
+                    newOI.Handle = oI.Header.Handle;
+                    newOI.ObjectType = oI.Header.Type;
+                    newOI.InkEffect = oI.Header.InkEffect;
+                    newOI.InkEffectParameter = oI.Header.InkEffectParam;
+                    newOI.Name = oI.Name;
+                    newOI.Transparent = true;
+                    newOI.IconType = 1;
+
+                    switch (oI.Header.Type)
+                    {
+                        case 0:
+                            MFAQuickBackdrop newOQB = new MFAQuickBackdrop();
+                            ObjectQuickBackdrop? oldOQB = oI.Properties as ObjectQuickBackdrop;
+                            newOQB.ObstacleType = oldOQB.ObstacleType;
+                            newOQB.CollisionType = oldOQB.CollisionType;
+                            newOQB.Width = oldOQB.Width * (oldOQB.Shape.LineFlags["FlipX"] ? -1 : 1);
+                            newOQB.Height = oldOQB.Height * (oldOQB.Shape.LineFlags["FlipY"] ? -1 : 1);
+                            newOQB.BorderSize = oldOQB.Shape.BorderSize;
+                            newOQB.BorderColor = oldOQB.Shape.BorderColor;
+                            newOQB.Shape = oldOQB.Shape.ShapeType;
+                            newOQB.FillType = oldOQB.Shape.FillType;
+                            newOQB.Color1 = oldOQB.Shape.Color1;
+                            newOQB.Color2 = oldOQB.Shape.Color2;
+                            newOQB.QuickBkdFlags.Value = oldOQB.Shape.VerticalGradient ? 1u : 0u;
+                            newOQB.Image = oldOQB.Shape.Image;
+
+                            newOI.ObjectLoader = newOQB;
+                            break;
+                        case 1:
+                            MFABackdrop newOBD = new MFABackdrop();
+                            ObjectBackdrop? oldOBD = oI.Properties as ObjectBackdrop;
+                            newOBD.ObstacleType = oldOBD.ObstacleType;
+                            newOBD.CollisionType = oldOBD.CollisionType;
+                            newOBD.Image = oldOBD.Image;
+
+                            newOI.ObjectLoader = newOBD;
+                            break;
+                        default:
+                            MFAObjectLoader newOC = oI.Header.Type switch
+                            {
+                                2 => new MFAActive(),
+                                3 => new MFAString(),
+                                7 => new MFACounter(),
+                                _ => new MFAExtensionObject()
+                            };
+                            ObjectCommon? oldOC = oI.Properties as ObjectCommon;
+                            newOC.ObjectFlags.Value = oldOC.ObjectFlags.Value;
+                            newOC.ObjectFlags["CCNCheck"] = false;
+                            newOC.NewObjectFlags.Value = oldOC.NewObjectFlags.Value;
+                            newOC.Background = oldOC.BackColor;
+                            newOC.Qualifiers = oldOC.Qualifiers;
+                            newOC.AlterableValues = oldOC.ObjectAlterableValues;
+                            newOC.AlterableStrings = oldOC.ObjectAlterableStrings;
+                            newOC.Movements = oldOC.ObjectMovements;
+                            newOC.TransitionIn = oldOC.ObjectTransitionIn;
+                            newOC.TransitionOut = oldOC.ObjectTransitionOut;
+
+                            switch (oI.Header.Type)
+                            {
+                                case 2:
+                                    (newOC as MFAActive).Animations = oldOC.ObjectAnimations.Animations.ToArray();
+                                    break;
+                                case 3:
+                                    (newOC as MFAString).Width = oldOC.ObjectParagraphs.Width;
+                                    (newOC as MFAString).Height = oldOC.ObjectParagraphs.Height;
+                                    (newOC as MFAString).Paragraphs = oldOC.ObjectParagraphs.Paragraphs;
+                                    break;
+                                case 7:
+                                    (newOC as MFACounter).CounterFlags.Value = 1; // Default Value
+                                    (newOC as MFACounter).DisplayType = oldOC.ObjectCounter.DisplayType;
+                                    (newOC as MFACounter).Width = oldOC.ObjectCounter.Width;
+                                    (newOC as MFACounter).Height = oldOC.ObjectCounter.Height;
+                                    (newOC as MFACounter).Images = oldOC.ObjectCounter.Frames;
+                                    (newOC as MFACounter).Font = oldOC.ObjectCounter.Font;
+                                    (newOC as MFACounter).Value = oldOC.ObjectValue.Initial;
+                                    (newOC as MFACounter).Minimum = oldOC.ObjectValue.Minimum;
+                                    (newOC as MFACounter).Maximum = oldOC.ObjectValue.Maximum;
+
+                                    newOI.CounterFlags = new MFACounterFlags();
+                                    newOI.CounterFlags.CounterFlags.Value = 0; // Default Value;
+                                    newOI.CounterFlags.CounterFlags["IntFixedDigitCount"] = oldOC.ObjectCounter.IntDigitPadding;
+                                    newOI.CounterFlags.CounterFlags["FloatFixedWholeCount"] = oldOC.ObjectCounter.FloatWholePadding;
+                                    newOI.CounterFlags.CounterFlags["FloatFixedDecimalCount"] = oldOC.ObjectCounter.FloatDecimalPadding;
+                                    newOI.CounterFlags.CounterFlags["FloatPadLeft"] = oldOC.ObjectCounter.FloatPadding;
+                                    newOI.CounterFlags.FixedDigits = oldOC.ObjectCounter.IntDigitCount;
+                                    newOI.CounterFlags.SignificantDigits = oldOC.ObjectCounter.FloatWholeCount;
+                                    newOI.CounterFlags.DecimalPoints = oldOC.ObjectCounter.FloatDecimalCount;
+                                    break;
+                                default:
+                                    (newOC as MFAExtensionObject).Version = oldOC.ObjectExtension.ExtensionVersion;
+                                    (newOC as MFAExtensionObject).ID = oldOC.ObjectExtension.ExtensionID;
+                                    (newOC as MFAExtensionObject).Private = oldOC.ObjectExtension.ExtensionPrivate;
+                                    (newOC as MFAExtensionObject).Data = oldOC.ObjectExtension.ExtensionData;
+                                    break;
+                            }
+
+                            newOI.ObjectLoader = newOC;
+                            break;
+                    }
+
+                    objectInfos.Add(instance.ObjectInfo, newOI);
+                }
+
+            writer.Write(objectInfos.Count);
+            foreach (MFAObjectInfo oI in objectInfos.Values)
+                oI.WriteMFA(writer);
+
+            MFAFrameInfo.Folders.Folders = new MFAFolder[objectInfos.Count];
+            for (uint i = 0; i < objectInfos.Count; i++)
+            {
+                MFAFolder folder = new MFAFolder();
+                folder.HiddenFolder = true;
+                folder.Children = new int[1];
+                folder.Children[0] = (int)objectInfos.Keys.ToArray()[i];
+                MFAFrameInfo.Folders.Folders[i] = folder;
+            }
+            MFAFrameInfo.Folders.WriteMFA(writer);
+            FrameInstances.WriteMFA(writer);
+            FrameEvents.WriteMFA(writer);
+            writer.WriteByte(0); // Last Chunk
+            //writer.WriteBytes(File.ReadAllBytes("Plugins\\FrameChunks.bin")); // Last MFA Frame Chunk
         }
     }
 }

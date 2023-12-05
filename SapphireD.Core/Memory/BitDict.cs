@@ -15,6 +15,14 @@
         public string[] Keys = new string[0];
         public uint Value { get; set; }
 
+        public BitDict()
+        {
+            List<string> keys = new List<string>();
+            for (int i = 0; i < 32; i++)
+                keys.Add(i.ToString());
+            Keys = keys.ToArray();
+        }
+
         public BitDict(params string[] keys) => Keys = keys;
         public bool this[string key]
         {
@@ -44,7 +52,7 @@
             foreach (var key in Keys)
                 actualKeys[key] = this[key];
 
-            return string.Join(";\n", actualKeys.Select(kv => kv.Key + "=" + kv.Value).ToArray());
+            return string.Join(";\n", actualKeys.Select(kv => kv.Key + ": " + kv.Value).ToArray());
         }
     }
 }

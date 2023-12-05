@@ -48,7 +48,20 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            writer.WriteShort(112);
+            writer.WriteByte(0);
 
+            if (HiddenFolder)
+                writer.WriteByte(3);
+            else
+            {
+                writer.WriteByte(4);
+                writer.WriteAutoYunicode(Name);
+                writer.WriteInt(Children.Length);
+            }
+
+            foreach (int child in Children)
+                writer.WriteInt(child);
         }
     }
 }

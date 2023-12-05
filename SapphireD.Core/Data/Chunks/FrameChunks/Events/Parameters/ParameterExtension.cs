@@ -20,5 +20,13 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
             Code = reader.ReadShort();
             Data = reader.ReadBytes(dataSize);
         }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            writer.WriteShort((short)Data.Length);
+            writer.WriteShort(Type);
+            writer.WriteShort(Code);
+            writer.WriteBytes(Data);
+        }
     }
 }

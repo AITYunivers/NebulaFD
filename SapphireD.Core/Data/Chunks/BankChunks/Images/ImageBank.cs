@@ -66,7 +66,15 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            writer.WriteInt(GraphicMode);
+            writer.WriteShort(PaletteVersion);
+            writer.WriteShort(PaletteEntries);
+            foreach (Color col in Palette)
+                writer.WriteColor(col);
 
+            writer.WriteInt(ImageCount);
+            foreach (Image img in Images.Values)
+                img.WriteMFA(writer);
         }
     }
 }

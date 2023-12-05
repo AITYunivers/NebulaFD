@@ -1,14 +1,40 @@
 ﻿
 using SapphireD.Core.Memory;
+using System.Diagnostics;
 
 namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 {
     public class ObjectSubApplication : Chunk
     {
-        public BitDict Options = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict SubAppFlags = new BitDict( // Sub-Application Flags
+            "ShareGlobalValues",     // Share with parent application: Global values & strings
+            "SharePlayerLives",      // Share with parent application: Lives
+            "SharePlayerScores",     // Share with parent application: Scores
+            "ShareWindowAttributes", // Share Windows Attributes (Unused?)
+            "Stretch",               // Stretch frame to object size
+            "Popup",                 // Popup Window
+            "Caption",               // Caption
+            "ToolCaption",           // Tool Caption
+            "Border",                // Border
+            "ResizeWindow",          // Resizable
+            "SystemMenu",            // System Menu
+            "DisableClose",          // Disable Close
+            "Modal",                 // Modal
+            "DialogueFrame",         // Dialog Frame
+            "Internal",              // Source: Frame from this application
+            "HideOnClose",           // Hidden on Close
+            "CustomSize",            // Customizable size
+            "InternalAboutBox",      // Internal About Box (Unused?)
+            "ClipSiblings",          // Clip Siblings
+            "SharePlayerControls",   // Share with parent application: Player Controls
+            "MDI",                   // MDI Child (Unused?)
+            "Docked", "",            // Docked
+            "DockedVertical",        // Docked Top (Unused?)
+            "DockedHorizontal",      // Docked Right (Unused?)
+            "Reopen",                // Reopen (Unused?)
+            "Sprite",                // Display as sprite
+            "IgnoreResize"           // Windows: ignore parent's 'Resize Display' option
+        );
 
         public int Width;
         public int Height;
@@ -28,7 +54,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             Height = reader.ReadInt();
             Version = reader.ReadShort();
             StartFrame = reader.ReadShort();
-            Options.Value = reader.ReadUInt();
+            SubAppFlags.Value = reader.ReadUInt();
             reader.Skip(8);
             Name = reader.ReadYuniversal();
         }

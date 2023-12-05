@@ -33,7 +33,9 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteInt(Behaviours.Length);
+            foreach (ObjectBehaviour behaviour in Behaviours)
+                behaviour.WriteMFA(writer);
         }
     }
 }

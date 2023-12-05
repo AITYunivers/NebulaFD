@@ -5,7 +5,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
     public class ObjectAnimation : Chunk
     {
         public string Name = string.Empty;
-        public ObjectDirection[] Directions = new ObjectDirection[0];
+        public List<ObjectDirection> Directions = new List<ObjectDirection>();
 
         public ObjectAnimation()
         {
@@ -20,26 +20,27 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             for (int i = 0; i < 32; i++)
                 Offsets[i] = reader.ReadShort();
 
-            Directions = new ObjectDirection[32];
+            Directions = new List<ObjectDirection>();
             for (int i = 0; i < 32; i++)
-            {
-                Directions[i] = new ObjectDirection();
                 if (Offsets[i] != 0)
                 {
                     reader.Seek(StartOffset + Offsets[i]);
-                    Directions[i].ReadCCN(reader);
+                    ObjectDirection dir = new ObjectDirection();
+                    dir.ReadCCN(reader);
+                    Directions.Add(dir);
                 }
-            }
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
             Name = reader.ReadAutoYuniversal();
-            Directions = new ObjectDirection[reader.ReadInt()];
-            for (int i = 0; i < Directions.Length; i++)
+            Directions = new List<ObjectDirection>();
+            int Count = reader.ReadInt();
+            for (int i = 0; i < Count; i++)
             {
-                Directions[i] = new ObjectDirection();
-                Directions[i].ReadMFA(reader);
+                ObjectDirection dir = new ObjectDirection();
+                dir.ReadMFA(reader);
+                Directions.Add(dir);
             }
         }
 
@@ -50,7 +51,10 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteAutoYunicode(Name);
+            writer.WriteInt(Directions.Count);
+            foreach (ObjectDirection direction in Directions)
+                direction.WriteMFA(writer);
         }
     }
 }

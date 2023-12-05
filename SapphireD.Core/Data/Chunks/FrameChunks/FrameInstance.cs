@@ -1,14 +1,12 @@
 ﻿using SapphireD.Core.Memory;
-using System.Drawing;
 
 namespace SapphireD.Core.Data.Chunks.FrameChunks
 {
     public class FrameInstance : Chunk
     {
-        public BitDict Flags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict InstanceFlags = new BitDict( // Instance Flags
+            "", "", "Locked" // Locked
+        );
 
         public uint Handle;
         public uint ObjectInfo;
@@ -42,7 +40,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             PositionY = reader.ReadInt();
             Layer = reader.ReadUInt();
             Handle = reader.ReadUInt();
-            Flags.Value = reader.ReadUShort();
+            InstanceFlags.Value = reader.ReadUShort();
             InstanceValue = reader.ReadShort();
             ParentType = reader.ReadUInt();
             ObjectInfo = reader.ReadUInt();
@@ -56,7 +54,15 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteInt(PositionX);
+            writer.WriteInt(PositionY);
+            writer.WriteUInt(Layer);
+            writer.WriteUInt(Handle);
+            writer.WriteUShort((ushort)InstanceFlags.Value);
+            writer.WriteShort(InstanceValue);
+            writer.WriteUInt(ParentType);
+            writer.WriteUInt(ObjectInfo);
+            writer.WriteUInt(ParentHandle);
         }
     }
 }

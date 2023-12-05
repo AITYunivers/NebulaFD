@@ -62,7 +62,14 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            ByteWriter paramWriter = new ByteWriter(new MemoryStream());
+            paramWriter.WriteShort((short)Code);
+            Data.WriteMFA(paramWriter);
 
+            writer.WriteUShort((ushort)paramWriter.Tell());
+            writer.WriteWriter(paramWriter);
+            paramWriter.Flush();
+            paramWriter.Close();
         }
     }
 }

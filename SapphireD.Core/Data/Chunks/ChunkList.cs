@@ -84,10 +84,10 @@ namespace SapphireD.Core.Data.Chunks
             //0x2250
             //0x2251
             //0x2252
-            //0x2253         ObjectHeaders
-            //0x2254         ObjectNames
+            { 0x2253, typeof(ObjectHeaders)       },
+            { 0x2254, typeof(ObjectNames)         },
             //0x2255         ObjectShaders
-            //0x2256         ObjectProperties
+            { 0x2256, typeof(ObjectProperties)    },
             //0x2257
             //0x2258         TrueTypeFontInfo
             //0x2259         TrueTypeFonts

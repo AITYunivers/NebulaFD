@@ -1,4 +1,5 @@
 ﻿using SapphireD.Core.Memory;
+using System.Diagnostics;
 
 namespace SapphireD.Core.Data.Chunks.AppChunks
 {
@@ -8,6 +9,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
         public List<byte> AccelShift = new();
         public List<short> AccelKey = new();
         public List<short> AccelId = new();
+        public byte[] Data = new byte[0];
 
         public MenuBar()
         {
@@ -47,13 +49,13 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             while (true)
             {
                 MenuItem menuItem = new MenuItem();
-                menuItem.ReadMFA(reader);
+                menuItem.ReadCCN(reader);
 
-                if (menuItem.Flags["4"])
+                if (menuItem.Flags["Parent"])
                     menuItem.Items = ReadMenuItems(reader);
 
                 menuItems.Add(menuItem);
-                if (menuItem.Flags["7"])
+                if (menuItem.Flags["Footer"])
                     break;
             }
             return menuItems;
@@ -61,6 +63,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
+            long realStartOffset = reader.Tell();
             uint mainSize = reader.ReadUInt();
             long startOffset = reader.Tell();
             uint headerSize = reader.ReadUInt();
@@ -71,7 +74,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             int accelSize = reader.ReadInt();
 
             reader.Seek(startOffset + menuOffset + 4);
-            Items = ReadMenuItems(reader);
+            //Items = ReadMenuItems(reader);
 
             reader.Seek(startOffset + accelOffset);
             for (int i = 0; i < accelSize / 8; i++)
@@ -83,7 +86,11 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
                 reader.Skip(2);
             }
 
-            reader.Seek(startOffset + mainSize);
+            reader.Seek(realStartOffset);
+            Data = reader.ReadBytes((int)mainSize + 4);
+            //File.WriteAllBytes(ChunkName, Data);
+            Debug.Assert(reader.Tell() == startOffset + mainSize);
+            //reader.Seek(startOffset + mainSize);
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
@@ -93,7 +100,34 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            writer.WriteBytes(File.ReadAllBytes(ChunkName));
+            return;
+            ByteWriter menuWriter = new ByteWriter(new MemoryStream());
 
+            menuWriter.WriteInt(20);
+            menuWriter.WriteInt(20);
+
+            ByteWriter dataWriter = new ByteWriter(new MemoryStream());
+            foreach (MenuItem menuItem in Items)
+                menuItem.WriteMFA(dataWriter);
+
+            menuWriter.WriteUInt((uint)dataWriter.Tell() + 4);
+            menuWriter.WriteUInt((uint)dataWriter.Tell() + 24);
+            menuWriter.WriteInt(AccelKey.Count * 8);
+            menuWriter.WriteInt(0);
+            menuWriter.WriteWriter(dataWriter);
+
+            for (int i = 0; i < AccelKey.Count; i++)
+            {
+                menuWriter.WriteByte(AccelShift[i]);
+                menuWriter.WriteByte(0);
+                menuWriter.WriteShort(AccelKey[i]);
+                menuWriter.WriteShort(AccelId[i]);
+                menuWriter.WriteShort(0);
+            }
+
+            writer.WriteUInt((uint)menuWriter.Tell());
+            writer.WriteWriter(menuWriter);
         }
     }
 }

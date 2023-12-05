@@ -4,10 +4,9 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
 {
     public class ParameterShoot : ParameterChunk
     {
-        public BitDict Flags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict ShootFlags = new BitDict( // Shoot Flags
+            "", "", "CalculateDirection" // Launch in select directions Disabled
+        );
 
         public ushort ObjectInfoParent;
         public short X;
@@ -31,7 +30,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             ObjectInfoParent = reader.ReadUShort();
-            Flags.Value = reader.ReadUShort();
+            ShootFlags.Value = reader.ReadUShort();
             X = reader.ReadShort();
             Y = reader.ReadShort();
             Slope = reader.ReadShort();
@@ -45,6 +44,25 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
             ObjectInfo = reader.ReadUShort();
             reader.Skip(4);
             ShootSpeed = reader.ReadShort();
+        }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            writer.WriteUShort(ObjectInfoParent);
+            writer.WriteUShort((ushort)ShootFlags.Value);
+            writer.WriteShort(X);
+            writer.WriteShort(Y);
+            writer.WriteShort(Slope);
+            writer.WriteShort(Angle);
+            writer.WriteInt(Direction);
+            writer.WriteShort(TypeParent);
+            writer.WriteShort(ObjectInfoList);
+            writer.WriteShort(Layer);
+
+            writer.WriteUShort(ObjectInstance);
+            writer.WriteUShort(ObjectInfo);
+            writer.WriteInt(0);
+            writer.WriteShort(ShootSpeed);
         }
     }
 }

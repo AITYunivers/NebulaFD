@@ -23,7 +23,7 @@ namespace SapphireD.Core.Memory
             return DecompressBlock(exeReader, compSize);
         }
 
-        public static byte[] DecompressOPF(ByteReader exeReader, out int decompressed)
+        /*public static byte[] DecompressOPF(ByteReader exeReader, out int decompressed)
         {
             uint decompressed_size = exeReader.ReadUInt();
             uint saved_size = decompressed_size;
@@ -31,14 +31,14 @@ namespace SapphireD.Core.Memory
             long start = exeReader.Tell();
             byte[] data = exeReader.ReadBytes();
             byte[] new_data = buf;
-            int bytesread = TinyInflate.TinyInflate.tinf_uncompress(buf, ref decompressed_size, data, (uint)data.Length);
+            int bytesread = TinyInflate.TinyInflateOLD.tinf_uncompress(buf, ref decompressed_size, data, (uint)data.Length);
             exeReader.Seek(start + bytesread);
             if (decompressed_size != saved_size)
                 throw new Exception($"Decompression failed ({saved_size}, {decompressed_size})");
 
             decompressed = (int)decompressed_size;
             return new_data;
-        }
+        }*/
 
         public static ByteReader DecompressAsReader(ByteReader exeReader, out int decompressed)
         {

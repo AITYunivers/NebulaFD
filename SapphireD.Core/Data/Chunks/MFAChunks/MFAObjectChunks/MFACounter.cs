@@ -1,16 +1,14 @@
-﻿using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
-using SapphireD.Core.Memory;
+﻿using SapphireD.Core.Memory;
+using System.Diagnostics;
 using System.Drawing;
-using System.Security.Cryptography.X509Certificates;
 
 namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
 {
     public class MFACounter : MFAObjectLoader
     {
-        public BitDict Flags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict CounterFlags = new BitDict( // Counter Flags
+            
+        );
 
         public int Value;
         public int Minimum;
@@ -22,7 +20,7 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
         public int ColorType;
         public int Width;
         public int Height;
-        public int[] Images = new int[0];
+        public uint[] Images = new uint[0];
         public uint Font;
 
         public MFACounter()
@@ -38,7 +36,7 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
             Minimum = reader.ReadInt();
             Maximum = reader.ReadInt();
             DisplayType = reader.ReadUInt();
-            Flags.Value = reader.ReadUInt();
+            CounterFlags.Value = reader.ReadUInt();
             Color1 = reader.ReadColor();
             Color2 = reader.ReadColor();
             Gradient = reader.ReadUInt();
@@ -46,11 +44,34 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
             Width = reader.ReadInt();
             Height = reader.ReadInt();
 
-            Images = new int[reader.ReadUInt()];
+            Images = new uint[reader.ReadUInt()];
             for (int i = 0; i < Images.Length; i++)
-                Images[i] = reader.ReadInt();
+                Images[i] = reader.ReadUInt();
 
             Font = reader.ReadUInt();
+        }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            base.WriteMFA(writer, extraInfo);
+
+            writer.WriteInt(Value);
+            writer.WriteInt(Minimum);
+            writer.WriteInt(Maximum);
+            writer.WriteUInt(DisplayType);
+            writer.WriteUInt(CounterFlags.Value);
+            writer.WriteColor(Color1);
+            writer.WriteColor(Color2);
+            writer.WriteUInt(Gradient);
+            writer.WriteInt(ColorType);
+            writer.WriteInt(Width);
+            writer.WriteInt(Height);
+
+            writer.WriteInt(Images.Length);
+            foreach (uint image in Images)
+                writer.WriteUInt(image);
+
+            writer.WriteUInt(Font);
         }
     }
 }

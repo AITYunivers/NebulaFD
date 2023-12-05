@@ -30,7 +30,8 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteInt(Handle);
+            writer.WriteAutoYunicode(Value);
         }
     }
 }

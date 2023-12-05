@@ -5,10 +5,10 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
 {
     public class MFAQuickBackdrop : MFAObjectLoader
     {
-        public BitDict Flags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict QuickBkdFlags = new BitDict( // Quick Backdrop Flags
+            "VerticalGradient",  // Vertical Gradient
+            "IntegralDimensions" // Integral Dimensions
+        );
 
         public uint ObstacleType;
         public uint CollisionType;
@@ -20,7 +20,7 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
         public int FillType;
         public Color Color1;
         public Color Color2;
-        public int Image;
+        public uint Image;
 
         public MFAQuickBackdrop()
         {
@@ -39,8 +39,24 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
             FillType = reader.ReadInt();
             Color1 = reader.ReadColor();
             Color2 = reader.ReadColor();
-            Flags.Value = reader.ReadUInt();
-            Image = reader.ReadInt();
+            QuickBkdFlags.Value = reader.ReadUInt();
+            Image = reader.ReadUInt();
+        }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            writer.WriteUInt(ObstacleType);
+            writer.WriteUInt(CollisionType);
+            writer.WriteInt(Width);
+            writer.WriteInt(Height);
+            writer.WriteInt(Shape);
+            writer.WriteInt(BorderSize);
+            writer.WriteColor(BorderColor);
+            writer.WriteInt(FillType);
+            writer.WriteColor(Color1);
+            writer.WriteColor(Color2);
+            writer.WriteUInt(QuickBkdFlags.Value);
+            writer.WriteUInt(Image);
         }
     }
 }

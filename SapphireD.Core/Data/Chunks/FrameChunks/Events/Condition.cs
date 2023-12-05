@@ -4,15 +4,21 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 {
     public class Condition : Chunk
     {
-        public BitDict Flags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict EventFlags = new BitDict( // Flags
+            "Repeat",         // Repeat
+            "Done",           // Done
+            "Default",        // Default
+            "DoneBeforeFade", // Done Before Fade In
+            "NotDoneInStart", // Not Done In Start
+            "Always",         // Always
+            "Bad",            // Bad
+            "BadObject"       // Bad Object
+        );
 
-        public BitDict OtherFlags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        public BitDict OtherFlags = new BitDict( // Other Flags
+            "Negated", "", "", "", "", // Not
+            "NoInterdependence"        // No Object Interdependence
+        );
 
         public short ObjectType;
         public short Num;
@@ -35,7 +41,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             Num = reader.ReadShort();
             ObjectInfo = reader.ReadShort();
             ObjectInfoList = reader.ReadShort();
-            Flags.Value = reader.ReadByte();
+            EventFlags.Value = reader.ReadByte();
             OtherFlags.Value = reader.ReadByte();
             Parameters = new Parameter[reader.ReadByte()];
             DefType = reader.ReadByte();
@@ -62,7 +68,24 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            ByteWriter condWriter = new ByteWriter(new MemoryStream());
+            condWriter.WriteShort(ObjectType);
+            condWriter.WriteShort(Num);
+            condWriter.WriteShort(ObjectInfo);
+            condWriter.WriteShort(ObjectInfoList);
+            condWriter.WriteByte((byte)EventFlags.Value);
+            condWriter.WriteByte((byte)OtherFlags.Value);
+            condWriter.WriteByte((byte)Parameters.Length);
+            condWriter.WriteByte(DefType);
+            condWriter.WriteShort(Identifier);
 
+            foreach (Parameter parameter in Parameters)
+                parameter.WriteMFA(condWriter);
+
+            writer.WriteUShort((ushort)condWriter.Tell());
+            writer.WriteWriter(condWriter);
+            condWriter.Flush();
+            condWriter.Close();
         }
     }
 }

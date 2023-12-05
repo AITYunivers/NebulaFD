@@ -1,5 +1,4 @@
-﻿using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
-using SapphireD.Core.Memory;
+﻿using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 
 namespace SapphireD.Core.Data.Chunks.ObjectChunks
@@ -8,7 +7,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
     {
         public ObjectInfoHeader Header = new();
         public string Name = string.Empty;
-        public ObjectProperties Properties = new();
+        public ObjectInfoProperties Properties = new();
 
         public ObjectInfo()
         {

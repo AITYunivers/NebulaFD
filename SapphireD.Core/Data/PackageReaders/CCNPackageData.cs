@@ -23,10 +23,10 @@ namespace SapphireD.Core.Data.PackageReaders
             SapDCore._unicode = Header != "PAME";
             Logger.Log(this, "Game Header: " + Header);
 
-            RuntimeVersion = (short)reader.ReadUInt16();
-            RuntimeSubversion = (short)reader.ReadUInt16();
-            ProductVersion = reader.ReadInt32();
-            ProductBuild = reader.ReadInt32();
+            RuntimeVersion = reader.ReadShort();
+            RuntimeSubversion = reader.ReadShort();
+            ProductVersion = reader.ReadInt();
+            ProductBuild = reader.ReadInt();
             SapDCore.Build = ProductBuild;
             Logger.Log(this, "Fusion Build: " + ProductBuild);
 
@@ -59,9 +59,12 @@ namespace SapphireD.Core.Data.PackageReaders
                     ChunksLoaded++;
                 });
 
-                if (newChunk.ChunkID == 0x2224 ||
-                    newChunk.ChunkID == 0x223B ||
-                    newChunk.ChunkID == 0x222E)
+                // Chunks with read priority
+                if (newChunk.ChunkID == 0x2224 || // App Name for Encryption
+                    newChunk.ChunkID == 0x222E || // Editor Filename for Encryption
+                    newChunk.ChunkID == 0x223B || // Copyright for Encryption
+                    newChunk.ChunkID == 0x2245 || // Extended Header for Image Bank
+                    newChunk.ChunkID == 0x2253)   // Object Headers for 2.5+ Object Bank
                     chunkReader.RunSynchronously();
                 else
                     ChunkReaders.Add(chunkReader);

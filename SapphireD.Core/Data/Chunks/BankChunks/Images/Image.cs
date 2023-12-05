@@ -1,4 +1,5 @@
-﻿using SapphireD.Core.Memory;
+﻿using SapphireD.Core.Data.Chunks.FrameChunks.Events;
+using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 using System;
 using System.Collections.Generic;
@@ -65,7 +66,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
         {
             if (SapDCore.MFA)
                 return new ImageMFA();
-            else if (SapDCore.Plus)
+            else if (SapDCore.PackageData.ExtendedHeader.CompressionFlags["OptimizeImageSize"])
                 return new Image25Plus();
             return new Image25();
         }
@@ -121,6 +122,66 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
             return BitmapCache;
         }
 
+        public void FromBitmap(Bitmap bmp)
+        {
+            Width = (short)bmp.Width;
+            Height = (short)bmp.Height;
+            GraphicMode = 4;
+
+            var bitmapData = bmp.LockBits(new Rectangle(0, 0, Width, Height),
+                                          ImageLockMode.ReadOnly,
+                                          PixelFormat.Format24bppRgb);
+            var copyPad = ImageHelper.GetPadding(Width, 4);
+            var length = bitmapData.Height * bitmapData.Stride + copyPad * 4;
+
+            var bytes = new byte[length];
+            var stride = bitmapData.Stride;
+            Marshal.Copy(bitmapData.Scan0, bytes, 0, length);
+            bmp.UnlockBits(bitmapData);
+
+            ImageData = new byte[Width * Height * 6];
+            var position = 0;
+            var pad = ImageHelper.GetPadding(Width, 3);
+
+            for (var y = 0; y < Height; y++)
+            {
+                for (var x = 0; x < Width; x++)
+                {
+                    var newPos = y * stride + x * 3;
+                    ImageData[position] = bytes[newPos];
+                    ImageData[position + 1] = bytes[newPos + 1];
+                    ImageData[position + 2] = bytes[newPos + 2];
+                    position += 3;
+                }
+
+                position += 3 * pad;
+            }
+
+            var bitmapDataAlpha = bmp.LockBits(new Rectangle(0, 0, Width, Height),
+                                                ImageLockMode.ReadOnly,
+                                                PixelFormat.Format32bppArgb);
+            var copyPadAlpha = ImageHelper.GetPadding(Width, 1);
+            var lengthAlpha = bitmapDataAlpha.Height * bitmapDataAlpha.Stride + copyPadAlpha * 4;
+
+            var bytesAlpha = new byte[lengthAlpha];
+            var strideAlpha = bitmapDataAlpha.Stride;
+            Marshal.Copy(bitmapDataAlpha.Scan0, bytesAlpha, 0, lengthAlpha);
+            bmp.UnlockBits(bitmapDataAlpha);
+
+            var aPad = ImageHelper.GetPadding(Width, 1, 4);
+            var alphaPos = position;
+            for (var y = 0; y < Height; y++)
+            {
+                for (var x = 0; x < Width; x++)
+                {
+                    ImageData[alphaPos] = bytesAlpha[y * strideAlpha + x * 4 + 3];
+                    alphaPos += 1;
+                }
+
+                alphaPos += aPad;
+            }
+        }
+
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
 
@@ -138,7 +199,98 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            PrepareForMfa();
+            Flags["LZX"] = true;
 
+            byte[] compressedImg = Decompressor.CompressBlock(ImageData);
+
+            writer.WriteUInt(Handle + 1);
+            writer.WriteInt(Checksum);
+            writer.WriteInt(References);
+            writer.WriteInt(compressedImg.Length + 4);
+            writer.WriteShort(Width);
+            writer.WriteShort(Height);
+            writer.WriteByte(GraphicMode);
+            writer.WriteByte((byte)Flags.Value);
+            writer.WriteShort(0);
+            writer.WriteShort(HotspotX);
+            writer.WriteShort(HotspotY);
+            writer.WriteShort(ActionPointX);
+            writer.WriteShort(ActionPointY);
+            writer.WriteColor(TransparentColor);
+            writer.WriteInt(ImageData.Length);
+            writer.WriteBytes(compressedImg);
+        }
+
+        public void PrepareForMfa()
+        {
+            switch (GraphicMode)
+            {
+                case 0:
+                    ImageData = ImageTranslator.AndroidMode0ToRGBA(ImageData, Width, Height, Flags["Alpha"]);
+                    ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
+                    GraphicMode = 4;
+                    break;
+                case 1:
+                    ImageData = ImageTranslator.AndroidMode1ToRGBA(ImageData, Width, Height, Flags["Alpha"]);
+                    ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
+                    GraphicMode = 4;
+                    break;
+                case 2:
+                    ImageData = ImageTranslator.AndroidMode2ToRGBA(ImageData, Width, Height, Flags["Alpha"]);
+                    ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
+                    GraphicMode = 4;
+                    break;
+                case 3:
+                    ImageData = ImageTranslator.AndroidMode3ToRGBA(ImageData, Width, Height, Flags["Alpha"]);
+                    ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
+                    GraphicMode = 4;
+                    break;
+                case 4:
+                    if (SapDCore.Android)
+                    {
+                        ImageData = ImageTranslator.AndroidMode4ToRGBA(ImageData, Width, Height, Flags["Alpha"]);
+                        ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
+                    }
+                    else if (SapDCore.Fusion > 2.5f)
+                    {
+                        ImageData = ImageTranslator.Normal24BitMaskedToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"], true);
+                        ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
+                    }
+                    break;
+                case 5:
+                    ImageData = ImageTranslator.AndroidMode5ToRGBA(ImageData, Width, Height, Flags["Alpha"], Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
+                    ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
+                    GraphicMode = 4;
+                    break;
+                case 8:
+                    ImageData = ImageTranslator.TwoFivePlusToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], SapDCore.Fusion > 2.5f);
+                    ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"]);
+                    GraphicMode = 4;
+                    break;
+            }
+        }
+
+        public Image Clone()
+        {
+            Image newImg = new Image();
+            newImg.Handle = Handle;
+            newImg.Checksum = Checksum;
+            newImg.References = References;
+            newImg.Width = Width;
+            newImg.Height = Height;
+            newImg.GraphicMode = GraphicMode;
+            newImg.HotspotX = HotspotX;
+            newImg.HotspotY = HotspotY;
+            newImg.ActionPointX = ActionPointX;
+            newImg.ActionPointY = ActionPointY;
+            newImg.TransparentColor = TransparentColor;
+
+            newImg.ImageData = ImageData;
+            newImg.BitmapCache = BitmapCache;
+
+            newImg.Flags.Value = Flags.Value;
+            return newImg;
         }
     }
 }

@@ -4,18 +4,23 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 {
     public class ObjectCounter : Chunk
     {
-        public BitDict Flags = new BitDict(new string[]
-        {
-            "1", "2", "3", "4", "5"
-        });
-
         public int Size;
         public int Width;
         public int Height;
         public short Player;
         public uint DisplayType;
+
+        public bool IntDigitPadding;
+        public bool FloatWholePadding;
+        public bool FloatDecimalPadding;
+        public bool FloatPadding;
+
+        public byte IntDigitCount;
+        public byte FloatWholeCount;
+        public byte FloatDecimalCount;
+
         public uint Font;
-        public int[] Frames = new int[0];
+        public uint[] Frames = new uint[0];
         public ObjectShape Shape = new();
 
         public ObjectCounter()
@@ -30,7 +35,14 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             Height = reader.ReadInt();
             Player = reader.ReadShort();
             DisplayType = reader.ReadUShort();
-            Flags.Value = reader.ReadUShort();
+            ushort digitCounts = reader.ReadUShort();
+            IntDigitCount = (byte)(digitCounts & 0xF);
+            FloatWholeCount = (byte)(((digitCounts & 0xF0) >> 4) + 1);
+            FloatDecimalCount = (byte)((digitCounts & 0xF000) >> 12);
+            IntDigitPadding = IntDigitCount > 0;
+            FloatWholePadding = (digitCounts & 0x200) != 0;
+            FloatDecimalPadding = (digitCounts & 0x400) != 0;
+            FloatPadding = (digitCounts & 0x800) != 0;
             Font = reader.ReadUShort();
 
             switch (DisplayType)
@@ -38,9 +50,9 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
                 case 1:
                 case 4:
                 case 50:
-                    Frames = new int[reader.ReadShort()];
+                    Frames = new uint[reader.ReadShort()];
                     for (int i = 0; i < Frames.Length; i++)
-                        Frames[i] = reader.ReadShort();
+                        Frames[i] = reader.ReadUShort();
                     break;
                 case 2:
                 case 3:

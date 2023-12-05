@@ -16,5 +16,10 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
         {
             Color = reader.ReadColor();
         }
+
+        public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
+        {
+            writer.WriteColor(Color);
+        }
     }
 }
