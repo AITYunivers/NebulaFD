@@ -1,5 +1,7 @@
 ﻿using SapphireD.Core.Data.Chunks;
+using SapphireD.Core.Data.Chunks.AppChunks;
 using SapphireD.Core.Data.Chunks.FrameChunks;
+using SapphireD.Core.Data.Chunks.ObjectChunks;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 using Spectre.Console;
@@ -33,7 +35,8 @@ namespace SapphireD.Core.Data.PackageReaders
             if (SapDCore.Build < 280)
                 SapDCore.Fusion = 2f + (ProductVersion == 1 ? 0.1f : 0);
 
-            Frames = new List<Frame>();
+            Frames = new Dictionary<int, Frame>();
+            int frameHandle = 0;
             while (reader.HasMemory(8))
             {
                 var newChunk = Chunk.InitChunk(reader);
@@ -59,12 +62,15 @@ namespace SapphireD.Core.Data.PackageReaders
                     ChunksLoaded++;
                 });
 
+                if (newChunk is Frame)
+                    (newChunk as Frame).Handle = frameHandle++;
+
                 // Chunks with read priority
-                if (newChunk.ChunkID == 0x2224 || // App Name for Encryption
-                    newChunk.ChunkID == 0x222E || // Editor Filename for Encryption
-                    newChunk.ChunkID == 0x223B || // Copyright for Encryption
-                    newChunk.ChunkID == 0x2245 || // Extended Header for Image Bank
-                    newChunk.ChunkID == 0x2253)   // Object Headers for 2.5+ Object Bank
+                if (newChunk is AppName        || // For Encryption
+                    newChunk is EditorFilename || // For Encryption
+                    newChunk is Copyright      || // For Encryption
+                    newChunk is ExtendedHeader || // For Image Bank
+                    newChunk is ObjectHeaders)    // For 2.5+ Object Bank
                     chunkReader.RunSynchronously();
                 else
                     ChunkReaders.Add(chunkReader);

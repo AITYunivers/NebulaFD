@@ -129,7 +129,7 @@ namespace SapphireD.Core.Data.PackageReaders
                 reader.Seek(offset);
                 Frame frame = new Frame();
                 frame.ReadMFA(reader);
-                Frames.Add(frame);
+                Frames.Add(frame.Handle, frame);
             }
 
             reader.Seek(returnOffset);
@@ -164,7 +164,7 @@ namespace SapphireD.Core.Data.PackageReaders
             }
 
             Dictionary<int, ObjectInfo> frameItems = new Dictionary<int, ObjectInfo>();
-            foreach (Frame frame in Frames)
+            foreach (Frame frame in Frames.Values)
             {
                 foreach (MFAObjectInfo oI in frame.MFAFrameInfo.Objects)
                 {
@@ -175,7 +175,13 @@ namespace SapphireD.Core.Data.PackageReaders
                     newOI.Header.InkEffect = oI.InkEffect;
                     newOI.Header.InkEffectParam = oI.InkEffectParameter;
                     newOI.Name = oI.Name;
-                    
+
+                    if (newOI.Header.InkEffect != 1 && oI.ObjectEffects != null)
+                    {
+                        newOI.Header.RGBCoeff = oI.ObjectEffects.RGBCoeff;
+                        newOI.Header.BlendCoeff = oI.ObjectEffects.BlendCoeff;
+                    }
+
                     switch (oI.ObjectType)
                     {
                         case 0:
@@ -225,12 +231,17 @@ namespace SapphireD.Core.Data.PackageReaders
                             switch (oI.ObjectType)
                             {
                                 case 2:
-                                    newOC.ObjectAnimations.Animations = (oldOC as MFAActive).Animations.ToList();
+                                    newOC.ObjectAnimations.Animations = new Dictionary<int, ObjectAnimation>();
+                                    for (int i = 0; i < (oldOC as MFAActive).Animations.Count; i++)
+                                        newOC.ObjectAnimations.Animations.Add(i, (oldOC as MFAActive).Animations[i]);
                                     break;
                                 case 3:
                                     newOC.ObjectParagraphs.Width = (oldOC as MFAString).Width;
                                     newOC.ObjectParagraphs.Height = (oldOC as MFAString).Height;
                                     newOC.ObjectParagraphs.Paragraphs = (oldOC as MFAString).Paragraphs;
+                                    newOC.ObjectParagraphs.Paragraphs[0].FontHandle = (ushort)(oldOC as MFAString).Font;
+                                    newOC.ObjectParagraphs.Paragraphs[0].Color = (oldOC as MFAString).Color;
+                                    newOC.ObjectParagraphs.Paragraphs[0].ParagraphFlags.Value = (oldOC as MFAString).StringFlags.Value;
                                     break;
                                 case 7:
                                     newOC.ObjectCounter.DisplayType = (oldOC as MFACounter).DisplayType;

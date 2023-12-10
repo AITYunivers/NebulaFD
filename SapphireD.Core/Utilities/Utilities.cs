@@ -44,10 +44,10 @@ namespace SapphireD.Core.Utilities
             using (var graphics = Graphics.FromImage(destImage))
             {
                 graphics.CompositingMode = CompositingMode.SourceCopy;
-                graphics.CompositingQuality = CompositingQuality.HighQuality;
-                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                graphics.SmoothingMode = SmoothingMode.HighQuality;
-                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                graphics.CompositingQuality = CompositingQuality.GammaCorrected;
+                graphics.InterpolationMode = InterpolationMode.Bilinear;
+                graphics.SmoothingMode = SmoothingMode.Default;
+                graphics.PixelOffsetMode = PixelOffsetMode.None;
 
                 using (var wrapMode = new ImageAttributes())
                 {

@@ -49,7 +49,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             writer.WriteAutoYunicode(FileName);
             writer.WriteInt(MagicNumber);
             writer.WriteAutoYunicode(SubType);
-            writer.WriteInt(1);
+            writer.WriteInt(0); // Is Unicode? How set this??
         }
     }
 }

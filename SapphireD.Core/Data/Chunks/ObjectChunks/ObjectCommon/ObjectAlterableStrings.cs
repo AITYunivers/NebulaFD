@@ -15,8 +15,12 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             AlterableStrings = new string[reader.ReadShort()];
+            AlterableStringNames = new string[AlterableStrings.Length];
             for (int i = 0; i < AlterableStrings.Length; i++)
+            {
+                AlterableStringNames[i] = string.Empty;
                 AlterableStrings[i] = reader.ReadYuniversal();
+            }
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

@@ -43,7 +43,16 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteByte((byte)ChunkID);
+            ByteWriter chunkWriter = new ByteWriter(new MemoryStream());
+            chunkWriter.WriteByte((byte)CounterFlags.Value);
+            chunkWriter.WriteByte(FixedDigits);
+            chunkWriter.WriteByte(SignificantDigits);
+            chunkWriter.WriteByte(DecimalPoints);
+            writer.WriteInt((int)chunkWriter.Tell());
+            writer.WriteWriter(chunkWriter);
+            chunkWriter.Flush();
+            chunkWriter.Close();
         }
     }
 }

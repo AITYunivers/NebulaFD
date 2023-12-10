@@ -34,12 +34,12 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             "RunWhileResizing"              // Run while resizing
         );
         public BitDict OtherFlags = new BitDict( // Other Flags
-            "DebuggerShortcuts", "", "",                // Enable debugger keyboard shortcuts
-            "DontShareSubAppData", "", "",              // Do not share data if run as sub-application
-            "IncludeExternalFiles",                     // Include external files
-            "ShowDebugger", "", "", "", "", "", "", "", // Show Debugger
-            "Direct3D9or11",                            // Display Mode: Direct 3D 9 / Direct 3D 11
-            "Direct3D8or11"                             // Display Mode: Direct 3D 8 / Direct 3D 11
+            "DebuggerShortcuts", "", "",            // Enable debugger keyboard shortcuts
+            "DontShareSubAppData", "", "",          // Do not share data if run as sub-application
+            "IncludeExternalFiles",                 // Include external files
+            "ShowDebugger", "", "", "", "", "", "", // Show Debugger
+            "Direct3D9or11",                        // Display Mode: Direct 3D 9 / Direct 3D 11
+            "Direct3D8or11"                         // Display Mode: Direct 3D 8 / Direct 3D 11
         );
         public BitDict DisplayFlags = new BitDict( // Display Flags (MFA Only)
             "MaximizedOnBoot",       // Maximized on boot-up

@@ -25,7 +25,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            FontHandle = reader.ReadUShort();
+            FontHandle = (ushort)(reader.ReadUShort() + 1u);
             ParagraphFlags.Value = reader.ReadUShort();
             Color = reader.ReadColor();
             Value = reader.ReadYuniversal();

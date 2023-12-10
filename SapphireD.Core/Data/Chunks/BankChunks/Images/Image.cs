@@ -1,14 +1,8 @@
-﻿using SapphireD.Core.Data.Chunks.FrameChunks.Events;
-using SapphireD.Core.Memory;
+﻿using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SapphireD.Core.Data.Chunks.BankChunks.Images
 {
@@ -204,7 +198,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
 
             byte[] compressedImg = Decompressor.CompressBlock(ImageData);
 
-            writer.WriteUInt(Handle + 1);
+            writer.WriteUInt(Handle);
             writer.WriteInt(Checksum);
             writer.WriteInt(References);
             writer.WriteInt(compressedImg.Length + 4);

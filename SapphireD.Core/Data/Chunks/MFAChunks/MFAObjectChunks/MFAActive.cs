@@ -5,7 +5,7 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
 {
     public class MFAActive : MFAObjectLoader
     {
-        public ObjectAnimation[] Animations = new ObjectAnimation[0];
+        public Dictionary<int, ObjectAnimation> Animations = new Dictionary<int, ObjectAnimation>();
 
         public MFAActive()
         {
@@ -18,11 +18,13 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
 
             if (reader.ReadByte() == 0) return;
 
-            Animations = new ObjectAnimation[reader.ReadUInt()];
-            for (int i = 0; i < Animations.Length; i++)
+            Animations = new Dictionary<int, ObjectAnimation>();
+            uint count = reader.ReadUInt();
+            for (int i = 0; i < count; i++)
             {
-                Animations[i] = new ObjectAnimation();
-                Animations[i].ReadMFA(reader);
+                ObjectAnimation anim = new ObjectAnimation();
+                anim.ReadMFA(reader);
+                Animations.Add(i, anim);
             }
         }
 
@@ -31,8 +33,8 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
             base.WriteMFA(writer, extraInfo);
 
             writer.WriteByte(1);
-            writer.WriteInt(Animations.Length);
-            foreach (ObjectAnimation animation in Animations)
+            writer.WriteInt(Animations.Count);
+            foreach (ObjectAnimation animation in Animations.Values)
                 animation.WriteMFA(writer);
         }
     }

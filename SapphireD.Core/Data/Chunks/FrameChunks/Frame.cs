@@ -10,6 +10,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 {
     public class Frame : Chunk
     {
+        public int Handle = 0;
         public FrameHeader FrameHeader = new();               // 0x3334
         public string FrameName = string.Empty;               // 0x3335
         public string FramePassword = string.Empty;           // 0x3336
@@ -47,14 +48,14 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                 newChunk.ChunkData = null;
             }
 
-            SapDCore.PackageData.Frames.Add(this);
+            SapDCore.PackageData.Frames.Add(Handle, this);
             log = $"Frame '{FrameName}' found.";
             Logger.Log(this, log, color: ConsoleColor.Green);
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            MFAFrameInfo.Handle = reader.ReadInt();
+            Handle = reader.ReadInt();
             FrameName = reader.ReadAutoYuniversal();
             FrameHeader.ReadMFA(reader);
             FrameHeader.SyncFlags(true);
@@ -150,7 +151,15 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                     newOI.InkEffectParameter = oI.Header.InkEffectParam;
                     newOI.Name = oI.Name;
                     newOI.Transparent = true;
+                    newOI.IconHandle = oI.IconHandle;
                     newOI.IconType = 1;
+
+                    if (newOI.InkEffect != 1)
+                    {
+                        newOI.ObjectEffects = new MFAObjectEffects();
+                        newOI.ObjectEffects.RGBCoeff = oI.Header.RGBCoeff;
+                        newOI.ObjectEffects.BlendCoeff = oI.Header.BlendCoeff;
+                    }
 
                     switch (oI.Header.Type)
                     {
@@ -204,11 +213,22 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                             switch (oI.Header.Type)
                             {
                                 case 2:
-                                    (newOC as MFAActive).Animations = oldOC.ObjectAnimations.Animations.ToArray();
+                                    int highest = 0;
+                                    foreach (var Dict in oldOC.ObjectAnimations.Animations)
+                                        highest = Math.Max(highest, Dict.Key);
+                                    (newOC as MFAActive).Animations = new Dictionary<int, ObjectAnimation>();
+                                    for (int i = 0; i <= highest; i++)
+                                        if (oldOC.ObjectAnimations.Animations.ContainsKey(i))
+                                            (newOC as MFAActive).Animations.Add(i, oldOC.ObjectAnimations.Animations[i]);
+                                        else
+                                            (newOC as MFAActive).Animations.Add(i, new ObjectAnimation());
                                     break;
                                 case 3:
                                     (newOC as MFAString).Width = oldOC.ObjectParagraphs.Width;
                                     (newOC as MFAString).Height = oldOC.ObjectParagraphs.Height;
+                                    (newOC as MFAString).Font = oldOC.ObjectParagraphs.Paragraphs[0].FontHandle;
+                                    (newOC as MFAString).Color = oldOC.ObjectParagraphs.Paragraphs[0].Color;
+                                    (newOC as MFAString).StringFlags.Value = oldOC.ObjectParagraphs.Paragraphs[0].ParagraphFlags.Value;
                                     (newOC as MFAString).Paragraphs = oldOC.ObjectParagraphs.Paragraphs;
                                     break;
                                 case 7:

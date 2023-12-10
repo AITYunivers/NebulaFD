@@ -7,8 +7,8 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
             Handle = reader.ReadUInt();
-            if (SapDCore.Build >= 284)
-                Handle--;
+            if (SapDCore.Build < 284)
+                Handle++;
 
             Checksum = reader.ReadInt();
             References = reader.ReadInt();

@@ -18,7 +18,10 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             AlterableValues = new int[reader.ReadShort()];
             AlterableValueNames = new string[AlterableValues.Length];
             for (int i = 0; i < AlterableValues.Length; i++)
+            {
+                AlterableValueNames[i] = string.Empty;
                 AlterableValues[i] = reader.ReadInt();
+            }
 
             AlterableFlags = reader.ReadUInt();
         }

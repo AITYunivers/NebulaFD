@@ -50,7 +50,7 @@ namespace SapphireD.Core.Data
         public byte[] Protection = new byte[0];             // 0x2242
         public ExtendedHeader ExtendedHeader = new();       // 0x2245
         public int AppCodePage;                             // 0x2246
-        public List<Frame> Frames = new();                  // 0x3333
+        public Dictionary<int, Frame> Frames = new();       // 0x3333
         public ObjectAnimations ObjectAnimations = new();   // 0x4449
         public AnimationOffsets AnimationOffsets = new();   // 0x444A
 

@@ -28,11 +28,12 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
         public uint InkEffectParameter;
         public int AntiAliasing;
         public int IconType;
-        public int IconHandle;
+        public uint IconHandle;
         public MFAObjectLoader ObjectLoader = new();
 
         // Chunks
-        public MFACounterFlags? CounterFlags = null; // 0x16
+        public MFACounterFlags? CounterFlags = null;   // 0x16
+        public MFAObjectEffects? ObjectEffects = null; // 0x2D
 
         public MFAObjectInfo()
         {
@@ -55,7 +56,7 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
             AntiAliasing = reader.ReadInt();
             ObjectFlags.Value = reader.ReadUInt();
             IconType = reader.ReadInt();
-            IconHandle = reader.ReadInt();
+            IconHandle = reader.ReadUInt();
 
             while (true)
             {
@@ -114,22 +115,12 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
             writer.WriteInt(AntiAliasing);
             writer.WriteUInt(ObjectFlags.Value);
             writer.WriteInt(IconType);
-            writer.WriteInt(IconHandle);
+            writer.WriteUInt(IconHandle);
 
-            ByteWriter? chunkWriter = null;
             if (CounterFlags != null)
-            {
-                writer.WriteByte((byte)CounterFlags.ChunkID);
-                chunkWriter = new ByteWriter(new MemoryStream());
-                chunkWriter.WriteByte((byte)CounterFlags.CounterFlags.Value);
-                chunkWriter.WriteByte(CounterFlags.FixedDigits);
-                chunkWriter.WriteByte(CounterFlags.SignificantDigits);
-                chunkWriter.WriteByte(CounterFlags.DecimalPoints);
-                writer.WriteInt((int)chunkWriter.Tell());
-                writer.WriteWriter(chunkWriter);
-                chunkWriter.Flush();
-                chunkWriter.Close();
-            }
+                CounterFlags.WriteMFA(writer);
+            if (ObjectEffects != null)
+                ObjectEffects.WriteMFA(writer);
             writer.WriteByte(0); // Last Chunk
 
             ObjectLoader.WriteMFA(writer);

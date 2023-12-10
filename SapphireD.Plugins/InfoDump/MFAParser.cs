@@ -6,19 +6,26 @@ using SapphireD.Core.Data.Chunks.BankChunks.Images;
 using SapphireD.Core.Data.Chunks.FrameChunks;
 using SapphireD.Core.Data.Chunks.FrameChunks.Events;
 using SapphireD.Core.Data.Chunks.MFAChunks;
+using SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks;
 using SapphireD.Core.Data.Chunks.ObjectChunks;
 using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Reflection.PortableExecutable;
+using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.X86;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using Image = SapphireD.Core.Data.Chunks.BankChunks.Images.Image;
+using Size = System.Drawing.Size;
 
 #pragma warning disable CA1416 // Validate platform compatibility
 namespace GameDumper
@@ -44,97 +51,38 @@ namespace GameDumper
             foreach (ObjectInfo objectInfo in dat.FrameItems.Items.Values)
             {
                 Bitmap iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFActive.png"));
-                switch (objectInfo.Header.Type)
+                try
                 {
-                    case 0: // Quick Backdrop
-                        try
-                        {
-                            Bitmap bmp = dat.ImageBank.Images[((ObjectQuickBackdrop)objectInfo.Properties).Shape.Image].GetBitmap();
-                            if (bmp.Width > bmp.Height)
-                                iconBmp = bmp.ResizeImage(new Size(32, (int)Math.Round((float)bmp.Height / bmp.Width * 32.0)));
-                            else
-                                iconBmp = bmp.ResizeImage(new Size((int)Math.Round((float)bmp.Width / bmp.Height * 32.0), 32));
-                        }
-                        catch
-                        {
-                            iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFQuickBackdrop.png"));
-                        }
-                        break;
-                    case 1: // Backdrop
-                        try
-                        {
-                            Bitmap bmp = dat.ImageBank.Images[((ObjectBackdrop)objectInfo.Properties).Image].GetBitmap();
-                            if (bmp.Width > bmp.Height)
-                                iconBmp = bmp.ResizeImage(new Size(32, (int)Math.Round((float)bmp.Height / bmp.Width * 32.0)));
-                            else
-                                iconBmp = bmp.ResizeImage(new Size((int)Math.Round((float)bmp.Width / bmp.Height * 32.0), 32));
-                        }
-                        catch
-                        {
-                            iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFBackdrop.png"));
-                        }
-                        break;
-                    case 2: // Active
-                        try
-                        {
-                            Bitmap bmp = dat.ImageBank.Images[((ObjectCommon)objectInfo.Properties).ObjectAnimations.Animations[0].Directions[0].Frames[0]].GetBitmap();
-                            if (bmp.Width > bmp.Height)
-                                iconBmp = bmp.ResizeImage(new Size(32, (int)Math.Round((float)bmp.Height / bmp.Width * 32.0)));
-                            else
-                                iconBmp = bmp.ResizeImage(new Size((int)Math.Round((float)bmp.Width / bmp.Height * 32.0), 32));
-                        }
-                        catch
-                        {
-                            iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFActive.png"));
-                        }
-                        break;
-                    case 3: // String
-                        iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFString.png"));
-                        break;
-                    case 4: // Question and Answer
-                        iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFQ&A.png"));
-                        break;
-                    case 5: // Score
-                        iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFScore.png"));
-                        break;
-                    case 6: // Lives
-                        iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFLives.png"));
-                        break;
-                    case 7: // Counter
-                        try
-                        {
-                            Bitmap bmp = dat.ImageBank.Images[((ObjectCommon)objectInfo.Properties).ObjectCounter.Frames[0]].GetBitmap();
-                            if (bmp.Width > bmp.Height)
-                                iconBmp = bmp.ResizeImage(new Size(32, (int)Math.Round((float)bmp.Height / bmp.Width * 32.0)));
-                            else
-                                iconBmp = bmp.ResizeImage(new Size((int)Math.Round((float)bmp.Width / bmp.Height * 32.0), 32));
-                        }
-                        catch
-                        {
-                            iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFCounter.png"));
-                        }
-                        break;
-                    case 8: // Formatted Text
-                        iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFFormattedText.png"));
-                        break;
-                    case 9: // Sub-Application
-                        iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFSubApplication.png"));
-                        break;
-                    case >= 32:
+                    iconBmp = objectInfo.Header.Type switch
+                    {
+                        0 => MakeIcon(dat.ImageBank.Images[((ObjectQuickBackdrop)objectInfo.Properties).Shape.Image].GetBitmap(), "MMFQuickBackdrop"),
+                        1 => MakeIcon(dat.ImageBank.Images[((ObjectBackdrop)objectInfo.Properties).Image].GetBitmap(), "MMFBackdrop"),
+                        2 => MakeIcon(dat.ImageBank.Images[((ObjectCommon)objectInfo.Properties).ObjectAnimations.Animations[0].Directions[0].Frames[0]].GetBitmap(), "MMFActive"),
+                        3 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFString.png")),
+                        4 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFQ&A.png")),
+                        5 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFScore.png")),
+                        6 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFLives.png")),
+                        7 => MakeIcon(dat.ImageBank.Images[((ObjectCommon)objectInfo.Properties).ObjectCounter.Frames[0]].GetBitmap(), "MMFCounter"),
+                        8 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFFormattedText.png")),
+                        9 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFSubApplication.png")),
+                        _ => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFActive.png"))
+                    };
+                    if (objectInfo.Header.Type >= 32)
+                    {
                         foreach (Extension posExt in dat.Extensions.Exts)
-                            if (posExt.Handle == objectInfo.Header.Type - 32)
+                            if (posExt.Handle == objectInfo.Header.Type - 32 && File.Exists("Plugins\\ObjectIcons\\" + posExt.Name + ".png"))
                             {
-                                if (File.Exists("Plugins\\ObjectIcons\\" + posExt.Name + ".png"))
-                                    iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\" + posExt.Name + ".png"));
+                                iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\" + posExt.Name + ".png"));
                                 break;
                             }
-                        break;
-                }
+                    }
+                } catch {}
 
                 var newIconImage = new Image();
-                newIconImage.Handle = (uint)IconBank.Images.Count;
+                newIconImage.Handle = (uint)IconBank.Images.Count + 20;
                 newIconImage.FromBitmap(iconBmp);
                 IconBank.Images.Add(newIconImage.Handle, newIconImage);
+                objectInfo.IconHandle = newIconImage.Handle;
             }
             IconBank.ImageCount = IconBank.Images.Count;
 
@@ -230,6 +178,62 @@ namespace GameDumper
             frameWriter.Close();
             writer.Flush();
             writer.Close();
+        }
+
+        public Bitmap MakeIcon(Bitmap source, string @default)
+        {
+            Bitmap output = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\" + @default + ".png"));
+
+            if (source.Width > 32 || source.Height > 32)
+            {
+                if (source.Width > source.Height)
+                    output = source.ResizeImage(new Size(32, (int)Math.Round((float)source.Height / source.Width * 32.0)));
+                else
+                    output = source.ResizeImage(new Size((int)Math.Round((float)source.Width / source.Height * 32.0), 32));
+            }
+            else
+            {
+                Rectangle destRect;
+                if (source.Width > source.Height)
+                {
+                    output = new Bitmap(32, source.Height);
+                    destRect = new Rectangle(0, 16 - source.Height / 2, source.Width, source.Height);
+                }
+                else
+                {
+                    output = new Bitmap(source.Width, 32);
+                    destRect = new Rectangle(16 - source.Width / 2, 0, source.Width, source.Height);
+                }
+
+                using (Graphics graphics = Graphics.FromImage(output))
+                {
+                    graphics.DrawImage(source, destRect);
+                }
+            }
+
+            // Alpha Fix
+            bool hasPixels = false;
+            {
+                var bitmapData = output.LockBits(new Rectangle(0, 0, output.Width, output.Height),
+                                                 ImageLockMode.ReadOnly,
+                                                 PixelFormat.Format32bppArgb);
+                var length = Math.Abs(bitmapData.Stride) * output.Height;
+                var bytes = new byte[length];
+                Marshal.Copy(bitmapData.Scan0, bytes, 0, length);
+
+                for (int i = 3; i < length; i += 4)
+                {
+                    bytes[i] = (byte)Math.Ceiling(bytes[i] / 255f);
+                    if (!hasPixels && bytes[i] == 1) hasPixels = true;
+                    bytes[i] *= 255;
+                }
+
+                Marshal.Copy(bytes, 0, bitmapData.Scan0, length);
+                output.UnlockBits(bitmapData);
+            }
+
+            if (hasPixels && output.Width > 1) return output;
+            else return new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\" + @default + ".png"));
         }
     }
 }

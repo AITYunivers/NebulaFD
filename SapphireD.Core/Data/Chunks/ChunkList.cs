@@ -25,7 +25,7 @@ namespace SapphireD.Core.Data.Chunks
             //0x002A
             //0x002B
             //0x002C
-            //0x002D         ObjectEffects
+            { 0x002D, typeof(MFAObjectEffects)    },
             //0x002E
             //0x002F
             //0x0030

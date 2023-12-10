@@ -8,6 +8,8 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
         public ObjectInfoHeader Header = new();
         public string Name = string.Empty;
         public ObjectInfoProperties Properties = new();
+        
+        public uint IconHandle;
 
         public ObjectInfo()
         {
