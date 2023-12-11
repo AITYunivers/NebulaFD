@@ -37,7 +37,7 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
             Version = reader.ReadInt();
             ID = reader.ReadInt();
             Private = reader.ReadInt();
-            Data = reader.ReadBytes(DataSize - 20);
+            Data = reader.ReadBytes(Math.Max(0, DataSize - 20));
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)

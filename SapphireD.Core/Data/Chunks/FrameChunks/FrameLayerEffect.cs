@@ -1,15 +1,18 @@
-﻿using SapphireD.Core.Memory;
+﻿using SapphireD.Core.Data.Chunks.BankChunks.Shaders;
+using SapphireD.Core.Memory;
 using System.Drawing;
 
 namespace SapphireD.Core.Data.Chunks.FrameChunks
 {
     public class FrameLayerEffect : Chunk
     {
-        public short Effect;
-        public short EffectParameter;
-        public Color RGBCoefficient;
         public int InkEffect;
-        //public EffectShader Shader = new EffectShader();
+        public uint InkEffectParam;
+        public Color RGBCoeff = Color.White;
+        public byte BlendCoeff;
+        public int ShaderHandle;
+        public Shader Shader = new Shader();
+        public ShaderParameter[] ShaderParameters = new ShaderParameter[0];
 
         public FrameLayerEffect()
         {
@@ -18,36 +21,62 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Effect = reader.ReadShort();
-            EffectParameter = reader.ReadShort();
-            RGBCoefficient = reader.ReadColor();
-            InkEffect = reader.ReadInt();
-            reader.Skip(8);
-            /*Shader.Parameters = new EffectParameter[reader.ReadInt()];
-            int dataOffset = reader.ReadInt();
-            if (dataOffset == 0) return;
+            int startOffset = (int)reader.Tell();
+            InkEffect = reader.ReadShort();
+            reader.Skip(2);
+            var b = reader.ReadByte();
+            var g = reader.ReadByte();
+            var r = reader.ReadByte();
+            RGBCoeff = Color.FromArgb(0, r, g, b);
+            BlendCoeff = (byte)(255 - reader.ReadByte());
+            ShaderHandle = reader.ReadInt();
+            ShaderParameters = new ShaderParameter[reader.ReadInt()];
+            int paramOffset = reader.ReadInt();
 
-            long returnOffset = reader.Tell();
-            reader.Seek(dataOffset);
-
-            ShaderInfo parentShader = SapDCore.PackageData.Shaders.ShaderInfos[InkEffect];
-            Shader.Name = parentShader.Name;
-            Shader.Handle = InkEffect;
-
-            for (int i = 0; i < Shader.Parameters.Length; i++)
+            if (paramOffset != 0)
             {
-                Shader.Parameters[i] = new EffectParameter();
-                Shader.Parameters[i].Name = parentShader.Parameters[i].Name;
-                Shader.Parameters[i].Type = parentShader.Parameters[i].Type;
-                Shader.Parameters[i].Data = reader.ReadBytes(4);
+                reader.Seek(startOffset + paramOffset);
+                Shader = SapDCore.PackageData.ShaderBank.Shaders[++ShaderHandle];
+                for (int i = 0; i < Shader.Parameters.Length; i++)
+                {
+                    ShaderParameters[i] = new ShaderParameter();
+                    ShaderParameters[i].Name = Shader.Parameters[i].Name;
+                    ShaderParameters[i].Type = Shader.Parameters[i].Type;
+                    if (ShaderParameters[i].Type == 1)
+                        ShaderParameters[i].FloatValue = reader.ReadFloat();
+                    else
+                        ShaderParameters[i].Value = reader.ReadInt();
+                }
             }
-
-            reader.Seek(returnOffset);*/
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            
+            InkEffect = reader.ReadInt();
+            var b = reader.ReadByte();
+            var g = reader.ReadByte();
+            var r = reader.ReadByte();
+            RGBCoeff = Color.FromArgb(0, r, g, b);
+            BlendCoeff = (byte)(255 - reader.ReadByte());
+            ShaderHandle = reader.ReadInt();
+
+            if (ShaderHandle != 0)
+            {
+                Shader = new Shader();
+                Shader.ReadMFA(reader);
+                ShaderParameters = new ShaderParameter[Shader.Parameters.Length];
+                for (int i = 0; i < Shader.Parameters.Length; i++)
+                {
+                    ShaderParameters[i] = new ShaderParameter();
+                    ShaderParameters[i].Name = Shader.Parameters[i].Name;
+                    ShaderParameters[i].Type = Shader.Parameters[i].Type;
+                    ShaderParameters[i].Value = Shader.Parameters[i].Value;
+                    ShaderParameters[i].FloatValue = Shader.Parameters[i].FloatValue;
+                }
+
+                if (!SapDCore.PackageData.ShaderBank.Shaders.ContainsKey(ShaderHandle))
+                    SapDCore.PackageData.ShaderBank.Shaders.Add(ShaderHandle, Shader);
+            }
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
@@ -57,7 +86,17 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteInt(InkEffect);
+            writer.WriteByte(RGBCoeff.B);
+            writer.WriteByte(RGBCoeff.G);
+            writer.WriteByte(RGBCoeff.R);
+            writer.WriteByte((byte)(255 - BlendCoeff));
+            writer.WriteInt(ShaderHandle);
+            if (ShaderHandle != 0)
+            {
+                Shader.Parameters = ShaderParameters;
+                Shader.WriteMFA(writer);
+            }
         }
     }
 }

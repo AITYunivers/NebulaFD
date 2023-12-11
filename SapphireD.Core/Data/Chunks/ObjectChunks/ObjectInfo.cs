@@ -8,6 +8,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
         public ObjectInfoHeader Header = new();
         public string Name = string.Empty;
         public ObjectInfoProperties Properties = new();
+        public ObjectInfoShader Shader = new();
         
         public uint IconHandle;
 

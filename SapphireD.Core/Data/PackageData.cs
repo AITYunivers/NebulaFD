@@ -3,6 +3,7 @@ using SapphireD.Core.Data.Chunks.AppChunks;
 using SapphireD.Core.Data.Chunks.BankChunks;
 using SapphireD.Core.Data.Chunks.BankChunks.Fonts;
 using SapphireD.Core.Data.Chunks.BankChunks.Images;
+using SapphireD.Core.Data.Chunks.BankChunks.Shaders;
 using SapphireD.Core.Data.Chunks.BankChunks.Sounds;
 using SapphireD.Core.Data.Chunks.FrameChunks;
 using SapphireD.Core.Data.Chunks.ObjectChunks;
@@ -48,6 +49,7 @@ namespace SapphireD.Core.Data
         public GlobalStringNames GlobalStringNames = new(); // 0x223D
         public bool ExeOnly;                                // 0x2240
         public byte[] Protection = new byte[0];             // 0x2242
+        public ShaderBank ShaderBank = new();               // 0x2243
         public ExtendedHeader ExtendedHeader = new();       // 0x2245
         public int AppCodePage;                             // 0x2246
         public Dictionary<int, Frame> Frames = new();       // 0x3333

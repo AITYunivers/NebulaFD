@@ -2,6 +2,7 @@
 using SapphireD.Core.Data.Chunks.BankChunks;
 using SapphireD.Core.Data.Chunks.BankChunks.Fonts;
 using SapphireD.Core.Data.Chunks.BankChunks.Images;
+using SapphireD.Core.Data.Chunks.BankChunks.Shaders;
 using SapphireD.Core.Data.Chunks.BankChunks.Sounds;
 using SapphireD.Core.Data.Chunks.FrameChunks;
 using SapphireD.Core.Data.Chunks.MFAChunks;
@@ -18,7 +19,7 @@ namespace SapphireD.Core.Data.Chunks
             { 0x0021, typeof(FrameRect)           },
             //0x0022         FrameDemoPath
             { 0x0023, typeof(FrameSeed)           },
-            //0x0025         FrameLayerEffects
+            { 0x0025, typeof(FrameLayerEffects)   },
             //0x0026
             { 0x0027, typeof(FrameMoveTimer)      },
             //0x0028         FrameEffects
@@ -68,7 +69,7 @@ namespace SapphireD.Core.Data.Chunks
             { 0x2240, typeof(ExeOnly)             },
             //0x2241
             { 0x2242, typeof(Protection)          },
-            //0x2243         Shaders
+            { 0x2243, typeof(ShaderBank)          },
             //0x2244
             { 0x2245, typeof(ExtendedHeader)      },
             { 0x2246, typeof(AppCodePage)         },
@@ -86,7 +87,7 @@ namespace SapphireD.Core.Data.Chunks
             //0x2252
             { 0x2253, typeof(ObjectHeaders)       },
             { 0x2254, typeof(ObjectNames)         },
-            //0x2255         ObjectShaders
+            { 0x2255, typeof(ObjectShaders)       },
             { 0x2256, typeof(ObjectProperties)    },
             //0x2257
             //0x2258         TrueTypeFontInfo
@@ -128,7 +129,7 @@ namespace SapphireD.Core.Data.Chunks
             { 0x4445, typeof(ObjectInfoName)      },
             { 0x4446, typeof(ObjectCommon)        },
             //0x4447
-            //0x4448         ObjectEffects
+            { 0x4448, typeof(ObjectInfoShader)    },
             { 0x4449, typeof(ObjectAnimations)    },
             { 0x444A, typeof(AnimationOffsets)    },
             //0x4500         ObjectShapes

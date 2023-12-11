@@ -180,6 +180,18 @@ namespace SapphireD.Core.Data.PackageReaders
                     {
                         newOI.Header.RGBCoeff = oI.ObjectEffects.RGBCoeff;
                         newOI.Header.BlendCoeff = oI.ObjectEffects.BlendCoeff;
+                        newOI.Shader.ShaderHandle = oI.ObjectEffects.ShaderHandle;
+                        if (newOI.Shader.ShaderHandle != 0)
+                        {
+                            newOI.Shader.ShaderParameters = new int[oI.ObjectEffects.ShaderParameters.Length];
+                            for (int i = 0; i < newOI.Shader.ShaderParameters.Length; i++)
+                            {
+                                if (oI.ObjectEffects.ShaderParameters[i].Type == 1)
+                                    newOI.Shader.ShaderParameters[i] = BitConverter.ToInt32(BitConverter.GetBytes(oI.ObjectEffects.ShaderParameters[i].FloatValue));
+                                else
+                                    newOI.Shader.ShaderParameters[i] = oI.ObjectEffects.ShaderParameters[i].Value;
+                            }
+                        }
                     }
 
                     switch (oI.ObjectType)

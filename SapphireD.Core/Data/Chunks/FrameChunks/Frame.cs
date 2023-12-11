@@ -5,6 +5,7 @@ using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using SapphireD.Core.Data.Chunks.ObjectChunks;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
+using SapphireD.Core.Data.Chunks.BankChunks.Shaders;
 
 namespace SapphireD.Core.Data.Chunks.FrameChunks
 {
@@ -159,6 +160,22 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                         newOI.ObjectEffects = new MFAObjectEffects();
                         newOI.ObjectEffects.RGBCoeff = oI.Header.RGBCoeff;
                         newOI.ObjectEffects.BlendCoeff = oI.Header.BlendCoeff;
+                        newOI.ObjectEffects.ShaderHandle = oI.Shader.ShaderHandle;
+                        if (newOI.ObjectEffects.ShaderHandle != 0)
+                        {
+                            newOI.ObjectEffects.Shader = SapDCore.PackageData.ShaderBank.Shaders[oI.Shader.ShaderHandle];
+                            newOI.ObjectEffects.ShaderParameters = new ShaderParameter[oI.Shader.ShaderParameters.Length];
+                            for (int i = 0; i < newOI.ObjectEffects.ShaderParameters.Length; i++)
+                            {
+                                newOI.ObjectEffects.ShaderParameters[i] = new ShaderParameter();
+                                newOI.ObjectEffects.ShaderParameters[i].Name = newOI.ObjectEffects.Shader.Parameters[i].Name;
+                                newOI.ObjectEffects.ShaderParameters[i].Type = newOI.ObjectEffects.Shader.Parameters[i].Type;
+                                if (newOI.ObjectEffects.ShaderParameters[i].Type == 1)
+                                    newOI.ObjectEffects.ShaderParameters[i].FloatValue = BitConverter.ToSingle(BitConverter.GetBytes(oI.Shader.ShaderParameters[i]));
+                                else
+                                    newOI.ObjectEffects.ShaderParameters[i].Value = oI.Shader.ShaderParameters[i];
+                            }
+                        }
                     }
 
                     switch (oI.Header.Type)
@@ -283,8 +300,10 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             MFAFrameInfo.Folders.WriteMFA(writer);
             FrameInstances.WriteMFA(writer);
             FrameEvents.WriteMFA(writer);
+
+            //FrameLayerEffects layerEffects = new();
+            //layerEffects.WriteMFA(writer, this);
             writer.WriteByte(0); // Last Chunk
-            //writer.WriteBytes(File.ReadAllBytes("Plugins\\FrameChunks.bin")); // Last MFA Frame Chunk
         }
     }
 }

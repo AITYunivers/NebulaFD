@@ -16,7 +16,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
         public int Handle;
         public int Type;
         public int InkEffect;
-        public Color RGBCoeff = new Color();
+        public Color RGBCoeff = Color.White;
         public byte BlendCoeff;
         public uint InkEffectParam;
 
