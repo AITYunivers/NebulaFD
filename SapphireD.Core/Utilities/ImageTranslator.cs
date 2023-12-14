@@ -456,7 +456,7 @@ namespace SapphireD.Core.Utilities
 
             return colorArray;
         }
-        public static byte[] FlashToRGBA(byte[] imageData, int width, int height, bool alpha, Color transparent, bool RGBA, bool flipRGB = false)
+        public static byte[] FlashToRGBA(byte[] imageData, int width, int height)
         {
             //Logger.Log("FlashToRGBA, Image Data Size: " + imageData.Length + ", Size: " + width + "x" + height + ", Alpha: " + alpha + ", Transparent Color: " + transparent + ", RGBA: " + RGBA + ", Flip RGB: " + flipRGB);
             byte[] colorArray = new byte[width * height * 4];
@@ -481,19 +481,17 @@ namespace SapphireD.Core.Utilities
             }
             if (position == imageData.Length)
                 return colorArray;
-            if (alpha && !RGBA)
+
+            int aPad = GetPadding(width, 1, 4);
+            int aStride = width * 4;
+            for (int y = 0; y < height; y++)
             {
-                int aPad = GetPadding(width, 1, 4);
-                int aStride = width * 4;
-                for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
                 {
-                    for (int x = 0; x < width; x++)
-                    {
-                        colorArray[(y * aStride) + (x * 4) + 3] = imageData[position];
-                        position += 1;
-                    }
-                    position += aPad;
+                    colorArray[(y * aStride) + (x * 4) + 3] = imageData[position];
+                    position += 1;
                 }
+                position += aPad;
             }
 
             return colorArray;

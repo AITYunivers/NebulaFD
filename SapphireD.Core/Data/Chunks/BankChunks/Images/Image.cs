@@ -22,6 +22,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
          * 6 - normal, 15 bits per pixel, but it's actually 16 but retarded
          * 7 - normal, 16 bits per pixel
          * 8 - 2.5+, 32 bits per pixel, 8 bits per color
+         * 9 - Flash, basically 8 but backwards
          */
 
         public uint Handle;
@@ -110,7 +111,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
                         colorArray = ImageTranslator.TwoFivePlusToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], SapDCore.Fusion == 3f);
                         break;
                     case 9:
-                        colorArray = ImageTranslator.FlashToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], SapDCore.Fusion == 3f);
+                        colorArray = ImageTranslator.FlashToRGBA(ImageData, Width, Height);
                         break;
                 }
 
@@ -264,6 +265,11 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
                     break;
                 case 8:
                     ImageData = ImageTranslator.TwoFivePlusToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], SapDCore.Fusion > 2.5f);
+                    ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"]);
+                    GraphicMode = 4;
+                    break;
+                case 9:
+                    ImageData = ImageTranslator.FlashToRGBA(ImageData, Width, Height);
                     ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"]);
                     GraphicMode = 4;
                     break;
