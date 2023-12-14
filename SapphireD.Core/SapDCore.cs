@@ -17,6 +17,7 @@ namespace SapphireD
         public static bool Android;
         public static bool iOS;
         public static bool MFA;
+        public static bool Flash;
 
         public static int Build;
         public static bool? _unicode = null;

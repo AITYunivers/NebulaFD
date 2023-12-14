@@ -51,6 +51,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            if (SapDCore.Fusion < 2.5f) return;
             while (true)
             {
                 string identifier = reader.ReadAscii(4);

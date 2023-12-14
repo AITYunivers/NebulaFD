@@ -456,6 +456,48 @@ namespace SapphireD.Core.Utilities
 
             return colorArray;
         }
+        public static byte[] FlashToRGBA(byte[] imageData, int width, int height, bool alpha, Color transparent, bool RGBA, bool flipRGB = false)
+        {
+            //Logger.Log("FlashToRGBA, Image Data Size: " + imageData.Length + ", Size: " + width + "x" + height + ", Alpha: " + alpha + ", Transparent Color: " + transparent + ", RGBA: " + RGBA + ", Flip RGB: " + flipRGB);
+            byte[] colorArray = new byte[width * height * 4];
+            int stride = width * 4;
+            int pad = GetPadding(width, 4);
+            int position = 0;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int newPos = (y * stride) + (x * 4);
+                    colorArray[newPos + 0] = imageData[position + 3];
+                    colorArray[newPos + 1] = imageData[position + 2];
+                    colorArray[newPos + 2] = imageData[position + 1];
+
+                    colorArray[newPos + 3] = 255;
+                    colorArray[(y * stride) + (x * 4) + 3] = imageData[position + 0];
+                    position += 4;
+                }
+
+                position += pad * 4;
+            }
+            if (position == imageData.Length)
+                return colorArray;
+            if (alpha && !RGBA)
+            {
+                int aPad = GetPadding(width, 1, 4);
+                int aStride = width * 4;
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        colorArray[(y * aStride) + (x * 4) + 3] = imageData[position];
+                        position += 1;
+                    }
+                    position += aPad;
+                }
+            }
+
+            return colorArray;
+        }
         public static byte[] RGBAToRGBMasked(byte[] imageData, int width, int height, bool alpha, bool RGBA = false) => RGBAToRGBMasked(imageData, width, height, alpha, Color.Black, RGBA);
         public static byte[] RGBAToRGBMasked(byte[] imageData, int width, int height, bool alpha, Color transparent, bool RGBA = false)
         {

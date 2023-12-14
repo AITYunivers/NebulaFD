@@ -62,6 +62,8 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
                 return new ImageMFA();
             else if (SapDCore.PackageData.ExtendedHeader.CompressionFlags["OptimizeImageSize"])
                 return new Image25Plus();
+            else if (SapDCore.Flash)
+                return new ImageFlash();
             return new Image25();
         }
 
@@ -106,6 +108,9 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
                         break;
                     case 8:
                         colorArray = ImageTranslator.TwoFivePlusToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], SapDCore.Fusion == 3f);
+                        break;
+                    case 9:
+                        colorArray = ImageTranslator.FlashToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], SapDCore.Fusion == 3f);
                         break;
                 }
 

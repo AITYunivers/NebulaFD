@@ -43,6 +43,12 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
         {
             Flags.Value = reader.ReadUInt();
             BuildType = reader.ReadByte();
+            switch (BuildType)
+            {
+                case 10:
+                    SapDCore.Flash = true;
+                    break;
+            }
             reader.Skip(3);
             CompressionFlags.Value = reader.ReadUInt();
             ScreenRatio = reader.ReadShort();

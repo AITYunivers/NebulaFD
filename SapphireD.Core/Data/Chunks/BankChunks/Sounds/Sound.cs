@@ -23,6 +23,13 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Sounds
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            if (SapDCore.Flash)
+            {
+                Handle = reader.ReadUShort();
+                Name = Utilities.Utilities.ClearName(reader.ReadYuniversal(reader.ReadShort()).Trim());
+                return;
+            }
+
             Handle = reader.ReadUInt() - 1;
             Checksum = reader.ReadInt();
             References = reader.ReadUInt();
