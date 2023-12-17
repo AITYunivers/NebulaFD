@@ -16,7 +16,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
         public uint ItemHandle;
         public uint InstanceHandle;
         public string Code = string.Empty;
-        public byte[] IconBuffer = new byte[0];
+        public string IconBuffer = string.Empty;
         public ushort SystemQualifier;
 
         public EventObject()
@@ -47,7 +47,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
                 case 2:
                     Code = reader.ReadAscii(4);
                     if (Code == "OIC2")
-                        IconBuffer = reader.ReadBytes(reader.ReadInt());
+                        IconBuffer = reader.ReadAutoYuniversal();
                     break;
                 case 3:
                     SystemQualifier = reader.ReadUShort();
@@ -78,10 +78,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
                 case 2:
                     writer.WriteAscii(Code);
                     if (Code == "OIC2")
-                    {
-                        writer.WriteInt(IconBuffer.Length);
-                        writer.WriteBytes(IconBuffer);
-                    }
+                        writer.WriteAutoYunicode(IconBuffer);
                     break;
                 case 3:
                     writer.WriteUShort(SystemQualifier);

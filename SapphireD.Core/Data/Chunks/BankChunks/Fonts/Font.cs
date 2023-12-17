@@ -34,7 +34,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Fonts
             Handle = reader.ReadUInt();
 
             ByteReader dataReader = null;
-            if (Compressed && !SapDCore.Flash) dataReader = Decompressor.DecompressAsReader(reader, out var decompSize);
+            if (Compressed) dataReader = Decompressor.DecompressAsReader(reader, out var decompSize);
             else dataReader = reader;
             Checksum = dataReader.ReadInt();
             References = dataReader.ReadInt();

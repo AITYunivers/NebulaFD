@@ -44,9 +44,9 @@ namespace GameDumper
             ByteWriter writer = new ByteWriter(new FileStream(path + Utilities.ClearName(Path.GetFileName(dat.EditorFilename)), FileMode.Create));
 
             IconBank.GraphicMode = dat.ImageBank.GraphicMode = dat.AppHeader.GraphicMode;
-            IconBank.PaletteVersion = dat.ImageBank.PaletteVersion = dat.Frames[0].FramePalette.PaletteVersion;
-            IconBank.PaletteEntries = dat.ImageBank.PaletteEntries = (short)dat.Frames[0].FramePalette.PaletteEntries;
-            IconBank.Palette = dat.ImageBank.Palette = dat.Frames[0].FramePalette.Palette;
+            IconBank.PaletteVersion = dat.ImageBank.PaletteVersion = dat.Frames.Values.First().FramePalette.PaletteVersion;
+            IconBank.PaletteEntries = dat.ImageBank.PaletteEntries = (short)dat.Frames.Values.First().FramePalette.PaletteEntries;
+            IconBank.Palette = dat.ImageBank.Palette = dat.Frames.Values.First().FramePalette.Palette;
 
             foreach (ObjectInfo objectInfo in dat.FrameItems.Items.Values)
             {
@@ -162,10 +162,13 @@ namespace GameDumper
 
             long offsetEnd = writer.Tell() + 4 * dat.Frames.Count + 4;
             ByteWriter frameWriter = new ByteWriter(new MemoryStream());
-            for (int i = 0; i < dat.Frames.Count; i++)
+            for (int i = 0; i < dat.Frames.Keys.Count; i++)
             {
                 writer.WriteUInt((uint)(offsetEnd + frameWriter.Tell()));
-                dat.Frames[i].WriteMFA(frameWriter, i);
+                Frame frm = dat.Frames[dat.Frames.Keys.ToArray()[i]];
+                if (!SapDCore.MFA)
+                    frm.Handle = i;
+                frm.WriteMFA(frameWriter);
             }
 
             writer.WriteUInt((uint)(offsetEnd + frameWriter.Tell()));

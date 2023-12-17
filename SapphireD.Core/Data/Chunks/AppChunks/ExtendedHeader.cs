@@ -45,8 +45,21 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             BuildType = reader.ReadByte();
             switch (BuildType)
             {
-                case 10:
+                case 10: // Adobe Flash
                     SapDCore.Flash = true;
+                    break;
+                case 12: // Android / OUYA Application
+                case 34: // Android App Bundle
+                    SapDCore.Android = true;
+                    break;
+                case 13: // iOS Application
+                case 14: // iOS Xcode Project
+                case 15: // Final iOS Xcode Project
+                    SapDCore.iOS = true;
+                    break;
+                case 27: // HTML5 Development
+                case 28: // HTML5 Final Project
+                    SapDCore.HTML = true;
                     break;
             }
             reader.Skip(3);

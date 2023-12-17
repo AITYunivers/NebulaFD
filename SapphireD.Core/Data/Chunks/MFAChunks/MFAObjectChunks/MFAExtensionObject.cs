@@ -32,12 +32,15 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
                 SubType = reader.ReadAutoYuniversal();
             }
 
+            uint RealSize = reader.ReadUInt();
+            uint EndPositon = (uint)reader.Tell() + RealSize;
             int DataSize = reader.ReadInt();
-            reader.Skip(8);
+            reader.Skip(4);
             Version = reader.ReadInt();
             ID = reader.ReadInt();
             Private = reader.ReadInt();
             Data = reader.ReadBytes(Math.Max(0, DataSize - 20));
+            reader.Seek(EndPositon);
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
@@ -54,8 +57,8 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
             }
 
             writer.WriteInt(Data.Length + 20);
-            writer.WriteInt(0);
-            writer.WriteInt(0);
+            writer.WriteInt(Data.Length + 20);
+            writer.WriteInt(-1);
             writer.WriteInt(Version);
             writer.WriteInt(ID);
             writer.WriteInt(Private);

@@ -114,7 +114,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteInt((int)extraInfo[0]);
+            writer.WriteInt(Handle);
             writer.WriteAutoYunicode(FrameName);
             FrameHeader.SyncFlags();
             FrameHeader.WriteMFA(writer);
@@ -164,7 +164,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                         if (newOI.ObjectEffects.ShaderHandle != 0)
                         {
                             newOI.ObjectEffects.Shader = SapDCore.PackageData.ShaderBank.Shaders[oI.Shader.ShaderHandle];
-                            newOI.ObjectEffects.ShaderParameters = new ShaderParameter[oI.Shader.ShaderParameters.Length];
+                            newOI.ObjectEffects.ShaderParameters = new ShaderParameter[Math.Min(oI.Shader.ShaderParameters.Length, newOI.ObjectEffects.Shader.Parameters.Length)];
                             for (int i = 0; i < newOI.ObjectEffects.ShaderParameters.Length; i++)
                             {
                                 newOI.ObjectEffects.ShaderParameters[i] = new ShaderParameter();
@@ -251,8 +251,12 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                                 case 7:
                                     (newOC as MFACounter).CounterFlags.Value = 1; // Default Value
                                     (newOC as MFACounter).DisplayType = oldOC.ObjectCounter.DisplayType;
-                                    (newOC as MFACounter).Width = oldOC.ObjectCounter.Width;
-                                    (newOC as MFACounter).Height = oldOC.ObjectCounter.Height;
+                                    (newOC as MFACounter).Width = oldOC.ObjectCounter.Width * (oldOC.ObjectCounter.Shape.LineFlags["FlipX"] ? -1 : 1);
+                                    (newOC as MFACounter).Height = oldOC.ObjectCounter.Height * (oldOC.ObjectCounter.Shape.LineFlags["FlipY"] ? -1 : 1);
+                                    (newOC as MFACounter).ColorType = oldOC.ObjectCounter.Shape.FillType;
+                                    (newOC as MFACounter).Color1 = oldOC.ObjectCounter.Shape.Color1;
+                                    (newOC as MFACounter).Color2 = oldOC.ObjectCounter.Shape.Color2;
+                                    (newOC as MFACounter).Gradient = oldOC.ObjectCounter.Shape.VerticalGradient ? 1u : 0;
                                     (newOC as MFACounter).Images = oldOC.ObjectCounter.Frames;
                                     (newOC as MFACounter).Font = oldOC.ObjectCounter.Font;
                                     (newOC as MFACounter).Value = oldOC.ObjectValue.Initial;
@@ -270,6 +274,12 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                                     newOI.CounterFlags.DecimalPoints = oldOC.ObjectCounter.FloatDecimalCount;
                                     break;
                                 default:
+                                    (newOC as MFAExtensionObject).Type = -1;
+                                    Extension ext = SapDCore.PackageData.Extensions.Exts[newOI.ObjectType - 32];
+                                    (newOC as MFAExtensionObject).Name = ext.Name;
+                                    (newOC as MFAExtensionObject).FileName = ext.FileName;
+                                    (newOC as MFAExtensionObject).Magic = (uint)ext.MagicNumber;
+                                    (newOC as MFAExtensionObject).SubType = ext.SubType;
                                     (newOC as MFAExtensionObject).Version = oldOC.ObjectExtension.ExtensionVersion;
                                     (newOC as MFAExtensionObject).ID = oldOC.ObjectExtension.ExtensionID;
                                     (newOC as MFAExtensionObject).Private = oldOC.ObjectExtension.ExtensionPrivate;

@@ -120,7 +120,7 @@ namespace SapphireD.Core.Data.Chunks
             { 0x3345, typeof(FrameLayerEffects)   },
             //0x3346         FrameBluRayOptions
             { 0x3347, typeof(FrameMoveTimer)      },
-            //0x3348         FrameMosiacTable
+            { 0x3348, typeof(FrameMosaicTable)    },
             { 0x3349, typeof(FrameEffects)        },
             //0x334A         FrameiPhoneOptions
             //0x334B

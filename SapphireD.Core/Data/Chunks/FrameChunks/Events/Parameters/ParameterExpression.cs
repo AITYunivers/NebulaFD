@@ -1,4 +1,5 @@
 ﻿using SapphireD.Core.Memory;
+using System.Diagnostics;
 
 namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
 {
@@ -6,6 +7,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
     {
         public short ObjectType;
         public short Num;
+        public ushort Size;
         public ExpressionChunk Expression = new();
         public ushort ObjectInfo;
         public short ObjectInfoList;
@@ -17,13 +19,14 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            long Debut = reader.Tell();
             ObjectType = reader.ReadShort();
             Num = reader.ReadShort();
 
             if (ObjectType == 0 && Num == 0)
                 return;
 
-            long endPosition = reader.Tell() + reader.ReadUShort() - 4;
+            Size = reader.ReadUShort();
             if (ObjectType == -1)
             {
                 Expression = Num switch
@@ -43,17 +46,23 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
                 if (Num == 16 || Num == 19)
                     Expression = new ExpressionShort();
             }
+            else if (ObjectType == 0)
+                Expression = new ExpressionExtension();
 
-            Expression.ReadCCN(reader);
-            reader.Seek(endPosition);
+            Debug.Assert(Size >= 6);
+            Expression.ReadCCN(reader, Size - 6);
+            reader.Seek(Debut + Size);
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            ByteWriter expWriter = new ByteWriter(new MemoryStream());
-            expWriter.WriteShort(ObjectType);
-            expWriter.WriteShort(Num);
+            writer.WriteShort(ObjectType);
+            writer.WriteShort(Num);
 
+            if (ObjectType == 0 && Num == 0)
+                return;
+
+            ByteWriter expWriter = new ByteWriter(new MemoryStream());
             if (ObjectType > 1 || ObjectType == -7)
             {
                 expWriter.WriteUShort(ObjectInfo);
@@ -62,7 +71,8 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
 
             Expression.WriteMFA(expWriter);
 
-            writer.WriteInt((int)expWriter.Tell());
+            writer.WriteUShort((ushort)(expWriter.Tell() + 6));
+            Debug.Assert(expWriter.Tell() + 6 == Size);
             writer.WriteWriter(expWriter);
 
             expWriter.Flush();

@@ -1,4 +1,5 @@
 ﻿using SapphireD.Core.Memory;
+using System.Reflection.PortableExecutable;
 
 namespace SapphireD.Core.Data.Chunks.AppChunks
 {
@@ -34,7 +35,12 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            Handle = reader.ReadInt();
+            FileName = reader.ReadAutoYuniversal();
+            Name = reader.ReadAutoYuniversal();
+            MagicNumber = reader.ReadInt();
+            SubType = reader.ReadAutoYuniversal();
+            reader.Skip(4); // Is Unicode
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
@@ -45,8 +51,8 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
             writer.WriteInt(Handle);
-            writer.WriteAutoYunicode(Name);
             writer.WriteAutoYunicode(FileName);
+            writer.WriteAutoYunicode(Name);
             writer.WriteInt(MagicNumber);
             writer.WriteAutoYunicode(SubType);
             writer.WriteInt(0); // Is Unicode? How set this??

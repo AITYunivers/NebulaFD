@@ -22,7 +22,6 @@ namespace SapphireD.Core.Data.PackageReaders
         public string Version = string.Empty;
         public FrameEvents GlobalEvents = new FrameEvents();
         public MFAQualifiers Qualifiers = new();
-        public MFAExtensions MFAExtensions = new();
         public int[] FrameOffsets = new int[0];
 
         public bool Finished;
@@ -114,7 +113,7 @@ namespace SapphireD.Core.Data.PackageReaders
             AppHeader.GraphicMode = (short)reader.ReadInt();
             reader.Skip(reader.ReadInt() * 4); // Icon Images
             Qualifiers.ReadMFA(reader);
-            MFAExtensions.ReadMFA(reader);
+            Extensions.ReadMFA(reader);
 
             if (reader.PeekInt() > 900)
                 reader.Skip(2);
@@ -152,17 +151,6 @@ namespace SapphireD.Core.Data.PackageReaders
 
         public void FinishParsing()
         {
-            Extensions.Exts = new Extension[MFAExtensions.Extensions.Length];
-            for (int i = 0; i < Extensions.Exts.Length; i++)
-            {
-                Extensions.Exts[i] = new Extension();
-                Extensions.Exts[i].Handle = MFAExtensions.Extensions[i].Handle;
-                Extensions.Exts[i].Name = MFAExtensions.Extensions[i].Name;
-                Extensions.Exts[i].FileName = MFAExtensions.Extensions[i].FileName;
-                Extensions.Exts[i].MagicNumber = MFAExtensions.Extensions[i].Magic;
-                Extensions.Exts[i].SubType = MFAExtensions.Extensions[i].SubType;
-            }
-
             Dictionary<int, ObjectInfo> frameItems = new Dictionary<int, ObjectInfo>();
             foreach (Frame frame in Frames.Values)
             {
@@ -261,6 +249,12 @@ namespace SapphireD.Core.Data.PackageReaders
                                     newOC.ObjectCounter.Height = (oldOC as MFACounter).Height;
                                     newOC.ObjectCounter.Frames = (oldOC as MFACounter).Images;
                                     newOC.ObjectCounter.Font = (oldOC as MFACounter).Font;
+                                    newOC.ObjectCounter.Shape.LineFlags.Value = (oldOC as MFACounter).Width  < 0 ? 1u : 0 +
+                                                                                (oldOC as MFACounter).Height < 0 ? 2u : 0;
+                                    newOC.ObjectCounter.Shape.FillType = (int)(oldOC as MFACounter).ColorType;
+                                    newOC.ObjectCounter.Shape.Color1 = (oldOC as MFACounter).Color1;
+                                    newOC.ObjectCounter.Shape.Color2 = (oldOC as MFACounter).Color2;
+                                    newOC.ObjectCounter.Shape.VerticalGradient = (oldOC as MFACounter).Gradient != 0;
                                     newOC.ObjectValue.Initial = (oldOC as MFACounter).Value;
                                     newOC.ObjectValue.Minimum = (oldOC as MFACounter).Minimum;
                                     newOC.ObjectValue.Maximum = (oldOC as MFACounter).Maximum;

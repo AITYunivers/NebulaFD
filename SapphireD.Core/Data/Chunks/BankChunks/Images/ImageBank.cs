@@ -30,7 +30,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
             LoadedImageCount = 0;
             TaskManager.Clear();
 
-            if (SapDCore.Flash)
+            if (SapDCore.Android || SapDCore.iOS|| SapDCore.Flash || SapDCore.HTML)
             {
                 reader.Skip(2);
                 ImageCount = reader.ReadShort();

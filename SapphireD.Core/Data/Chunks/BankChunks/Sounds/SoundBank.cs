@@ -15,7 +15,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Sounds
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            if (SapDCore.Flash)
+            if (SapDCore.Android || SapDCore.iOS || SapDCore.Flash || SapDCore.HTML)
             {
                 reader.Skip(2);
                 Count = reader.ReadShort();

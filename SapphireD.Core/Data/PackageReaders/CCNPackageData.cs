@@ -2,6 +2,7 @@
 using SapphireD.Core.Data.Chunks.AppChunks;
 using SapphireD.Core.Data.Chunks.FrameChunks;
 using SapphireD.Core.Data.Chunks.ObjectChunks;
+using SapphireD.Core.FileReaders;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 using Spectre.Console;
@@ -22,7 +23,9 @@ namespace SapphireD.Core.Data.PackageReaders
                 return;
 
             Header = reader.ReadAscii(4);
-            SapDCore._unicode = Header != "PAME";
+            SapDCore._unicode = Header != "PAME" && Header != "CRUF";
+            if (Header == "CRUF")
+                SapDCore.Fusion = 3f;
             Logger.Log(this, "Game Header: " + Header);
 
             RuntimeVersion = reader.ReadShort();
@@ -71,6 +74,8 @@ namespace SapphireD.Core.Data.PackageReaders
                     newChunk is Copyright      || // For Encryption
                     newChunk is ExtendedHeader || // For Image Bank
                     newChunk is ObjectHeaders)    // For 2.5+ Object Bank
+                    chunkReader.RunSynchronously();
+                else if (newChunk is Frame && SapDCore.CurrentReader is OpenFileReader)
                     chunkReader.RunSynchronously();
                 else
                     ChunkReaders.Add(chunkReader);

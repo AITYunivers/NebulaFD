@@ -86,7 +86,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDef
                 node.WriteMFA(nodeWriter);
 
                 writer.WriteByte(0);
-                writer.WriteByte((byte)nodeWriter.Tell());
+                writer.WriteByte((byte)(nodeWriter.Tell() + 2));
                 writer.WriteWriter(nodeWriter);
                 nodeWriter.Flush();
                 nodeWriter.Close();

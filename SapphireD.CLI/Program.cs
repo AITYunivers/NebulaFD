@@ -108,6 +108,9 @@ namespace SapphireD
                 case ".tmp":
                     SapDCore.CurrentReader = new AGMIFileReader();
                     break;
+                case ".zip":
+                    SapDCore.CurrentReader = new OpenFileReader();
+                    break;
             }
         }
 

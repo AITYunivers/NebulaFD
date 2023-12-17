@@ -88,7 +88,25 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             reader.Skip(6);
             int OrderCheck = reader.ReadInt();
             reader.Seek(StartOffset + 4);
-            if (SapDCore.Build == 284 && OrderCheck == 0)
+            if (SapDCore.iOS)
+            {
+                ExtensionOffset = reader.ReadShort();
+                MovementsOffset = reader.ReadShort();
+                reader.Skip(2);
+                ValueOffset = reader.ReadShort();
+                AnimationOffset = reader.ReadShort();
+                DataOffset = reader.ReadShort();
+            }
+            else if (SapDCore.HTML)
+            {
+                reader.Skip(2);
+                DataOffset = reader.ReadShort();
+                reader.Skip(2);
+                ValueOffset = reader.ReadShort();
+                AnimationOffset = reader.ReadShort();
+                MovementsOffset = reader.ReadShort();
+            }
+            else if (SapDCore.Build == 284 && OrderCheck == 0)
             {
                 ValueOffset = reader.ReadShort();
                 reader.Skip(4);
@@ -96,22 +114,41 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
                 ExtensionOffset = reader.ReadShort();
                 AnimationOffset = reader.ReadShort();
             }
-            else
+            else if (SapDCore.Build >= 284)
             {
                 AnimationOffset = reader.ReadShort();
                 MovementsOffset = reader.ReadShort();
                 reader.Skip(4);
                 ExtensionOffset = reader.ReadShort();
                 ValueOffset = reader.ReadShort();
+            }
+            else
+            {
+                MovementsOffset = reader.ReadShort();
+                AnimationOffset = reader.ReadShort();
+                reader.Skip(2);
+                ValueOffset = reader.ReadShort();
+                DataOffset = reader.ReadShort();
+                reader.Skip(2);
             }
             ObjectFlags.Value = reader.ReadUInt();
             for (int i = 0; i < 8; i++)
                 Qualifiers[i] = reader.ReadShort();
-            DataOffset = reader.ReadShort();
+
+            if (SapDCore.iOS || SapDCore.HTML)
+                reader.Skip(2);
+            else if (SapDCore.Build >= 284)
+                DataOffset = reader.ReadShort();
+            else
+                ExtensionOffset = reader.ReadShort();
+
             AlterableValuesOffset = reader.ReadShort();
             AlterableStringsOffset = reader.ReadShort();
             NewObjectFlags.Value = reader.ReadUShort();
-            reader.Skip(2);
+            if (SapDCore.HTML)
+                ExtensionOffset = reader.ReadShort();
+            else
+                reader.Skip(2);
             Identifier = reader.ReadAscii(4);
             BackColor = reader.ReadColor();
             TransitionInOffset = reader.ReadInt();

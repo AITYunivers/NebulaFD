@@ -9,7 +9,8 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Sounds
         public int Checksum;
         public uint References;
         public BitDict Flags = new BitDict( // Flags
-            "", "", "", "", "", "Decompressed" // Decompressed
+            "", "", "", "", "", "Decompressed", // Decompressed
+            "", "", "HasName"                   // Has Name (Android Only?)
         );
         public int Frequency;
         public string Name = string.Empty;
@@ -23,10 +24,36 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Sounds
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            if (SapDCore.Flash)
+            if (SapDCore.Android)
             {
                 Handle = reader.ReadUShort();
-                Name = Utilities.Utilities.ClearName(reader.ReadYuniversal(reader.ReadShort()).Trim());
+                Flags.Value = reader.ReadUShort();
+                reader.Skip(4);
+                Frequency = reader.ReadInt();
+                if (Flags["HasName"])
+                    Name = Utilities.Utilities.ClearName(reader.ReadYuniversal(reader.ReadShort()).Trim(' ', (char)0));
+                return;
+            }
+            else if (SapDCore.iOS)
+            {
+                Handle = reader.ReadUShort();
+                Name = Utilities.Utilities.ClearName(reader.ReadYuniversal(reader.ReadShort()).Trim(' ', (char)0));
+                reader.Skip(4);
+                Data = reader.ReadBytes(reader.ReadInt());
+                return;
+            }
+            else if (SapDCore.Flash)
+            {
+                Handle = reader.ReadUShort();
+                Name = Utilities.Utilities.ClearName(reader.ReadYuniversal(reader.ReadShort()).Trim(' ', (char)0));
+                return;
+            }
+            else if (SapDCore.HTML)
+            {
+                Handle = reader.ReadUShort();
+                reader.Skip(1);
+                Frequency = reader.ReadInt();
+                Name = Utilities.Utilities.ClearName(reader.ReadYuniversal(reader.ReadShort()).Trim(' ', (char)0));
                 return;
             }
 
@@ -45,7 +72,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Sounds
             }
             else
                 soundData = new ByteReader(reader.ReadBytes(decompressedSize));
-            Name = Utilities.Utilities.ClearName(soundData.ReadYuniversal(nameLength).Trim());
+            Name = Utilities.Utilities.ClearName(soundData.ReadYuniversal(nameLength).Trim(' ', (char)0));
             if (Flags["Decompressed"]) soundData.Seek(0);
             Data = soundData.ReadBytes();
         }
@@ -61,7 +88,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Sounds
             int nameLength = reader.ReadInt();
             ByteReader soundData;
             soundData = new ByteReader(reader.ReadBytes(decompressedSize));
-            Name = Utilities.Utilities.ClearName(soundData.ReadWideString(nameLength).Trim());
+            Name = Utilities.Utilities.ClearName(soundData.ReadWideString(nameLength).Trim(' ', (char)0));
             if (Flags["Decompressed"]) soundData.Seek(0);
             Data = soundData.ReadBytes();
         }

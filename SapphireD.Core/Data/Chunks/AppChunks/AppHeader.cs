@@ -225,7 +225,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
                 Flags["MenuDisplayedDisabled"] = !DisplayFlags["MenuDisplayed"];
                 Flags["MenuBar"] = DisplayFlags["MenuBar"];
                 Flags["MaximizedOnBoot"] = DisplayFlags["MaximizedOnBoot"];
-                Flags["MultiSamples"] = DisplayFlags["MultiSamples"];
+                Flags["MultiSamples"] = GraphicFlags["MultiSamples"];
                 Flags["ChangeResolutionMode"] = DisplayFlags["ChangeResolutionMode"];
                 Flags["AllowFullscreenSwitch"] = DisplayFlags["AllowFullscreenSwitch"];
 

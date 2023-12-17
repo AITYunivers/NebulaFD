@@ -19,6 +19,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Fonts
             for (int i = 0; i < Count; i++)
             {
                 Font fnt = new Font();
+                fnt.Compressed = !SapDCore.Android && !SapDCore.iOS && !SapDCore.Flash && !SapDCore.HTML;
                 fnt.ReadCCN(reader);
                 Fonts[fnt.Handle] = fnt;
             }

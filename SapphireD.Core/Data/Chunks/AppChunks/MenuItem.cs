@@ -29,12 +29,15 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             if (!Flags["Parent"])
                 ID = reader.ReadUShort();
 
-            Name = reader.ReadYuniversal();
+            Name = reader.ReadWideString();
             for (int i = 0; i < Name.Length; i++)
             {
                 if (Name[i] == '&')
                 {
-                    Mnemonic = Name[i + 1].ToString();
+                    if (i + 1 != Name.Length)
+                        Mnemonic = Name[i + 1].ToString();
+                    else
+                        Mnemonic = "";
                     Name = Name.Replace("&", "");
                     break;
                 }

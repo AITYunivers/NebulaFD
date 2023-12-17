@@ -1,4 +1,5 @@
-﻿using SapphireD.Core.Memory;
+﻿using SapphireD.Core.FileReaders;
+using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -61,10 +62,14 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
         {
             if (SapDCore.MFA)
                 return new ImageMFA();
-            else if (SapDCore.PackageData.ExtendedHeader.CompressionFlags["OptimizeImageSize"])
-                return new Image25Plus();
+            else if (SapDCore.CurrentReader is OpenFileReader)
+                return new ImageOpen();
+            else if (SapDCore.Android || SapDCore.iOS)
+                return new ImageMobile();
             else if (SapDCore.Flash)
                 return new ImageFlash();
+            else if (SapDCore.PackageData.ExtendedHeader.CompressionFlags["OptimizeImageSize"])
+                return new Image25Plus();
             return new Image25();
         }
 

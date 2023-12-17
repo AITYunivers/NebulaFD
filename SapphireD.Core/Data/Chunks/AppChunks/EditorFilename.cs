@@ -21,6 +21,9 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
                 Decryption.MakeKey(pkgData.AppName, pkgData.Copyright, Value);
             else
                 Decryption.MakeKey(Value, pkgData.AppName, pkgData.Copyright);
+
+            if (string.IsNullOrEmpty(pkgData.AppName))
+                pkgData.AppName = Path.GetFileNameWithoutExtension(Value);
         }
     }
 }

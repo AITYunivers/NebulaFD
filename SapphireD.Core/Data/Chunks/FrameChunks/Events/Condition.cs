@@ -35,7 +35,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            long endPosition = reader.Tell() + reader.ReadUShort();
+            long endPosition = reader.Tell() + Math.Abs(reader.ReadUShort());
 
             ObjectType = reader.ReadShort();
             Num = reader.ReadShort();
@@ -82,7 +82,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             foreach (Parameter parameter in Parameters)
                 parameter.WriteMFA(condWriter);
 
-            writer.WriteUShort((ushort)condWriter.Tell());
+            writer.WriteUShort((ushort)(condWriter.Tell() + 2));
             writer.WriteWriter(condWriter);
             condWriter.Flush();
             condWriter.Close();

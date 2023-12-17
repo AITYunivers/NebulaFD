@@ -28,10 +28,12 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             ObjectInfo = reader.ReadUShort();
             PositionX = reader.ReadInt();
             PositionY = reader.ReadInt();
-            ParentType = reader.ReadUShort();
+            if (SapDCore.Fusion < 3)
+                ParentType = reader.ReadUShort();
             ParentHandle = reader.ReadUShort();
             Layer = reader.ReadUShort();
-            InstanceValue = reader.ReadShort();
+            if (SapDCore.Fusion < 3)
+                InstanceValue = reader.ReadShort();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

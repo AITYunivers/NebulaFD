@@ -52,7 +52,10 @@ namespace SapphireD.Core.Data.Chunks
             newChunk.ChunkData = newData;
 
             if (!ChunkList.ChunkJumpTable.ContainsKey(id))
+            {
+                Directory.CreateDirectory("Chunks");
                 File.WriteAllBytes($"Chunks\\[{chunkIndex++}] Chunk-{string.Format("0x{0:X}", id)}.bin", newChunk.ChunkData);
+            }
 
             if (dataReader == null)
                 Logger.Log(newChunk, $"Chunk data is null for chunk {newChunk.ChunkName} with flag {flag}");

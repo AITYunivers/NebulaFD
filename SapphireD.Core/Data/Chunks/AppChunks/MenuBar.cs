@@ -69,7 +69,11 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
             uint headerSize = reader.ReadUInt();
             int menuOffset = reader.ReadInt();
             int menuSize = reader.ReadInt();
-            if (menuSize == 0) return;
+            if (menuSize == 0)
+            {
+                reader.Seek(startOffset + mainSize);
+                return;
+            }
             int accelOffset = reader.ReadInt();
             int accelSize = reader.ReadInt();
 

@@ -77,6 +77,8 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                 else if (identifier == "ERev")
                 {
                     long endPosition = reader.Tell() + reader.ReadInt();
+                    if (SapDCore.Android || SapDCore.HTML)
+                        reader.Skip(4);
                     while (reader.Tell() < endPosition)
                     {
                         Event newEvent = new Event();
@@ -104,6 +106,8 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             else
             {
                 endOffset = reader.ReadUInt();
+                reader.Skip(endOffset);
+                return;
                 if (endOffset == 0) return;
                 else endOffset += reader.Tell() - 4;
             }
@@ -223,12 +227,11 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             if (Events.Count > 0)
             {
                 writer.WriteAscii("Evts");
-                writer.WriteInt(0);
-                /*ByteWriter evtsWriter = new ByteWriter(new MemoryStream());
+                ByteWriter evtsWriter = new ByteWriter(new MemoryStream());
                 foreach (Event evt in Events)
                     evt.WriteMFA(evtsWriter);
-                writer.WriteInt((int)evtsWriter.Tell());
-                writer.WriteWriter(evtsWriter);*/
+                writer.WriteUInt((uint)evtsWriter.Tell());
+                writer.WriteWriter(evtsWriter);
             }
 
             if (EventObjects.Length > 0)

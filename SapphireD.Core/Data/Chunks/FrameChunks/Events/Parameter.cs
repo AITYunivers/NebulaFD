@@ -66,7 +66,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             paramWriter.WriteShort((short)Code);
             Data.WriteMFA(paramWriter);
 
-            writer.WriteUShort((ushort)paramWriter.Tell());
+            writer.WriteUShort((ushort)(paramWriter.Tell() + 2));
             writer.WriteWriter(paramWriter);
             paramWriter.Flush();
             paramWriter.Close();
