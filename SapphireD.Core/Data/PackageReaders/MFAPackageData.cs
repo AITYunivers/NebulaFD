@@ -128,7 +128,7 @@ namespace SapphireD.Core.Data.PackageReaders
                 reader.Seek(offset);
                 Frame frame = new Frame();
                 frame.ReadMFA(reader);
-                Frames.Add(frame.Handle, frame);
+                Frames.Add(frame);
             }
 
             reader.Seek(returnOffset);
@@ -152,7 +152,7 @@ namespace SapphireD.Core.Data.PackageReaders
         public void FinishParsing()
         {
             Dictionary<int, ObjectInfo> frameItems = new Dictionary<int, ObjectInfo>();
-            foreach (Frame frame in Frames.Values)
+            foreach (Frame frame in Frames)
             {
                 foreach (MFAObjectInfo oI in frame.MFAFrameInfo.Objects)
                 {

@@ -5,7 +5,7 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 {
     public class Extensions : Chunk
     {
-        public Extension[] Exts = new Extension[0];
+        public Dictionary<int, Extension> Exts = new();
 
         public Extensions()
         {
@@ -15,13 +15,15 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Exts = new Extension[reader.ReadUShort()];
+            Exts = new();
+            ushort Count = reader.ReadUShort();
             reader.Skip(2);
 
-            for (int i = 0; i < Exts.Length; i++)
+            for (int i = 0; i < Count; i++)
             {
-                Exts[i] = new Extension();
-                Exts[i].ReadCCN(reader);
+                Extension ext = new Extension();
+                ext.ReadCCN(reader);
+                Exts.Add(ext.Handle, ext);
             }
 
             SapDCore.PackageData.Extensions = this;
@@ -29,11 +31,13 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            Exts = new Extension[reader.ReadInt()];
-            for (int i = 0; i < Exts.Length; i++)
+            Exts = new();
+            uint Count = reader.ReadUInt();
+            for (int i = 0; i < Count; i++)
             {
-                Exts[i] = new Extension();
-                Exts[i].ReadMFA(reader);
+                Extension ext = new Extension();
+                ext.ReadMFA(reader);
+                Exts.Add(ext.Handle, ext);
             }
         }
 
@@ -44,8 +48,8 @@ namespace SapphireD.Core.Data.Chunks.AppChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteInt(Exts.Length);
-            foreach (Extension ext in Exts)
+            writer.WriteInt(Exts.Count);
+            foreach (Extension ext in Exts.Values)
                 ext.WriteMFA(writer);
         }
     }

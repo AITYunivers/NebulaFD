@@ -27,6 +27,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
                     reader.Seek(StartOffset + Offsets[i]);
                     ObjectDirection dir = new ObjectDirection();
                     dir.ReadCCN(reader);
+                    dir.Index = i;
                     Directions.Add(dir);
                 }
         }

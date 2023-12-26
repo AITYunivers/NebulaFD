@@ -22,6 +22,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
         {
             for (int i = 0; i < ((Frame)extraInfo[0]).FrameLayers.Layers.Length; i++)
             {
+                if (reader.Tell() < reader.Size()) return;
                 FrameLayerEffect effect = new FrameLayerEffect();
                 effect.ReadCCN(reader);
                 ((Frame)extraInfo[0]).FrameLayers.Layers[i].Effect = effect;

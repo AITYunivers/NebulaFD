@@ -37,5 +37,13 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
 
             writer.WriteInt(0); // Final Expression
         }
+
+        public override string ToString()
+        {
+            string str = string.Empty;
+            foreach (ParameterExpression expression in Expressions)
+                str += expression.ToString();
+            return str.Trim();
+        }
     }
 }

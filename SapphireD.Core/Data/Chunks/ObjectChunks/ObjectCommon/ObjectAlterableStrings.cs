@@ -30,7 +30,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             for (int i = 0; i < AlterableStrings.Length; i++)
             {
                 AlterableStringNames[i] = reader.ReadAutoYuniversal();
-                reader.Skip(4);
+                int type = reader.ReadInt();// reader.Skip(4);
                 AlterableStrings[i] = reader.ReadAutoYuniversal();
             }
         }

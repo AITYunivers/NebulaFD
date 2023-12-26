@@ -94,6 +94,22 @@ namespace SapphireD.Core.Memory
             return str;
         }
 
+        public string ReadAsciiStop(int length)
+        {
+            string str = "";
+            long debut = Tell();
+            if (length >= 0)
+                for (int i = 0; i < length; i++)
+                {
+                    byte ch = ReadByte();
+                    if (ch == 0) break;
+                    str += Convert.ToChar(ch);
+                }
+
+            Seek(debut + length);
+            return str;
+        }
+
 
 
         public string ReadWideString(int length = -1)

@@ -44,9 +44,9 @@ namespace GameDumper
             ByteWriter writer = new ByteWriter(new FileStream(path + Utilities.ClearName(Path.GetFileName(dat.EditorFilename)), FileMode.Create));
 
             IconBank.GraphicMode = dat.ImageBank.GraphicMode = dat.AppHeader.GraphicMode;
-            IconBank.PaletteVersion = dat.ImageBank.PaletteVersion = dat.Frames.Values.First().FramePalette.PaletteVersion;
-            IconBank.PaletteEntries = dat.ImageBank.PaletteEntries = (short)dat.Frames.Values.First().FramePalette.PaletteEntries;
-            IconBank.Palette = dat.ImageBank.Palette = dat.Frames.Values.First().FramePalette.Palette;
+            IconBank.PaletteVersion = dat.ImageBank.PaletteVersion = dat.Frames.First().FramePalette.PaletteVersion;
+            IconBank.PaletteEntries = dat.ImageBank.PaletteEntries = (short)dat.Frames.First().FramePalette.PaletteEntries;
+            IconBank.Palette = dat.ImageBank.Palette = dat.Frames.First().FramePalette.Palette;
 
             foreach (ObjectInfo objectInfo in dat.FrameItems.Items.Values)
             {
@@ -69,7 +69,7 @@ namespace GameDumper
                     };
                     if (objectInfo.Header.Type >= 32)
                     {
-                        foreach (Extension posExt in dat.Extensions.Exts)
+                        foreach (Extension posExt in dat.Extensions.Exts.Values)
                             if (posExt.Handle == objectInfo.Header.Type - 32 && File.Exists("Plugins\\ObjectIcons\\" + posExt.Name + ".png"))
                             {
                                 iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\" + posExt.Name + ".png"));
@@ -162,12 +162,12 @@ namespace GameDumper
 
             long offsetEnd = writer.Tell() + 4 * dat.Frames.Count + 4;
             ByteWriter frameWriter = new ByteWriter(new MemoryStream());
-            for (int i = 0; i < dat.Frames.Keys.Count; i++)
+            for (int i = 0; i < dat.Frames.Count; i++)
             {
                 writer.WriteUInt((uint)(offsetEnd + frameWriter.Tell()));
-                Frame frm = dat.Frames[dat.Frames.Keys.ToArray()[i]];
+                Frame frm = dat.Frames[i];
                 if (!SapDCore.MFA)
-                    frm.Handle = i;
+                    frm.Handle = dat.FrameHandles.IndexOf((short)i);
                 frm.WriteMFA(frameWriter);
             }
 

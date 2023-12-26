@@ -38,7 +38,7 @@ namespace SapphireD.Core.Data.PackageReaders
             if (SapDCore.Build < 280)
                 SapDCore.Fusion = 2f + (ProductVersion == 1 ? 0.1f : 0);
 
-            Frames = new Dictionary<int, Frame>();
+            Frames = new List<Frame>();
             int frameHandle = 0;
             while (reader.HasMemory(8))
             {
@@ -65,13 +65,11 @@ namespace SapphireD.Core.Data.PackageReaders
                     ChunksLoaded++;
                 });
 
-                if (newChunk is Frame)
-                    (newChunk as Frame).Handle = frameHandle++;
-
                 // Chunks with read priority
                 if (newChunk is AppName        || // For Encryption
                     newChunk is EditorFilename || // For Encryption
                     newChunk is Copyright      || // For Encryption
+                    newChunk is FrameHandles   || // For Frame Handles
                     newChunk is ExtendedHeader || // For Image Bank
                     newChunk is ObjectHeaders)    // For 2.5+ Object Bank
                     chunkReader.RunSynchronously();
@@ -82,8 +80,9 @@ namespace SapphireD.Core.Data.PackageReaders
 
                 ChunksLoaded++;
             }
+
             foreach (Task chunkReader in ChunkReaders)
-                chunkReader.Start();
+                chunkReader.RunSynchronously(); //chunkReader.Start();
 
             foreach (Task chunkReader in ChunkReaders)
                 chunkReader.Wait();

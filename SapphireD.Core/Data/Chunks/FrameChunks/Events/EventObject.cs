@@ -14,7 +14,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
         public string Name = string.Empty;
         public string TypeName = string.Empty;
         public uint ItemHandle;
-        public uint InstanceHandle;
+        public int InstanceHandle;
         public string Code = string.Empty;
         public string IconBuffer = string.Empty;
         public ushort SystemQualifier;
@@ -42,7 +42,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             {
                 case 1:
                     ItemHandle = reader.ReadUInt();
-                    InstanceHandle = reader.ReadUInt();
+                    InstanceHandle = reader.ReadInt();
                     break;
                 case 2:
                     Code = reader.ReadAscii(4);
@@ -73,7 +73,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             {
                 case 1:
                     writer.WriteUInt(ItemHandle);
-                    writer.WriteUInt(InstanceHandle);
+                    writer.WriteInt(InstanceHandle);
                     break;
                 case 2:
                     writer.WriteAscii(Code);

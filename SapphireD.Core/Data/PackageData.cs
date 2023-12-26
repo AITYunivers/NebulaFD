@@ -32,7 +32,7 @@ namespace SapphireD.Core.Data
         public string ExtensionsPath = string.Empty;        // 0x2227
         public FrameItems FrameItems = new();               // 0x2229 & 0x223F
         public string HelpFile = string.Empty;              // 0x2230
-        public short[] FrameHandles = new short[0];         // 0x222B
+        public List<short> FrameHandles = new();            // 0x222B
         public ExtensionData ExtensionData = new();         // 0x222C
         public string EditorFilename = string.Empty;        // 0x222E
         public string TargetFilename = string.Empty;        // 0x222F
@@ -52,7 +52,7 @@ namespace SapphireD.Core.Data
         public ShaderBank ShaderBank = new();               // 0x2243
         public ExtendedHeader ExtendedHeader = new();       // 0x2245
         public int AppCodePage;                             // 0x2246
-        public Dictionary<int, Frame> Frames = new();       // 0x3333
+        public List<Frame> Frames = new();                  // 0x3333
         public ObjectAnimations ObjectAnimations = new();   // 0x4449
         public AnimationOffsets AnimationOffsets = new();   // 0x444A
 

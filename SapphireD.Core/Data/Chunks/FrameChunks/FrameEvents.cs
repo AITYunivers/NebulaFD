@@ -106,10 +106,8 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             else
             {
                 endOffset = reader.ReadUInt();
-                reader.Skip(endOffset);
-                return;
                 if (endOffset == 0) return;
-                else endOffset += reader.Tell() - 4;
+                else endOffset += reader.Tell();
             }
 
             while (true)
@@ -227,6 +225,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             if (Events.Count > 0)
             {
                 writer.WriteAscii("Evts");
+                //writer.WriteUInt(0);
                 ByteWriter evtsWriter = new ByteWriter(new MemoryStream());
                 foreach (Event evt in Events)
                     evt.WriteMFA(evtsWriter);

@@ -54,11 +54,30 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             }
 
             reader.Seek(endPosition);
+            Fix();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            ReadCCN(reader, extraInfo);
+            long endPosition = reader.Tell() + Math.Abs(reader.ReadUShort());
+
+            ObjectType = reader.ReadShort();
+            Num = reader.ReadShort();
+            ObjectInfo = reader.ReadShort();
+            ObjectInfoList = reader.ReadShort();
+            EventFlags.Value = reader.ReadByte();
+            OtherFlags.Value = reader.ReadByte();
+            Parameters = new Parameter[reader.ReadByte()];
+            DefType = reader.ReadByte();
+            Identifier = reader.ReadShort();
+
+            for (int i = 0; i < Parameters.Length; i++)
+            {
+                Parameters[i] = new Parameter();
+                Parameters[i].ReadCCN(reader);
+            }
+
+            reader.Seek(endPosition);
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
@@ -86,6 +105,21 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             writer.WriteWriter(condWriter);
             condWriter.Flush();
             condWriter.Close();
+        }
+
+        private void Fix()
+        {
+            switch (ObjectType)
+            {
+                case 2:
+                    switch (Num)
+                    {
+                        case -42:
+                            Num = -27;
+                            break;
+                    }
+                    break;
+            }
         }
     }
 }

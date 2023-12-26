@@ -1,4 +1,5 @@
 ﻿using SapphireD.Core.Memory;
+using SapphireD.Core.Utilities;
 
 namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 {
@@ -62,12 +63,14 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             {
                 Conditions[i] = new Condition();
                 Conditions[i].ReadCCN(reader);
+                Logger.Log(this, $"[COND] Type: {Conditions[i].ObjectType}, Num: {Conditions[i].Num}");
             }
 
             for (int i = 0; i < Actions.Length; i++)
             {
                 Actions[i] = new Action();
                 Actions[i].ReadCCN(reader);
+                Logger.Log(this, $"[ACT] Type: {Actions[i].ObjectType}, Num: {Actions[i].Num}");
             }
 
             reader.Seek(endPosition);
@@ -89,12 +92,14 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             {
                 Conditions[i] = new Condition();
                 Conditions[i].ReadMFA(reader);
+                Logger.Log(this, $"[COND] Type: {Conditions[i].ObjectType}, Num: {Conditions[i].Num}");
             }
 
             for (int i = 0; i < Actions.Length; i++)
             {
                 Actions[i] = new Action();
                 Actions[i].ReadMFA(reader);
+                Logger.Log(this, $"[ACT] Type: {Actions[i].ObjectType}, Num: {Actions[i].Num}");
             }
 
             reader.Seek(endPosition);

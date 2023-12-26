@@ -1,4 +1,5 @@
 ﻿using SapphireD.Core.Memory;
+using System.Diagnostics;
 
 namespace SapphireD.Core.Data.Chunks.BankChunks.Images
 {
@@ -12,21 +13,21 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
 
             Checksum = reader.ReadInt();
             References = reader.ReadInt();
-            var dataSize = reader.ReadInt32();
+            var dataSize = reader.ReadInt();
             var newReader = new ByteReader(reader.ReadBytes(dataSize + 20));
-            Width = newReader.ReadInt16();
-            Height = newReader.ReadInt16();
+            Width = newReader.ReadShort();
+            Height = newReader.ReadShort();
             GraphicMode = newReader.ReadByte();
             Flags.Value = newReader.ReadByte();
-            newReader.ReadInt16();
-            HotspotX = newReader.ReadInt16();
-            HotspotY = newReader.ReadInt16();
-            ActionPointX = newReader.ReadInt16();
-            ActionPointY = newReader.ReadInt16();
+            newReader.ReadShort();
+            HotspotX = newReader.ReadShort();
+            HotspotY = newReader.ReadShort();
+            ActionPointX = newReader.ReadShort();
+            ActionPointY = newReader.ReadShort();
             TransparentColor = newReader.ReadColor();
             if (Flags["LZX"])
             {
-                var decompressedSize = newReader.ReadInt32();
+                var decompressedSize = newReader.ReadInt();
                 ImageData = Decompressor.DecompressBlock(newReader, (int)(newReader.Size() - newReader.Tell()));
             }
             else ImageData = newReader.ReadBytes(dataSize);

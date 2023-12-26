@@ -6,6 +6,7 @@ using SapphireD.Core.Data.Chunks.ObjectChunks;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 using SapphireD.Core.Data.Chunks.BankChunks.Shaders;
+using SapphireD.Core.Data.Chunks.FrameChunks.Events;
 
 namespace SapphireD.Core.Data.Chunks.FrameChunks
 {
@@ -49,7 +50,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                 newChunk.ChunkData = null;
             }
 
-            SapDCore.PackageData.Frames.Add(Handle, this);
+            SapDCore.PackageData.Frames.Add(this);
             log = $"Frame '{FrameName}' found.";
             Logger.Log(this, log, color: ConsoleColor.Green);
         }
@@ -105,6 +106,8 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                 if (newChunk is Last)
                     break;
             }
+
+            Logger.Log(this, $"Frame '{FrameName}' found.", color: ConsoleColor.Green);
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
@@ -131,12 +134,12 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             writer.WriteInt(0); // Active Layer
             FrameLayers.WriteMFA(writer);
 
-            writer.WriteByte(string.IsNullOrEmpty(FrameTransitionIn.ModuleName) ? (byte)0 : (byte)1);
-            if (!string.IsNullOrEmpty(FrameTransitionIn.ModuleName))
+            writer.WriteByte(string.IsNullOrEmpty(FrameTransitionIn.FileName) ? (byte)0 : (byte)1);
+            if (!string.IsNullOrEmpty(FrameTransitionIn.FileName))
                 FrameTransitionIn.WriteMFA(writer);
 
-            writer.WriteByte(string.IsNullOrEmpty(FrameTransitionOut.ModuleName) ? (byte)0 : (byte)1);
-            if (!string.IsNullOrEmpty(FrameTransitionOut.ModuleName))
+            writer.WriteByte(string.IsNullOrEmpty(FrameTransitionOut.FileName) ? (byte)0 : (byte)1);
+            if (!string.IsNullOrEmpty(FrameTransitionOut.FileName))
                 FrameTransitionOut.WriteMFA(writer);
 
             Dictionary<uint, MFAObjectInfo> objectInfos = new Dictionary<uint, MFAObjectInfo>();
@@ -273,6 +276,14 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                                     newOI.CounterFlags.SignificantDigits = oldOC.ObjectCounter.FloatWholeCount;
                                     newOI.CounterFlags.DecimalPoints = oldOC.ObjectCounter.FloatDecimalCount;
                                     break;
+                                case 0:
+                                case 1:
+                                case 4:
+                                case 5:
+                                case 6:
+                                case 8:
+                                case 9:
+                                    break;
                                 default:
                                     (newOC as MFAExtensionObject).Type = -1;
                                     Extension ext = SapDCore.PackageData.Extensions.Exts[newOI.ObjectType - 32];
@@ -309,6 +320,26 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             }
             MFAFrameInfo.Folders.WriteMFA(writer);
             FrameInstances.WriteMFA(writer);
+            List<EventObject> evtObjs = new();
+            foreach (MFAObjectInfo oI in objectInfos.Values)
+            {
+                EventObject evtObj = new();
+                evtObj.Handle = oI.Handle;
+                evtObj.ObjectType = 1;
+                evtObj.ItemType = (ushort)oI.ObjectType;
+                evtObj.Name = oI.Name;
+                evtObj.TypeName = oI.ObjectType switch
+                {
+                    2 => "Sprite",
+                    3 => "Text",
+                    7 => "Counter",
+                    _ => ""
+                };
+                evtObj.ItemHandle = (uint)oI.Handle;
+                evtObj.InstanceHandle = -1;
+                evtObjs.Add(evtObj);
+            }
+            FrameEvents.EventObjects = evtObjs.ToArray();
             FrameEvents.WriteMFA(writer);
 
             //FrameLayerEffects layerEffects = new();

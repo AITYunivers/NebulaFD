@@ -7,7 +7,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
     {
         public string ModuleName = string.Empty;
         public int Module;
-        public int ID;
+        public string ID = string.Empty;
         public int Duration;
         public bool UseColor;
         public Color Color = Color.Black;
@@ -25,7 +25,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             long StartOffset = reader.Tell();
 
             Module = reader.ReadInt();
-            ID = reader.ReadInt();
+            ID = reader.ReadAscii(4);
             Duration = reader.ReadInt();
             UseColor = reader.ReadInt() != 0;
             Color = reader.ReadColor();
@@ -38,14 +38,40 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             FileName = reader.ReadYuniversal();
             reader.Seek(StartOffset + DataOffset);
             ParameterData = reader.ReadBytes(DataSize);
+
+            ModuleName = ID switch
+            {
+                "SE00" => "Advanced Scrolling",
+                "SE10" => "Back",
+                "BAND" => "Bands",
+                "SE12" => "Cell",
+                "DOOR" => "Door",
+                "FADE" => "Fade",
+                "SE03" => "Line",
+                "MOSA" => "Mosaic",
+                "SE05" => "Open",
+                "SE06" => "Push",
+                "SCRL" => "Scrolling",
+                "SE01" => "Square",
+                "SE07" => "Stretch",
+                "SE09" => "Stretch 2",
+                "SE08" => "Turn",
+                "SE02" => "Turn 2",
+                "SE13" => "Weft",
+                "ZIGZ" => "Zigzag",
+                "SE04" => "ZigZag 2",
+                "ZOOM" => "Zoom",
+                "SE11" => "Zoom 2",
+                _ => "Transition"
+            };
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            ModuleName = reader.ReadAutoYuniversal();
             FileName = reader.ReadAutoYuniversal();
+            ModuleName = reader.ReadAutoYuniversal();
             Module = reader.ReadInt();
-            ID = reader.ReadInt();
+            ID = reader.ReadAscii(4);
             Duration = reader.ReadInt();
             UseColor = reader.ReadInt() != 0;
             Color = reader.ReadColor();
@@ -59,10 +85,10 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteAutoYunicode(ModuleName);
             writer.WriteAutoYunicode(FileName);
+            writer.WriteAutoYunicode(ModuleName);
             writer.WriteInt(Module);
-            writer.WriteInt(ID);
+            writer.WriteAscii(ID);
             writer.WriteInt(Duration);
             writer.WriteInt(UseColor ? 1 : 0);
             writer.WriteColor(Color);

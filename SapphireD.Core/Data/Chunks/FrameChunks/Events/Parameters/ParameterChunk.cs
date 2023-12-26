@@ -28,5 +28,10 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters
         {
 
         }
+
+        public override string ToString()
+        {
+            return "";
+        }
     }
 }

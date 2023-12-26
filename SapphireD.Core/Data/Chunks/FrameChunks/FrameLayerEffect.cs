@@ -33,7 +33,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             ShaderParameters = new ShaderParameter[reader.ReadInt()];
             int paramOffset = reader.ReadInt();
 
-            if (paramOffset != 0)
+            if (paramOffset != 0 && startOffset + paramOffset < reader.Size())
             {
                 reader.Seek(startOffset + paramOffset);
                 Shader = SapDCore.PackageData.ShaderBank.Shaders[++ShaderHandle];

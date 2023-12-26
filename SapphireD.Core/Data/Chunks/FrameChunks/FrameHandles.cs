@@ -20,7 +20,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             for (int i = 0; i < count; i++)
                 FrameHandleIndex[i] = reader.ReadShort();
 
-            SapDCore.PackageData.FrameHandles = FrameHandleIndex;
+            SapDCore.PackageData.FrameHandles = FrameHandleIndex.ToList();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
