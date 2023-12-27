@@ -13,7 +13,14 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public int BorderSize;
         public Color BorderColor = Color.White;
         public int ShapeType;
+        /* Shape Type Values:
+         * 2 - Bar
+         */
         public int FillType;
+        /* Fill Type Values:
+         * 1 - Solid Color
+         * 2 - Gradient
+         */
         public Color Color1 = Color.White;
         public Color Color2 = Color.White;
         public bool VerticalGradient;

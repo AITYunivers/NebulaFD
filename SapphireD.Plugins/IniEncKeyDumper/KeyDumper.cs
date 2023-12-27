@@ -66,13 +66,13 @@ namespace SapphireD.Plugins.EncKeyDumper
         public void GetKeysFromEvents()
         {
             PackageData data = SapDCore.PackageData;
-            foreach (Frame frm in data.Frames.Values)
+            foreach (Frame frm in data.Frames)
             {
                 foreach (Event evt in frm.FrameEvents.Events)
                 {
                     foreach (Action act in evt.Actions)
                     {
-                        if (act.ObjectType < 32) continue;
+                        if (act.ObjectType < 32 || act.ObjectInfo < 0) continue;
                         ObjectInfo oI = data.FrameItems.Items[act.ObjectInfo];
                         ObjectCommon props = (ObjectCommon)oI.Properties;
                         string key = GetKeyFromAction(data.Extensions.Exts[oI.Header.Type - 32].FileName, act);

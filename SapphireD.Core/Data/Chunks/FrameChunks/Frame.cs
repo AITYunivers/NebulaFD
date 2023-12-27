@@ -252,14 +252,14 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                                     (newOC as MFAString).Paragraphs = oldOC.ObjectParagraphs.Paragraphs;
                                     break;
                                 case 7:
-                                    (newOC as MFACounter).CounterFlags.Value = 1; // Default Value
                                     (newOC as MFACounter).DisplayType = oldOC.ObjectCounter.DisplayType;
                                     (newOC as MFACounter).Width = oldOC.ObjectCounter.Width * (oldOC.ObjectCounter.Shape.LineFlags["FlipX"] ? -1 : 1);
                                     (newOC as MFACounter).Height = oldOC.ObjectCounter.Height * (oldOC.ObjectCounter.Shape.LineFlags["FlipY"] ? -1 : 1);
-                                    (newOC as MFACounter).ColorType = oldOC.ObjectCounter.Shape.FillType;
+                                    (newOC as MFACounter).BarDirection = oldOC.ObjectCounter.BarDirection ? 1 : 0;
+                                    (newOC as MFACounter).FillType = oldOC.ObjectCounter.Shape.FillType;
                                     (newOC as MFACounter).Color1 = oldOC.ObjectCounter.Shape.Color1;
                                     (newOC as MFACounter).Color2 = oldOC.ObjectCounter.Shape.Color2;
-                                    (newOC as MFACounter).Gradient = oldOC.ObjectCounter.Shape.VerticalGradient ? 1u : 0;
+                                    (newOC as MFACounter).VerticalGradient = oldOC.ObjectCounter.Shape.VerticalGradient;
                                     (newOC as MFACounter).Images = oldOC.ObjectCounter.Frames;
                                     (newOC as MFACounter).Font = oldOC.ObjectCounter.Font;
                                     (newOC as MFACounter).Value = oldOC.ObjectValue.Initial;

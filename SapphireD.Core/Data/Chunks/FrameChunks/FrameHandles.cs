@@ -4,7 +4,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 {
     public class FrameHandles : Chunk
     {
-        public short[] FrameHandleIndex;
+        public short[] FrameHandleIndex = new short[0];
 
         public FrameHandles()
         {

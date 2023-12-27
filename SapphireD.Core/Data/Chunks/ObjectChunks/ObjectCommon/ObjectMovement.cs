@@ -1,11 +1,13 @@
 ﻿using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDefinitions;
 using SapphireD.Core.Memory;
+using System.Diagnostics;
 
 namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 {
     public class ObjectMovement : Chunk
     {
         public string Name = string.Empty;
+        public int ID;
         public short Player;
         public short Type;
         public byte Move;
@@ -22,7 +24,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         {
             long StartOffset = (long)extraInfo[0];
             int NameOffset = reader.ReadInt();
-            int MovementID = reader.ReadInt();
+            ID = reader.ReadInt();
             int DataOffset = reader.ReadInt();
             int DataSize = reader.ReadInt();
             reader.Seek(StartOffset + DataOffset);
@@ -62,7 +64,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
                     long ReturnOffset = reader.Tell();
                     reader.Seek(StartOffset + NameOffset);
                     ((ObjectMovementExtension)MovementDefinition).FileName = reader.ReadYuniversal();
-                    ((ObjectMovementExtension)MovementDefinition).ID = MovementID;
+                    ((ObjectMovementExtension)MovementDefinition).ID = ID;
                     reader.Seek(ReturnOffset);
                     break;
             }
@@ -73,8 +75,9 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
             Name = reader.ReadAutoYuniversal();
+            Debug.Assert(Name != "ATTACK");
             string Extension = reader.ReadAutoYuniversal();
-            int MovementID = reader.ReadInt();
+            ID = reader.ReadInt();
             int DataSize = reader.ReadInt();
             long StartingOffset = reader.Tell();
             
@@ -82,7 +85,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             {
                 MovementDefinition = new ObjectMovementExtension();
                 ((ObjectMovementExtension)MovementDefinition).FileName = Extension;
-                ((ObjectMovementExtension)MovementDefinition).ID = MovementID;
+                ((ObjectMovementExtension)MovementDefinition).ID = ID;
             }
             else
             {
@@ -137,12 +140,12 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             {
                 ObjectMovementExtension ExtensionDefinition = (ObjectMovementExtension)MovementDefinition;
                 writer.WriteAutoYunicode(ExtensionDefinition.FileName);
-                writer.WriteInt(ExtensionDefinition.ID);
+                writer.WriteInt(ID);
             }
             else
             {
                 writer.WriteAutoYunicode("");
-                writer.WriteInt(0);
+                writer.WriteInt(ID);
                 mvntWriter.WriteShort(Player);
                 mvntWriter.WriteShort(Type);
                 mvntWriter.WriteByte(Move);

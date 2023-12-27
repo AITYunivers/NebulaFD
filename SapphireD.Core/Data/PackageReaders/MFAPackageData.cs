@@ -9,7 +9,6 @@ using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 using Spectre.Console;
-using System.Diagnostics;
 
 #pragma warning disable CS8602
 namespace SapphireD.Core.Data.PackageReaders
@@ -251,13 +250,14 @@ namespace SapphireD.Core.Data.PackageReaders
                                     newOC.ObjectCounter.Font = (oldOC as MFACounter).Font;
                                     newOC.ObjectCounter.Shape.LineFlags.Value = (oldOC as MFACounter).Width  < 0 ? 1u : 0 +
                                                                                 (oldOC as MFACounter).Height < 0 ? 2u : 0;
-                                    newOC.ObjectCounter.Shape.FillType = (int)(oldOC as MFACounter).ColorType;
+                                    newOC.ObjectCounter.Shape.FillType = (oldOC as MFACounter).FillType;
                                     newOC.ObjectCounter.Shape.Color1 = (oldOC as MFACounter).Color1;
                                     newOC.ObjectCounter.Shape.Color2 = (oldOC as MFACounter).Color2;
-                                    newOC.ObjectCounter.Shape.VerticalGradient = (oldOC as MFACounter).Gradient != 0;
+                                    newOC.ObjectCounter.Shape.VerticalGradient = (oldOC as MFACounter).VerticalGradient;
                                     newOC.ObjectValue.Initial = (oldOC as MFACounter).Value;
                                     newOC.ObjectValue.Minimum = (oldOC as MFACounter).Minimum;
                                     newOC.ObjectValue.Maximum = (oldOC as MFACounter).Maximum;
+                                    newOC.ObjectCounter.BarDirection = (oldOC as MFACounter).BarDirection == 1;
 
                                     if (oI.CounterFlags != null)
                                     {

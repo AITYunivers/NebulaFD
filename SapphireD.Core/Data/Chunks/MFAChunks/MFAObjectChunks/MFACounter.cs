@@ -1,23 +1,35 @@
 ﻿using SapphireD.Core.Memory;
-using System.Diagnostics;
 using System.Drawing;
 
 namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
 {
     public class MFACounter : MFAObjectLoader
     {
-        public BitDict CounterFlags = new BitDict( // Counter Flags
-            
-        );
-
         public int Value;
         public int Minimum;
         public int Maximum;
         public uint DisplayType;
+        /* Display Type Values:
+         * 0 - Hidden
+         * 1 - Numbers
+         * 2 - Vertical Bar
+         * 3 - Horizontal Bar
+         * 4 - Animation
+         * 5 - Text
+         */
+        public int FillType;
+        /* Fill Type Values:
+         * 1 - Solid Color
+         * 2 - Gradient
+         */
         public Color Color1;
         public Color Color2;
-        public uint Gradient;
-        public int ColorType;
+        public bool VerticalGradient;
+        public int BarDirection;
+        /* Bar Direction Values:
+         * 0 - Down/Left
+         * 1 - Up/Right
+         */
         public int Width;
         public int Height;
         public uint[] Images = new uint[0];
@@ -36,11 +48,11 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
             Minimum = reader.ReadInt();
             Maximum = reader.ReadInt();
             DisplayType = reader.ReadUInt();
-            CounterFlags.Value = reader.ReadUInt();
+            FillType = reader.ReadInt();
             Color1 = reader.ReadColor();
             Color2 = reader.ReadColor();
-            Gradient = reader.ReadUInt();
-            ColorType = reader.ReadInt();
+            VerticalGradient = reader.ReadInt() != 0;
+            BarDirection = reader.ReadInt();
             Width = reader.ReadInt();
             Height = reader.ReadInt();
 
@@ -59,11 +71,11 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
             writer.WriteInt(Minimum);
             writer.WriteInt(Maximum);
             writer.WriteUInt(DisplayType);
-            writer.WriteUInt(CounterFlags.Value);
+            writer.WriteInt(FillType);
             writer.WriteColor(Color1);
             writer.WriteColor(Color2);
-            writer.WriteUInt(Gradient);
-            writer.WriteInt(ColorType);
+            writer.WriteInt(VerticalGradient ? 1 : 0);
+            writer.WriteInt(BarDirection);
             writer.WriteInt(Width);
             writer.WriteInt(Height);
 

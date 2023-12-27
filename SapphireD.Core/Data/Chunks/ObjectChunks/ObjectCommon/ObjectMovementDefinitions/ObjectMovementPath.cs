@@ -80,13 +80,14 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDef
             writer.WriteByte(Reverse);
             writer.WriteByte(0);
 
+            byte oldSize = 0;
             foreach (ObjectMovementPathNode node in PathNodes)
             {
                 ByteWriter nodeWriter = new ByteWriter(new MemoryStream());
                 node.WriteMFA(nodeWriter);
-
-                writer.WriteByte(0);
-                writer.WriteByte((byte)(nodeWriter.Tell() + 2));
+                writer.WriteByte(oldSize);
+                oldSize = (byte)(nodeWriter.Tell() + 2);
+                writer.WriteByte(oldSize);
                 writer.WriteWriter(nodeWriter);
                 nodeWriter.Flush();
                 nodeWriter.Close();

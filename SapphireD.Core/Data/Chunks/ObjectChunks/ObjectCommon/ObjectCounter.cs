@@ -9,11 +9,20 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public int Height;
         public short Player;
         public uint DisplayType;
+        /* Display Type Values:
+         * 0 - Hidden
+         * 1 - Numbers
+         * 2 - Vertical Bar
+         * 3 - Horizontal Bar
+         * 4 - Animation
+         * 5 - Text
+         */
 
         public bool IntDigitPadding;
         public bool FloatWholePadding;
         public bool FloatDecimalPadding;
         public bool FloatPadding;
+        public bool BarDirection;
 
         public byte IntDigitCount;
         public byte FloatWholeCount;
@@ -43,20 +52,20 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             FloatWholePadding = (digitCounts & 0x200) != 0;
             FloatDecimalPadding = (digitCounts & 0x400) != 0;
             FloatPadding = (digitCounts & 0x800) != 0;
+            BarDirection = (digitCounts & 0x100) != 0;
             Font = reader.ReadUShort();
 
             switch (DisplayType)
             {
-                case 1:
-                case 4:
-                case 50:
+                case 1: // Numbers
+                case 4: // Animation
                     Frames = new uint[reader.ReadShort()];
                     for (int i = 0; i < Frames.Length; i++)
                         Frames[i] = reader.ReadUShort();
                     break;
-                case 2:
-                case 3:
-                case 5:
+                case 2: // Vertical Bar
+                case 3: // Horizontal Bar
+                case 5: // Text
                     Shape.ReadCCN(reader);
                     break;
             }

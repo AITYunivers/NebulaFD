@@ -29,7 +29,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDef
             Sin = reader.ReadShort();
             Length = reader.ReadShort();
             Pause = reader.ReadShort();
-            Name = reader.ReadYuniversal();
+            Name = reader.ReadWideString();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

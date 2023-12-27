@@ -22,7 +22,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 
         public short ObjectType;
         public short Num;
-        public ushort ObjectInfo;
+        public short ObjectInfo;
         public ushort ObjectInfoList;
         public Parameter[] Parameters = new Parameter[0];
         public byte DefType;
@@ -38,7 +38,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 
             ObjectType = reader.ReadShort();
             Num = reader.ReadShort();
-            ObjectInfo = reader.ReadUShort();
+            ObjectInfo = reader.ReadShort();
             ObjectInfoList = reader.ReadUShort();
             EventFlags.Value = reader.ReadByte();
             OtherFlags.Value = reader.ReadByte();
@@ -61,7 +61,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 
             ObjectType = reader.ReadShort();
             Num = reader.ReadShort();
-            ObjectInfo = reader.ReadUShort();
+            ObjectInfo = reader.ReadShort();
             ObjectInfoList = reader.ReadUShort();
             EventFlags.Value = reader.ReadByte();
             OtherFlags.Value = reader.ReadByte();
@@ -87,7 +87,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             ByteWriter actWriter = new ByteWriter(new MemoryStream());
             actWriter.WriteShort(ObjectType);
             actWriter.WriteShort(Num);
-            actWriter.WriteUShort(ObjectInfo);
+            actWriter.WriteShort(ObjectInfo);
             actWriter.WriteUShort(ObjectInfoList);
             actWriter.WriteByte((byte)EventFlags.Value);
             actWriter.WriteByte((byte)OtherFlags.Value);
