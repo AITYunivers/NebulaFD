@@ -1,4 +1,6 @@
-﻿using SapphireD.Core.Memory;
+﻿using SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters;
+using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
+using SapphireD.Core.Memory;
 
 namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 {
@@ -105,7 +107,22 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 
         public void Fix()
         {
-
+            switch (ObjectType)
+            {
+                case 2:
+                    switch (Num)
+                    {
+                        case 13: // Set Movement
+                            {
+                                ParameterShort param = (ParameterShort)Parameters[0].Data;
+                                ObjectCommon oC = (ObjectCommon)SapDCore.PackageData.FrameItems.Items[ObjectInfo].Properties;
+                                string name = oC.ObjectMovements.Movements[param.Value].Name;
+                                param.Extra = string.IsNullOrEmpty(name) ? "Movement #" + param.Value : name;
+                            }
+                            break;
+                    }
+                    break;
+            }
         }
     }
 }

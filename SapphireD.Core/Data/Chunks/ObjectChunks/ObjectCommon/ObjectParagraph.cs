@@ -6,12 +6,9 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
     public class ObjectParagraph : Chunk
     {
         public BitDict ParagraphFlags = new BitDict( // Paragraph Flags
-            "HoriCenter", // Alignment Horizontal: Center (Unused?)
-            "HoriRight",  // Alignment Horizontal: Right (Unused?)
-            "VertCenter", // Alignment Vertical: Center (Unused?)
-            "VertBottom", // Alignment Vertical: Bottom (Unused?)
-            "Correct",    // Correct Answer
-            "Relief"      // Relief (Unused?)
+            "MFACorrect", "", "", "",  // MFA Correct Answer
+            "", "", "", "", "Correct", // CCN Correct Answer
+            "Relief"                   // Relief
         );
 
         public ushort FontHandle;

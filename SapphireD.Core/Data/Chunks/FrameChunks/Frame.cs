@@ -7,6 +7,7 @@ using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
 using SapphireD.Core.Data.Chunks.BankChunks.Shaders;
 using SapphireD.Core.Data.Chunks.FrameChunks.Events;
+using System.Drawing;
 
 namespace SapphireD.Core.Data.Chunks.FrameChunks
 {
@@ -215,6 +216,8 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                             {
                                 2 => new MFAActive(),
                                 3 => new MFAString(),
+                                4 => new MFAQNA(),
+                                6 => new MFALives(),
                                 7 => new MFACounter(),
                                 _ => new MFAExtensionObject()
                             };
@@ -251,6 +254,45 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                                     (newOC as MFAString).StringFlags.Value = oldOC.ObjectParagraphs.Paragraphs[0].ParagraphFlags.Value;
                                     (newOC as MFAString).Paragraphs = oldOC.ObjectParagraphs.Paragraphs;
                                     break;
+                                case 4:
+                                    (newOC as MFAQNA).Width = oldOC.ObjectParagraphs.Width;
+                                    (newOC as MFAQNA).Height = oldOC.ObjectParagraphs.Height;
+
+                                    (newOC as MFAQNA).QuestionFont = oldOC.ObjectParagraphs.Paragraphs[0].FontHandle;
+                                    (newOC as MFAQNA).QuestionColor = oldOC.ObjectParagraphs.Paragraphs[0].Color;
+                                    (newOC as MFAQNA).QuestionRelief = oldOC.ObjectParagraphs.Paragraphs[0].ParagraphFlags["Relief"];
+                                    (newOC as MFAQNA).QuestionParagraph = oldOC.ObjectParagraphs.Paragraphs[0];
+
+                                    (newOC as MFAQNA).AnswerFont = oldOC.ObjectParagraphs.Paragraphs[1].FontHandle;
+                                    (newOC as MFAQNA).AnswerColor = oldOC.ObjectParagraphs.Paragraphs[1].Color;
+                                    (newOC as MFAQNA).AnswerRelief = oldOC.ObjectParagraphs.Paragraphs[1].ParagraphFlags["Relief"];
+                                    List<ObjectParagraph> ansParas = oldOC.ObjectParagraphs.Paragraphs.ToList();
+                                    ansParas.RemoveAt(0);
+                                    ansParas[0].ParagraphFlags["MFACorrect"] = oldOC.ObjectParagraphs.Paragraphs[1].ParagraphFlags["Correct"];
+                                    (newOC as MFAQNA).AnswerParagraphs = ansParas.ToArray();
+                                    break;
+                                case 6:
+                                    (newOC as MFALives).Player = oldOC.ObjectCounter.Player;
+                                    (newOC as MFALives).Images = oldOC.ObjectCounter.Frames;
+                                    (newOC as MFALives).UseText = oldOC.ObjectCounter.Frames.Length == 0;
+                                    if ((newOC as MFALives).UseText)
+                                    {
+                                        (newOC as MFALives).Color = oldOC.ObjectParagraphs.Paragraphs[0].Color;
+                                        (newOC as MFALives).Font = oldOC.ObjectParagraphs.Paragraphs[0].FontHandle;
+                                    }
+                                    else
+                                    {
+                                        (newOC as MFALives).Color = Color.Black;
+                                        (newOC as MFALives).Font = -1;
+                                    }
+                                    (newOC as MFALives).Width = oldOC.ObjectCounter.Width;
+                                    (newOC as MFALives).Height = oldOC.ObjectCounter.Height;
+
+                                    newOI.LivesFlags = new MFALivesFlags();
+                                    newOI.LivesFlags.LivesFlags.Value = 0; // Default Value;
+                                    newOI.LivesFlags.LivesFlags["FixedDigitCount"] = oldOC.ObjectCounter.IntDigitPadding;
+                                    newOI.LivesFlags.FixedDigits = oldOC.ObjectCounter.IntDigitCount;
+                                    break;
                                 case 7:
                                     (newOC as MFACounter).DisplayType = oldOC.ObjectCounter.DisplayType;
                                     (newOC as MFACounter).Width = oldOC.ObjectCounter.Width * (oldOC.ObjectCounter.Shape.LineFlags["FlipX"] ? -1 : 1);
@@ -276,11 +318,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                                     newOI.CounterFlags.SignificantDigits = oldOC.ObjectCounter.FloatWholeCount;
                                     newOI.CounterFlags.DecimalPoints = oldOC.ObjectCounter.FloatDecimalCount;
                                     break;
-                                case 0:
-                                case 1:
-                                case 4:
                                 case 5:
-                                case 6:
                                 case 8:
                                 case 9:
                                     break;

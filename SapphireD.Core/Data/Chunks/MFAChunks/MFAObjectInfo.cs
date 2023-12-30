@@ -33,6 +33,7 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
 
         // Chunks
         public MFACounterFlags? CounterFlags = null;   // 0x16
+        public MFALivesFlags? LivesFlags = null;       // 0x17
         public MFAObjectEffects? ObjectEffects = null; // 0x2D
 
         public MFAObjectInfo()
@@ -82,16 +83,21 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
                     ObjectLoader = new MFAActive();
                     break;
                 case 3: // String
-                case 4: // Question & Answer
                     ObjectLoader = new MFAString();
+                    break;
+                case 4: // Question & Answer
+                    ObjectLoader = new MFAQNA();
                     break;
                 case 5: // Score
                 case 6: // Lives
+                    ObjectLoader = new MFALives();
+                    break;
                 case 7: // Counter
                     ObjectLoader = new MFACounter();
                     break;
                 case 8: // Formatted Text
                 case 9: // Sub-Application
+                    break;
                 default:
                     ObjectLoader = new MFAExtensionObject();
                     break;
@@ -119,6 +125,8 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
 
             if (CounterFlags != null)
                 CounterFlags.WriteMFA(writer);
+            if (LivesFlags != null)
+                LivesFlags.WriteMFA(writer);
             if (ObjectEffects != null)
                 ObjectEffects.WriteMFA(writer);
             writer.WriteByte(0); // Last Chunk

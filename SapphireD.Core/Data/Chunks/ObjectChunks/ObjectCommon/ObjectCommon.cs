@@ -185,6 +185,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
                 {
                     //Text
                     case "TE":
+                    case "QS":
                         ObjectParagraphs.ReadCCN(reader);
                         break;
                     //Counter

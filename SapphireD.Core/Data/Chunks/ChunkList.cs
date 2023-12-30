@@ -16,6 +16,7 @@ namespace SapphireD.Core.Data.Chunks
         public static Dictionary<short, Type> ChunkJumpTable = new Dictionary<short, Type>()
         {
             { 0x0016, typeof(MFACounterFlags)     },
+            { 0x0017, typeof(MFALivesFlags)       },
             { 0x0021, typeof(FrameRect)           },
             //0x0022         FrameDemoPath
             { 0x0023, typeof(FrameSeed)           },

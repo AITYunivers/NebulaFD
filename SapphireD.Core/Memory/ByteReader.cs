@@ -110,8 +110,6 @@ namespace SapphireD.Core.Memory
             return str;
         }
 
-
-
         public string ReadWideString(int length = -1)
         {
             string str = "";
@@ -130,6 +128,22 @@ namespace SapphireD.Core.Memory
                 }
             }
 
+            return str;
+        }
+
+        public string ReadWideStringStop(int length = -1)
+        {
+            string str = "";
+            long debut = Tell();
+            if (length >= 0)
+                for (int i = 0; i < length; i++)
+                {
+                    short ch = ReadShort();
+                    if (ch == 0) break;
+                    str += Convert.ToChar(ch);
+                }
+
+            Seek(debut + length);
             return str;
         }
 
@@ -156,6 +170,21 @@ namespace SapphireD.Core.Memory
                 return ReadWideString(len); 
             else
                 return ReadAscii(len);
+        }
+
+        public string ReadYuniversalStop(int len = -1)
+        {
+            if (SapDCore._unicode == null)
+            {
+                Skip(1);
+                SapDCore._unicode = ReadByte() == 0;
+                Skip(-2);
+            }
+
+            if (SapDCore.Unicode)
+                return ReadWideStringStop(len); 
+            else
+                return ReadAsciiStop(len);
         }
 
         public Color ReadColor()

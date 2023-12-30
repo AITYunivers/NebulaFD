@@ -20,6 +20,7 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
         public int Height;
         public int Font;
         public Color Color;
+        public bool Relief;
 
         public ObjectParagraph[] Paragraphs = new ObjectParagraph[0];
 
@@ -37,7 +38,7 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
             Font = reader.ReadInt();
             Color = reader.ReadColor();
             StringFlags.Value = reader.ReadUInt();
-            reader.Skip(4);
+            Relief = reader.ReadInt() == 1;
 
             Paragraphs = new ObjectParagraph[reader.ReadUInt()];
             for (int i = 0; i < Paragraphs.Length; i++)

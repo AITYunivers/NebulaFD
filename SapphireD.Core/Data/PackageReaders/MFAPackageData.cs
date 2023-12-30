@@ -242,6 +242,22 @@ namespace SapphireD.Core.Data.PackageReaders
                                     newOC.ObjectParagraphs.Paragraphs[0].Color = (oldOC as MFAString).Color;
                                     newOC.ObjectParagraphs.Paragraphs[0].ParagraphFlags.Value = (oldOC as MFAString).StringFlags.Value;
                                     break;
+                                case 4:
+                                    newOC.ObjectParagraphs.Width = (oldOC as MFAQNA).Width;
+                                    newOC.ObjectParagraphs.Height = (oldOC as MFAQNA).Height;
+                                    List<ObjectParagraph> objParas = (oldOC as MFAQNA).AnswerParagraphs.ToList();
+                                    objParas.Insert(0, (oldOC as MFAQNA).QuestionParagraph);
+                                    objParas[0].FontHandle = (ushort)(oldOC as MFAQNA).QuestionFont;
+                                    objParas[0].Color = (oldOC as MFAQNA).QuestionColor;
+                                    objParas[0].ParagraphFlags["Relief"] = (oldOC as MFAQNA).QuestionRelief;
+                                    objParas[1].FontHandle = (ushort)(oldOC as MFAQNA).AnswerFont;
+                                    objParas[1].Color = (oldOC as MFAQNA).AnswerColor;
+                                    objParas[1].ParagraphFlags["Relief"] = (oldOC as MFAQNA).AnswerRelief;
+                                    objParas[1].ParagraphFlags["Correct"] = objParas[1].ParagraphFlags["MFACorrect"];
+                                    newOC.ObjectParagraphs.Paragraphs = objParas.ToArray();
+                                    break;
+                                case 5:
+                                case 6:
                                 case 7:
                                     newOC.ObjectCounter.DisplayType = (oldOC as MFACounter).DisplayType;
                                     newOC.ObjectCounter.Width = (oldOC as MFACounter).Width;

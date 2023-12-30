@@ -75,7 +75,6 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
             Name = reader.ReadAutoYuniversal();
-            Debug.Assert(Name != "ATTACK");
             string Extension = reader.ReadAutoYuniversal();
             ID = reader.ReadInt();
             int DataSize = reader.ReadInt();
