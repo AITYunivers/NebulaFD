@@ -111,6 +111,9 @@ namespace SapphireD
                 case ".zip":
                     SapDCore.CurrentReader = new OpenFileReader();
                     break;
+                case ".apk":
+                    SapDCore.CurrentReader = new APKFileReader();
+                    break;
             }
         }
 

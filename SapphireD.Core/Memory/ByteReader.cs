@@ -143,7 +143,7 @@ namespace SapphireD.Core.Memory
                     str += Convert.ToChar(ch);
                 }
 
-            Seek(debut + length);
+            Seek(debut + length * 2);
             return str;
         }
 
