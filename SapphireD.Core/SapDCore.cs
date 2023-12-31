@@ -19,6 +19,24 @@ namespace SapphireD
         public static bool MFA;
         public static bool Flash;
         public static bool HTML;
+        public static int D3D
+        {
+            get
+            {
+                if (PackageData.AppHeader.OtherFlags["Direct3D9or11"] && PackageData.AppHeader.OtherFlags["Direct3D8or11"])
+                    return 11;
+                else if (PackageData.AppHeader.OtherFlags["Direct3D9or11"])
+                    return 9;
+                else if (PackageData.AppHeader.OtherFlags["Direct3D8or11"])
+                    return 8;
+                else
+                    return 0;
+            }
+            set
+            {
+
+            }
+        }
 
         public static int Build;
         public static bool? _unicode = null;

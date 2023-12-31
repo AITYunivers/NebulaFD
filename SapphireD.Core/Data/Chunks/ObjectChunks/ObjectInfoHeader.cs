@@ -1,7 +1,5 @@
 ﻿using SapphireD.Core.Memory;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Security.AccessControl;
 
 namespace SapphireD.Core.Data.Chunks.ObjectChunks
 {
@@ -16,7 +14,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
         public int Handle;
         public int Type;
         public int InkEffect;
-        public Color RGBCoeff = Color.White;
+        public Color RGBCoeff = Color.FromArgb(0, 255, 255, 255);
         public byte BlendCoeff;
         public uint InkEffectParam;
 
@@ -36,11 +34,16 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
             reader.Skip(2);
             if (InkEffect != 1)
             {
-                var b = reader.ReadByte();
-                var g = reader.ReadByte();
-                var r = reader.ReadByte();
-                RGBCoeff = Color.FromArgb(0, r, g, b);
-                BlendCoeff = (byte)(255 - reader.ReadByte());
+                if (SapDCore.D3D == 0)
+                    reader.Skip(4);
+                else
+                {
+                    var b = reader.ReadByte();
+                    var g = reader.ReadByte();
+                    var r = reader.ReadByte();
+                    RGBCoeff = Color.FromArgb(0, r, g, b);
+                    BlendCoeff = (byte)(255 - reader.ReadByte());
+                }
             }
             else
                 InkEffectParam = reader.ReadUInt();
