@@ -4,13 +4,13 @@ using System.Drawing;
 
 namespace SapphireD.Core.FileReaders
 {
-    public interface FileReader
+    public interface IFileReader
     {
         string Name { get; }
+        Dictionary<int, Bitmap> Icons { get; set; }
 
         PackageData getPackageData();
         void LoadGame(ByteReader fileReader, string filePath);
-        Dictionary<int, Bitmap> getIcons();
-        FileReader Copy();
+        IFileReader Copy();
     }
 }

@@ -7,12 +7,13 @@ using System.IO.Compression;
 
 namespace SapphireD.Core.FileReaders
 {
-    public class APKFileReader : FileReader
+    public class APKFileReader : IFileReader
     {
         public string Name => "APK";
+        public Dictionary<int, Bitmap> Icons { get { return _icons; } set { _icons = value; } }
+        private Dictionary<int, Bitmap> _icons = new Dictionary<int, Bitmap>();
 
         public CCNPackageData Package = new();
-        public Dictionary<int, Bitmap> Icons = new();
 
         public bool Unpacked;
 
@@ -38,6 +39,11 @@ namespace SapphireD.Core.FileReaders
                         // TODO
                     }
                 }
+                else if (Directory.GetParent(entry.FullName)?.Name == "drawable-xhdpi" &&
+                         entry.Name == "launcher.png")
+                {
+                    loadIcons(new Bitmap(Bitmap.FromStream(entry.Open())));
+                }
             }
             archive.Dispose();
 
@@ -45,15 +51,23 @@ namespace SapphireD.Core.FileReaders
                 Package.Read(ccnReader);
         }
 
-        public PackageData getPackageData() => Package!;
-        public Dictionary<int, Bitmap> getIcons() => Icons;
+        private void loadIcons(Bitmap bmp)
+        {
+            _icons.Add(16,  bmp.ResizeImage(new Size(16, 16)));
+            _icons.Add(32,  bmp.ResizeImage(new Size(32, 32)));
+            _icons.Add(64,  bmp.ResizeImage(new Size(48, 48)));
+            _icons.Add(128, bmp.ResizeImage(new Size(128, 128)));
+            _icons.Add(256, bmp.ResizeImage(new Size(256, 256)));
+        }
 
-        public FileReader Copy()
+        public PackageData getPackageData() => Package!;
+
+        public IFileReader Copy()
         {
             CCNFileReader fileReader = new()
             {
                 Package = Package,
-                Icons = Icons
+                Icons = _icons
             };
             return fileReader;
         }

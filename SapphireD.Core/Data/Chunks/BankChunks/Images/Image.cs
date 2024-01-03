@@ -40,6 +40,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
 
         public byte[] ImageData = new byte[0];
         private Bitmap? BitmapCache = null;
+        public bool IsFromBitmap;
 
         public BitDict Flags = new BitDict(new string[]
         {
@@ -132,6 +133,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
             Width = (short)bmp.Width;
             Height = (short)bmp.Height;
             GraphicMode = 4;
+            IsFromBitmap = true;
 
             var bitmapData = bmp.LockBits(new Rectangle(0, 0, Width, Height),
                                           ImageLockMode.ReadOnly,
@@ -252,6 +254,7 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
                     GraphicMode = 4;
                     break;
                 case 4:
+                    if (IsFromBitmap) break;
                     if (SapDCore.Android)
                     {
                         ImageData = ImageTranslator.AndroidMode4ToRGBA(ImageData, Width, Height, Flags["Alpha"]);

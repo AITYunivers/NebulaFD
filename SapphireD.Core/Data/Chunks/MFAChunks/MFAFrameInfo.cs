@@ -8,7 +8,7 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
         public int Handle;
         public int EditorX;
         public int EditorY;
-        public int Stamp;
+        public int IconHandle;
         public int EditorLayer;
         public MFAObjectInfo[] Objects = new MFAObjectInfo[0];
         public MFAFolders Folders = new();

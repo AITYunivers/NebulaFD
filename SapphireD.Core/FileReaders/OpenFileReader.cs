@@ -1,18 +1,18 @@
 ﻿using SapphireD.Core.Data;
 using SapphireD.Core.Data.PackageReaders;
 using SapphireD.Core.Memory;
-using SapphireD.Core.Utilities;
 using System.Drawing;
 using System.IO.Compression;
 
 namespace SapphireD.Core.FileReaders
 {
-    public class OpenFileReader : FileReader
+    public class OpenFileReader : IFileReader
     {
         public string Name => "Open File Structure (HTML/XNA)";
+        public Dictionary<int, Bitmap> Icons { get { return _icons; } set { _icons = value; } }
+        private Dictionary<int, Bitmap> _icons = new Dictionary<int, Bitmap>();
 
         public CCNPackageData Package = new();
-        public Dictionary<int, Bitmap> Icons = new();
 
         public bool Unpacked;
 
@@ -60,14 +60,13 @@ namespace SapphireD.Core.FileReaders
         }
 
         public PackageData getPackageData() => Package!;
-        public Dictionary<int, Bitmap> getIcons() => Icons;
 
-        public FileReader Copy()
+        public IFileReader Copy()
         {
             CCNFileReader fileReader = new()
             {
                 Package = Package,
-                Icons = Icons
+                Icons = _icons
             };
             return fileReader;
         }

@@ -59,16 +59,16 @@ namespace SapphireD
             AnsiConsole.Write(SapDCore.ConsoleRule);
 
             var fileReaders = from t in Assembly.GetAssembly(typeof(SapDCore)).GetTypes()
-                            where t.GetInterfaces().Contains(typeof(FileReader))
+                            where t.GetInterfaces().Contains(typeof(IFileReader))
                             && t.GetConstructor(Type.EmptyTypes) != null
-                            select Activator.CreateInstance(t) as FileReader;
+                            select Activator.CreateInstance(t) as IFileReader;
 
             List<string> fileReaderNames = new()
             {
                 "Auto-Detect"
             };
 
-            foreach (FileReader fileReader in fileReaders)
+            foreach (IFileReader fileReader in fileReaders)
                 fileReaderNames.Add(fileReader.Name);
 
             string? selectedReader = AnsiConsole.Prompt(new SelectionPrompt<string>()
@@ -76,7 +76,7 @@ namespace SapphireD
                                                 .AddChoices(fileReaderNames));
 
             SapDCore.CurrentReader = null;
-            foreach (FileReader fileReader in fileReaders)
+            foreach (IFileReader fileReader in fileReaders)
                 if (fileReader.Name == selectedReader)
                 {
                     SapDCore.CurrentReader = fileReader;

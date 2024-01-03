@@ -5,12 +5,13 @@ using System.Drawing;
 
 namespace SapphireD.Core.FileReaders
 {
-    public class MFAFileReader : FileReader
+    public class MFAFileReader : IFileReader
     {
         public string Name => "MFA";
+        public Dictionary<int, Bitmap> Icons { get { return _icons; } set { _icons = value; } }
+        private Dictionary<int, Bitmap> _icons = new Dictionary<int, Bitmap>();
 
         public MFAPackageData Package = new();
-        public Dictionary<int, Bitmap> Icons = new Dictionary<int, Bitmap>();
 
         public void LoadGame(ByteReader fileReader, string filePath)
         {
@@ -18,14 +19,13 @@ namespace SapphireD.Core.FileReaders
         }
 
         public PackageData getPackageData() => Package!;
-        public Dictionary<int, Bitmap> getIcons() => Icons;
 
-        public FileReader Copy()
+        public IFileReader Copy()
         {
             MFAFileReader fileReader = new()
             {
                 Package = Package,
-                Icons = Icons
+                Icons = _icons
             };
             return fileReader;
         }

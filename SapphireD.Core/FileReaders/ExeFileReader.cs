@@ -9,12 +9,13 @@ using TsudaKageyu;
 
 namespace SapphireD.Core.FileReaders
 {
-    public class EXEFileReader : FileReader
+    public class EXEFileReader : IFileReader
     {
         public string Name => "Normal EXE";
+        public Dictionary<int, Bitmap> Icons { get { return _icons; } set { _icons = value; } }
+        private Dictionary<int, Bitmap> _icons = new Dictionary<int, Bitmap>();
 
         public CCNPackageData Package = new();
-        public Dictionary<int, Bitmap> Icons = new Dictionary<int, Bitmap>();
 
         public void LoadGame(ByteReader fileReader, string filePath)
         {
@@ -45,25 +46,39 @@ namespace SapphireD.Core.FileReaders
 
             foreach (var icon in icos)
             {
-                if (IconUtil.GetBitCount(icon) != 8)
-                    Icons.TryAdd(icon.Width, icon.ToBitmap());
+                if (IconUtil.GetBitCount(icon) > 8 || icon.Width > 48)
+                    _icons.TryAdd(icon.Width == 48 ? 64 : icon.Width, icon.ToBitmap());
             }
 
             // 32-Bit 16x16
-            if (!Icons.ContainsKey(16))
-                Icons.Add(16, Icons.Last().Value.ResizeImage(new Size(16, 16)));
+            if (!_icons.ContainsKey(16))
+                _icons.Add(16, _icons[getLargestIcon()].ResizeImage(new Size(16, 16)));
             // 32-Bit 32x32
-            if (!Icons.ContainsKey(32))
-                Icons.Add(32, Icons.Last().Value.ResizeImage(new Size(32, 32)));
-            // 32-Bit 48x48
-            if (!Icons.ContainsKey(48))
-                Icons.Add(48, Icons.Last().Value.ResizeImage(new Size(48, 48)));
+            if (!_icons.ContainsKey(32))
+                _icons.Add(32, _icons[getLargestIcon()].ResizeImage(new Size(32, 32)));
+            // 32-Bit 48x48 (Written as 64 for math reasons)
+            if (!_icons.ContainsKey(64))
+                _icons.Add(64, _icons[getLargestIcon()].ResizeImage(new Size(48, 48)));
             // 32-Bit 128x128
-            if (!Icons.ContainsKey(128))
-                Icons.Add(128, Icons.Last().Value.ResizeImage(new Size(128, 128)));
+            if (!_icons.ContainsKey(128))
+                _icons.Add(128, _icons[getLargestIcon()].ResizeImage(new Size(128, 128)));
             // 32-Bit 256x256
-            if (!Icons.ContainsKey(256))
-                Icons.Add(256, Icons.Last().Value.ResizeImage(new Size(256, 256)));
+            if (!_icons.ContainsKey(256))
+                _icons.Add(256, _icons[getLargestIcon()].ResizeImage(new Size(256, 256)));
+        }
+
+        private int getLargestIcon()
+        {
+            if (_icons.ContainsKey(256))
+                return 256;
+            else if (_icons.ContainsKey(128))
+                return 128;
+            else if (_icons.ContainsKey(64))
+                return 64;
+            else if (_icons.ContainsKey(32))
+                return 32;
+            else
+                return 16;
         }
 
         private void calculateEntryPoint(ByteReader exeReader)
@@ -108,14 +123,13 @@ namespace SapphireD.Core.FileReaders
         }
 
         public PackageData getPackageData() => Package!;
-        public Dictionary<int, Bitmap> getIcons() => Icons;
 
-        public FileReader Copy()
+        public IFileReader Copy()
         {
             EXEFileReader fileReader = new()
             {
                 Package = Package,
-                Icons = Icons
+                Icons = _icons
             };
             return fileReader;
         }

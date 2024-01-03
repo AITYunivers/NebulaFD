@@ -1,4 +1,5 @@
-﻿using SapphireD;
+﻿using Ressy;
+using SapphireD;
 using SapphireD.Core.Data;
 using SapphireD.Core.Data.Chunks.AppChunks;
 using SapphireD.Core.Data.Chunks.BankChunks.Fonts;
@@ -14,6 +15,8 @@ using SapphireD.Core.Utilities;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -24,6 +27,7 @@ using System.Runtime.Intrinsics.X86;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using Color = System.Drawing.Color;
 using Image = SapphireD.Core.Data.Chunks.BankChunks.Images.Image;
 using Size = System.Drawing.Size;
 
@@ -35,6 +39,7 @@ namespace GameDumper
         public string Name => "MFA Parser";
 
         public ImageBank IconBank = new ImageBank();
+        public MFAAppIcon? AppIcons = null;
 
         public void Execute()
         {
@@ -47,6 +52,34 @@ namespace GameDumper
             IconBank.PaletteVersion = dat.ImageBank.PaletteVersion = dat.Frames.First().FramePalette.PaletteVersion;
             IconBank.PaletteEntries = dat.ImageBank.PaletteEntries = (short)dat.Frames.First().FramePalette.PaletteEntries;
             IconBank.Palette = dat.ImageBank.Palette = dat.Frames.First().FramePalette.Palette;
+
+            if (SapDCore.CurrentReader.Icons.Count == 5)
+            {
+                AppIcons = new();
+                AppIcons.IconHandles = new uint[2];
+                AppIcons.IconHandles[0] = 1;
+                AppIcons.IconHandles[1] = 0;
+
+                for (int i = 0; i < 5; i++)
+                {
+                    var newIconImage = new Image();
+                    newIconImage.Handle = (uint)i;
+                    newIconImage.FromBitmap(SapDCore.CurrentReader.Icons[(int)Math.Pow(2, 8 - i)]);
+                    newIconImage.Flags["Alpha"] = true;
+                    newIconImage.Flags["RGBA"] = true;
+                    IconBank.Images.Add(newIconImage.Handle, newIconImage);
+                }
+
+                for (int i = 0, ii = 0; ii < 6; i = (i + 1) % 3, ii++)
+                {
+                    var newIconImage = new Image();
+                    newIconImage.Handle = (uint)ii + 5;
+                    newIconImage.FromBitmap(SapDCore.CurrentReader.Icons[(int)Math.Pow(2, 6 - i)]);
+                    newIconImage.Flags["Alpha"] = true;
+                    newIconImage.Flags["RGBA"] = true;
+                    IconBank.Images.Add(newIconImage.Handle, newIconImage);
+                }
+            }
 
             foreach (ObjectInfo objectInfo in dat.FrameItems.Items.Values)
             {
@@ -62,7 +95,7 @@ namespace GameDumper
                         4 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFQ&A.png")),
                         5 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFScore.png")),
                         6 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFLives.png")),
-                        7 => MakeIcon(dat.ImageBank.Images[((ObjectCommon)objectInfo.Properties).ObjectCounter.Frames[0]].GetBitmap(), "MMFCounter"),
+                        7 => MakeIcon(getCounterBmp(((ObjectCommon)objectInfo.Properties).ObjectCounter, ((ObjectCommon)objectInfo.Properties).ObjectValue), "MMFCounter"),
                         8 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFFormattedText.png")),
                         9 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFSubApplication.png")),
                         _ => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFActive.png"))
@@ -81,8 +114,20 @@ namespace GameDumper
                 var newIconImage = new Image();
                 newIconImage.Handle = (uint)IconBank.Images.Count + 20;
                 newIconImage.FromBitmap(iconBmp);
+                newIconImage.Flags["Alpha"] = true;
+                newIconImage.Flags["RGBA"] = true;
                 IconBank.Images.Add(newIconImage.Handle, newIconImage);
                 objectInfo.IconHandle = newIconImage.Handle;
+            }
+            foreach (Frame frm in dat.Frames)
+            {
+                Image frmImg = new Image();
+                frmImg.Handle = (uint)IconBank.Images.Count + 20;
+                frmImg.FromBitmap(MakeFrameIcon(frm));
+                frmImg.Flags["Alpha"] = true;
+                frmImg.Flags["RGBA"] = true;
+                IconBank.Images.Add(frmImg.Handle, frmImg);
+                frm.MFAFrameInfo.IconHandle = (int)frmImg.Handle;
             }
             IconBank.ImageCount = IconBank.Images.Count;
 
@@ -129,7 +174,7 @@ namespace GameDumper
             writer.WriteAutoYunicode(dat.TargetFilename);
             writer.WriteAutoYunicode("");
             writer.WriteAutoYunicode("");
-            writer.WriteAutoYunicode(dat.About + " | SapphireD");
+            writer.WriteAutoYunicode(dat.About + (string.IsNullOrEmpty(dat.About) ? "" : " | ")  + "Decompiled using SapphireD");
             writer.WriteInt(0);
             dat.BinaryFiles.WriteMFA(writer);
 
@@ -154,7 +199,7 @@ namespace GameDumper
 
             writer.WriteInt(dat.AppHeader.GraphicMode);
             writer.WriteInt(9); // Icon Images
-            for (int i = 0; i < 9; i++) // Icon Images
+            for (int i = 2; i < 11; i++) // Icon Images
                 writer.WriteInt(i); // Icon Image
             writer.WriteInt(0); // Qualifiers
             dat.Extensions.WriteMFA(writer);
@@ -174,6 +219,8 @@ namespace GameDumper
             writer.WriteUInt((uint)(offsetEnd + frameWriter.Tell()));
             writer.WriteWriter(frameWriter);
 
+            if (AppIcons != null)
+                AppIcons.WriteMFA(writer);
             writer.WriteByte(0);
             //writer.WriteBytes(File.ReadAllBytes("Plugins\\MFAChunks.bin"));
 
@@ -186,6 +233,7 @@ namespace GameDumper
         public Bitmap MakeIcon(Bitmap source, string @default)
         {
             Bitmap output = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\" + @default + ".png"));
+            if (source == null) return output;
 
             if (source.Width > 32 || source.Height > 32)
             {
@@ -197,19 +245,14 @@ namespace GameDumper
             else
             {
                 Rectangle destRect;
-                if (source.Width > source.Height)
-                {
-                    output = new Bitmap(32, source.Height);
-                    destRect = new Rectangle(0, 16 - source.Height / 2, source.Width, source.Height);
-                }
-                else
-                {
-                    output = new Bitmap(source.Width, 32);
-                    destRect = new Rectangle(16 - source.Width / 2, 0, source.Width, source.Height);
-                }
+                output = new Bitmap(32, 32);
+                destRect = new Rectangle(16 - source.Width / 2,
+                                         16 - source.Height / 2,
+                                         source.Width, source.Height);
 
                 using (Graphics graphics = Graphics.FromImage(output))
                 {
+                    graphics.Clear(Color.Transparent);
                     graphics.DrawImage(source, destRect);
                 }
             }
@@ -237,6 +280,199 @@ namespace GameDumper
 
             if (hasPixels && output.Width > 1) return output;
             else return new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\" + @default + ".png"));
+        }
+
+        public Bitmap MakeFrameIcon(Frame frm)
+        {
+            Bitmap output = new Bitmap(SapDCore.PackageData.AppHeader.AppWidth, SapDCore.PackageData.AppHeader.AppHeight);
+            Rectangle destRect;
+            using (Graphics graphics = Graphics.FromImage(output))
+            {
+                graphics.Clear(Color.FromArgb(255, frm.FrameHeader.Background));
+                foreach (FrameInstance inst in frm.FrameInstances.Instances)
+                {
+                    ObjectInfo oi = SapDCore.PackageData.FrameItems.Items[(int)inst.ObjectInfo];
+                    Image? img = null;
+                    float alpha = 0f;
+                    if (oi.Header.InkEffect != 1)
+                        alpha = oi.Header.BlendCoeff / 255.0f;
+                    else
+                        alpha = oi.Header.InkEffectParam * 2.0f / 255.0f;
+                    switch (oi.Header.Type)
+                    {
+                        case 0: // Quick Backdrop
+                            if (((ObjectQuickBackdrop)oi.Properties).Shape.FillType == 0)
+                            {
+                                img = SapDCore.PackageData.ImageBank.Images[((ObjectQuickBackdrop)oi.Properties).Shape.Image];
+                                destRect = new Rectangle(inst.PositionX, inst.PositionY,
+                                                         ((ObjectQuickBackdrop)oi.Properties).Width,
+                                                         ((ObjectQuickBackdrop)oi.Properties).Height);
+                                doDraw(graphics, img.GetBitmap(), destRect, alpha);
+                            }
+                            break;
+                        case 1: // Backdrop
+                            img = SapDCore.PackageData.ImageBank.Images[((ObjectBackdrop)oi.Properties).Image];
+                            destRect = new Rectangle(inst.PositionX, inst.PositionY,
+                                                     img.Width, img.Height);
+                            doDraw(graphics, img.GetBitmap(), destRect, alpha);
+                            break;
+                        case 2: // Active
+                            img = SapDCore.PackageData.ImageBank.Images[((ObjectCommon)oi.Properties).ObjectAnimations.Animations.First().Value.Directions.First().Frames.First()];
+                            destRect = new Rectangle(inst.PositionX - img.HotspotX,
+                                                     inst.PositionY - img.HotspotY,
+                                                     img.Width, img.Height);
+                            doDraw(graphics, img.GetBitmap(), destRect, alpha);
+                            break;
+                        case 7: // Counter
+                            ObjectCounter cntr = ((ObjectCommon)oi.Properties).ObjectCounter;
+                            Bitmap cntrImg = getCounterBmp(cntr, ((ObjectCommon)oi.Properties).ObjectValue);
+
+                            if (cntr.DisplayType == 1)
+                            {
+                                destRect = new Rectangle(inst.PositionX - cntrImg.Width,
+                                                         inst.PositionY - cntrImg.Height,
+                                                         cntrImg.Width, cntrImg.Height);
+                                doDraw(graphics, cntrImg, destRect, alpha);
+                            }
+                            else if (cntr.DisplayType == 4)
+                            {
+                                destRect = new Rectangle(inst.PositionX, inst.PositionY,
+                                                         cntrImg.Width, cntrImg.Height);
+                                doDraw(graphics, cntrImg, destRect, alpha);
+                            }
+                            break;
+                    }
+                }
+            }
+            if (Directory.Exists("junk"))
+                output.Save("junk\\" + frm.FrameName + ".png");
+            return output.ResizeImage(64, 48);
+        }
+
+        private void doDraw(Graphics g, Bitmap sourceBitmap, Rectangle dest, float alpha)
+        {
+            using (ImageAttributes imageAttributes = new ImageAttributes())
+            {
+                ColorMatrix colorMatrix = new ColorMatrix();
+                colorMatrix.Matrix33 = 1 - alpha;
+                imageAttributes.SetColorMatrix(colorMatrix);
+
+                g.DrawImage(
+                    sourceBitmap,
+                    dest,
+                    0, 0, sourceBitmap.Width, sourceBitmap.Height,
+                    GraphicsUnit.Pixel,
+                    imageAttributes
+                );
+            }
+        }
+
+        Dictionary<char, uint> counterID = new Dictionary<char, uint>()
+        {
+            { '0',  0 },
+            { '1',  1 },
+            { '2',  2 },
+            { '3',  3 },
+            { '4',  4 },
+            { '5',  5 },
+            { '6',  6 },
+            { '7',  7 },
+            { '8',  8 },
+            { '9',  9 },
+            { '-', 10 },
+            { '+', 11 },
+            { '.', 12 },
+            { 'e', 13 },
+        };
+
+        private Bitmap getCounterBmp(ObjectCounter cntr, ObjectValue val)
+        {
+            Bitmap bmp = null;
+            Graphics g = null;
+            if (cntr.DisplayType == 1)
+            {
+                int width = 0;
+                int height = 0;
+                foreach (char c in val.Initial.ToString())
+                {
+                    uint id = counterID[c];
+                    Image img = SapDCore.PackageData.ImageBank.Images[cntr.Frames[id]];
+                    width += img.Width;
+                    height = Math.Max(height, img.Height);
+                }
+                bmp = new Bitmap(width, height);
+                g = Graphics.FromImage(bmp);
+                int? prevX = null;
+                foreach (char c in val.Initial.ToString().Reverse())
+                {
+                    uint id = counterID[c];
+                    Image img = SapDCore.PackageData.ImageBank.Images[cntr.Frames[id]];
+                    int xToDraw = width - img.Width;
+                    if (prevX != null)
+                        xToDraw = (int)prevX - img.Width;
+                    g.DrawImageUnscaled(img.GetBitmap(), xToDraw, 0);
+                    prevX = xToDraw;
+                }
+            }
+            else if (cntr.DisplayType == 4)
+            {
+                double ratio = (double)(val.Initial - val.Minimum) / (val.Maximum - val.Minimum);
+                Image img = SapDCore.PackageData.ImageBank.Images[cntr.Frames[(int)(cntr.Frames.Length * ratio)]];
+                bmp = new Bitmap(img.Width, img.Height);
+                g = Graphics.FromImage(bmp);
+                g.DrawImageUnscaled(img.GetBitmap(), 0, 0);
+            }
+
+            if (g != null)
+                g.Dispose();
+
+            return bmp;
+        }
+
+        private Bitmap cropBmp(Bitmap bmp)
+        {
+            Rectangle bounds = getCropBounds(bmp);
+            if (bounds.Width == bmp.Width &&
+                bounds.Height == bmp.Height ||
+                bounds.Width == 0 ||
+                bounds.Height == 0)
+                return bmp;
+            Bitmap newBmp = new Bitmap(bounds.Width, bounds.Height);
+            using (Graphics g = Graphics.FromImage(newBmp))
+                g.DrawImage(bmp, new Rectangle(0, 0, newBmp.Width, newBmp.Height), bounds, GraphicsUnit.Pixel);
+            return newBmp;
+        }
+
+        private Rectangle getCropBounds(Bitmap bitmap)
+        {
+            BitmapData bmpData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                                                    ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            int left = int.MaxValue, right = int.MinValue, top = int.MaxValue, bottom = int.MinValue;
+
+            byte[] data = new byte[bmpData.Width * bmpData.Height * 4];
+            Marshal.Copy(bmpData.Scan0, data, 0, data.Length);
+            int ptr = 0;
+
+            for (int y = 0; y < bmpData.Height; y++)
+            {
+                for (int x = 0; x < bmpData.Width; x++)
+                {
+                    if (data[ptr + 3] != 0)
+                    {
+                        left = Math.Min(left, x);
+                        right = Math.Max(right, x);
+                        top = Math.Min(top, y);
+                        bottom = Math.Max(bottom, y);
+                    }
+                    ptr += 4;
+                }
+                ptr += bmpData.Stride - (bmpData.Width * 4);
+            }
+
+            bitmap.UnlockBits(bmpData);
+            if (left > right || top > bottom)
+                return Rectangle.Empty;
+            return new Rectangle(left, top, right - left + 1, bottom - top + 1);
         }
     }
 }

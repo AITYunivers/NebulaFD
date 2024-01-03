@@ -37,7 +37,7 @@ namespace SapphireD.Core.Data.PackageReaders
             RuntimeSubversion = (short)reader.ReadUInt16();
             ProductVersion = reader.ReadInt32();
             ProductBuild = reader.ReadInt32();
-            reader.Skip(4);
+            reader.Skip(4); // Stamp
             SapDCore.Build = ProductBuild;
             Logger.Log(this, "Fusion Build: " + ProductBuild);
 
@@ -48,20 +48,20 @@ namespace SapphireD.Core.Data.PackageReaders
             int stampLength = reader.ReadInt32();
             byte[] stamp = reader.ReadBytes(stampLength);
 
-            var chunkHeader = reader.ReadAscii(4); // ATNF
+            reader.Skip(4); // ATNF
             FontBank.ReadMFA(reader);
 
-            chunkHeader = reader.ReadAscii(4); // APMS
+            reader.Skip(4); // APMS
             SoundBank.ReadMFA(reader);
 
-            chunkHeader = reader.ReadAscii(4); // ASUM
+            reader.Skip(4); // ASUM
             reader.Skip(4);
             //MusicBank.ReadMFA(reader);
 
-            chunkHeader = reader.ReadAscii(4); // AGMI
+            reader.Skip(4); // AGMI
             IconBank.ReadMFA(reader);
 
-            chunkHeader = reader.ReadAscii(4); // AGMI
+            reader.Skip(4); // AGMI
             ImageBank.ReadMFA(reader);
 
             AppName = reader.ReadAutoYuniversal();
@@ -81,7 +81,7 @@ namespace SapphireD.Core.Data.PackageReaders
             AppHeader.InitScore = (reader.ReadInt() + 1) * -1;
             AppHeader.InitLives = (reader.ReadInt() + 1) * -1;
             AppHeader.FrameRate = reader.ReadInt();
-            reader.Skip(4);
+            reader.Skip(4); // Build Type
             TargetFilename = reader.ReadAutoYuniversal();
             reader.ReadAutoYuniversal();
             reader.ReadAutoYuniversal();
@@ -110,7 +110,17 @@ namespace SapphireD.Core.Data.PackageReaders
             GlobalEvents.ReadMFA(reader, true);
 
             AppHeader.GraphicMode = (short)reader.ReadInt();
-            reader.Skip(reader.ReadInt() * 4); // Icon Images
+            {
+                int cnt = reader.ReadInt();
+                long end = reader.Tell() + cnt * 4;
+                if (cnt >= 3)
+                {
+                    SapDCore.CurrentReader.Icons.Add(64, IconBank.Images[reader.ReadUInt()].GetBitmap());
+                    SapDCore.CurrentReader.Icons.Add(32, IconBank.Images[reader.ReadUInt()].GetBitmap());
+                    SapDCore.CurrentReader.Icons.Add(16, IconBank.Images[reader.ReadUInt()].GetBitmap());
+                }
+                reader.Seek(end);
+            }
             Qualifiers.ReadMFA(reader);
             Extensions.ReadMFA(reader);
 

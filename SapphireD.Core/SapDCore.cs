@@ -44,7 +44,7 @@ namespace SapphireD
 
         public static string FilePath = string.Empty;
         public static string Parameters = string.Empty;
-        public static FileReader? CurrentReader;
+        public static IFileReader? CurrentReader;
         public static PackageData PackageData => CurrentReader.getPackageData();
 
         public static void Init()

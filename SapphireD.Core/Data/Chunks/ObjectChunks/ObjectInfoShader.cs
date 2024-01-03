@@ -15,7 +15,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            ShaderHandle = reader.ReadInt();
+            ShaderHandle = reader.ReadInt() + 1;
             ShaderParameters = new int[reader.ReadInt()];
 
             for (int i = 0; i < ShaderParameters.Length; i++)

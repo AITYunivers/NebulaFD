@@ -127,8 +127,8 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
                 CounterFlags.WriteMFA(writer);
             if (LivesFlags != null)
                 LivesFlags.WriteMFA(writer);
-            if (ObjectEffects != null)
-                ObjectEffects.WriteMFA(writer);
+            //if (ObjectEffects != null)
+                //ObjectEffects.WriteMFA(writer);
             writer.WriteByte(0); // Last Chunk
 
             ObjectLoader.WriteMFA(writer);

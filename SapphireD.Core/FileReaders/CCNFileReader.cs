@@ -5,12 +5,13 @@ using System.Drawing;
 
 namespace SapphireD.Core.FileReaders
 {
-    public class CCNFileReader : FileReader
+    public class CCNFileReader : IFileReader
     {
         public string Name => Unpacked ? "Unpacked EXE" : "CCN";
+        public Dictionary<int, Bitmap> Icons { get { return _icons; } set { _icons = value; } }
+        private Dictionary<int, Bitmap> _icons = new Dictionary<int, Bitmap>();
 
         public CCNPackageData Package = new();
-        public Dictionary<int, Bitmap> Icons = new Dictionary<int, Bitmap>();
 
         public bool Unpacked;
 
@@ -29,14 +30,13 @@ namespace SapphireD.Core.FileReaders
         }
 
         public PackageData getPackageData() => Package!;
-        public Dictionary<int, Bitmap> getIcons() => Icons;
 
-        public FileReader Copy()
+        public IFileReader Copy()
         {
             CCNFileReader fileReader = new()
             {
                 Package = Package,
-                Icons = Icons
+                Icons = _icons
             };
             return fileReader;
         }

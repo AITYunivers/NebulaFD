@@ -2,6 +2,10 @@
 using SapphireD.Core.Data.PackageReaders;
 using SapphireD.Core.Utilities;
 using Spectre.Console;
+using System.Drawing.Imaging;
+using System.Drawing;
+using System.Runtime.InteropServices;
+using Image = SapphireD.Core.Data.Chunks.BankChunks.Images.Image;
 
 namespace SapphireD.Plugins.GameDumper
 {

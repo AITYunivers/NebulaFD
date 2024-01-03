@@ -31,7 +31,11 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
             base.WriteMFA(writer, extraInfo);
-
+            if (Animations.Count == 0)
+            {
+                writer.WriteByte(0);
+                return;
+            }    
             writer.WriteByte(1);
             writer.WriteInt(Animations.Count);
             foreach (ObjectAnimation animation in Animations.Values)

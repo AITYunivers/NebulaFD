@@ -8,6 +8,8 @@ using SapphireD.Core.Utilities;
 using SapphireD.Core.Data.Chunks.BankChunks.Shaders;
 using SapphireD.Core.Data.Chunks.FrameChunks.Events;
 using System.Drawing;
+using SapphireD.Core.Data.Chunks.BankChunks.Images;
+using Image = SapphireD.Core.Data.Chunks.BankChunks.Images.Image;
 
 namespace SapphireD.Core.Data.Chunks.FrameChunks
 {
@@ -51,8 +53,13 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                 newChunk.ChunkData = null;
             }
 
-            SapDCore.PackageData.Frames.Add(this);
             log = $"Frame '{FrameName}' found.";
+
+            if (FrameHeader.FrameFlags["DontInclude"])
+                log += " (Not Included)";
+            else
+                SapDCore.PackageData.Frames.Add(this);
+
             Logger.Log(this, log, color: ConsoleColor.Green);
         }
 
@@ -74,7 +81,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
 
             FramePalette.ReadMFA(reader);
 
-            MFAFrameInfo.Stamp = reader.ReadInt();
+            MFAFrameInfo.IconHandle = reader.ReadInt();
             MFAFrameInfo.EditorLayer = reader.ReadInt();
 
             FrameLayers.ReadMFA(reader);
@@ -131,7 +138,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             writer.WriteInt(FrameHeader.Width / 2);
             writer.WriteInt(FrameHeader.Height / 2);
             FramePalette.WriteMFA(writer);
-            writer.WriteInt(73); // Stamp
+            writer.WriteInt(MFAFrameInfo.IconHandle); // Icon Handle
             writer.WriteInt(0); // Active Layer
             FrameLayers.WriteMFA(writer);
 

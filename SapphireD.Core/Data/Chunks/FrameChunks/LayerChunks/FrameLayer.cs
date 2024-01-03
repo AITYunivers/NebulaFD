@@ -5,7 +5,9 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.LayerChunks
     public class FrameLayer : Chunk
     {
         public BitDict LayerFlags = new BitDict( // Layer Flags
-            "", "", "DontSaveBackground", "", "", // Save Background Disabled
+            "XCoefficient",                       // 
+            "YCoefficient",                       // 
+            "DontSaveBackground", "", "",         // Save Background Disabled
             "WrapHorizontally",                   // Wrap Horizontally
             "WrapVertically",                     // Wrap Vertically
             "PrevEffect", "", "", "",             // Same effect as previous layer
@@ -43,6 +45,12 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.LayerChunks
             BackdropCount = reader.ReadInt();
             BackdropIndex = reader.ReadInt();
             Name = reader.ReadYuniversal();
+
+            if (SapDCore.Android || SapDCore.iOS)
+            {
+                XCoefficient /= 9.18355E-41f;
+                YCoefficient /= 9.18355E-41f;
+            }
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

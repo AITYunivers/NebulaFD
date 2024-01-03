@@ -32,10 +32,12 @@ namespace SapphireD.Core.Data.Chunks
             //0x002F
             //0x0030
             //0x0031         FrameInclude
+            //0x0032
             { 0x0039, typeof(MFAAltFlags)         },
             { 0x003A, typeof(MFAAltValueIndex)    },
             { 0x003B, typeof(MFAAltStringIndex)   },
             { 0x003C, typeof(MFAAltFlagIndex)     },
+            { 0x009A, typeof(MFAAppIcon)          },
             //0x1122         Preview
             //0x2222         MiniHeader
             { 0x2223, typeof(AppHeader)           },
