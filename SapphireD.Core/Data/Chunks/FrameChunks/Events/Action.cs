@@ -1,6 +1,8 @@
 ﻿using SapphireD.Core.Data.Chunks.FrameChunks.Events.Parameters;
 using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using SapphireD.Core.Memory;
+using System;
+using System.Diagnostics;
 
 namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 {
@@ -29,6 +31,8 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
         public Parameter[] Parameters = new Parameter[0];
         public byte DefType;
 
+        public bool DoAdd = true;
+
         public Action()
         {
             ChunkName = "Action";
@@ -54,7 +58,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             }
 
             reader.Seek(endPosition);
-            Fix();
+            Fix((List<Action>)extraInfo[0]);
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -105,13 +109,42 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             actWriter.Close();
         }
 
-        public void Fix()
+        private void Fix(List<Action> evntList)
         {
             switch (ObjectType)
             {
+                case -1:
+                    switch (Num)
+                    {
+                        case 43:
+                            Num = 0;
+                            break;
+                    }
+                    break;
                 case 2:
                     switch (Num)
                     {
+                        case 2: // Set X
+                            if (Parameters.Length > 1)
+                            {
+                                Action act = new Action();
+                                act.ObjectType = ObjectType;
+                                act.Num = Num;
+                                act.ObjectInfo = ObjectInfo;
+                                act.ObjectInfoList = ObjectInfoList;
+                                act.EventFlags = EventFlags;
+                                act.OtherFlags = OtherFlags;
+                                act.Parameters = new Parameter[1];
+                                act.Parameters[0] = Parameters[0];
+                                act.DefType = DefType;
+                                evntList.Add(act);
+
+                                Num = 3;
+                                Parameter param = Parameters[1];
+                                Parameters = new Parameter[1];
+                                Parameters[0] = param;
+                            }
+                            break;
                         case 13: // Set Movement
                             {
                                 ParameterShort param = (ParameterShort)Parameters[0].Data;

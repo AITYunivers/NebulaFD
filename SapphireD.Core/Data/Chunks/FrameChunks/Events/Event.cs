@@ -24,8 +24,8 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             "Has Parent"    // Has Parent
         );
 
-        public Condition[] Conditions = new Condition[0];
-        public Action[] Actions = new Action[0];
+        public List<Condition> Conditions = new List<Condition>();
+        public List<Action> Actions = new List<Action>();
 
         public int Restricted;
         public int RestrictCpt;
@@ -41,8 +41,8 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
         {
             long endPosition = reader.Tell() + Math.Abs(reader.ReadShort());
 
-            Conditions = new Condition[reader.ReadByte()];
-            Actions = new Action[reader.ReadByte()];
+            byte cndCnt = reader.ReadByte();
+            byte actCnt = reader.ReadByte();
             EventFlags.Value = reader.ReadUShort();
 
             if (SapDCore.Build >= 284 && !(SapDCore.MFA || SapDCore.Android && SapDCore.Build == 287))
@@ -59,18 +59,26 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
                 Undo = reader.ReadShort();
             }
 
-            for (int i = 0; i < Conditions.Length; i++)
+            for (int i = 0; i < cndCnt; i++)
             {
-                Conditions[i] = new Condition();
-                Conditions[i].ReadCCN(reader);
-                Logger.Log(this, $"[COND] Type: {Conditions[i].ObjectType}, Num: {Conditions[i].Num}");
+                Condition cnd = new Condition();
+                cnd.ReadCCN(reader, Conditions);
+                if (cnd.DoAdd)
+                {
+                    Conditions.Add(cnd);
+                    Logger.Log(this, $"[COND] Type: {cnd.ObjectType}, Num: {cnd.Num}");
+                }
             }
 
-            for (int i = 0; i < Actions.Length; i++)
+            for (int i = 0; i < actCnt; i++)
             {
-                Actions[i] = new Action();
-                Actions[i].ReadCCN(reader);
-                Logger.Log(this, $"[ACT] Type: {Actions[i].ObjectType}, Num: {Actions[i].Num}");
+                Action act = new Action();
+                act.ReadCCN(reader, Actions);
+                if (act.DoAdd)
+                {
+                    Actions.Add(act);
+                    Logger.Log(this, $"[ACT] Type: {act.ObjectType}, Num: {act.Num}");
+                }
             }
 
             reader.Seek(endPosition);
@@ -80,25 +88,27 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
         {
             long endPosition = reader.Tell() + Math.Abs(reader.ReadShort());
 
-            Conditions = new Condition[reader.ReadByte()];
-            Actions = new Action[reader.ReadByte()];
+            byte cndCnt = reader.ReadByte();
+            byte actCnt = reader.ReadByte();
             EventFlags.Value = reader.ReadUShort();
             Restricted = reader.ReadShort();
             RestrictCpt = reader.ReadShort();
             Identifier = reader.ReadShort();
             Undo = reader.ReadShort();
 
-            for (int i = 0; i < Conditions.Length; i++)
+            for (int i = 0; i < cndCnt; i++)
             {
-                Conditions[i] = new Condition();
-                Conditions[i].ReadMFA(reader);
+                Condition cnd = new Condition();
+                cnd.ReadMFA(reader);
+                Conditions.Add(cnd);
                 Logger.Log(this, $"[COND] Type: {Conditions[i].ObjectType}, Num: {Conditions[i].Num}");
             }
 
-            for (int i = 0; i < Actions.Length; i++)
+            for (int i = 0; i < actCnt; i++)
             {
-                Actions[i] = new Action();
-                Actions[i].ReadMFA(reader);
+                Action act = new Action();
+                act.ReadMFA(reader, Actions);
+                Actions.Add(act);
                 Logger.Log(this, $"[ACT] Type: {Actions[i].ObjectType}, Num: {Actions[i].Num}");
             }
 
@@ -113,8 +123,8 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
             ByteWriter evtWriter = new ByteWriter(new MemoryStream());
-            evtWriter.WriteByte((byte)Conditions.Length);
-            evtWriter.WriteByte((byte)Actions.Length);
+            evtWriter.WriteByte((byte)Conditions.Count);
+            evtWriter.WriteByte((byte)Actions.Count);
             evtWriter.WriteUShort((ushort)EventFlags.Value);
             evtWriter.WriteShort((short)Restricted);
             evtWriter.WriteShort((short)RestrictCpt);

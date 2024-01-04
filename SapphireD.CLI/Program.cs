@@ -114,6 +114,9 @@ namespace SapphireD
                 case ".apk":
                     SapDCore.CurrentReader = new APKFileReader();
                     break;
+                case ".ipa":
+                    SapDCore.CurrentReader = new IPAFileReader();
+                    break;
             }
         }
 

@@ -1,32 +1,16 @@
-﻿using Ressy;
-using SapphireD;
+﻿using SapphireD;
 using SapphireD.Core.Data;
 using SapphireD.Core.Data.Chunks.AppChunks;
-using SapphireD.Core.Data.Chunks.BankChunks.Fonts;
 using SapphireD.Core.Data.Chunks.BankChunks.Images;
 using SapphireD.Core.Data.Chunks.FrameChunks;
-using SapphireD.Core.Data.Chunks.FrameChunks.Events;
 using SapphireD.Core.Data.Chunks.MFAChunks;
-using SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks;
 using SapphireD.Core.Data.Chunks.ObjectChunks;
 using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using SapphireD.Core.Memory;
 using SapphireD.Core.Utilities;
-using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Linq;
-using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
-using System.Runtime.Intrinsics.X86;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 using Color = System.Drawing.Color;
 using Image = SapphireD.Core.Data.Chunks.BankChunks.Images.Image;
 using Size = System.Drawing.Size;
@@ -53,7 +37,7 @@ namespace GameDumper
             IconBank.PaletteEntries = dat.ImageBank.PaletteEntries = (short)dat.Frames.First().FramePalette.PaletteEntries;
             IconBank.Palette = dat.ImageBank.Palette = dat.Frames.First().FramePalette.Palette;
 
-            if (SapDCore.CurrentReader.Icons.Count == 5)
+            if (SapDCore.CurrentReader!.Icons.Count == 5)
             {
                 AppIcons = new();
                 AppIcons.IconHandles = new uint[2];
@@ -112,7 +96,7 @@ namespace GameDumper
                 } catch {}
 
                 var newIconImage = new Image();
-                newIconImage.Handle = (uint)IconBank.Images.Count + 20;
+                newIconImage.Handle = (uint)IconBank.Images.Count;
                 newIconImage.FromBitmap(iconBmp);
                 newIconImage.Flags["Alpha"] = true;
                 newIconImage.Flags["RGBA"] = true;
@@ -122,7 +106,7 @@ namespace GameDumper
             foreach (Frame frm in dat.Frames)
             {
                 Image frmImg = new Image();
-                frmImg.Handle = (uint)IconBank.Images.Count + 20;
+                frmImg.Handle = (uint)IconBank.Images.Count;
                 frmImg.FromBitmap(MakeFrameIcon(frm));
                 frmImg.Flags["Alpha"] = true;
                 frmImg.Flags["RGBA"] = true;
@@ -356,11 +340,12 @@ namespace GameDumper
                 ColorMatrix colorMatrix = new ColorMatrix();
                 colorMatrix.Matrix33 = 1 - alpha;
                 imageAttributes.SetColorMatrix(colorMatrix);
+                imageAttributes.SetWrapMode(System.Drawing.Drawing2D.WrapMode.Tile);
 
                 g.DrawImage(
                     sourceBitmap,
                     dest,
-                    0, 0, sourceBitmap.Width, sourceBitmap.Height,
+                    0, 0, dest.Width, dest.Height,
                     GraphicsUnit.Pixel,
                     imageAttributes
                 );

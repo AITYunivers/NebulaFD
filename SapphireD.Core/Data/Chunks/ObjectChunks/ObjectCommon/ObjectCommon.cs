@@ -6,25 +6,25 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
     public class ObjectCommon : ObjectInfoProperties
     {
         public BitDict ObjectFlags = new BitDict( // Object Flags
-            "DisplayInFront",         // Display In Front (Unused?)
-            "Background",             // Background
-            "SaveBackground",         // Save Background
-            "RunBeforeFadeIn",        // Run Before Fade In
-            "HasMovements",           // Has Movements
-            "HasAnimations",          // Has Animations
-            "TabStop",                // Tab Stop Focus
-            "WindowProcess",          // Is Window Process
-            "HasAlterables",          // Has Alterable Values, Strings, and Flags
-            "HasSprites",             // Uses Images
-            "InternalSaveBackground", // Interal Save Background
-            "DontFollowFrame",        // Follow the frame Disabled
-            "DisplayAsBackground",    // Display as background
-            "DontDestroyIfTooFar",    // Destroy object if too far from frame Disabled
-            "DontInactivateIfTooFar", // Inactivate if too far from window: No
-            "InactivateIfTooFar",     // Inactivate if too far from window: Yes
-            "HasText",                // Uses Text
-            "CreateAtStart", "", "",  // Create at start
-            "DontResetFrameDuration"  // Do not reset current frame duration when the animation is modified
+            "DisplayInFront",             // Display In Front (Unused?)
+            "Background",                 // Background
+            "SaveBackground",             // Save Background
+            "RunBeforeFadeIn",            // Run Before Fade In
+            "HasMovements",               // Has Movements
+            "HasAnimations",              // Has Animations
+            "TabStop",                    // Tab Stop Focus
+            "WindowProcess",              // Is Window Process
+            "HasAlterables",              // Has Alterable Values, Strings, and Flags
+            "HasSprites",                 // Uses Images
+            "InternalSaveBackground",     // Interal Save Background
+            "DontFollowFrame",            // Follow the frame Disabled
+            "DisplayAsBackground",        // Display as background
+            "DontDestroyIfTooFar",        // Destroy object if too far from frame Disabled
+            "DontInactivateIfTooFar",     // Inactivate if too far from window: No
+            "InactivateIfTooFar",         // Inactivate if too far from window: Yes
+            "HasText",                    // Uses Text
+            "DontCreateAtStart", "", "",  // Create at start Disabled
+            "DontResetFrameDuration"      // Do not reset current frame duration when the animation is modified
         );
 
         public BitDict NewObjectFlags = new BitDict( // New Object Flags

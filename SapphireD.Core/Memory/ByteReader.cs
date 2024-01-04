@@ -138,7 +138,7 @@ namespace SapphireD.Core.Memory
             if (length >= 0)
                 for (int i = 0; i < length; i++)
                 {
-                    short ch = ReadShort();
+                    ushort ch = ReadUShort();
                     if (ch == 0) break;
                     str += Convert.ToChar(ch);
                 }

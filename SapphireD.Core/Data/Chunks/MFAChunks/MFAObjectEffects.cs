@@ -67,8 +67,8 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
             chunkWriter.WriteByte(RGBCoeff.G);
             chunkWriter.WriteByte(RGBCoeff.R);
             chunkWriter.WriteByte((byte)(255 - BlendCoeff));
-            chunkWriter.WriteInt(ShaderHandle);
-            if (ShaderHandle != 0)
+            chunkWriter.WriteInt(0);//ShaderHandle);
+            if (true == false && ShaderHandle != 0)
             {
                 Shader.Parameters = ShaderParameters;
                 Shader.WriteMFA(chunkWriter);

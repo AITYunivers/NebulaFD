@@ -20,6 +20,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         /* Fill Type Values:
          * 1 - Solid Color
          * 2 - Gradient
+         * 3 - Motif
          */
         public Color Color1 = Color.White;
         public Color Color2 = Color.White;

@@ -28,6 +28,8 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
         public byte DefType;
         public short Identifier;
 
+        public bool DoAdd = true;
+
         public Condition()
         {
             ChunkName = "Condition";
@@ -54,7 +56,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             }
 
             reader.Seek(endPosition);
-            Fix();
+            Fix((List<Condition>)extraInfo[0]);
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -107,11 +109,27 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             condWriter.Close();
         }
 
-        private void Fix()
+        private void Fix(List<Condition> evntList)
         {
             switch (ObjectType)
             {
+                case -1:
+                    switch (Num)
+                    {
+                        case -43:
+                            DoAdd = false;
+                            break;
+                    }
+                    break;
                 case 2:
+                    switch (Num)
+                    {
+                        case -42:
+                            Num = -27;
+                            break;
+                    }
+                    break;
+                case 3:
                     switch (Num)
                     {
                         case -42:
