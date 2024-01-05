@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
 {
-    public class MFALives : MFAObjectLoader
+    public class MFACounterAlt : MFAObjectLoader
     {
         public int Player;
         public uint[] Images = new uint[0];
@@ -13,9 +13,10 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
         public int Width;
         public int Height;
 
-        public MFALives()
+        public MFACounterAlt()
         {
-            ChunkName = "MFALives";
+            // This is for Lives and Score objects
+            ChunkName = "MFACounterAlt";
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

@@ -33,7 +33,7 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
 
         // Chunks
         public MFACounterFlags? CounterFlags = null;   // 0x16
-        public MFALivesFlags? LivesFlags = null;       // 0x17
+        public MFACounterAltFlags? CounterAltFlags = null;       // 0x17
         public MFAObjectEffects? ObjectEffects = null; // 0x2D
 
         public MFAObjectInfo()
@@ -89,14 +89,17 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
                     ObjectLoader = new MFAQNA();
                     break;
                 case 5: // Score
+                    break;
                 case 6: // Lives
-                    ObjectLoader = new MFALives();
+                    ObjectLoader = new MFACounterAlt();
                     break;
                 case 7: // Counter
                     ObjectLoader = new MFACounter();
                     break;
                 case 8: // Formatted Text
+                    break;
                 case 9: // Sub-Application
+                    ObjectLoader = new MFASubApplication();
                     break;
                 default:
                     ObjectLoader = new MFAExtensionObject();
@@ -116,8 +119,8 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
             writer.WriteInt(Handle);
             writer.WriteAutoYunicode(Name);
             writer.WriteInt(Transparent ? 1 : 0);
-            writer.WriteInt(InkEffect);
-            writer.WriteUInt(InkEffectParameter);
+            writer.WriteInt(ObjectType == 9 ? 0 : InkEffect);
+            writer.WriteUInt(ObjectType == 9 ? 0 : InkEffectParameter);
             writer.WriteInt(AntiAliasing);
             writer.WriteUInt(ObjectFlags.Value);
             writer.WriteInt(IconType);
@@ -125,9 +128,9 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
 
             if (CounterFlags != null)
                 CounterFlags.WriteMFA(writer);
-            if (LivesFlags != null)
-                LivesFlags.WriteMFA(writer);
-            if (ObjectEffects != null)
+            if (CounterAltFlags != null)
+                CounterAltFlags.WriteMFA(writer);
+            if (ObjectEffects != null && ObjectType != 9)
                 ObjectEffects.WriteMFA(writer);
             writer.WriteByte(0); // Last Chunk
 

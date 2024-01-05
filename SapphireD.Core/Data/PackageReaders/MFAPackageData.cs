@@ -268,6 +268,20 @@ namespace SapphireD.Core.Data.PackageReaders
                                     break;
                                 case 5:
                                 case 6:
+                                    newOC.ObjectCounter.Player = (short)(oldOC as MFACounterAlt).Player;
+                                    newOC.ObjectCounter.Frames = (oldOC as MFACounterAlt).Images;
+                                    if ((oldOC as MFACounterAlt).UseText)
+                                    {
+                                        newOC.ObjectParagraphs.Paragraphs = new ObjectParagraph[1];
+                                        newOC.ObjectParagraphs.Paragraphs[0] = new ObjectParagraph();
+                                        newOC.ObjectParagraphs.Paragraphs[0].Color = (oldOC as MFACounterAlt).Color;
+                                        newOC.ObjectParagraphs.Paragraphs[0].FontHandle = (ushort)(oldOC as MFACounterAlt).Font;
+                                    }
+                                    newOC.ObjectCounter.Width = (oldOC as MFACounterAlt).Width;
+                                    newOC.ObjectCounter.Height = (oldOC as MFACounterAlt).Height;
+                                    newOC.ObjectCounter.IntDigitPadding = oI.CounterAltFlags.CounterAltFlags["FixedDigitCount"];
+                                    newOC.ObjectCounter.IntDigitCount = oI.CounterAltFlags.FixedDigits;
+                                    break;
                                 case 7:
                                     newOC.ObjectCounter.DisplayType = (oldOC as MFACounter).DisplayType;
                                     newOC.ObjectCounter.Width = (oldOC as MFACounter).Width;
@@ -295,6 +309,20 @@ namespace SapphireD.Core.Data.PackageReaders
                                         newOC.ObjectCounter.FloatWholeCount = oI.CounterFlags.SignificantDigits;
                                         newOC.ObjectCounter.FloatDecimalCount = oI.CounterFlags.DecimalPoints;
                                     }
+                                    break;
+                                case 8:
+                                    newOC.ObjectFormattedText.FTFlags.Value = (oldOC as MFAFormattedText).FTFlags.Value;
+                                    newOC.ObjectFormattedText.Color = (oldOC as MFAFormattedText).Color;
+                                    newOC.ObjectFormattedText.Width = (oldOC as MFAFormattedText).Width;
+                                    newOC.ObjectFormattedText.Height = (oldOC as MFAFormattedText).Height;
+                                    newOC.ObjectFormattedText.Data = (oldOC as MFAFormattedText).Data;
+                                    break;
+                                case 9:
+                                    newOC.ObjectSubApplication.Width = (oldOC as MFASubApplication).Width;
+                                    newOC.ObjectSubApplication.Height = (oldOC as MFASubApplication).Height;
+                                    newOC.ObjectSubApplication.StartFrame = (short)(oldOC as MFASubApplication).StartFrame;
+                                    newOC.ObjectSubApplication.SubAppFlags = (oldOC as MFASubApplication).SubAppFlags;
+                                    newOC.ObjectSubApplication.Name = (oldOC as MFASubApplication).Name;
                                     break;
                                 default:
                                     newOC.ObjectExtension.ExtensionVersion = (oldOC as MFAExtensionObject).Version;

@@ -1,4 +1,5 @@
 ﻿using SapphireD.Core.Memory;
+using System.Diagnostics;
 
 namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
 {
@@ -92,7 +93,13 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             ByteWriter condWriter = new ByteWriter(new MemoryStream());
             condWriter.WriteShort(ObjectType);
             condWriter.WriteShort(Num);
-            condWriter.WriteShort(ObjectInfo);
+            short oI = ObjectInfo;
+            if (oI >> 8 == -128)
+            {
+                byte qual = (byte)(oI & 0xFF);
+                oI = (short)((qual | ((128 - ObjectType) << 8)) & 0xFFFF);
+            }
+            condWriter.WriteShort(oI);
             condWriter.WriteShort(ObjectInfoList);
             condWriter.WriteByte((byte)EventFlags.Value);
             condWriter.WriteByte((byte)OtherFlags.Value);
@@ -116,22 +123,25 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
                 case -1:
                     switch (Num)
                     {
+                        case -25:
+                            Num = -24;
+                            break;
+                        case -28:
+                        case -31:
+                            Num = -8;
+                            break;
                         case -43:
                             DoAdd = false;
                             break;
                     }
                     break;
-                case 2:
+                case >= 0:
                     switch (Num)
                     {
-                        case -42:
+                        case -25:
                             Num = -27;
+                            DoAdd = false; // TODO
                             break;
-                    }
-                    break;
-                case 3:
-                    switch (Num)
-                    {
                         case -42:
                             Num = -27;
                             break;

@@ -7,9 +7,6 @@ namespace SapphireD.Core.Data.Chunks.BankChunks.Images
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Handle = reader.ReadUShort();
-            if (SapDCore.Build == 284)
-                Handle--;
-
             GraphicMode = (byte)reader.ReadInt();
             Width = reader.ReadInt16();
             Height = reader.ReadInt16();

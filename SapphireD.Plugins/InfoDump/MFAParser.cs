@@ -154,7 +154,7 @@ namespace GameDumper
             writer.WriteInt((dat.AppHeader.InitScore + 1) * -1);
             writer.WriteInt((dat.AppHeader.InitLives + 1) * -1);
             writer.WriteInt(dat.AppHeader.FrameRate);
-            writer.WriteInt(0);
+            writer.WriteInt(dat.ExtendedHeader.BuildType);
             writer.WriteAutoYunicode(dat.TargetFilename);
             writer.WriteAutoYunicode("");
             writer.WriteAutoYunicode("");
@@ -182,9 +182,14 @@ namespace GameDumper
             writer.WriteInt(0); // Global Events
 
             writer.WriteInt(dat.AppHeader.GraphicMode);
-            writer.WriteInt(9); // Icon Images
-            for (int i = 2; i < 11; i++) // Icon Images
-                writer.WriteInt(i); // Icon Image
+            if (SapDCore.CurrentReader!.Icons.Count == 5)
+            {
+                writer.WriteInt(9); // Icon Images
+                for (int i = 2; i < 11; i++) // Icon Images
+                    writer.WriteInt(i); // Icon Image
+            }
+            else
+                writer.WriteInt(0);
             writer.WriteInt(0); // Qualifiers
             dat.Extensions.WriteMFA(writer);
             writer.WriteInt(dat.Frames.Count);
@@ -402,7 +407,7 @@ namespace GameDumper
             else if (cntr.DisplayType == 4)
             {
                 double ratio = (double)(val.Initial - val.Minimum) / (val.Maximum - val.Minimum);
-                Image img = SapDCore.PackageData.ImageBank.Images[cntr.Frames[(int)(cntr.Frames.Length * ratio)]];
+                Image img = SapDCore.PackageData.ImageBank.Images[cntr.Frames[(int)((cntr.Frames.Length - 1) * ratio)]];
                 bmp = new Bitmap(img.Width, img.Height);
                 g = Graphics.FromImage(bmp);
                 g.DrawImageUnscaled(img.GetBitmap(), 0, 0);

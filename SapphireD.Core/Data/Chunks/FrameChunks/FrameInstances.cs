@@ -1,5 +1,4 @@
-﻿using SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks;
-using SapphireD.Core.Memory;
+﻿using SapphireD.Core.Memory;
 
 namespace SapphireD.Core.Data.Chunks.FrameChunks
 {

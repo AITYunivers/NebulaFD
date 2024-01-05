@@ -202,7 +202,7 @@ namespace SapphireD.Plugins.GameDumper
             else if (cntr.DisplayType == 4)
             {
                 double ratio = (double)(val.Initial - val.Minimum) / (val.Maximum - val.Minimum);
-                Image img = SapDCore.PackageData.ImageBank.Images[cntr.Frames[(int)(cntr.Frames.Length * ratio)]];
+                Image img = SapDCore.PackageData.ImageBank.Images[cntr.Frames[(int)((cntr.Frames.Length - 1) * ratio)]];
                 bmp = new Bitmap(img.Width, img.Height);
                 g = Graphics.FromImage(bmp);
                 g.DrawImageUnscaled(img.GetBitmap(), 0, 0);

@@ -2,17 +2,17 @@
 
 namespace SapphireD.Core.Data.Chunks.MFAChunks
 {
-    public class MFALivesFlags : Chunk
+    public class MFACounterAltFlags : Chunk
     {
-        public BitDict LivesFlags = new BitDict( // Counter Flags
+        public BitDict CounterAltFlags = new BitDict( // Counter Flags
             "FixedDigitCount" // Fixed number of digits
         );
 
         public byte FixedDigits;
 
-        public MFALivesFlags()
+        public MFACounterAltFlags()
         {
-            ChunkName = "MFALivesFlags";
+            ChunkName = "MFACounterAltFlags";
             ChunkID = 0x0017;
         }
 
@@ -23,10 +23,10 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            LivesFlags.Value = reader.ReadByte();
+            CounterAltFlags.Value = reader.ReadByte();
             FixedDigits = reader.ReadByte();
 
-            (extraInfo[0] as MFAObjectInfo).LivesFlags = this;
+            (extraInfo[0] as MFAObjectInfo).CounterAltFlags = this;
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
@@ -38,7 +38,7 @@ namespace SapphireD.Core.Data.Chunks.MFAChunks
         {
             writer.WriteByte((byte)ChunkID);
             ByteWriter chunkWriter = new ByteWriter(new MemoryStream());
-            chunkWriter.WriteByte((byte)LivesFlags.Value);
+            chunkWriter.WriteByte((byte)CounterAltFlags.Value);
             chunkWriter.WriteByte(FixedDigits);
             writer.WriteInt((int)chunkWriter.Tell());
             writer.WriteWriter(chunkWriter);

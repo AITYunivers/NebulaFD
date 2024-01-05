@@ -224,8 +224,10 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                                 2 => new MFAActive(),
                                 3 => new MFAString(),
                                 4 => new MFAQNA(),
-                                6 => new MFALives(),
+                                6 => new MFACounterAlt(),
                                 7 => new MFACounter(),
+                                8 => new MFAFormattedText(),
+                                9 => new MFASubApplication(),
                                 _ => new MFAExtensionObject()
                             };
                             ObjectCommon? oldOC = oI.Properties as ObjectCommon;
@@ -278,27 +280,28 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                                     ansParas[0].ParagraphFlags["MFACorrect"] = oldOC.ObjectParagraphs.Paragraphs[1].ParagraphFlags["Correct"];
                                     (newOC as MFAQNA).AnswerParagraphs = ansParas.ToArray();
                                     break;
+                                case 5:
                                 case 6:
-                                    (newOC as MFALives).Player = oldOC.ObjectCounter.Player;
-                                    (newOC as MFALives).Images = oldOC.ObjectCounter.Frames;
-                                    (newOC as MFALives).UseText = oldOC.ObjectCounter.Frames.Length == 0;
-                                    if ((newOC as MFALives).UseText)
+                                    (newOC as MFACounterAlt).Player = oldOC.ObjectCounter.Player;
+                                    (newOC as MFACounterAlt).Images = oldOC.ObjectCounter.Frames;
+                                    (newOC as MFACounterAlt).UseText = oldOC.ObjectCounter.Frames.Length == 0;
+                                    if ((newOC as MFACounterAlt).UseText)
                                     {
-                                        (newOC as MFALives).Color = oldOC.ObjectParagraphs.Paragraphs[0].Color;
-                                        (newOC as MFALives).Font = oldOC.ObjectParagraphs.Paragraphs[0].FontHandle;
+                                        (newOC as MFACounterAlt).Color = oldOC.ObjectParagraphs.Paragraphs[0].Color;
+                                        (newOC as MFACounterAlt).Font = oldOC.ObjectParagraphs.Paragraphs[0].FontHandle;
                                     }
                                     else
                                     {
-                                        (newOC as MFALives).Color = Color.Black;
-                                        (newOC as MFALives).Font = -1;
+                                        (newOC as MFACounterAlt).Color = Color.Black;
+                                        (newOC as MFACounterAlt).Font = -1;
                                     }
-                                    (newOC as MFALives).Width = oldOC.ObjectCounter.Width;
-                                    (newOC as MFALives).Height = oldOC.ObjectCounter.Height;
+                                    (newOC as MFACounterAlt).Width = oldOC.ObjectCounter.Width;
+                                    (newOC as MFACounterAlt).Height = oldOC.ObjectCounter.Height;
 
-                                    newOI.LivesFlags = new MFALivesFlags();
-                                    newOI.LivesFlags.LivesFlags.Value = 0; // Default Value;
-                                    newOI.LivesFlags.LivesFlags["FixedDigitCount"] = oldOC.ObjectCounter.IntDigitPadding;
-                                    newOI.LivesFlags.FixedDigits = oldOC.ObjectCounter.IntDigitCount;
+                                    newOI.CounterAltFlags = new MFACounterAltFlags();
+                                    newOI.CounterAltFlags.CounterAltFlags.Value = 0; // Default Value;
+                                    newOI.CounterAltFlags.CounterAltFlags["FixedDigitCount"] = oldOC.ObjectCounter.IntDigitPadding;
+                                    newOI.CounterAltFlags.FixedDigits = oldOC.ObjectCounter.IntDigitCount;
                                     break;
                                 case 7:
                                     (newOC as MFACounter).DisplayType = oldOC.ObjectCounter.DisplayType;
@@ -325,9 +328,19 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                                     newOI.CounterFlags.SignificantDigits = oldOC.ObjectCounter.FloatWholeCount;
                                     newOI.CounterFlags.DecimalPoints = oldOC.ObjectCounter.FloatDecimalCount;
                                     break;
-                                case 5:
                                 case 8:
+                                    (newOC as MFAFormattedText).Width = oldOC.ObjectFormattedText.Width;
+                                    (newOC as MFAFormattedText).Height = oldOC.ObjectFormattedText.Height;
+                                    (newOC as MFAFormattedText).FTFlags.Value = oldOC.ObjectFormattedText.FTFlags.Value;
+                                    (newOC as MFAFormattedText).Color = oldOC.ObjectFormattedText.Color;
+                                    (newOC as MFAFormattedText).Data = oldOC.ObjectFormattedText.Data;
+                                    break;
                                 case 9:
+                                    (newOC as MFASubApplication).Name = oldOC.ObjectSubApplication.Name;
+                                    (newOC as MFASubApplication).Width = oldOC.ObjectSubApplication.Width;
+                                    (newOC as MFASubApplication).Height = oldOC.ObjectSubApplication.Height;
+                                    (newOC as MFASubApplication).SubAppFlags.Value = oldOC.ObjectSubApplication.SubAppFlags.Value;
+                                    (newOC as MFASubApplication).StartFrame = oldOC.ObjectSubApplication.StartFrame;
                                     break;
                                 default:
                                     (newOC as MFAExtensionObject).Type = -1;
@@ -366,8 +379,10 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
             MFAFrameInfo.Folders.WriteMFA(writer);
             FrameInstances.WriteMFA(writer);
             List<EventObject> evtObjs = new();
+            Dictionary<int, List<short>> quals = new();
             foreach (MFAObjectInfo oI in objectInfos.Values)
             {
+                if (oI.ObjectType < 2) continue;
                 EventObject evtObj = new();
                 evtObj.Handle = oI.Handle;
                 evtObj.ObjectType = 1;
@@ -377,12 +392,46 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks
                 {
                     2 => "Sprite",
                     3 => "Text",
+                    4 => "Question",
+                    5 => "Score",
+                    6 => "Lives",
                     7 => "Counter",
-                    _ => ""
+                    _ => string.Empty
                 };
                 evtObj.ItemHandle = (uint)oI.Handle;
                 evtObj.InstanceHandle = -1;
                 evtObjs.Add(evtObj);
+
+                foreach (short qual in oI.ObjectLoader.Qualifiers)
+                {
+                    if (!quals.ContainsKey(oI.ObjectType))
+                        quals.Add(oI.ObjectType, new());
+                    if (qual != -1 && !quals[oI.ObjectType].Contains(qual))
+                        quals[oI.ObjectType].Add(qual);
+                }
+            }
+            foreach (int oType in quals.Keys)
+            {
+                foreach (short qual in quals[oType])
+                {
+                    EventObject evtObj = new();
+                    evtObj.Handle = (short)((byte)qual | ((128 - oType) << 8));
+                    evtObj.ObjectType = 3;
+                    evtObj.ItemType = (ushort)oType;
+                    evtObj.Name = string.Empty;
+                    evtObj.TypeName = oType switch
+                    {
+                        2 => "Sprite",
+                        3 => "Text",
+                        4 => "Question",
+                        5 => "Score",
+                        6 => "Lives",
+                        7 => "Counter",
+                        _ => string.Empty
+                    };
+                    evtObj.SystemQualifier = (ushort)qual;
+                    evtObjs.Add(evtObj);
+                }
             }
             FrameEvents.EventObjects = evtObjs.ToArray();
             FrameEvents.WriteMFA(writer);

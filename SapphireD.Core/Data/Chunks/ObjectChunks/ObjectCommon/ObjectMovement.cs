@@ -29,6 +29,9 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             int DataSize = reader.ReadInt();
             reader.Seek(StartOffset + DataOffset);
 
+            if (string.IsNullOrEmpty(Name))
+                Name = "Movement #" + ID;
+
             Player = reader.ReadShort();
             Type = reader.ReadShort();
             Move = reader.ReadByte();
@@ -79,7 +82,10 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             ID = reader.ReadInt();
             int DataSize = reader.ReadInt();
             long StartingOffset = reader.Tell();
-            
+
+            if (string.IsNullOrEmpty(Name))
+                Name = "Movement #" + ID;
+
             if (Extension.Length > 0)
             {
                 MovementDefinition = new ObjectMovementExtension();

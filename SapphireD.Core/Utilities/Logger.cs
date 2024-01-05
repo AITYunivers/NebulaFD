@@ -4,12 +4,12 @@ namespace SapphireD.Core.Utilities
 {
     public static class Logger
     {
-        public static bool doLog = true;
+        public static bool doLog = false;
         private static List<string> Logs = new();
 
         public static void Log(object parent, object message, int type = 0, ConsoleColor color = ConsoleColor.Black)
         {
-            return;
+            //return;
             if (doLog)
             {
                 Console.ForegroundColor = ConsoleColor.Cyan;
@@ -19,16 +19,16 @@ namespace SapphireD.Core.Utilities
                 if (color == ConsoleColor.Black)
                     Console.ResetColor();
                 Console.WriteLine(message);
+                Debug.WriteLine(message);
+                Console.ResetColor();
             }
 
             string outInfo = $"[{(type != 0 ? type + "\\" : "")}{parent.GetType().Name}\\{DateTime.Now.ToString("HH:mm:ss.ff")}] ";
-            Logs.Add(outInfo + message);
-            Debug.WriteLine(outInfo + message);
-
-            Console.ResetColor();
+            Logs.Add(message.ToString());
             try
             {
-                File.WriteAllLines("Latest.log", Logs);
+                if (parent.GetType().Name != "Event")
+                    File.WriteAllLines("Latest.log", Logs);
             }
             catch {}
         }

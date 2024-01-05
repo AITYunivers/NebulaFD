@@ -31,7 +31,7 @@ namespace SapphireD.Core.FileReaders
                     File.Delete("open.ccj");
                     appName = Directory.GetParent(entry.FullName)?.Name.Replace(".app", "");
                 }
-                else if (entry.Name == "AppIcon60x60@3x.png")
+                else if (entry.Name.StartsWith("AppIcon60x60@") && _icons.Count == 0)
                 {
                     loadIcons(new Bitmap(Bitmap.FromStream(entry.Open())));
                 }

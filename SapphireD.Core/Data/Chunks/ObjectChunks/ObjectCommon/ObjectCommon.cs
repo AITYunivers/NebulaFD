@@ -1,4 +1,5 @@
 ﻿using SapphireD.Core.Memory;
+using System.Diagnostics;
 using System.Drawing;
 
 namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
@@ -59,6 +60,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public ObjectMovements ObjectMovements = new();
         public ObjectParagraphs ObjectParagraphs = new();
         public ObjectCounter ObjectCounter = new();
+        public ObjectFormattedText ObjectFormattedText = new();
         public ObjectSubApplication ObjectSubApplication = new();
         public ObjectExtension ObjectExtension = new();
         public ObjectValue ObjectValue = new();
@@ -85,10 +87,12 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
             long StartOffset = reader.Tell();
 
-            reader.Skip(6);
+            int size = reader.ReadInt();
+            reader.Skip(2);
             int OrderCheck = reader.ReadInt();
+            File.WriteAllBytes("bitch.dat", reader.ReadBytes());
             reader.Seek(StartOffset + 4);
-            if (SapDCore.iOS)
+            if (SapDCore.iOS && SapDCore.Build >= 284)
             {
                 ExtensionOffset = reader.ReadShort();
                 MovementsOffset = reader.ReadShort();
@@ -105,6 +109,15 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
                 ValueOffset = reader.ReadShort();
                 AnimationOffset = reader.ReadShort();
                 MovementsOffset = reader.ReadShort();
+            }
+            else if (SapDCore.Android && SapDCore.Build >= 284)
+            {
+                MovementsOffset = reader.ReadShort();
+                AnimationOffset = reader.ReadShort();
+                reader.Skip(2);
+                ValueOffset = reader.ReadShort();
+                DataOffset = reader.ReadShort();
+                ExtensionOffset = reader.ReadShort();
             }
             else if (SapDCore.Build == 284 && OrderCheck == 0)
             {
@@ -135,9 +148,11 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             for (int i = 0; i < 8; i++)
                 Qualifiers[i] = reader.ReadShort();
 
-            if (SapDCore.iOS || SapDCore.HTML)
+            if ((SapDCore.iOS && SapDCore.Build >= 284) || SapDCore.HTML)
                 reader.Skip(2);
-            else if (SapDCore.Build >= 284)
+            else if (SapDCore.Android && (SapDCore.Build == 284 || SapDCore.Build == 288))
+                AnimationOffset = reader.ReadShort();
+            else if (!SapDCore.Android && SapDCore.Build >= 284)
                 DataOffset = reader.ReadShort();
             else
                 ExtensionOffset = reader.ReadShort();
@@ -193,6 +208,10 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
                     case "SC":
                     case "LI":
                         ObjectCounter.ReadCCN(reader);
+                        break;
+                    // Formatted Text
+                    case "RT":
+                        ObjectFormattedText.ReadCCN(reader);
                         break;
                     //Sub-Application
                     case "CC":

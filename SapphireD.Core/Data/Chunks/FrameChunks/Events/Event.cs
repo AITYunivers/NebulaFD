@@ -66,7 +66,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
                 if (cnd.DoAdd)
                 {
                     Conditions.Add(cnd);
-                    Logger.Log(this, $"[COND] Type: {cnd.ObjectType}, Num: {cnd.Num}");
+                    Logger.Log(this, $"[COND] Type: {cnd.ObjectType}, Num: {cnd.Num}, Params: {cnd.Parameters.Length}");
                 }
             }
 
@@ -77,7 +77,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
                 if (act.DoAdd)
                 {
                     Actions.Add(act);
-                    Logger.Log(this, $"[ACT] Type: {act.ObjectType}, Num: {act.Num}");
+                    Logger.Log(this, $"[ACT] Type: {act.ObjectType}, Num: {act.Num}, Params: {act.Parameters.Length}");
                 }
             }
 
@@ -101,7 +101,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
                 Condition cnd = new Condition();
                 cnd.ReadMFA(reader);
                 Conditions.Add(cnd);
-                Logger.Log(this, $"[COND] Type: {Conditions[i].ObjectType}, Num: {Conditions[i].Num}");
+                Logger.Log(this, $"[COND] Type: {cnd.ObjectType}, Num: {cnd.Num}, Params: {cnd.Parameters.Length}");
             }
 
             for (int i = 0; i < actCnt; i++)
@@ -109,7 +109,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
                 Action act = new Action();
                 act.ReadMFA(reader, Actions);
                 Actions.Add(act);
-                Logger.Log(this, $"[ACT] Type: {Actions[i].ObjectType}, Num: {Actions[i].Num}");
+                Logger.Log(this, $"[ACT] Type: {act.ObjectType}, Num: {act.Num}, Params: {act.Parameters.Length}");
             }
 
             reader.Seek(endPosition);

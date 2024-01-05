@@ -1,10 +1,10 @@
-﻿
+﻿using SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using SapphireD.Core.Memory;
-using System.Diagnostics;
+using System.Drawing;
 
-namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
+namespace SapphireD.Core.Data.Chunks.MFAChunks.MFAObjectChunks
 {
-    public class ObjectSubApplication : Chunk
+    public class MFASubApplication : MFAObjectLoader
     {
         public BitDict SubAppFlags = new BitDict( // Sub-Application Flags
             "ShareGlobalValues",     // Share with parent application: Global values & strings
@@ -14,7 +14,7 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             "Stretch",               // Stretch frame to object size
             "Popup",                 // Popup Window
             "Caption",               // Caption
-            "ToolCaption",           // Tool Captio
+            "ToolCaption",           // Tool Caption
             "Border",                // Border
             "ResizeWindow",          // Resizable
             "SystemMenu",            // System Menu
@@ -28,7 +28,8 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             "ClipSiblings",          // Clip Siblings
             "SharePlayerControls",   // Share with parent application: Player Controls
             "MDI",                   // MDI Child
-            "Docked", "",            // Docked
+            "Docked",                // Docked
+            "MFACheck",              // MFA Check
             "DockedVertical",        // Docked Top
             "DockedHorizontal",      // Docked Right
             "Reopen",                // Reopen (Unused?)
@@ -36,42 +37,41 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks.ObjectCommon
             "IgnoreResize"           // Windows: ignore parent's 'Resize Display' option
         );
 
+        public string Name = string.Empty;
         public int Width;
         public int Height;
-        public short Version;
-        public short StartFrame;
-        public string Name = string.Empty;
+        public int StartFrame;
+        public int WindowIcon;
 
-        public ObjectSubApplication()
+        public MFASubApplication()
         {
-            ChunkName = "ObjectSubApplication";
-        }
-
-        public override void ReadCCN(ByteReader reader, params object[] extraInfo)
-        {
-            reader.Skip(4);
-            Width = reader.ReadInt();
-            Height = reader.ReadInt();
-            Version = reader.ReadShort();
-            StartFrame = reader.ReadShort();
-            SubAppFlags.Value = reader.ReadUInt();
-            reader.Skip(8);
-            Name = reader.ReadYuniversal();
+            ChunkName = "MFASubApplication";
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
+            base.ReadMFA(reader, extraInfo);
 
-        }
-
-        public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
-        {
-
+            Name = reader.ReadAutoYuniversal();
+            Width = reader.ReadInt();
+            Height = reader.ReadInt();
+            SubAppFlags.Value = reader.ReadUInt();
+            if (SubAppFlags["Internal"])
+                StartFrame = reader.ReadInt();
+            reader.Skip(4);
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            base.WriteMFA(writer, extraInfo);
 
+            writer.WriteAutoYunicode(Name);
+            writer.WriteInt(Width);
+            writer.WriteInt(Height);
+            writer.WriteUInt(SubAppFlags.Value);
+            if (SubAppFlags["Internal"])
+                writer.WriteInt(StartFrame);
+            writer.WriteInt(-1);
         }
     }
 }

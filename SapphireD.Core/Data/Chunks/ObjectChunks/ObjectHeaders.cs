@@ -1,5 +1,6 @@
 ﻿using SapphireD.Core.Memory;
 using System.Diagnostics;
+using System.Drawing;
 
 namespace SapphireD.Core.Data.Chunks.ObjectChunks
 {
@@ -21,8 +22,23 @@ namespace SapphireD.Core.Data.Chunks.ObjectChunks
                 oI.Header.Type = reader.ReadShort();
                 oI.Header.ObjectFlags.Value = reader.ReadUShort();
                 reader.Skip(2);
-                oI.Header.InkEffect = reader.ReadInt();
-                oI.Header.InkEffectParam = reader.ReadUInt();
+                oI.Header.InkEffect = reader.ReadShort();
+                reader.Skip(2);
+                if (oI.Header.InkEffect != 1)
+                {
+                    if (SapDCore.D3D == 0)
+                        reader.Skip(4);
+                    else
+                    {
+                        var b = reader.ReadByte();
+                        var g = reader.ReadByte();
+                        var r = reader.ReadByte();
+                        oI.Header.RGBCoeff = Color.FromArgb(0, r, g, b);
+                        oI.Header.BlendCoeff = (byte)(255 - reader.ReadByte());
+                    }
+                }
+                else
+                    oI.Header.InkEffectParam = reader.ReadUInt();
                 newItems.Items.Add(oI.Header.Handle, oI);
             }
             SapDCore.PackageData.FrameItems = newItems;

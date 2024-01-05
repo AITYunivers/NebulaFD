@@ -93,7 +93,13 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
             ByteWriter actWriter = new ByteWriter(new MemoryStream());
             actWriter.WriteShort(ObjectType);
             actWriter.WriteShort(Num);
-            actWriter.WriteShort(ObjectInfo);
+            short oI = ObjectInfo;
+            if (oI >> 8 == -128)
+            {
+                byte qual = (byte)(oI & 0xFF);
+                oI = (short)((qual | ((128 - ObjectType) << 8)) & 0xFFFF);
+            }
+            actWriter.WriteShort(oI);
             actWriter.WriteUShort(ObjectInfoList);
             actWriter.WriteByte((byte)EventFlags.Value);
             actWriter.WriteByte((byte)OtherFlags.Value);
@@ -113,18 +119,48 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
         {
             switch (ObjectType)
             {
-                case -1:
+                case -2:
                     switch (Num)
                     {
-                        case 43:
-                            Num = 0;
+                        case 36:
+                            Action act = new Action();
+                            act.ObjectType = ObjectType;
+                            act.Num = 4;
+                            act.ObjectInfo = ObjectInfo;
+                            act.ObjectInfoList = ObjectInfoList;
+                            act.EventFlags = EventFlags;
+                            act.OtherFlags = OtherFlags;
+                            act.Parameters = new Parameter[2];
+                            act.Parameters[0] = Parameters[0];
+                            act.Parameters[1] = Parameters[2];
+                            act.DefType = DefType;
+                            evntList.Add(act);
+
+                            Num = 21;
+                            Parameter param1 = Parameters[0];
+                            Parameter param2 = Parameters[3];
+                            Parameters = new Parameter[2];
+                            Parameters[0] = param1;
+                            Parameters[1] = param2;
                             break;
                     }
                     break;
-                case 2:
+                case -1:
+                    switch (Num)
+                    {
+                        case 27:
+                            Num = 3;
+                            break;
+                        case 43:
+                            DoAdd = false;
+                            break;
+                    }
+                    break;
+                case >= 0:
                     switch (Num)
                     {
                         case 2: // Set X
+                        case 3: // Set Y
                             if (Parameters.Length > 1)
                             {
                                 Action act = new Action();
@@ -139,7 +175,7 @@ namespace SapphireD.Core.Data.Chunks.FrameChunks.Events
                                 act.DefType = DefType;
                                 evntList.Add(act);
 
-                                Num = 3;
+                                Num = (short)(Num == 2 ? 3 : 2);
                                 Parameter param = Parameters[1];
                                 Parameters = new Parameter[1];
                                 Parameters[0] = param;

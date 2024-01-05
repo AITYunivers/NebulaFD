@@ -39,7 +39,8 @@ namespace SapphireD.Core.FileReaders
                         // TODO
                     }
                 }
-                else if (Directory.GetParent(entry.FullName)?.Name == "drawable-xhdpi" &&
+                else if ((Directory.GetParent(entry.FullName)?.Name == "drawable-xhdpi" ||
+                         Directory.GetParent(entry.FullName)?.Name == "drawable-xxxhdpi-v4") &&
                          entry.Name == "launcher.png")
                 {
                     loadIcons(new Bitmap(Bitmap.FromStream(entry.Open())));

@@ -23,7 +23,8 @@ namespace SapphireD.Core.Data.PackageReaders
                 return;
 
             Header = reader.ReadAscii(4);
-            SapDCore._unicode = Header != "PAME" && Header != "CRUF";
+            if (Header.StartsWith("PAM"))
+                SapDCore._unicode = Header != "PAME";
             if (Header == "CRUF")
                 SapDCore.Fusion = 3f;
             Logger.Log(this, "Game Header: " + Header);
