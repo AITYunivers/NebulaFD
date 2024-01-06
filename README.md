@@ -1,8 +1,5 @@
-<a>
-    <img src="https://raw.githubusercontent.com/AITYunivers/Nebula/master/.resources/NebulaLogo.png" alt="Nebula Logo" title="Nebula" align="right" height="120"/>
-</a>
-
-# Nebula
+![Nebula Logo](https://raw.githubusercontent.com/AITYunivers/Nebula/master/.resources/NebulaLogo.png)
+# 
 **README is a Work In Progress.**
 
 Just another Clickteam Fusion 2.5 decompiler made by [Yunivers](https://github.com/AITYunivers).
