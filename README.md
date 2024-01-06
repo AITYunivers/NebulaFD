@@ -1,8 +1,18 @@
+<a>
+    <img src="https://raw.githubusercontent.com/AITYunivers/FusionRipper/master/.resources/FusionRipperLogo.png" alt="FusionRipper Logo" title="FusionRipper" align="right" height="120"/>
+</a>
+
 # FusionRipper
-A work in progress Clickteam Fusion decompiler.
+**README is a Work In Progress.**
 
-While only focusing on normal 2.5 games, it can also read MMF 2, TGF 2, and 2.5+. There's code for TGF 1.0 and MMF 1.5, they aren't finished and won't get you anything other than Pack Data.
+Just another Clickteam Fusion 2.5 decompiler made by [Yunivers](https://github.com/AITYunivers).
+|Table of Contents| Description |
+|--|--|
+| [Credits](https://github.com/AITYunivers/FusionRipper/tree/master#Credits)|A list of FusionRipper credits.|
 
-2.5+ currently is not fully supported for MFA parsing.
-
-This project aims to become a new Clickteam Fusion 2.5 decompiler with much cleaner code than the alternatives coded (mostly) from the ground up, along with MFA reading and CCN writing planned support from the start.
+## Credits
+|User| Credit for..|
+|--|--|
+| [Yunivers](https://github.com/AITYunivers)| Creator of FusionRipper. |
+| [Kostya](https://github.com/1987kostya1)| Developer of the Image Bank.|
+| [RED_EYE](https://github.com/REDxEYE) | Developer of the decryption library. |
