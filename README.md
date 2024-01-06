@@ -1,4 +1,4 @@
-![Nebula Logo](https://raw.githubusercontent.com/AITYunivers/Nebula/master/.resources/NebulaLogo.png)
+![Nebula Logo](https://raw.githubusercontent.com/AITYunivers/NebulaFD/master/.resources/NebulaLogo.png)
 # 
 **README is a Work In Progress.**
 
