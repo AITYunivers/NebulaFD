@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Nebula.Core\FusionRipper.Core.csproj" />
+    <ProjectReference Include="..\..\Nebula.Core\Nebula.Core.csproj" />
   </ItemGroup>
 
 </Project>

@@ -21,15 +21,15 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             FileFlags.Value = reader.ReadUShort();
-            FileName = reader.ReadAscii(260);
-            Command = reader.ReadAscii();
+            FileName = reader.ReadYuniversalStop(260);
+            Command = reader.ReadYuniversal();
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
             writer.WriteUShort((ushort)FileFlags.Value);
-            writer.WriteAscii(FileName, 260);
-            writer.WriteAscii(Command, true);
+            writer.WriteUnicode(FileName, 260);
+            writer.WriteUnicode(Command, true);
         }
     }
 }

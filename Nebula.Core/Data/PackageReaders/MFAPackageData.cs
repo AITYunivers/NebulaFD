@@ -138,6 +138,7 @@ namespace Nebula.Core.Data.PackageReaders
                 Frame frame = new Frame();
                 frame.ReadMFA(reader);
                 Frames.Add(frame);
+                FrameHandles.Add((short)frame.Handle);
             }
 
             reader.Seek(returnOffset);

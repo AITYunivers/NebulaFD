@@ -1,5 +1,6 @@
 ﻿using Nebula;
 using Nebula.Core.Data;
+using Nebula.Core.Data.Chunks;
 using Nebula.Core.Data.Chunks.AppChunks;
 using Nebula.Core.Data.Chunks.BankChunks.Images;
 using Nebula.Core.Data.Chunks.FrameChunks;
@@ -36,6 +37,21 @@ namespace GameDumper
             IconBank.PaletteVersion = dat.ImageBank.PaletteVersion = dat.Frames.First().FramePalette.PaletteVersion;
             IconBank.PaletteEntries = dat.ImageBank.PaletteEntries = (short)dat.Frames.First().FramePalette.PaletteEntries;
             IconBank.Palette = dat.ImageBank.Palette = dat.Frames.First().FramePalette.Palette;
+
+            // Initialize images on multiple threads for speed
+            List<Task> imgTasks = new List<Task>();
+            foreach (Image img in dat.ImageBank.Images.Values)
+            {
+                Task imgTask = new Task(() =>
+                {
+                    img.GetBitmap();
+                });
+                imgTasks.Add(imgTask);
+            }
+            foreach (Task imgTask in imgTasks)
+                imgTask.Start();
+            foreach (Task imgTask in imgTasks)
+                imgTask.Wait();
 
             if (NebulaCore.CurrentReader!.Icons.Count == 5)
             {

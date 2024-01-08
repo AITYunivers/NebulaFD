@@ -24,7 +24,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         public ushort FrameType;
         public Comment[] Comments = new Comment[0];
         public EventGroup[] EventGroups = new EventGroup[0];
-        public EventObject[] EventObjects = new EventObject[0];
+        public Dictionary<int, EventObject> EventObjects = new();
         public int EditorData;
         public ushort ConditionWidth;
         public short ObjectHeight;
@@ -82,7 +82,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     while (reader.Tell() < endPosition)
                     {
                         Event newEvent = new Event();
-                        newEvent.ReadCCN(reader);
+                        newEvent.ReadCCN(reader, this);
                         Events.Add(newEvent);
                     }
                 }
@@ -120,7 +120,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     while (reader.Tell() < endPosition)
                     {
                         Event newEvent = new Event();
-                        newEvent.ReadMFA(reader);
+                        newEvent.ReadMFA(reader, this);
                         Events.Add(newEvent);
                     }
                 }
@@ -145,11 +145,13 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                 }
                 else if (identifier == "EvOb" || identifier == "SJBO")
                 {
-                    EventObjects = new EventObject[reader.ReadInt()];
-                    for (int i = 0; i < EventObjects.Length; i++)
+                    EventObjects = new();
+                    int cnt = reader.ReadInt();
+                    for (int i = 0; i < cnt; i++)
                     {
-                        EventObjects[i] = new EventObject();
-                        EventObjects[i].ReadMFA(reader);
+                        EventObject evtObj = new EventObject();
+                        evtObj.ReadMFA(reader);
+                        EventObjects.Add(evtObj.Handle, evtObj);
                     }
                 }
                 else if (identifier == "EvCs")
@@ -233,11 +235,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                 writer.WriteWriter(evtsWriter);
             }
 
-            if (EventObjects.Length > 0)
+            if (EventObjects.Count > 0)
             {
                 writer.WriteAscii("EvOb");
-                writer.WriteInt(EventObjects.Length);
-                foreach (EventObject obj in EventObjects)
+                writer.WriteInt(EventObjects.Count);
+                foreach (EventObject obj in EventObjects.Values)
                     obj.WriteMFA(writer);
             }
 

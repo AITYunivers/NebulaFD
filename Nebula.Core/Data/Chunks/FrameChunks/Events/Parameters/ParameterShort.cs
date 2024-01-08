@@ -5,7 +5,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
     public class ParameterShort : ParameterChunk
     {
         public short Value;
-        public string? Extra;
 
         public ParameterShort()
         {
@@ -20,7 +19,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
             writer.WriteShort(Value);
-            if (Extra != null) writer.WriteUnicode(Extra, 33);
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
         }
     }
 }

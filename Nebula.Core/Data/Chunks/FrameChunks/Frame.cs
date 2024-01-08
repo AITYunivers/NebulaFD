@@ -378,7 +378,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             }
             MFAFrameInfo.Folders.WriteMFA(writer);
             FrameInstances.WriteMFA(writer);
-            List<EventObject> evtObjs = new();
+            Dictionary<int, EventObject> evtObjs = new();
             Dictionary<int, List<short>> quals = new();
             foreach (MFAObjectInfo oI in objectInfos.Values)
             {
@@ -400,7 +400,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                 };
                 evtObj.ItemHandle = (uint)oI.Handle;
                 evtObj.InstanceHandle = -1;
-                evtObjs.Add(evtObj);
+                evtObjs.Add(evtObj.Handle, evtObj);
 
                 foreach (short qual in oI.ObjectLoader.Qualifiers)
                 {
@@ -430,10 +430,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                         _ => string.Empty
                     };
                     evtObj.SystemQualifier = (ushort)qual;
-                    evtObjs.Add(evtObj);
+                    evtObjs.Add(evtObj.Handle, evtObj);
                 }
             }
-            FrameEvents.EventObjects = evtObjs.ToArray();
+            FrameEvents.EventObjects = evtObjs;
             FrameEvents.WriteMFA(writer);
 
             //FrameLayerEffects layerEffects = new();

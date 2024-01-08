@@ -26,5 +26,18 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             writer.WriteInt(Loops);
             writer.WriteShort(Comparison);
         }
+
+        public override string ToString()
+        {
+            TimeSpan tS = TimeSpan.FromMilliseconds(Timer);
+            string output = string.Empty;
+            if (tS.Hours > 0)
+                output += tS.Hours.ToString("D2") + ":";
+            if (tS.Minutes > 0)
+                output += tS.Minutes.ToString("D2") + "'";
+            output += tS.Seconds.ToString("D2") + "''";
+            output += "-" + tS.Milliseconds.ToString("D2").Substring(0, 2);
+            return output;
+        }
     }
 }

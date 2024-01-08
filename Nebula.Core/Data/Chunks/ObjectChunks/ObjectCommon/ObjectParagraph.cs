@@ -22,7 +22,9 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            FontHandle = (ushort)(reader.ReadUShort() + 1u);
+            FontHandle = reader.ReadUShort();
+            if (!NebulaCore.Android)
+                FontHandle++;
             ParagraphFlags.Value = reader.ReadUShort();
             Color = reader.ReadColor();
             Value = reader.ReadYuniversal();

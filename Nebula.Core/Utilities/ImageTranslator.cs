@@ -393,7 +393,7 @@ namespace Nebula.Core.Utilities
         public static byte[] AndroidMode5ToRGBA(byte[] imageData, int width, int height, bool alpha, bool RLE)
         {
             var img = new Data.Chunks.BankChunks.Images.Image();
-            //img.FromBitmap((Bitmap)Bitmap.FromStream(new MemoryStream(imageData)));
+            img.FromBitmap((Bitmap)Bitmap.FromStream(new MemoryStream(imageData)));
             return Normal24BitMaskedToRGBA(img.ImageData, width, height, true, Color.Black, RLE);
         }
         public static byte[] TwoFivePlusToRGBA(byte[] imageData, int width, int height, bool alpha, Color transparent, bool RGBA, bool flipRGB = false)

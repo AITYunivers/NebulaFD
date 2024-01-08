@@ -21,5 +21,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         {
             writer.WriteColor(Color);
         }
+
+        public override string ToString()
+        {
+            return $"RGB({Color.R},{Color.G},{Color.B})";
+        }
     }
 }

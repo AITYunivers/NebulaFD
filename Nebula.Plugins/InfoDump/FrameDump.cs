@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using Image = Nebula.Core.Data.Chunks.BankChunks.Images.Image;
 using Color = System.Drawing.Color;
+using System.Diagnostics;
 
 namespace Nebula.Plugins.GameDumper
 {
@@ -96,7 +97,7 @@ namespace Nebula.Plugins.GameDumper
                             break;
                         default:
                             ObjectCommon oc = ((ObjectCommon)oi.Properties);
-                            if (layer != -1 && (!oc.NewObjectFlags["VisibleAtStart"] || oc.ObjectFlags["DontCreateAtStart"]))
+                            if (layer != -1 && (!oc.NewObjectFlags["VisibleAtStart"] || oc.ObjectFlags["DontCreateAtStart"] || inst.InstanceFlags["CreateOnly"]))
                                 continue;
                             switch (oi.Header.Type)
                             {

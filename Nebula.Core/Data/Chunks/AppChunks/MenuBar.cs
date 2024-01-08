@@ -78,7 +78,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             int accelSize = reader.ReadInt();
 
             reader.Seek(startOffset + menuOffset + 4);
-            //Items = ReadMenuItems(reader);
+            Items = ReadMenuItems(reader);
 
             reader.Seek(startOffset + accelOffset);
             for (int i = 0; i < accelSize / 8; i++)

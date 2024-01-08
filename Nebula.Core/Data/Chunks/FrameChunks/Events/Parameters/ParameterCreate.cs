@@ -11,7 +11,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             "DontInheritDirection"   // Orientation: Normal
         );
 
-        public ushort ObjectInfoParent;
+        public short ObjectInfoParent;
         public short X;
         public short Y;
         public short Slope;
@@ -31,7 +31,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            ObjectInfoParent = reader.ReadUShort();
+            ObjectInfoParent = reader.ReadShort();
             CreateFlags.Value = reader.ReadUShort();
             X = reader.ReadShort();
             Y = reader.ReadShort();
@@ -48,7 +48,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteUShort(ObjectInfoParent);
+            writer.WriteShort(ObjectInfoParent);
             writer.WriteUShort((ushort)CreateFlags.Value);
             writer.WriteShort(X);
             writer.WriteShort(Y);
@@ -61,6 +61,40 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
             writer.WriteUShort(ObjectInstances);
             writer.WriteUShort(ObjectInfo);
+        }
+
+        public override string ToString()
+        {
+            string output = $"{NebulaCore.PackageData.FrameItems.Items[ObjectInfo].Name} at ({X},{Y})";
+            if (ObjectInfoParent != -1)
+                output += " from " + NebulaCore.PackageData.FrameItems.Items[ObjectInfoParent].Name;
+            else
+                output += " layer " + (Layer + 1);
+            if (CreateFlags.Value != 8)
+            {
+                output += " (";
+                bool add = false;
+                if (CreateFlags["OffsetFromActionPoint"])
+                {
+                    output += "action point";
+                    add = true;
+                }
+                if (CreateFlags["OffsetFromDirection"])
+                {
+                    if (add)
+                        output += ", ";
+                    output += "located";
+                    add = true;
+                }
+                if (CreateFlags["InheritDirection"])
+                {
+                    if (add)
+                        output += ", ";
+                    output += "oriented";
+                }
+                output += ")";
+            }
+            return output;
         }
     }
 }

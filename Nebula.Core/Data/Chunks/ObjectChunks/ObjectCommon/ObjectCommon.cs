@@ -40,6 +40,20 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
             "InitializeFlags"         // Initialize Flags
         );
 
+        public BitDict PreferenceFlags = new BitDict( // Preference Flags
+            "OEPREFS_BACKSAVE",
+            "OEPREFS_SCROLLINGINDEPENDANT",
+            "OEPREFS_QUICKDISPLAY",
+            "OEPREFS_SLEEP",
+            "OEPREFS_LOADONCALL",
+            "OEPREFS_GLOBAL",
+            "OEPREFS_BACKEFFECTS",
+            "OEPREFS_KILL",
+            "OEPREFS_INKEFFECTS",
+            "OEPREFS_TRANSITIONS",
+            "OEPREFS_FINECOLLISIONS"
+        );
+
         public short[] Qualifiers = new short[8];
         public string Identifier = string.Empty;
         public Color BackColor = Color.White;
@@ -85,85 +99,29 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                 return;
             }
 
-            long StartOffset = reader.Tell();
+            long startOffset = reader.Tell();
+            //File.WriteAllBytes("bitch.bin", reader.ReadBytes());
+            //reader.Seek(startOffset);
+            reader.Skip(6);
+            bool check = reader.ReadInt() == 0;
+            reader.Skip(-6);
 
-            int size = reader.ReadInt();
-            reader.Skip(2);
-            int OrderCheck = reader.ReadInt();
-            File.WriteAllBytes("bitch.dat", reader.ReadBytes());
-            reader.Seek(StartOffset + 4);
-            if (NebulaCore.iOS && NebulaCore.Build >= 284)
-            {
-                ExtensionOffset = reader.ReadShort();
-                MovementsOffset = reader.ReadShort();
-                reader.Skip(2);
-                ValueOffset = reader.ReadShort();
-                AnimationOffset = reader.ReadShort();
-                DataOffset = reader.ReadShort();
-            }
-            else if (NebulaCore.HTML)
-            {
-                reader.Skip(2);
-                DataOffset = reader.ReadShort();
-                reader.Skip(2);
-                ValueOffset = reader.ReadShort();
-                AnimationOffset = reader.ReadShort();
-                MovementsOffset = reader.ReadShort();
-            }
-            else if (NebulaCore.Android && NebulaCore.Build >= 284)
-            {
-                MovementsOffset = reader.ReadShort();
-                AnimationOffset = reader.ReadShort();
-                reader.Skip(2);
-                ValueOffset = reader.ReadShort();
-                DataOffset = reader.ReadShort();
-                ExtensionOffset = reader.ReadShort();
-            }
-            else if (NebulaCore.Build == 284 && OrderCheck == 0)
-            {
-                ValueOffset = reader.ReadShort();
-                reader.Skip(4);
-                MovementsOffset = reader.ReadShort();
-                ExtensionOffset = reader.ReadShort();
-                AnimationOffset = reader.ReadShort();
-            }
-            else if (NebulaCore.Build >= 284)
-            {
-                AnimationOffset = reader.ReadShort();
-                MovementsOffset = reader.ReadShort();
-                reader.Skip(4);
-                ExtensionOffset = reader.ReadShort();
-                ValueOffset = reader.ReadShort();
-            }
-            else
-            {
-                MovementsOffset = reader.ReadShort();
-                AnimationOffset = reader.ReadShort();
-                reader.Skip(2);
-                ValueOffset = reader.ReadShort();
-                DataOffset = reader.ReadShort();
-                reader.Skip(2);
-            }
+            GetOffset(reader, 0, check);
+            GetOffset(reader, 1, check);
+            GetOffset(reader, 2);
+            GetOffset(reader, 3, check);
+            GetOffset(reader, 4);
+            GetOffset(reader, 5, check);
+            
             ObjectFlags.Value = reader.ReadUInt();
             for (int i = 0; i < 8; i++)
                 Qualifiers[i] = reader.ReadShort();
 
-            if ((NebulaCore.iOS && NebulaCore.Build >= 284) || NebulaCore.HTML)
-                reader.Skip(2);
-            else if (NebulaCore.Android && (NebulaCore.Build == 284 || NebulaCore.Build == 288))
-                AnimationOffset = reader.ReadShort();
-            else if (!NebulaCore.Android && NebulaCore.Build >= 284)
-                DataOffset = reader.ReadShort();
-            else
-                ExtensionOffset = reader.ReadShort();
-
-            AlterableValuesOffset = reader.ReadShort();
-            AlterableStringsOffset = reader.ReadShort();
+            GetOffset(reader, 6);
+            GetOffset(reader, 7);
+            GetOffset(reader, 8);
             NewObjectFlags.Value = reader.ReadUShort();
-            if (NebulaCore.HTML)
-                ExtensionOffset = reader.ReadShort();
-            else
-                reader.Skip(2);
+            GetOffset(reader, 9);
             Identifier = reader.ReadAscii(4);
             BackColor = reader.ReadColor();
             TransitionInOffset = reader.ReadInt();
@@ -171,31 +129,31 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
             if (AnimationOffset > 0)
             {
-                reader.Seek(StartOffset + AnimationOffset);
+                reader.Seek(startOffset + AnimationOffset);
                 ObjectAnimations.ReadCCN(reader, 0);
             }
 
             if (AlterableValuesOffset > 0)
             {
-                reader.Seek(StartOffset + AlterableValuesOffset);
+                reader.Seek(startOffset + AlterableValuesOffset);
                 ObjectAlterableValues.ReadCCN(reader);
             }
 
             if (AlterableStringsOffset > 0)
             {
-                reader.Seek(StartOffset + AlterableStringsOffset);
+                reader.Seek(startOffset + AlterableStringsOffset);
                 ObjectAlterableStrings.ReadCCN(reader);
             }
 
             if (MovementsOffset > 0)
             {
-                reader.Seek(StartOffset + MovementsOffset);
+                reader.Seek(startOffset + MovementsOffset);
                 ObjectMovements.ReadCCN(reader);
             }
 
             if (DataOffset > 0)
             {
-                reader.Seek(StartOffset + DataOffset);
+                reader.Seek(startOffset + DataOffset);
                 switch (Identifier.Substring(0, 2))
                 {
                     //Text
@@ -222,25 +180,25 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
             if (ExtensionOffset > 0)
             {
-                reader.Seek(StartOffset + ExtensionOffset);
+                reader.Seek(startOffset + ExtensionOffset);
                 ObjectExtension.ReadCCN(reader);
             }
 
             if (ValueOffset > 0)
             {
-                reader.Seek(StartOffset + ValueOffset);
+                reader.Seek(startOffset + ValueOffset);
                 ObjectValue.ReadCCN(reader);
             }
 
             if (TransitionInOffset > 0)
             {
-                reader.Seek(StartOffset + TransitionInOffset);
+                reader.Seek(startOffset + TransitionInOffset);
                 ObjectTransitionIn.ReadCCN(reader);
             }
 
             if (TransitionOutOffset > 0)
             {
-                reader.Seek(StartOffset + TransitionOutOffset);
+                reader.Seek(startOffset + TransitionOutOffset);
                 ObjectTransitionOut.ReadCCN(reader);
             }
 
@@ -260,6 +218,193 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
+        }
+
+        List<short> Offsets = new();
+        public void GetOffset(ByteReader reader, int index, bool check = false)
+        {
+            short Offset = reader.ReadShort();
+            Offsets.Add(Offset);
+
+            if (NebulaCore.Android)
+            {
+                switch (index)
+                {
+                    case 0:
+                        MovementsOffset = Offset;
+                        break;
+                    case 1:
+                        if (NebulaCore.Build >= 284)
+                            AlterableValuesOffset = Offset;
+                        else
+                            AnimationOffset = Offset;
+                        break;
+                    case 3:
+                        ValueOffset = Offset;
+                        break;
+                    case 4:
+                        DataOffset = Offset;
+                        break;
+                    case 5:
+                        if (NebulaCore.Build >= 284)
+                            ExtensionOffset = Offset;
+                        else return;
+                        break;
+                    case 6:
+                        if (NebulaCore.Build >= 284)
+                            AnimationOffset = Offset;
+                        else
+                            ExtensionOffset = Offset;
+                        break;
+                    case 7:
+                        if (NebulaCore.Build >= 284)
+                            return;
+                        else
+                            AlterableValuesOffset = Offset;
+                        break;
+                    case 8:
+                        if (NebulaCore.Build >= 284)
+                            return;
+                        else
+                            AlterableStringsOffset = Offset;
+                        break;
+                    case 9:
+                        PreferenceFlags.Value = (ushort)Offset;
+                        break;
+                }
+            }
+            else if (NebulaCore.iOS)
+            {
+                switch (index)
+                {
+                    case 0:
+                        if (NebulaCore.Build >= 284)
+                            ExtensionOffset = Offset;
+                        else
+                            MovementsOffset = Offset;
+                        break;
+                    case 1:
+                        if (NebulaCore.Build >= 284)
+                            MovementsOffset = Offset;
+                        else
+                            AnimationOffset = Offset;
+                        break;
+                    case 3:
+                        ValueOffset = Offset;
+                        break;
+                    case 4:
+                        if (NebulaCore.Build >= 284)
+                            AnimationOffset = Offset;
+                        else
+                            DataOffset = Offset;
+                        break;
+                    case 5:
+                        if (NebulaCore.Build >= 284)
+                            DataOffset = Offset;
+                        else return;
+                        break;
+                    case 6:
+                        if (NebulaCore.Build >= 284)
+                            return;
+                        else
+                            ExtensionOffset = Offset;
+                        break;
+                    case 7:
+                        AlterableValuesOffset = Offset;
+                        break;
+                    case 8:
+                        AlterableStringsOffset = Offset;
+                        break;
+                    case 9:
+                        PreferenceFlags.Value = (ushort)Offset;
+                        break;
+                }
+            }
+            else if (NebulaCore.HTML)
+            {
+                switch (index)
+                {
+                    case 1:
+                        DataOffset = Offset;
+                        break;
+                    case 3:
+                        ValueOffset = Offset;
+                        break;
+                    case 4:
+                        AnimationOffset = Offset;
+                        break;
+                    case 5:
+                        MovementsOffset = Offset;
+                        break;
+                    case 7:
+                        AlterableValuesOffset = Offset;
+                        break;
+                    case 8:
+                        AlterableStringsOffset = Offset;
+                        break;
+                    case 9:
+                        ExtensionOffset = Offset;
+                        break;
+                }
+            }
+            else
+            {
+                switch (index)
+                {
+                    case 0:
+                        if (NebulaCore.Build == 284 && check)
+                            ValueOffset = Offset;
+                        else if (NebulaCore.Build >= 284)
+                            AnimationOffset = Offset;
+                        else
+                            MovementsOffset = Offset;
+                        break;
+                    case 1:
+                        if (NebulaCore.Build == 284 && check)
+                            return;
+                        else if (NebulaCore.Build >= 284)
+                            MovementsOffset = Offset;
+                        else
+                            AnimationOffset = Offset;
+                        break;
+                    case 3:
+                        if (NebulaCore.Build == 284 && check)
+                            MovementsOffset = Offset;
+                        else if (NebulaCore.Build >= 284)
+                            return;
+                        else
+                            ValueOffset = Offset;
+                        break;
+                    case 4:
+                        if (NebulaCore.Build >= 284)
+                            ExtensionOffset = Offset;
+                        else
+                            ValueOffset = Offset;
+                        break;
+                    case 5:
+                        if (NebulaCore.Build == 284 && check)
+                            AnimationOffset = Offset;
+                        else if (NebulaCore.Build >= 284)
+                            ValueOffset = Offset;
+                        else return;
+                        break;
+                    case 6:
+                        if (NebulaCore.Build >= 284)
+                            DataOffset = Offset;
+                        else
+                            ExtensionOffset = Offset;
+                        break;
+                    case 7:
+                        AlterableValuesOffset = Offset;
+                        break;
+                    case 8:
+                        AlterableStringsOffset = Offset;
+                        break;
+                    case 9:
+                        PreferenceFlags.Value = (ushort)Offset;
+                        break;
+                }
+            }
         }
     }
 }

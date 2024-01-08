@@ -32,6 +32,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
         public short Identifier;
         public short Undo;
 
+        public FrameEvents Parent = null;
+
         public Event()
         {
             ChunkName = "Event";
@@ -62,7 +64,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             for (int i = 0; i < cndCnt; i++)
             {
                 Condition cnd = new Condition();
-                cnd.ReadCCN(reader, Conditions);
+                cnd.ReadCCN(reader, Conditions, this);
                 if (cnd.DoAdd)
                 {
                     Conditions.Add(cnd);
@@ -73,7 +75,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             for (int i = 0; i < actCnt; i++)
             {
                 Action act = new Action();
-                act.ReadCCN(reader, Actions);
+                act.ReadCCN(reader, Actions, this);
                 if (act.DoAdd)
                 {
                     Actions.Add(act);
@@ -82,6 +84,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             }
 
             reader.Seek(endPosition);
+            Parent = (FrameEvents)extraInfo[0];
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -99,7 +102,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             for (int i = 0; i < cndCnt; i++)
             {
                 Condition cnd = new Condition();
-                cnd.ReadMFA(reader);
+                cnd.ReadMFA(reader, Conditions, this);
                 Conditions.Add(cnd);
                 Logger.Log(this, $"[COND] Type: {cnd.ObjectType}, Num: {cnd.Num}, Params: {cnd.Parameters.Length}");
             }
@@ -107,12 +110,13 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             for (int i = 0; i < actCnt; i++)
             {
                 Action act = new Action();
-                act.ReadMFA(reader, Actions);
+                act.ReadMFA(reader, Actions, this);
                 Actions.Add(act);
                 Logger.Log(this, $"[ACT] Type: {act.ObjectType}, Num: {act.Num}, Params: {act.Parameters.Length}");
             }
 
             reader.Seek(endPosition);
+            Parent = (FrameEvents)extraInfo[0];
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

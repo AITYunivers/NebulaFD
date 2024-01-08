@@ -26,5 +26,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             writer.WriteShort(ObjectInfo);
             writer.WriteShort(ObjectType);
         }
+
+        public override string ToString()
+        {
+            return NebulaCore.PackageData.FrameItems.Items[ObjectInfo].Name;
+        }
     }
 }

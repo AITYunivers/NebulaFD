@@ -20,5 +20,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         {
             writer.WriteInt(Value);
         }
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
 }

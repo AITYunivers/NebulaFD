@@ -29,5 +29,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             writer.WriteShort(X2);
             writer.WriteShort(Y2);
         }
+        public override string ToString()
+        {
+            return $"({X1},{Y1}) to ({X2},{Y2})";
+        }
     }
 }

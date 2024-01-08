@@ -5,7 +5,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
     public class FrameInstance : Chunk
     {
         public BitDict InstanceFlags = new BitDict( // Instance Flags
-            "", "", "Locked" // Locked
+            "", "", "Locked", // Locked
+            "CreateOnly"      // Fake Instance
         );
 
         public uint Handle;
@@ -29,7 +30,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             PositionX = reader.ReadInt();
             PositionY = reader.ReadInt();
             if (NebulaCore.Fusion < 3)
+            {
                 ParentType = reader.ReadUShort();
+                InstanceFlags["CreateOnly"] = ParentType != 0;
+            }
             ParentHandle = reader.ReadUShort();
             Layer = reader.ReadUShort();
             if (NebulaCore.Fusion < 3)

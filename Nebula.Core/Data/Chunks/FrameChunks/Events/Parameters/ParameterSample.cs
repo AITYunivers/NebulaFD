@@ -29,5 +29,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             writer.WriteUShort((ushort)SampleFlags.Value);
             writer.WriteUnicode(Name, true);
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }
