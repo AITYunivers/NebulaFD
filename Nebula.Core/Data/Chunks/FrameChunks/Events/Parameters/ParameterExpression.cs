@@ -83,18 +83,18 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         {
             switch (ObjectType)
             {
-                default: return "";
+                default: return base.ToString();
                 case -4:
                     switch (Num)
                     {
-                        default: return "";
+                        default: return base.ToString();
                         case 0:
                             return "timer";
                     }
                 case -1:
                     switch (Num)
                     {
-                        default: return "";
+                        default: return base.ToString();
                         case -3:
                             return ", ";
                         case -2:
@@ -171,7 +171,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
                 case 0:
                     switch (Num)
                     {
-                        default: return "";
+                        default: return base.ToString();
                         case 2:
                             return " + ";
                         case 4:

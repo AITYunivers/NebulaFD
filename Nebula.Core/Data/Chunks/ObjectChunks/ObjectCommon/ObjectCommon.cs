@@ -347,52 +347,68 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                         break;
                 }
             }
-            else
+            else if (NebulaCore.Build >= 284)
             {
                 switch (index)
                 {
                     case 0:
                         if (NebulaCore.Build == 284 && check)
                             ValueOffset = Offset;
-                        else if (NebulaCore.Build >= 284)
-                            AnimationOffset = Offset;
                         else
-                            MovementsOffset = Offset;
+                            AnimationOffset = Offset;
                         break;
                     case 1:
                         if (NebulaCore.Build == 284 && check)
                             return;
-                        else if (NebulaCore.Build >= 284)
-                            MovementsOffset = Offset;
                         else
-                            AnimationOffset = Offset;
+                            MovementsOffset = Offset;
                         break;
                     case 3:
                         if (NebulaCore.Build == 284 && check)
                             MovementsOffset = Offset;
-                        else if (NebulaCore.Build >= 284)
-                            return;
-                        else
-                            ValueOffset = Offset;
+                        else return;
                         break;
                     case 4:
-                        if (NebulaCore.Build >= 284)
-                            ExtensionOffset = Offset;
-                        else
-                            ValueOffset = Offset;
+                        ExtensionOffset = Offset;
                         break;
                     case 5:
                         if (NebulaCore.Build == 284 && check)
                             AnimationOffset = Offset;
-                        else if (NebulaCore.Build >= 284)
+                        else
                             ValueOffset = Offset;
-                        else return;
                         break;
                     case 6:
-                        if (NebulaCore.Build >= 284)
-                            DataOffset = Offset;
-                        else
-                            ExtensionOffset = Offset;
+                        DataOffset = Offset;
+                        break;
+                    case 7:
+                        AlterableValuesOffset = Offset;
+                        break;
+                    case 8:
+                        AlterableStringsOffset = Offset;
+                        break;
+                    case 9:
+                        PreferenceFlags.Value = (ushort)Offset;
+                        break;
+                }
+            }
+            else
+            {
+                switch (index)
+                {
+                    case 0:
+                        MovementsOffset = Offset;
+                        break;
+                    case 1:
+                        AnimationOffset = Offset;
+                        break;
+                    case 3:
+                        ValueOffset = Offset;
+                        break;
+                    case 4:
+                        DataOffset = Offset;
+                        break;
+                    case 6:
+                        ExtensionOffset = Offset;
                         break;
                     case 7:
                         AlterableValuesOffset = Offset;
