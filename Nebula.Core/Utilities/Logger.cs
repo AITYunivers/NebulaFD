@@ -9,6 +9,8 @@ namespace Nebula.Core.Utilities
 
         public static void Log(object parent, object message, int type = 0, ConsoleColor color = ConsoleColor.Black)
         {
+            if (parent.GetType().Name != "Event")
+                Debug.WriteLine(message);
             if (doLog)
             {
                 /*Console.ForegroundColor = ConsoleColor.Cyan;
@@ -19,7 +21,6 @@ namespace Nebula.Core.Utilities
                     Console.ResetColor();
                 Console.WriteLine(message);
                 Console.ResetColor();*/
-                Debug.WriteLine(message);
 
                 //string outInfo = $"[{(type != 0 ? type + "\\" : "")}{parent.GetType().Name}\\{DateTime.Now.ToString("HH:mm:ss.ff")}] ";
                 Logs.Add(message.ToString());

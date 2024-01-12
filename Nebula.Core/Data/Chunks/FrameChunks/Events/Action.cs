@@ -154,8 +154,14 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 case -1:
                     switch (Num)
                     {
+                        case -33:
+                            Num = -8;
+                            break;
+                        case -24:
+                            Num = -25;
+                            break;
                         case 0:
-                            DoAdd = false;
+                            // DoAdd = false;
                             break;
                         case 27:
                             Num = 3;
@@ -197,6 +203,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                                 string name = oC.ObjectMovements.Movements[param.ID].Name;
                                 param.Name = string.IsNullOrEmpty(name) ? "Movement #" + param.ID : name;
                             }
+                            break;
+                        case -43:
+                            Num = -27;
                             break;
                     }
                     break;

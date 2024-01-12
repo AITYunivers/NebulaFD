@@ -52,5 +52,13 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
         {
 
         }
+
+        public ObjectAnimation GetFirst()
+        {
+            foreach (var animation in Animations.Values)
+                if (animation.Directions.Count > 0)
+                    return animation;
+            return null;
+        }
     }
 }

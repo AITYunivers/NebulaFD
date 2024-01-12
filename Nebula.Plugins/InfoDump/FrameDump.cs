@@ -1,19 +1,21 @@
 ﻿using Nebula.Core.Data.Chunks.FrameChunks;
-using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using Nebula.Core.Data.Chunks.ObjectChunks;
+using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using Nebula.Core.Utilities;
 using Spectre.Console;
-using System.Drawing.Imaging;
 using System.Drawing;
-using Image = Nebula.Core.Data.Chunks.BankChunks.Images.Image;
+using System.Drawing.Imaging;
 using Color = System.Drawing.Color;
-using System.Diagnostics;
+using Image = Nebula.Core.Data.Chunks.BankChunks.Images.Image;
 
 namespace Nebula.Plugins.GameDumper
 {
     public class FrameDump : INebulaPlugin
     {
         public string Name => "Frame Dumper";
+        private bool ShowHiddenObjects = false;
+        private bool DumpLayers = true;
+        private bool ExpandBounds = false;
 
         public void Execute()
         {
@@ -45,8 +47,9 @@ namespace Nebula.Plugins.GameDumper
                             string frmPath = Path.Combine(path, Utilities.ClearName(frm.FrameName));
                             Directory.CreateDirectory(frmPath);
                             MakeFrameImg(frm).Save(frmPath + "\\Frame.png");
-                            for (int i = 0; i < frm.FrameLayers.Layers.Length; i++)
-                                MakeFrameImg(frm, i).Save(frmPath + "\\Layer " + i + ".png");
+                            if (DumpLayers)
+                                for (int i = 0; i < frm.FrameLayers.Layers.Length; i++)
+                                    MakeFrameImg(frm, i).Save(frmPath + "\\Layer " + i + ".png");
                             task.Value = ++progress;
                         }
                     }
@@ -97,12 +100,12 @@ namespace Nebula.Plugins.GameDumper
                             break;
                         default:
                             ObjectCommon oc = ((ObjectCommon)oi.Properties);
-                            if (layer != -1 && (!oc.NewObjectFlags["VisibleAtStart"] || oc.ObjectFlags["DontCreateAtStart"] || inst.InstanceFlags["CreateOnly"]))
+                            if (!ShowHiddenObjects && (!oc.NewObjectFlags["VisibleAtStart"] || oc.ObjectFlags["DontCreateAtStart"] || inst.InstanceFlags["CreateOnly"]))
                                 continue;
                             switch (oi.Header.Type)
                             {
                                 case 2: // Active
-                                    img = NebulaCore.PackageData.ImageBank.Images[oc.ObjectAnimations.Animations.First().Value.Directions.First().Frames.First()];
+                                    img = NebulaCore.PackageData.ImageBank.Images[oc.ObjectAnimations.GetFirst().Directions.First().Frames.First()];
                                     destRect = new Rectangle(inst.PositionX - img.HotspotX,
                                                              inst.PositionY - img.HotspotY,
                                                              img.Width, img.Height);
@@ -143,13 +146,31 @@ namespace Nebula.Plugins.GameDumper
                 imageAttributes.SetColorMatrix(colorMatrix);
                 imageAttributes.SetWrapMode(System.Drawing.Drawing2D.WrapMode.Tile);
 
-                g.DrawImage(
-                    sourceBitmap,
-                    dest,
-                    0, 0, dest.Width, dest.Height,
-                    GraphicsUnit.Pixel,
-                    imageAttributes
-                );
+                if (sourceBitmap.Width != dest.Width || sourceBitmap.Height != dest.Height)
+                {
+                    Bitmap bTD = new Bitmap(dest.Width, dest.Height);
+                    using (Graphics gTD = Graphics.FromImage(bTD))
+                    {
+                        gTD.DrawImage(
+                            sourceBitmap,
+                            new Rectangle(0, 0, dest.Width, dest.Height),
+                            0, 0, dest.Width, dest.Height,
+                            GraphicsUnit.Pixel,
+                            imageAttributes
+                        );
+                    }
+                    g.DrawImageUnscaled(bTD, dest.X, dest.Y);
+                }
+                else
+                {
+                    g.DrawImage(
+                        sourceBitmap,
+                        dest,
+                        0, 0, dest.Width, dest.Height,
+                        GraphicsUnit.Pixel,
+                        imageAttributes
+                    );
+                }
             }
         }
 
