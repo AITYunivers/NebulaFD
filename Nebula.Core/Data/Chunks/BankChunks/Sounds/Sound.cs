@@ -9,7 +9,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
         public int Checksum;
         public uint References;
         public BitDict Flags = new BitDict( // Flags
-            "", "", "", "", "", "Decompressed", // Decompressed
+            "Check", "", "", "", "", "Decompressed", // Decompressed
             "", "", "HasName",                  // Has Name (Android Only?)
             "", "", "", "", "", "NameCrop"      // Name Crop
         );
@@ -106,6 +106,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
             Flags["NameCrop"] = false;
+            Flags["Check"] = true;
             writer.WriteUInt(Handle + 1);
             writer.WriteInt(Checksum);
             writer.WriteUInt(References);
