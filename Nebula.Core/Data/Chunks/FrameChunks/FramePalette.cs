@@ -5,8 +5,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 {
     public class FramePalette : Chunk
     {
-        public short PaletteVersion;
-        public int PaletteEntries;
+        public short PaletteVersion = 768;
+        public int PaletteEntries = 0;
         public List<Color> Palette = new();
 
         public FramePalette()
@@ -39,7 +39,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteInt(PaletteEntries);
+            writer.WriteInt(Palette.Count);
             foreach (Color col in Palette)
                 writer.WriteColor(col);
         }

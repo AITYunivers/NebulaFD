@@ -3,10 +3,10 @@
  *
  * Written by Andrew Church <achurch@achurch.org>
  * This source code is public domain.
- *//*
+ */
 
 // Ported to C# by Yunivers
-namespace TinyInflate
+namespace Nebula.Core
 {
     public static unsafe class TinyInflate
     {
@@ -37,8 +37,6 @@ namespace TinyInflate
             public _state state;
             public byte[] in_ptr;
             public uint in_ptr_index;
-            public byte[] in_top;
-            public uint in_top_index;
             public byte[] out_base;
             public uint out_base_index;
             public ulong out_ofs;
@@ -184,7 +182,6 @@ namespace TinyInflate
 
             state.in_ptr = compressed_data;
             state.in_ptr_index = 0;
-            state.in_top_index = (uint)(state.in_ptr_index + compressed_size);
             state.out_base = output_buffer;
             state.out_base_index = 0;
             state.out_size = output_size;
@@ -245,10 +242,7 @@ namespace TinyInflate
         {
             byte[] in_ptr = new byte[state.in_ptr.Length];
             Array.Copy(state.in_ptr, in_ptr, in_ptr.Length);
-            uint in_ptr_index = state.in_ptr_index;
-            byte[] in_top = new byte[state.in_top.Length];
-            Array.Copy(state.in_top, in_top, in_top.Length);
-            uint in_top_index = state.in_top_index;
+            int in_ptr_index = (int)state.in_ptr_index;
             byte[] out_base = new byte[state.out_base.Length];
             Array.Copy(state.out_base, out_base, out_base.Length);
             uint out_base_index = state.out_base_index;
@@ -259,37 +253,24 @@ namespace TinyInflate
 
             ulong icrc = ~state.crc;
 
-            state.in_ptr = in_ptr;
-            state.out_ofs = out_ofs;
-            state.crc = ~icrc & 0xFFFFFFFFUL;
-            state.bit_accum = bit_accum;
-            state.num_bits = (byte)num_bits;
-            state.state = DecompressionState._state.HEADER;
-            return 0;
+            int output = CHECK_STATE(ref state, ref num_bits, ref in_ptr_index, ref bit_accum, in_ptr, ref out_ofs, out_size, ref out_base, ref icrc);
 
-        out_of_data:
             state.in_ptr = in_ptr;
             state.out_ofs = out_ofs;
             state.crc = ~icrc & 0xFFFFFFFFUL;
             state.bit_accum = bit_accum;
             state.num_bits = (byte)num_bits;
-            return 1;
-
-        error_return:
-            state.in_ptr = in_ptr;
-            state.out_ofs = out_ofs;
-            state.crc = ~icrc & 0xFFFFFFFFUL;
-            state.bit_accum = bit_accum;
-            state.num_bits = (byte)num_bits;
-            return -1;
+            if (output == 0)
+                state.state = DecompressionState._state.HEADER;
+            return output;
         }
 
-        private static int GETBITS(uint n, ref ulong var, ref uint num_bits, ref int in_ptr_index, int in_top_index, ref ulong bit_accum)
+        private static int GETBITS(uint n, ref ulong var, ref uint num_bits, ref int in_ptr_index, int in_ptr_length, ref ulong bit_accum)
         {
             uint __n = n;
             while (num_bits < __n)
             {
-                if (in_ptr_index >= in_top_index)
+                if (in_ptr_index >= in_ptr_length)
                     return 1;
                 bit_accum |= (ulong)in_ptr_index << (int)num_bits;
                 num_bits += 8;
@@ -301,7 +282,7 @@ namespace TinyInflate
             return 0;
         }
 
-        private static int GETHUFF(ref ulong var, uint[] table, uint num_bits, uint in_ptr_index, uint in_top_index, ref ulong bit_accum)
+        private static int GETHUFF(ref ulong var, uint[] table, uint num_bits, uint in_ptr_index, uint in_ptr_length, ref ulong bit_accum)
         {
             uint bits_used = 0;
             uint index = 0;
@@ -309,7 +290,7 @@ namespace TinyInflate
             {
                 if (num_bits <= bits_used)
                 {
-                    if (in_ptr_index >= in_top_index)
+                    if (in_ptr_index >= in_ptr_length)
                         return 1;
                     bit_accum |= (ulong)in_ptr_index << (int)num_bits;
                     num_bits += 8;
@@ -350,56 +331,64 @@ namespace TinyInflate
             icrc = crc32_table[(icrc & 0xFF) ^ __val] ^ ((icrc >> 8) & 0xFFFFFFUL);
         }
 
-        private static int CHECK_STATE(ref DecompressionState state, ref uint num_bits, ref int in_ptr_index, int in_top_index, ref ulong bit_accum,
+        private static int CHECK_STATE(ref DecompressionState state, ref uint num_bits, ref int in_ptr_index, ref ulong bit_accum,
                                        byte[] in_ptr, ref ulong out_ofs, ulong out_size, ref byte[] out_base, ref ulong icrc)
         {
-            
-            if (state.state == DecompressionState._state.UNCOMPRESSED_LEN)
-                goto state_UNCOMPRESSED_LEN;
-
-            ulong blocktype = state.block_type;
-            int e = GETBITS(3, ref blocktype, ref num_bits, ref in_ptr_index, in_top_index, ref bit_accum);
-            if (e != 0) return e;
-            state.block_type = (byte)blocktype;
-            state.final = (byte)(state.block_type & 1);
-            state.block_type >>= 1;
-
-            if (state.block_type == 3)
-                return -1;
-
-            if (state.block_type == 0)
+            ulong blocktype = 0;
+            int e = 0;
+            if (state.state != DecompressionState._state.UNCOMPRESSED_LEN)
             {
-                num_bits = 0;
-                state.state = DecompressionState._state.UNCOMPRESSED_LEN;
-            state_UNCOMPRESSED_LEN:
-                ulong statelen = state.len;
-                e = GETBITS(16, ref statelen, ref num_bits, ref in_ptr_index, in_top_index, ref bit_accum);
+                blocktype = state.block_type;
+                e = GETBITS(3, ref blocktype, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
                 if (e != 0) return e;
-                state.len = (uint)statelen;
-                state.state = DecompressionState._state.UNCOMPRESSED_ILEN;
-            state_UNCOMPRESSED_ILEN:
-                ulong stateilen = state.ilen;
-                e = GETBITS(16, ref stateilen, ref num_bits, ref in_ptr_index, in_top_index, ref bit_accum);
-                if (e != 0) return e;
-                state.ilen = (uint)stateilen;
-                if (state.ilen != (~state.len & 0xFFFF))
+                state.block_type = (byte)blocktype;
+                state.final = (byte)(state.block_type & 1);
+                state.block_type >>= 1;
+
+                if (state.block_type == 3)
                     return -1;
-                state.nread = 0;
-                state.state = DecompressionState._state.UNCOMPRESSED_DATA;
-            state_UNCOMPRESSED_DATA:
-                while (state.nread < state.len)
+            }
+
+            if (state.block_type == 0 || state.state == DecompressionState._state.UNCOMPRESSED_LEN)
+            {
+                if (state.state != DecompressionState._state.UNCOMPRESSED_LEN)
+                    num_bits = 0;
+                state.state = DecompressionState._state.UNCOMPRESSED_LEN;
+                if (state.state == DecompressionState._state.UNCOMPRESSED_LEN)
                 {
-                    if (in_ptr_index < in_top_index)
-                        return 1;
-                    PUTBYTE(in_ptr[in_ptr_index++], ref out_ofs, out_size, ref out_base, ref icrc);
-                    state.nread++;
+                    ulong statelen = state.len;
+                    e = GETBITS(16, ref statelen, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
+                    if (e != 0) return e;
+                    state.len = (uint)statelen;
+                    state.state = DecompressionState._state.UNCOMPRESSED_ILEN;
                 }
-                state.in_ptr = in_ptr;
-                state.out_ofs = out_ofs;
-                state.crc = ~icrc & 0xFFFFFFFFUL;
-                state.bit_accum = bit_accum;
-                state.num_bits = (byte)num_bits;
-                state.state = DecompressionState._state.HEADER;
+                if (state.state == DecompressionState._state.UNCOMPRESSED_ILEN)
+                {
+                    ulong stateilen = state.ilen;
+                    e = GETBITS(16, ref stateilen, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
+                    if (e != 0) return e;
+                    state.ilen = (uint)stateilen;
+                    if (state.ilen != (~state.len & 0xFFFF))
+                        return -1;
+                    state.nread = 0;
+                    state.state = DecompressionState._state.UNCOMPRESSED_DATA;
+                }
+                if (state.state == DecompressionState._state.UNCOMPRESSED_DATA)
+                {
+                    while (state.nread < state.len)
+                    {
+                        if (in_ptr_index < in_ptr.Length)
+                            return 1;
+                        PUTBYTE(in_ptr[in_ptr_index++], ref out_ofs, out_size, ref out_base, ref icrc);
+                        state.nread++;
+                    }
+                    state.in_ptr = in_ptr;
+                    state.out_ofs = out_ofs;
+                    state.crc = ~icrc & 0xFFFFFFFFUL;
+                    state.bit_accum = bit_accum;
+                    state.num_bits = (byte)num_bits;
+                    state.state = DecompressionState._state.HEADER;
+                }
                 return 0;
             }
 
@@ -411,52 +400,57 @@ namespace TinyInflate
                 };
 
                 state.state = DecompressionState._state.LITERAL_COUNT;
-            state_LITERAL_COUNT:
-                ulong literalcount = state.literal_count;
-                e = GETBITS(5, ref literalcount, ref num_bits, ref in_ptr_index, in_top_index, ref bit_accum);
-                if (e != 0) return e;
-                state.literal_count = (uint)literalcount;
-                state.literal_count += 257;
-                state.state = DecompressionState._state.DISTANCE_COUNT;
-            state_DISTANCE_COUNT:
-                ulong distancecount = state.distance_count;
-                e = GETBITS(5, ref distancecount, ref num_bits, ref in_ptr_index, in_top_index, ref bit_accum);
-                if (e != 0) return e;
-                state.distance_count = (uint)distancecount;
-                state.distance_count += 1;
-                state.state = DecompressionState._state.CODELEN_COUNT;
-            state_CODELEN_COUNT:
-                ulong codelencount = state.codelen_count;
-                e = GETBITS(4, ref codelencount, ref num_bits, ref in_ptr_index, in_top_index, ref bit_accum);
-                if (e != 0) return e;
-                state.codelen_count = (uint)codelencount;
-                state.codelen_count += 4;
-
-                state.counter = 0;
-                state.state = DecompressionState._state.READ_CODE_LENGTHS;
-            state_READ_CODE_LENGTHS:
-                while (state.counter < state.codelen_count)
+                if (state.state == DecompressionState._state.LITERAL_COUNT)
                 {
-                    ulong value1 = state.codelen_len[codelen_order[state.counter]];
-                    e = GETBITS(3, ref value1, ref num_bits, ref in_ptr_index, in_top_index, ref bit_accum);
+                    ulong literalcount = state.literal_count;
+                    e = GETBITS(5, ref literalcount, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
                     if (e != 0) return e;
-                    state.codelen_len[codelen_order[state.counter]] = (byte)value1;
-                    state.counter++;
+                    state.literal_count = (uint)literalcount;
+                    state.literal_count += 257;
+                    state.state = DecompressionState._state.DISTANCE_COUNT;
                 }
+                if (state.state == DecompressionState._state.DISTANCE_COUNT)
+                {
+                    ulong distancecount = state.distance_count;
+                    e = GETBITS(5, ref distancecount, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
+                    if (e != 0) return e;
+                    state.distance_count = (uint)distancecount;
+                    state.distance_count += 1;
+                    state.state = DecompressionState._state.CODELEN_COUNT;
+                }
+                if (state.state == DecompressionState._state.CODELEN_COUNT)
+                {
+                    ulong codelencount = state.codelen_count;
+                    e = GETBITS(4, ref codelencount, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
+                    if (e != 0) return e;
+                    state.codelen_count = (uint)codelencount;
+                    state.codelen_count += 4;
 
-                for (; state.counter < 19; state.counter++)
-                    state.codelen_len[codelen_order[state.counter]] = 0;
+                    state.counter = 0;
+                    state.state = DecompressionState._state.READ_CODE_LENGTHS;
+                }
+                if (state.state == DecompressionState._state.READ_CODE_LENGTHS)
+                {
+                    while (state.counter < state.codelen_count)
+                    {
+                        ulong value1 = state.codelen_len[codelen_order[state.counter]];
+                        e = GETBITS(3, ref value1, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
+                        if (e != 0) return e;
+                        state.codelen_len[codelen_order[state.counter]] = (byte)value1;
+                        state.counter++;
+                    }
 
-                if (gen_huffman_table(19, state.codelen_len, 0, ref state.codelen_table) == 0)
-                    return -1;
+                    for (; state.counter < 19; state.counter++)
+                        state.codelen_len[codelen_order[state.counter]] = 0;
 
-                uint repeat_count;
+                    if (gen_huffman_table(19, state.codelen_len, 0, ref state.codelen_table) == 0)
+                        return -1;
 
-                state.last_value = 0;
-                state.counter = 0;
-                state.state = DecompressionState._state.READ_LENGTHS;
-            state_READ_LENGTHS:
-                repeat_count = 0;
+                    state.last_value = 0;
+                    state.counter = 0;
+                    state.state = DecompressionState._state.READ_LENGTHS;
+                }
+                uint repeat_count = 0;
                 while (state.counter < state.literal_count + state.distance_count)
                 {
                     if (repeat_count == 0)
@@ -465,7 +459,7 @@ namespace TinyInflate
                         for (int i = 0; i < state.codelen_table.Length; i++)
                             codelentable[i] = (uint)state.codelen_table[i];
                         ulong statesymbol = state.symbol;
-                        e = GETHUFF(ref statesymbol, codelentable, num_bits, (uint)in_ptr_index, (uint)in_top_index, ref bit_accum);
+                        e = GETHUFF(ref statesymbol, codelentable, num_bits, (uint)in_ptr_index, (uint)in_ptr.Length, ref bit_accum);
                         if (e != 0) return e;
                         state.symbol = (uint)statesymbol;
                         for (int i = 0; i < state.codelen_table.Length; i++)
@@ -479,9 +473,8 @@ namespace TinyInflate
                         else if (state.symbol == 16)
                         {
                             state.state = DecompressionState._state.READ_LENGTHS_16;
-                        state_READ_LENGTHS_16:
                             ulong repeatcount = repeat_count;
-                            e = GETBITS(2, ref repeatcount, ref num_bits, ref in_ptr_index, in_top_index, ref bit_accum);
+                            e = GETBITS(2, ref repeatcount, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
                             if (e != 0) return e;
                             repeat_count = (uint)repeatcount;
                             repeat_count += 3;
@@ -490,9 +483,8 @@ namespace TinyInflate
                         {
                             state.last_value = 0;
                             state.state = DecompressionState._state.READ_LENGTHS_17;
-                        state_READ_LENGTHS_17:
                             ulong repeatcount = repeat_count;
-                            e = GETBITS(3, ref repeatcount, ref num_bits, ref in_ptr_index, in_top_index, ref bit_accum);
+                            e = GETBITS(3, ref repeatcount, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
                             if (e != 0) return e;
                             repeat_count = (uint)repeatcount;
                             repeat_count += 3;
@@ -501,9 +493,8 @@ namespace TinyInflate
                         {
                             state.last_value = 0;
                             state.state = DecompressionState._state.READ_LENGTHS_18;
-                        state_READ_LENGTHS_18:
                             ulong repeatcount = repeat_count;
-                            e = GETBITS(7, ref repeatcount, ref num_bits, ref in_ptr_index, in_top_index, ref bit_accum);
+                            e = GETBITS(7, ref repeatcount, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
                             if (e != 0) return e;
                             repeat_count = (uint)repeatcount;
                             repeat_count += 11;
@@ -579,7 +570,7 @@ namespace TinyInflate
                 for (int i = 0; i < state.literal_table.Length; i++)
                     literaltable[i] = (uint)state.literal_table[i];
                 ulong statesymbol = state.symbol;
-                e = GETHUFF(ref statesymbol, literaltable, num_bits, (uint)in_ptr_index, (uint)in_top_index, ref bit_accum);
+                e = GETHUFF(ref statesymbol, literaltable, num_bits, (uint)in_ptr_index, (uint)in_ptr.Length, ref bit_accum);
                 if (e != 0) return e;
                 state.symbol = (uint)statesymbol;
                 for (int i = 0; i < state.literal_table.Length; i++)
@@ -602,7 +593,7 @@ namespace TinyInflate
                 state_READ_LENGTH:
                     uint length_bits = (state.symbol - 261) / 4;
                     ulong repeatlength = state.repeat_length;
-                    e = GETBITS(length_bits, ref repeatlength, ref num_bits, ref in_ptr_index, in_top_index, ref bit_accum);
+                    e = GETBITS(length_bits, ref repeatlength, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
                     if (e != 0) return e;
                     state.repeat_length = (uint)repeatlength;
                     state.repeat_length += 3 + ((4 + ((state.symbol - 265) & 3)) << (int)length_bits);
@@ -618,7 +609,7 @@ namespace TinyInflate
                 for (int i = 0; i < state.distance_table.Length; i++)
                     distancetable[i] = (uint)state.distance_table[i];
                 statesymbol = state.symbol;
-                e = GETHUFF(ref statesymbol, distancetable, num_bits, (uint)in_ptr_index, (uint)in_top_index, ref bit_accum);
+                e = GETHUFF(ref statesymbol, distancetable, num_bits, (uint)in_ptr_index, (uint)in_ptr.Length, ref bit_accum);
                 if (e != 0) return e;
                 state.symbol = (uint)statesymbol;
                 for (int i = 0; i < state.distance_table.Length; i++)
@@ -632,7 +623,7 @@ namespace TinyInflate
                 state_READ_DISTANCE_EXTRA:
                     uint distance_bits = (state.symbol - 2) / 2;
                     ulong dist = distance;
-                    e = GETBITS(distance_bits, ref dist, ref num_bits, ref in_ptr_index, in_top_index, ref bit_accum);
+                    e = GETBITS(distance_bits, ref dist, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
                     if (e != 0) return e;
                     distance = (uint)dist;
                     distance += 1 + ((2 + (state.symbol & 1)) << (int)distance_bits);
@@ -715,7 +706,7 @@ namespace TinyInflate
 
                 for (j = 0; j < symbols; j++)
                     if (lengths[j] == i)
-                        table[index++] = j;
+                        table[index++] = (short)j;
 
                 for (j = next_code; j < code_limit; j++)
                 {
@@ -728,4 +719,3 @@ namespace TinyInflate
         }
     }
 }
-*/

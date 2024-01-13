@@ -117,6 +117,12 @@ namespace Nebula
                 case ".ipa":
                     NebulaCore.CurrentReader = new IPAFileReader();
                     break;
+                case ".gam":
+                    if (File.Exists(Path.Combine(Path.GetDirectoryName(NebulaCore.FilePath), Path.GetFileNameWithoutExtension(NebulaCore.FilePath) + ".img")))
+                        NebulaCore.CurrentReader = new KNPFileReader();
+                    else
+                        NebulaCore.CurrentReader = new CCNFileReader();
+                    break;
             }
         }
 

@@ -1,0 +1,274 @@
+﻿using Nebula.Core.Data.Chunks.BankChunks.Images;
+using Nebula.Core.Data.Chunks.BankChunks.Sounds;
+using Nebula.Core.Data.Chunks.FrameChunks;
+using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
+using Spectre.Console;
+using System.Drawing;
+using System.Media;
+using System.Text;
+using Color = System.Drawing.Color;
+using Image = Nebula.Core.Data.Chunks.BankChunks.Images.Image;
+using Font = Nebula.Core.Data.Chunks.BankChunks.Fonts.Font;
+using Size = Spectre.Console.Size;
+
+#pragma warning disable CS8602
+namespace Nebula.Core.Data.PackageReaders
+{
+    public class KNPPackageData : PackageData
+    {
+        public string FilePath = string.Empty;
+        bool Finished = false;
+
+        public override void Read(ByteReader reader)
+        {
+            Logger.Log(this, $"Running {NebulaCore.BuildDate} build.");
+            NebulaCore._unicode = false;
+            NebulaCore.Fusion = 0.0f;
+            AppName = Path.GetFileNameWithoutExtension(FilePath);
+
+            if (File.Exists(FilePath + ".gam"))
+                ReadGameData(new ByteReader(new MemoryStream(File.ReadAllBytes(FilePath + ".gam"))));
+            if (File.Exists(FilePath + ".snd"))
+                ReadSoundBank(new ByteReader(new MemoryStream(File.ReadAllBytes(FilePath + ".snd"))));
+            if (File.Exists(FilePath + ".mus"))
+                ReadMusicBank(new ByteReader(new MemoryStream(File.ReadAllBytes(FilePath + ".mus"))));
+            if (File.Exists(FilePath + ".img"))
+                ReadImageBank(new ByteReader(new MemoryStream(File.ReadAllBytes(FilePath + ".img"))));
+            if (File.Exists(FilePath + ".mtf"))
+                ReadFontBank(new ByteReader(new MemoryStream(File.ReadAllBytes(FilePath + ".mtf"))));
+
+            FinishParsing();
+            Finished = true;
+        }
+
+        public void ReadGameData(ByteReader reader)
+        {
+            Header = reader.ReadAscii(4);
+            reader.Skip(2);
+            AppName = reader.ReadYuniversalStop(80);
+            Author = reader.ReadYuniversalStop(80);
+            reader.Skip(80); // Company
+            reader.Skip(1146);
+            long iconOffset = reader.Tell();
+            reader.Skip(1024); // Icon?
+            reader.Skip(138);
+            while (reader.HasMemory(256 * 4))
+                ReadFrameData(reader);
+
+            reader.Seek(iconOffset);
+            ReadIconData(reader);
+        }
+
+        public void ReadFrameData(ByteReader reader)
+        {
+            Frame frm = new Frame();
+            int StampSize = reader.ReadInt();
+            reader.Skip(16);
+            for (int i = 0; i < 256; i++)
+                frm.FramePalette.Palette.Add(reader.ReadColor(true));
+            reader.Skip(StampSize);
+            if (!reader.HasMemory(1)) return;
+            reader.Skip(4);
+            frm.FrameHeader.Width = reader.ReadShort();
+            frm.FrameHeader.Height = reader.ReadShort();
+            frm.FrameName = reader.ReadYuniversalStop(32);
+            reader.Skip(16);
+            long endOffset = reader.Tell() + reader.ReadUInt() - 36;
+            reader.Skip(58);
+            ushort ObjectCount = reader.ReadUShort();
+            reader.Skip(4);
+            //for (int i = 0; i < ObjectCount; i++)
+                //ReadObjectData(reader);
+            reader.Seek(endOffset);
+            Frames.Add(frm);
+        }
+
+        public void ReadObjectData(ByteReader reader)
+        {
+            string objName = reader.ReadYuniversalStop(40);
+            reader.Skip(24);
+            uint paragraphData = reader.ReadUInt();
+            reader.Skip(2 + paragraphData);
+            uint randomData = reader.ReadUInt();
+            reader.Skip(14 + randomData);
+        }
+
+        public void ReadIconData(ByteReader reader)
+        {
+            AppIcon.Icon = new Bitmap(32, 32);
+
+            for (int h = 0; h < AppIcon.Icon.Height; h++)
+                for (int w = 0; w < AppIcon.Icon.Width; w++)
+                    AppIcon.Icon.SetPixel(w, AppIcon.Icon.Width - 1 - h, Frames[0].FramePalette.Palette[reader.ReadByte()]);
+
+            NebulaCore.CurrentReader.Icons.Add(16,  AppIcon.Icon.ResizeImage(16));
+            NebulaCore.CurrentReader.Icons.Add(32,  AppIcon.Icon);
+            NebulaCore.CurrentReader.Icons.Add(64,  AppIcon.Icon.ResizeImage(48));
+            NebulaCore.CurrentReader.Icons.Add(128, AppIcon.Icon.ResizeImage(128));
+            NebulaCore.CurrentReader.Icons.Add(256, AppIcon.Icon.ResizeImage(256));
+        }
+
+        public void ReadSoundBank(ByteReader reader)
+        {
+            int sndCnt = reader.ReadInt();
+            int[] sndOffsets = new int[sndCnt];
+            int[] sndSizes = new int[sndCnt];
+            for (int i = 0; i < sndCnt; i++)
+            {
+                sndOffsets[i] = reader.ReadInt();
+                sndSizes[i] = reader.ReadInt();
+            }
+
+            for (uint i = 0; i < sndCnt; i++)
+            {
+                if (sndOffsets[i] == 0)
+                    continue;
+                reader.Seek(sndOffsets[i]);
+                reader.Skip(6);
+                int sndSize = reader.ReadInt();
+                Sound snd = new Sound();
+                snd.Name = reader.ReadYuniversalStop(22);
+                snd.Data = FixSoundData(reader.ReadBytes(sndSize));
+                SoundBank.Sounds.Add(i, snd);
+            }
+        }
+
+        public byte[] FixSoundData(byte[] data)
+        {
+            byte[] output = new byte[data.Length + 44];
+            Array.Copy(Encoding.ASCII.GetBytes("RIFF"), 0, output, 0,  4);
+            Array.Copy(BitConverter.GetBytes(8146), 0, output, 4,  4);
+            Array.Copy(Encoding.ASCII.GetBytes("WAVEfmt "), 0, output, 8,  8);
+            Array.Copy(BitConverter.GetBytes(16), 0, output, 16, 4);
+            Array.Copy(data, 0, output, 20, 16);
+            Array.Copy(Encoding.ASCII.GetBytes("data"), 0, output, 36, 4);
+            Array.Copy(BitConverter.GetBytes(data.Length - 16), 0, output, 40, 4);
+            Array.Copy(data, 16, output, 44, data.Length - 16);
+            return output;
+        }
+
+        public void ReadMusicBank(ByteReader reader)
+        {
+            int musCnt = reader.ReadInt();
+            int[] musOffsets = new int[musCnt];
+            int[] musSizes = new int[musCnt];
+            for (int i = 0; i < musCnt; i++)
+            {
+                musOffsets[i] = reader.ReadInt();
+                musSizes[i] = reader.ReadInt();
+            }
+
+            for (uint i = 0; i < musCnt; i++)
+            {
+                if (musOffsets[i] == 0)
+                    continue;
+                reader.Seek(musOffsets[i]);
+                reader.Skip(6);
+                int musSize = reader.ReadInt();
+                string musName = reader.ReadYuniversalStop(22);
+                byte[] musData = reader.ReadBytes(musSize);
+            }
+        }
+
+        public void ReadImageBank(ByteReader reader)
+        {
+            int imgCnt = reader.ReadInt();
+            int[] imgOffsets = new int[imgCnt];
+            int[] imgSizes = new int[imgCnt];
+            for (int i = 0; i < imgCnt; i++)
+            {
+                imgOffsets[i] = reader.ReadInt();
+                imgSizes[i] = reader.ReadInt();
+            }
+
+            for (uint i = 0; i < imgCnt; i++)
+            {
+                if (imgOffsets[i] == 0)
+                    continue;
+                Image img = new Image();
+                reader.Seek(imgOffsets[i]);
+                reader.Skip(6);
+                img.Handle = i;
+                int imgSize = reader.ReadInt();
+                img.Width = (short)(Math.Ceiling(reader.ReadShort() / 2.0f) * 2);
+                img.Height = reader.ReadShort();
+                reader.Skip(2);
+                img.HotspotX = reader.ReadShort();
+                img.HotspotY = reader.ReadShort();
+                img.ActionPointX = reader.ReadShort();
+                img.ActionPointY = reader.ReadShort();
+                img.ImageData = reader.ReadBytes(imgSize);
+                img.TransparentColor = Color.Black;
+                img.GraphicMode = 255;
+                img.Palette = Frames[0].FramePalette.Palette;
+                img.Flags["RLE"] = true;
+                ImageBank.Images.Add(img.Handle, img);
+            }
+        }
+
+        public void ReadFontBank(ByteReader reader)
+        {
+            int fntCnt = reader.ReadInt();
+            int[] fntOffsets = new int[fntCnt];
+            int[] fntSizes = new int[fntCnt];
+            for (int i = 0; i < fntCnt; i++)
+            {
+                fntOffsets[i] = reader.ReadInt();
+                fntSizes[i] = reader.ReadInt();
+            }
+
+            for (uint i = 0; i < fntCnt; i++)
+            {
+                if (fntOffsets[i] == 0)
+                    continue;
+                reader.Seek(fntOffsets[i]);
+                Font fnt = new Font();
+                fnt.Handle = i;
+                reader.Skip(18);
+                fnt.Name = reader.ReadYuniversalStop(32);
+                string fntSubName = reader.ReadYuniversalStop(32);
+                reader.Skip(22);
+                FontBank.Fonts.Add(fnt.Handle, fnt);
+            }
+        }
+
+        public void FinishParsing()
+        {
+            EditorFilename = FilePath + ".mfa";
+            AppHeader.AppWidth = (short)Frames[0].FrameHeader.Width;
+            AppHeader.AppHeight = (short)Frames[0].FrameHeader.Height;
+            AppHeader.GraphicMode = 3;
+            for (int i = 0; i < Frames.Count; i++)
+            {
+                if (string.IsNullOrEmpty(Frames[i].FrameName))
+                    Frames[i].FrameName = "Frame " + (i + 1);
+                Frames[i].Handle = i;
+                Frames[i].FrameHeader.FrameFlags.Value = 32800;
+            }
+            AppHeader.Flags.Value = 4294944001;
+            AppHeader.NewFlags.Value = 2048;
+            AppHeader.OtherFlags.Value = 4294951041;
+            AppHeader.OtherFlags["Direct3D9or11"] = false;
+            AppHeader.OtherFlags["Direct3D8or11"] = false;
+            ExtendedHeader.Flags.Value = 3288334336;
+            ExtendedHeader.CompressionFlags.Value = 1049120;
+        }
+
+        public override void CliUpdate()
+        {
+            AnsiConsole.Progress().Start(ctx =>
+            {
+                ProgressTask? mainTask = ctx.AddTask("[DeepSkyBlue3]Reading Klik n Play game.[/]");
+                mainTask.Value = 0;
+                mainTask.MaxValue = 1;
+
+                while (!mainTask.IsFinished)
+                {
+                    if (Finished)
+                        mainTask.Value = 1;
+                }
+            });
+        }
+    }
+}

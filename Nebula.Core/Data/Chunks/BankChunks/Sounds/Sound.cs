@@ -9,9 +9,10 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
         public int Checksum;
         public uint References;
         public BitDict Flags = new BitDict( // Flags
-            "Check", "", "", "", "", "Decompressed", // Decompressed
-            "", "", "HasName",                  // Has Name (Android Only?)
-            "", "", "", "", "", "NameCrop"      // Name Crop
+            "Check",                        // Will not compile exes if off
+            "", "", "", "", "Decompressed", // Decompressed
+            "", "", "HasName",              // Has Name (Android Only?)
+            "", "", "", "", "", "NameCrop"  // Name Crop
         );
         public int Frequency;
         public string Name = string.Empty;

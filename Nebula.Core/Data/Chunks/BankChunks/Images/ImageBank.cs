@@ -77,11 +77,11 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
         {
             writer.WriteInt(GraphicMode);
             writer.WriteShort(PaletteVersion);
-            writer.WriteShort(PaletteEntries);
+            writer.WriteShort((short)Palette.Count);
             foreach (Color col in Palette)
                 writer.WriteColor(col);
 
-            writer.WriteInt(ImageCount);
+            writer.WriteInt(Images.Count);
             foreach (Image img in Images.Values)
                 img.WriteMFA(writer);
         }

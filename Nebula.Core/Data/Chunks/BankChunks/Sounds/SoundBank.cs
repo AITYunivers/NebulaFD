@@ -21,9 +21,8 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
                 Count = reader.ReadShort();
             }
             else
-            {
                 Count = reader.ReadInt();
-            }
+
             for (int i = 0; i < Count; i++)
             {
                 Sound snd = new Sound();
@@ -51,7 +50,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteInt(Count);
+            writer.WriteInt(Sounds.Count);
             foreach (Sound snd in Sounds.Values)
                 snd.WriteMFA(writer);
         }

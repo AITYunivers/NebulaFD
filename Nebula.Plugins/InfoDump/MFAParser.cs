@@ -216,7 +216,7 @@ namespace GameDumper
             {
                 writer.WriteUInt((uint)(offsetEnd + frameWriter.Tell()));
                 Frame frm = dat.Frames[i];
-                if (!NebulaCore.MFA)
+                if (!NebulaCore.MFA && NebulaCore.Fusion >= 1.0f)
                     frm.Handle = dat.FrameHandles.IndexOf((short)i);
                 frm.WriteMFA(frameWriter);
             }
@@ -296,6 +296,8 @@ namespace GameDumper
                 graphics.Clear(Color.FromArgb(255, frm.FrameHeader.Background));
                 foreach (FrameInstance inst in frm.FrameInstances.Instances)
                 {
+                    if (!NebulaCore.PackageData.FrameItems.Items.ContainsKey((int)inst.ObjectInfo))
+                        continue;
                     ObjectInfo oi = NebulaCore.PackageData.FrameItems.Items[(int)inst.ObjectInfo];
                     Image? img = null;
                     float alpha = 0f;

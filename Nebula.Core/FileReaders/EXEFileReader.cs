@@ -50,6 +50,10 @@ namespace Nebula.Core.FileReaders
                     _icons.TryAdd(icon.Width == 48 ? 64 : icon.Width, icon.ToBitmap());
             }
 
+            if (_icons.Count == 0)
+                foreach (var icon in icos)
+                    _icons.TryAdd(icon.Width == 48 ? 64 : icon.Width, icon.ToBitmap());
+
             // 32-Bit 16x16
             if (!_icons.ContainsKey(16))
                 _icons.Add(16, _icons[getLargestIcon()].ResizeImage(new Size(16, 16)));
@@ -86,37 +90,19 @@ namespace Nebula.Core.FileReaders
             var sig = exeReader.ReadAscii(2);
             if (sig != "MZ")
                 Logger.Log(this, "Invalid executable signature", 2, ConsoleColor.Red);
-
+            exeReader.Seek(7);
+            uint position = exeReader.ReadUInt();
             exeReader.Seek(60);
-            var hdrOffset = exeReader.ReadUInt16();
+            var hdrOffset = exeReader.ReadUShort();
             exeReader.Seek(hdrOffset + 6);
-            var numOfSections = exeReader.ReadUInt16();
+            var numOfSections = exeReader.ReadUShort();
             exeReader.Skip(240);
 
-            var position = 0;
             for (var i = 0; i < numOfSections; i++)
             {
-                var entry = exeReader.Tell();
-                var sectionName = exeReader.ReadAscii();
-
-                if (sectionName == ".extra")
-                {
-                    exeReader.Seek(entry + 20);
-                    position = (int)exeReader.ReadUInt32(); //Pointer to raw data
-                    break;
-                }
-
-                if (i >= numOfSections - 1)
-                {
-                    exeReader.Seek(entry + 16);
-                    var size = exeReader.ReadInt();
-                    var address = exeReader.ReadInt(); //Pointer to raw data
-
-                    position = (int)(address + size);
-                    break;
-                }
-
-                exeReader.Seek(entry + 40);
+                exeReader.Skip(16);
+                position += exeReader.ReadUInt();
+                exeReader.Skip(20);
             }
 
             exeReader.Seek(position);

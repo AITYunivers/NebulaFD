@@ -152,7 +152,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
             Dictionary<uint, MFAObjectInfo> objectInfos = new Dictionary<uint, MFAObjectInfo>();
             foreach (FrameInstance instance in FrameInstances.Instances)
-                if (!objectInfos.ContainsKey(instance.ObjectInfo))
+                if (!objectInfos.ContainsKey(instance.ObjectInfo) && NebulaCore.PackageData.FrameItems.Items.ContainsKey((int)instance.ObjectInfo))
                 {
                     MFAObjectInfo newOI = new MFAObjectInfo();
                     ObjectInfo oI = NebulaCore.PackageData.FrameItems.Items[(int)instance.ObjectInfo];

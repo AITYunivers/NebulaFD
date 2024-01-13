@@ -31,7 +31,10 @@ namespace Nebula.Core.Memory
             long start = exeReader.Tell();
             byte[] data = exeReader.ReadBytes();
             byte[] new_data = buf;
-            int bytesread = TinyInflate.TinyInflateOLD.tinf_uncompress(buf, ref decompressed_size, data, (uint)data.Length);
+            //ulong crc_ret = 0;
+            long bytesread = 0;
+            bytesread = TinyInflateOLD.TinyInflateOLD.tinf_uncompress(buf, ref decompressed_size, data, (uint)data.Length);
+            //bytesread = TinyInflate.tinflate(data, data.Length, ref new_data, decompressed_size, ref crc_ret);
             exeReader.Seek(start + bytesread);
             if (decompressed_size != saved_size)
                 throw new Exception($"Decompression failed ({saved_size}, {decompressed_size})");

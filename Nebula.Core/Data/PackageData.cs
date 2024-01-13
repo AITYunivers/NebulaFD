@@ -22,8 +22,8 @@ namespace Nebula.Core.Data
         public string Header = string.Empty;
         public short RuntimeVersion;
         public short RuntimeSubversion;
-        public int ProductVersion;
-        public int ProductBuild;
+        public int ProductVersion = 2;
+        public int ProductBuild = 295;
 
         public AppHeader AppHeader = new();                 // 0x2223
         public string AppName = string.Empty;               // 0x2224

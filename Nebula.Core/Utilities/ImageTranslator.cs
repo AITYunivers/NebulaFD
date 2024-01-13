@@ -549,5 +549,56 @@ namespace Nebula.Core.Utilities
             Array.Resize(ref colorArray, position);
             return colorArray;
         }
+        public static byte[] ColorPaletteToRGBA(byte[] imageData, int width, int height, List<Color> palette, Color transparent, bool RLE)
+        {
+            byte[] colorArray = new byte[width * height * 4];
+            int stride = width * 4;
+            int position = 0;
+            int command = imageData[position];
+            bool rleLoop = false;
+            bool rleCommander = false;
+            if (RLE)
+                position++;
+
+            Color rgb = Color.White;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    if (!RLE || !rleLoop || rleCommander)
+                    {
+                        rgb = palette[imageData[position++]];
+                        rleLoop = true;
+                    }
+
+                    int newPos = (y * stride) + (x * 4);
+                    colorArray[newPos + 2] = rgb.R;
+                    colorArray[newPos + 1] = rgb.G;
+                    colorArray[newPos + 0] = rgb.B;
+                    colorArray[newPos + 3] = 255;
+                    if (colorArray[newPos + 2] == transparent.R &&
+                        colorArray[newPos + 1] == transparent.G &&
+                        colorArray[newPos + 0] == transparent.B)
+                        colorArray[newPos + 3] = 0;
+
+                    if (RLE && --command == 0)
+                    {
+                        command = imageData[position++];
+                        rleCommander = false;
+                        rleLoop = false;
+
+                        if (command > 128)
+                        {
+                            command -= 128;
+                            rleCommander = true;
+                        }
+                        else if (command == 0)
+                            rleLoop = true;
+                    }
+                }
+            }
+
+            return colorArray;
+        }
     }
 }

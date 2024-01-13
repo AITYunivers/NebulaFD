@@ -9,7 +9,7 @@ namespace Nebula.Core.FileReaders
         public void Read(ByteReader reader)
         {
             if (reader.PeekInt() == 2004318071)
-                reader.Skip(28);        // Multimedia Fusion 2 or above
+                reader.Skip(28); // Multimedia Fusion 2 or above
             else if (reader.PeekInt() == 32639 || reader.PeekInt() == 8748)
             {
                 NebulaCore.Fusion = 1.5f; // Multimedia Fusion 1.5
@@ -20,6 +20,8 @@ namespace Nebula.Core.FileReaders
                 NebulaCore.Fusion = 1.1f; // The Games Factory
                 NebulaCore._unicode = false;
             }
+            else
+                reader.Skip(28); // Click Protector
 
             if (NebulaCore.Fusion > 1.5f)
             {

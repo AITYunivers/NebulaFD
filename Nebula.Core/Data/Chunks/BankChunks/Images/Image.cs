@@ -41,6 +41,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
         public byte[] ImageData = new byte[0];
         private Bitmap? BitmapCache = null;
         public bool IsFromBitmap;
+        public List<Color> Palette = new List<Color>();
 
         public BitDict Flags = new BitDict(new string[]
         {
@@ -118,6 +119,9 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                         break;
                     case 9:
                         colorArray = ImageTranslator.FlashToRGBA(ImageData, Width, Height);
+                        break;
+                    case 255:
+                        colorArray = ImageTranslator.ColorPaletteToRGBA(ImageData, Width, Height, Palette, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                         break;
                 }
 
@@ -278,6 +282,11 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                     break;
                 case 9:
                     ImageData = ImageTranslator.FlashToRGBA(ImageData, Width, Height);
+                    ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"]);
+                    GraphicMode = 4;
+                    break;
+                case 255:
+                    ImageData = ImageTranslator.ColorPaletteToRGBA(ImageData, Width, Height, Palette, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                     ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"]);
                     GraphicMode = 4;
                     break;

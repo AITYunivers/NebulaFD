@@ -71,7 +71,7 @@ namespace Nebula.Plugins.GameDumper
                 graphics.Clear(Color.FromArgb(layer < 1 ? 255 : 0, frm.FrameHeader.Background));
                 foreach (FrameInstance inst in frm.FrameInstances.Instances)
                 {
-                    if (layer != -1 && layer != inst.Layer)
+                    if ((layer != -1 && layer != inst.Layer) || !NebulaCore.PackageData.FrameItems.Items.ContainsKey((int)inst.ObjectInfo))
                         continue;
                     ObjectInfo oi = NebulaCore.PackageData.FrameItems.Items[(int)inst.ObjectInfo];
                     Image? img = null;
