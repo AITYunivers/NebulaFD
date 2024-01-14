@@ -5,12 +5,10 @@ using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 using Spectre.Console;
 using System.Drawing;
-using System.Media;
 using System.Text;
 using Color = System.Drawing.Color;
-using Image = Nebula.Core.Data.Chunks.BankChunks.Images.Image;
 using Font = Nebula.Core.Data.Chunks.BankChunks.Fonts.Font;
-using Size = Spectre.Console.Size;
+using Image = Nebula.Core.Data.Chunks.BankChunks.Images.Image;
 
 #pragma warning disable CS8602
 namespace Nebula.Core.Data.PackageReaders

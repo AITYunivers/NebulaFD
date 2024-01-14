@@ -31,7 +31,7 @@ namespace GameDumper
             PackageData dat = NebulaCore.PackageData;
             string path = "Dumps\\" + Utilities.ClearName(dat.AppName) + "\\";
             Directory.CreateDirectory(path);
-            ByteWriter writer = new ByteWriter(new FileStream(path + Utilities.ClearName(Path.GetFileName(dat.EditorFilename)), FileMode.Create));
+            ByteWriter writer = new ByteWriter(new FileStream(path + Utilities.ClearName(Path.GetFileName(string.IsNullOrEmpty(dat.EditorFilename) ? dat.AppName + ".mfa" : dat.EditorFilename)), FileMode.Create));
 
             IconBank.GraphicMode = dat.ImageBank.GraphicMode = dat.AppHeader.GraphicMode;
             IconBank.PaletteVersion = dat.ImageBank.PaletteVersion = dat.Frames.First().FramePalette.PaletteVersion;

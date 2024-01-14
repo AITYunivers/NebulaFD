@@ -31,6 +31,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         public FrameEffects FrameEffects = new();             // 0x3349
 
         public MFAFrameInfo MFAFrameInfo = new();
+        public Bitmap? BitmapCache = null;
 
         public Frame()
         {
