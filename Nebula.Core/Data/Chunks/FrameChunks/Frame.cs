@@ -225,7 +225,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                                 2 => new MFAActive(),
                                 3 => new MFAString(),
                                 4 => new MFAQNA(),
-                                6 => new MFACounterAlt(),
+                                5 or 6 => new MFACounterAlt(),
                                 7 => new MFACounter(),
                                 8 => new MFAFormattedText(),
                                 9 => new MFASubApplication(),

@@ -1,4 +1,5 @@
 ﻿using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 
 namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
 {
@@ -15,6 +16,9 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            if (Parameters.DontIncludeSounds)
+                return;
+
             if (NebulaCore.Android || NebulaCore.iOS || NebulaCore.Flash || NebulaCore.HTML)
             {
                 reader.Skip(2);

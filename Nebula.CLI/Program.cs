@@ -23,6 +23,7 @@ namespace Nebula
             }
 
             NebulaCore.Init();
+            
             SpectreMain();
         }
 

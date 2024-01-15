@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,10 +6,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64</Platforms>
+    <ApplicationIcon>Resources\AppIcon.ico</ApplicationIcon>
+    <AssemblyName>Nebula</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Program.cs~RFd458c7.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\AppIcon.ico" />
   </ItemGroup>
 
   <ItemGroup>

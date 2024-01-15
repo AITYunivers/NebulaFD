@@ -179,24 +179,38 @@ namespace Nebula.Core.Utilities
 
             return colorArray;
         }
-        public static byte[] Normal15BitToRGBA(byte[] imageData, int width, int height, bool alpha, Color transparent)
+        public static byte[] Normal15BitToRGBA(byte[] imageData, int width, int height, bool alpha, Color transparent, bool RLE)
         {
             byte[] colorArray = new byte[width * height * 4];
             int stride = width * 4;
             int pad = GetPadding(width, 2);
             int position = 0;
+            int command = imageData[position];
+            bool rleLoop = false;
+            bool rleCommander = false;
+            if (RLE)
+                position++;
+
+            byte r = 0;
+            byte g = 0;
+            byte b = 0;
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    ushort newShort = (ushort)(imageData[position] | imageData[position + 1] << 8);
-                    byte r = (byte)((newShort & 31744) >> 10);
-                    byte g = (byte)((newShort & 992) >> 5);
-                    byte b = (byte)((newShort & 31));
+                    if (!RLE || !rleLoop || rleCommander)
+                    {
+                        ushort newShort = (ushort)(imageData[position++] | imageData[position++] << 8);
+                        r = (byte)((newShort & 31744) >> 10);
+                        g = (byte)((newShort & 992) >> 5);
+                        b = (byte)((newShort & 31));
 
-                    r = (byte)(r << 3);
-                    g = (byte)(g << 3);
-                    b = (byte)(b << 3);
+                        r = (byte)(r << 3);
+                        g = (byte)(g << 3);
+                        b = (byte)(b << 3);
+                        rleLoop = true;
+                    }
+
                     int newPos = (y * stride) + (x * 4);
                     colorArray[newPos + 2] = r;
                     colorArray[newPos + 1] = g;
@@ -209,7 +223,21 @@ namespace Nebula.Core.Utilities
                             colorArray[newPos + 0] == transparent.B)
                             colorArray[newPos + 3] = 0;
                     }
-                    position += 2;
+
+                    if (RLE && --command == 0)
+                    {
+                        command = imageData[position++];
+                        rleCommander = false;
+                        rleLoop = false;
+
+                        if (command > 128)
+                        {
+                            command -= 128;
+                            rleCommander = true;
+                        }
+                        else if (command == 0)
+                            rleLoop = true;
+                    }
                 }
 
                 position += pad * 2;

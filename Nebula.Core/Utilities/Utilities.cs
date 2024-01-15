@@ -142,14 +142,14 @@ namespace Nebula.Core.Utilities
         public static Bitmap MakeFrameImg(Frame frm, int layer = -1, bool showHiddenObjects = false, bool useFrameSize = true)
         {
             Bitmap output;
-            if (useFrameSize || frm.BitmapCache == null)
+            if (useFrameSize || frm.BitmapCache == null && layer == -1)
                 output = new Bitmap(frm.FrameHeader.Width, frm.FrameHeader.Height);
             else
                 output = new Bitmap(NebulaCore.PackageData.AppHeader.AppWidth, NebulaCore.PackageData.AppHeader.AppHeight);
             Rectangle destRect;
             using (Graphics graphics = Graphics.FromImage(output))
             {
-                if (frm.BitmapCache != null)
+                if (frm.BitmapCache != null && layer == -1)
                     graphics.DrawImageUnscaled(frm.BitmapCache, 0, 0);
                 else
                 {
@@ -220,7 +220,7 @@ namespace Nebula.Core.Utilities
                     }
                 }
             }
-            if (frm.BitmapCache == null)
+            if (frm.BitmapCache == null && layer == -1)
             {
                 frm.BitmapCache = output;
                 if (!useFrameSize)

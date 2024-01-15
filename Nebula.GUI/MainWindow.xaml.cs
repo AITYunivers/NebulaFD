@@ -90,7 +90,7 @@ namespace Nebula.GUI
         private void Interface_PostRead()
         {
             PackageData data = NebulaCore.PackageData;
-            for (int i = 0; i < data.Frames.Count; i++)
+            /*for (int i = 0; i < data.Frames.Count; i++)
             {
                 TreeViewItem tVI = new TreeViewItem();
                 tVI.Header = data.Frames[i].FrameName;
@@ -98,10 +98,25 @@ namespace Nebula.GUI
                 tVI.Tag = i;
                 tVI.Selected += TV_FrameSelected;
                 TV_Frames.Items.Add(tVI);
-            }
+            }*/
 
             FrameView.Header = data.Frames.First().FrameName;
             FrameView.Content = FrameView_CreateView(data.Frames.First());
+
+            loadingFrameListSelected = true;
+            Task frmsListTask = new Task(() =>
+            {
+                foreach (Frame frm in NebulaCore.PackageData.Frames)
+                    if (frm.BitmapCache == null)
+                        Utilities.MakeFrameImg(frm);
+
+                Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate ()
+                {
+                    FramesListView.Content = FramesList_CreateView();
+                    loadingFrameListSelected = false;
+                }));
+            });
+            frmsListTask.Start();
         }
 
         private Grid FrameView_CreateView(Frame frm)
@@ -128,6 +143,10 @@ namespace Nebula.GUI
             trn.Children.Add(trnsl);
             viewbox.RenderTransform = trn;
 
+            Grid frmGrid = new Grid();
+            frmGrid.HorizontalAlignment = HorizontalAlignment.Stretch;
+            frmGrid.VerticalAlignment = VerticalAlignment.Stretch;
+
             Rectangle bounds = new Rectangle();
             bounds.Fill = new SolidColorBrush(Color.FromArgb(255,
                                                              frm.FrameHeader.Background.R,
@@ -137,7 +156,9 @@ namespace Nebula.GUI
             bounds.Height = frm.FrameHeader.Height;
             bounds.HorizontalAlignment = HorizontalAlignment.Center;
             bounds.VerticalAlignment = VerticalAlignment.Center;
-            viewbox.Child = bounds;
+
+            frmGrid.Children.Add(bounds);
+            viewbox.Child = frmGrid;
             grid.Children.Add(viewbox);
             return grid;
         }
@@ -215,16 +236,18 @@ namespace Nebula.GUI
             if (NebulaCore.PackageData == null || NebulaCore.PackageData.Frames.Count == 0) return new Grid();
             Grid grid = new Grid();
             grid.ClipToBounds = true;
+            grid.Margin = new Thickness(-3);
 
             ListBox listBox = new ListBox();
             listBox.Background = Brushes.Transparent;
+            listBox.BorderThickness = new Thickness(0);
             grid.Children.Add(listBox);
 
             foreach (Frame frm in NebulaCore.PackageData.Frames)
             {
                 ListBoxItem lBI = new ListBoxItem();
                 lBI.Height = 90;
-                lBI.BorderBrush = TV_Main.BorderBrush;
+                lBI.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF957FEF"));
                 lBI.BorderThickness = new Thickness(0, 0, 0, 1);
 
                 Grid lBIGrid = new Grid();

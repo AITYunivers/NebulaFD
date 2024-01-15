@@ -19,7 +19,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            while (true)
+            while (reader.HasMemory(8))
             {
                 Chunk newChunk = InitChunk(reader);
                 Logger.Log(this, $"Reading Object Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
@@ -27,8 +27,6 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
                 ByteReader chunkReader = new ByteReader(newChunk.ChunkData!);
                 newChunk.ReadCCN(chunkReader, this);
                 newChunk.ChunkData = null;
-                if (newChunk.ChunkID == 0x7F7F)
-                    break;
             }
         }
 

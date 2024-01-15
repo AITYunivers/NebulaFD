@@ -5,26 +5,40 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Nebula.GUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Background="#FF262626" Foreground="#FFE6E8E6" AllowDrop="True">
+        Title="Nebula" Height="450" Width="800" Background="#FF262626" Foreground="#FFE6E8E6" AllowDrop="True" Icon="/Resources/AppIcon.png">
     <Grid AllowDrop="True" Drop="Nebula_DropFile">
         <Grid.RowDefinitions>
             <RowDefinition Height="19"/>
             <RowDefinition Height="209*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="189*"/>
+            <ColumnDefinition Width="40"/>
             <ColumnDefinition Width="611*"/>
         </Grid.ColumnDefinitions>
-        <TreeView x:Name="TV_Main" Background="{x:Null}" BorderBrush="#FF957FEF" Foreground="#FFE6D3F1" Grid.RowSpan="1" Grid.Row="1" BorderThickness="0,0,1,0">
+        <!--<TreeView x:Name="TV_Main" Background="{x:Null}" BorderBrush="#FF957FEF" Foreground="#FFE6D3F1" Grid.RowSpan="1" Grid.Row="1" BorderThickness="0,0,1,0">
             <TreeView.Resources>
                 <SolidColorBrush Color="#30FFFFFF" x:Key="{x:Static SystemColors.HighlightBrushKey}"/>
                 <SolidColorBrush Color="#15FFFFFF" x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"/>
             </TreeView.Resources>
             <TreeViewItem Header="App Info" Foreground="#FFE6E8E6"/>
             <TreeViewItem x:Name="TV_Frames" Header="Frames" Foreground="#FFE6E8E6" Selected="TV_FrameListSelected">
-                <!--<TreeViewItem Header="Example Frame" Foreground="#FFE6E8E6"/>-->
+                <TreeViewItem Header="Example Frame" Foreground="#FFE6E8E6"/>
             </TreeViewItem>
-        </TreeView>
+        </TreeView>-->
+        <ListBox Grid.Row="1" Background="{x:Null}" BorderThickness="0,0,1,0" BorderBrush="#FF957FEF">
+            <ListBoxItem Height="30" Width="35" ToolTip="Home">
+                <Image Source="/Resources/HomeIcon.png"/>
+            </ListBoxItem>
+            <ListBoxItem Height="30" Width="35" ToolTip="App Info">
+                <Image Source="/Resources/InfoIcon.png"/>
+            </ListBoxItem>
+            <ListBoxItem Height="30" Width="35" ToolTip="Frames">
+                <Image Source="/Resources/FramesIcon.png"/>
+            </ListBoxItem>
+        </ListBox>
+        <Button Grid.Row="1" Width="30" Height="35" VerticalAlignment="Bottom" HorizontalAlignment="Center" Background="{x:Null}" BorderBrush="{x:Null}">
+            <Image Source="/Resources/SettingIcon.png" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+        </Button>
         <Menu Grid.Column="0" Foreground="#FFE6E8E6" Grid.RowSpan="1" Grid.ColumnSpan="2" BorderBrush="#FF957FEF" BorderThickness="0,0,0,1">
             <Menu.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -33,6 +47,25 @@
                 </LinearGradientBrush>
             </Menu.Background>
 
+            <!--<MenuItem x:Name="Back_Button" Padding="0,0,0,0" BorderThickness="0,0,0,0" Margin="0,-3,-5,-3">
+                <MenuItem.Icon>
+                    <Image Source="Resources/ArrowBtn.png" Stretch="None"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem x:Name="Forward_Button" Padding="0,0,0,0" BorderThickness="0,0,0,0" Margin="0,-3,-5,-3">
+                <MenuItem.Icon>
+                    <Image Source="Resources/ArrowBtn.png" Stretch="None" RenderTransformOrigin="0.5,0.5">
+                        <Image.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleX="-1"/>
+                                <SkewTransform/>
+                                <RotateTransform/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </Image.RenderTransform>
+                    </Image>
+                </MenuItem.Icon>
+            </MenuItem>-->
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Foreground="Black"/>
                 <MenuItem Header="_Close" Foreground="Black"/>
@@ -40,7 +73,7 @@
             </MenuItem>
         </Menu>
         <TabControl Grid.Column="1" Grid.Row="1" Background="{x:Null}" Foreground="#FFE6E8E6" BorderBrush="#FF957FEF" BorderThickness="0,1,0,0">
-            <TabItem x:Name="FrameView" Header="Frame" Background="{x:Null}" Foreground="#FFE6E8E6" BorderBrush="#FF957FEF">
+            <TabItem x:Name="FrameView" Header="Frame" Background="{x:Null}" Foreground="#FFE6E8E6" BorderBrush="#FF957FEF" Visibility="Collapsed">
                 <Grid MouseWheel="FrameView_OnScroll" MouseMove="FrameView_MoveView" ClipToBounds="True" MouseLeave="FrameView_ResetMouse">
                     <Viewbox RenderTransformOrigin="0.5,0.5">
                         <Viewbox.RenderTransform>
@@ -56,11 +89,11 @@
                 </Grid>
             </TabItem>
             <TabItem x:Name="FramesListView" Header="Frame List" Background="{x:Null}" Foreground="#FFE6E8E6" BorderBrush="#FF957FEF">
-                <Grid ClipToBounds="True">
-                    <ListBox Background="{x:Null}">
+                <Grid ClipToBounds="True" Margin="-2,-2,-2,-2">
+                    <ListBox Background="{x:Null}" BorderThickness="0,0,0,0">
                         <!--<ListBoxItem Height="90" BorderBrush="#FF957FEF" BorderThickness="0,0,0,1">
                             <Grid>
-                                <Image Source="/02-title.png" Width="130" Stretch="Fill" Height="82" HorizontalAlignment="Left" Margin="3,0,0,0"/>
+                                <Image Source="" Width="130" Stretch="Fill" Height="82" HorizontalAlignment="Left" Margin="3,0,0,0"/>
                                 <Label Content="Example Frame" Foreground="#FFE6E8E6" Padding="140,0,0,0" FontSize="16"/>
                                 <Label Content="640x480" Foreground="#90E6E8E6" Padding="140,22,0,0" FontSize="12"/>
                             </Grid>

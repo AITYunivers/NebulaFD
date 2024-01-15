@@ -1,4 +1,5 @@
 ﻿using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 using System.Drawing;
 
 namespace Nebula.Core.Data.Chunks.BankChunks.Images
@@ -26,6 +27,9 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             NebulaCore.PackageData.ImageBank = this;
+
+            if (Parameters.DontIncludeImages)
+                return;
 
             LoadedImageCount = 0;
             TaskManager.Clear();

@@ -40,10 +40,7 @@ namespace Nebula
                 else
                     return 0;
             }
-            set
-            {
-
-            }
+            set {}
         }
 
         public static int Build;
@@ -51,7 +48,6 @@ namespace Nebula
         public static bool Unicode => _unicode != null && _unicode == true;
 
         public static string FilePath = string.Empty;
-        public static string Parameters = string.Empty;
         public static IFileReader? CurrentReader;
         public static PackageData PackageData => CurrentReader.getPackageData();
 

@@ -189,7 +189,7 @@ namespace Nebula.Core.Data.PackageReaders
                 reader.Skip(6);
                 img.Handle = i;
                 int imgSize = reader.ReadInt();
-                img.Width = (short)(Math.Ceiling(reader.ReadShort() / 2.0f) * 2);
+                img.Width = reader.ReadShort();
                 img.Height = reader.ReadShort();
                 reader.Skip(2);
                 img.HotspotX = reader.ReadShort();
@@ -198,8 +198,7 @@ namespace Nebula.Core.Data.PackageReaders
                 img.ActionPointY = reader.ReadShort();
                 img.ImageData = reader.ReadBytes(imgSize);
                 img.TransparentColor = Color.Black;
-                img.GraphicMode = 255;
-                img.Palette = Frames[0].FramePalette.Palette;
+                img.GraphicMode = 3;
                 img.Flags["RLE"] = true;
                 ImageBank.Images.Add(img.Handle, img);
             }

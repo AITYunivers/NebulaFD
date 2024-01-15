@@ -23,7 +23,8 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
             {
                 ObjectInfo newOI = new ObjectInfo();
                 newOI.ReadCCN(reader);
-                Items.Add(newOI.Header.Handle, newOI);
+                if (!Items.ContainsKey(newOI.Header.Handle))
+                    Items.Add(newOI.Header.Handle, newOI);
             }
 
             NebulaCore.PackageData.FrameItems = this;

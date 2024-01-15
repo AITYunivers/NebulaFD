@@ -6,18 +6,29 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <AssemblyName>Nebula GUI</AssemblyName>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="02-title.png" />
-  </ItemGroup>
-
+	<ItemGroup>
+		<None Remove="Resources\AppIcon.png" />
+		<None Remove="Resources\ArrowBtn.png" />
+		<None Remove="Resources\FramesIcon.png" />
+		<None Remove="Resources\HomeIcon.png" />
+		<None Remove="Resources\InfoIcon.png" />
+		<None Remove="Resources\SettingIcon.png" />
+	</ItemGroup>
+	
   <ItemGroup>
     <ProjectReference Include="..\Nebula.Core\Nebula.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="02-title.png" />
+    <Resource Include="Resources\AppIcon.png" />
+    <Resource Include="Resources\ArrowBtn.png" />
+    <Resource Include="Resources\FramesIcon.png" />
+    <Resource Include="Resources\HomeIcon.png" />
+    <Resource Include="Resources\InfoIcon.png" />
+    <Resource Include="Resources\SettingIcon.png" />
   </ItemGroup>
 
 </Project>

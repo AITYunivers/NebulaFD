@@ -90,19 +90,28 @@ namespace Nebula.Core.FileReaders
             var sig = exeReader.ReadAscii(2);
             if (sig != "MZ")
                 Logger.Log(this, "Invalid executable signature", 2, ConsoleColor.Red);
-            exeReader.Seek(7);
-            uint position = exeReader.ReadUInt();
             exeReader.Seek(60);
             var hdrOffset = exeReader.ReadUShort();
             exeReader.Seek(hdrOffset + 6);
             var numOfSections = exeReader.ReadUShort();
             exeReader.Skip(240);
 
+            uint position = 0;
             for (var i = 0; i < numOfSections; i++)
             {
-                exeReader.Skip(16);
-                position += exeReader.ReadUInt();
-                exeReader.Skip(20);
+                if (position == 0)
+                {
+                    exeReader.Skip(16);
+                    position += exeReader.ReadUInt();
+                    position += exeReader.ReadUInt();
+                    exeReader.Skip(16);
+                }
+                else
+                {
+                    exeReader.Skip(16);
+                    position += exeReader.ReadUInt();
+                    exeReader.Skip(20);
+                }
             }
 
             exeReader.Seek(position);
