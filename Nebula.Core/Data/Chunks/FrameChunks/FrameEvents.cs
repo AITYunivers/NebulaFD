@@ -1,6 +1,7 @@
 ﻿using Nebula.Core.Data.Chunks.FrameChunks.Events;
 using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
 using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks
 {
@@ -79,6 +80,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     long endPosition = reader.Tell() + reader.ReadInt();
                     if (NebulaCore.Android || NebulaCore.HTML)
                         reader.Skip(4);
+                    if (Parameters.DontIncludeEvents)
+                        reader.Seek(endPosition);
                     while (reader.Tell() < endPosition)
                     {
                         Event newEvent = new Event();

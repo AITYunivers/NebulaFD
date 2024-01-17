@@ -15,7 +15,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
         {
             long StartOffset = reader.Tell();
 
-            if (NebulaCore.Fusion < 2.0f)
+            if (NebulaCore.Fusion < 2.0f || NebulaCore.Fusion == 3)
                 return;
 
             Movements = new ObjectMovement[reader.ReadInt()];

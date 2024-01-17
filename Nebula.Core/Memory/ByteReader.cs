@@ -187,17 +187,21 @@ namespace Nebula.Core.Memory
                 return ReadAsciiStop(len);
         }
 
-        public Color ReadColor(bool bgr = false)
+        public Color ReadColor(int type = 0)
         {
             var r = ReadByte();
             var g = ReadByte();
             var b = ReadByte();
             var a = ReadByte();
 
-            if (bgr)
-                return Color.FromArgb(a, b, g, r);
-            else
-                return Color.FromArgb(a, r, g, b);
+            switch (type)
+            {
+                case 0:
+                default: // RGBA
+                    return Color.FromArgb(a, r, g, b);
+                case 1: // BGRA
+                    return Color.FromArgb(a, b, g, r);
+            }
         }
 
         public override byte[] ReadBytes(int count = -1)

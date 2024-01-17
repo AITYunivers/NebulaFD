@@ -1,12 +1,6 @@
 ﻿using Nebula.Core.Data.Chunks.FrameChunks;
-using Nebula.Core.Data.Chunks.ObjectChunks;
-using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using Nebula.Core.Utilities;
 using Spectre.Console;
-using System.Drawing;
-using System.Drawing.Imaging;
-using Color = System.Drawing.Color;
-using Image = Nebula.Core.Data.Chunks.BankChunks.Images.Image;
 
 namespace Nebula.Plugins.GameDumper
 {

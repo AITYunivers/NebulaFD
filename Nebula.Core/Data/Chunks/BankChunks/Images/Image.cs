@@ -108,7 +108,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                         if (NebulaCore.Android)
                             colorArray = ImageTranslator.AndroidMode4ToRGBA(ImageData, Width, Height, false);
                         else
-                            colorArray = ImageTranslator.Normal24BitMaskedToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"], NebulaCore.Fusion == 3f);
+                            colorArray = ImageTranslator.Normal24BitMaskedToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"], NebulaCore.Seeded);
                         break;
                     case 5:
                         colorArray = ImageTranslator.AndroidMode5ToRGBA(ImageData, Width, Height, Flags["Alpha"], Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
@@ -120,7 +120,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                         colorArray = ImageTranslator.Normal16BitToRGBA(ImageData, Width, Height, false, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                         break;
                     case 8:
-                        colorArray = ImageTranslator.TwoFivePlusToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], NebulaCore.Fusion == 3f);
+                        colorArray = ImageTranslator.TwoFivePlusToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], NebulaCore.Seeded);
                         break;
                     case 9:
                         colorArray = ImageTranslator.FlashToRGBA(ImageData, Width, Height);

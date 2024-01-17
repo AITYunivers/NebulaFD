@@ -198,7 +198,7 @@ namespace Nebula.Core.Utilities
                                         break;
                                     case 7: // Counter
                                         ObjectCounter cntr = oc.ObjectCounter;
-                                        Bitmap cntrImg = getCounterBmp(cntr, oc.ObjectValue);
+                                        Bitmap cntrImg = GetCounterBmp(cntr, oc.ObjectValue);
 
                                         if (cntr.DisplayType == 1)
                                         {
@@ -284,7 +284,7 @@ namespace Nebula.Core.Utilities
             { 'e', 13 },
         };
 
-        private static Bitmap getCounterBmp(ObjectCounter cntr, ObjectValue val)
+        public static Bitmap GetCounterBmp(ObjectCounter cntr, ObjectValue val)
         {
             Bitmap bmp = null;
             Graphics g = null;
@@ -292,7 +292,13 @@ namespace Nebula.Core.Utilities
             {
                 int width = 0;
                 int height = 0;
-                foreach (char c in val.Initial.ToString())
+                string value = val.Initial.ToString();
+
+                if (cntr.IntDigitPadding)
+                    for (int i = 0; i < cntr.IntDigitCount - val.Initial.ToString().Length; i++)
+                        value = '0' + value;
+
+                foreach (char c in value)
                 {
                     uint id = counterID[c];
                     Data.Chunks.BankChunks.Images.Image img = NebulaCore.PackageData.ImageBank.Images[cntr.Frames[id]];
@@ -302,7 +308,7 @@ namespace Nebula.Core.Utilities
                 bmp = new Bitmap(width, height);
                 g = Graphics.FromImage(bmp);
                 int? prevX = null;
-                foreach (char c in val.Initial.ToString().Reverse())
+                foreach (char c in value.Reverse())
                 {
                     uint id = counterID[c];
                     Data.Chunks.BankChunks.Images.Image img = NebulaCore.PackageData.ImageBank.Images[cntr.Frames[id]];

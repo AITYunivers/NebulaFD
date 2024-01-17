@@ -3,7 +3,6 @@ using Nebula.Core.Data.Chunks.BankChunks.Sounds;
 using Nebula.Core.Data.Chunks.FrameChunks;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
-using Spectre.Console;
 using System.Drawing;
 using System.Text;
 using Color = System.Drawing.Color;
@@ -16,10 +15,10 @@ namespace Nebula.Core.Data.PackageReaders
     public class KNPPackageData : PackageData
     {
         public string FilePath = string.Empty;
-        bool Finished = false;
 
-        public override void Read(ByteReader reader)
+        public override void Read()
         {
+            Reader = new ByteReader(new byte[1]);
             Logger.Log(this, $"Running {NebulaCore.BuildDate} build.");
             NebulaCore._unicode = false;
             NebulaCore.Fusion = 0.0f;
@@ -37,7 +36,6 @@ namespace Nebula.Core.Data.PackageReaders
                 ReadFontBank(new ByteReader(new MemoryStream(File.ReadAllBytes(FilePath + ".mtf"))));
 
             FinishParsing();
-            Finished = true;
         }
 
         public void ReadGameData(ByteReader reader)
@@ -47,10 +45,37 @@ namespace Nebula.Core.Data.PackageReaders
             AppName = reader.ReadYuniversalStop(80);
             Author = reader.ReadYuniversalStop(80);
             reader.Skip(80); // Company
-            reader.Skip(1146);
+            AppHeader.GraphicMode = reader.ReadShort();
+            AppHeader.AppWidth = reader.ReadShort();
+            AppHeader.AppHeight = reader.ReadShort();
+            AppHeader.BorderColor = reader.ReadColor();
+            AppHeader.Flags.Value = reader.ReadUInt(); // Default: 356
+            AppHeader.Flags["FitInside"] = false; // Panic Key (F5)
+            reader.Skip(4);
+            AppHeader.ControlType = new int[4];
+            AppHeader.ControlKeys = new int[4][];
+            for (int i = 0; i < 4; i++)
+                AppHeader.ControlType[i] = reader.ReadShort();
+            for (int i = 0; i < 4; i++)
+            {
+                AppHeader.ControlKeys[i] = new int[6];
+                for (int ii = 0; ii < 6; ii++)
+                    AppHeader.ControlKeys[i][ii] = reader.ReadShort();
+            }
+            AppHeader.InitLives = reader.ReadInt();
+            reader.Skip(8); // Lives Minimum and Maximum (Not in CTF2.5)
+            AppHeader.InitScore = reader.ReadInt();
+            reader.Skip(8); // Score Minimum and Maximum (Not in CTF2.5)
+            reader.Skip(4); // Offset to the start of Global Color Palette
+            reader.Skip(2); // Frame Count
+            reader.Skip(4); // Help File Type
+            for (int i = 0; i < 256; i++)
+                reader.Skip(4); // Frame Offset
+            for (int i = 0; i < 256; i++)
+                reader.Skip(2); // Frame Handle
             long iconOffset = reader.Tell();
-            reader.Skip(1024); // Icon?
-            reader.Skip(138);
+            reader.Skip(512); // Icon Data
+            reader.Skip(128);
             while (reader.HasMemory(256 * 4))
                 ReadFrameData(reader);
 
@@ -64,14 +89,16 @@ namespace Nebula.Core.Data.PackageReaders
             int StampSize = reader.ReadInt();
             reader.Skip(16);
             for (int i = 0; i < 256; i++)
-                frm.FramePalette.Palette.Add(reader.ReadColor(true));
+                frm.FramePalette.Palette.Add(reader.ReadColor(1));
             reader.Skip(StampSize);
             if (!reader.HasMemory(1)) return;
             reader.Skip(4);
             frm.FrameHeader.Width = reader.ReadShort();
             frm.FrameHeader.Height = reader.ReadShort();
             frm.FrameName = reader.ReadYuniversalStop(32);
-            reader.Skip(16);
+            frm.FramePassword = reader.ReadYuniversalStop(10);
+            reader.Skip(4);
+            frm.FrameHeader.FrameFlags.Value = reader.ReadUShort();
             long endOffset = reader.Tell() + reader.ReadUInt() - 36;
             reader.Skip(58);
             ushort ObjectCount = reader.ReadUShort();
@@ -94,11 +121,15 @@ namespace Nebula.Core.Data.PackageReaders
 
         public void ReadIconData(ByteReader reader)
         {
-            AppIcon.Icon = new Bitmap(32, 32);
-
-            for (int h = 0; h < AppIcon.Icon.Height; h++)
-                for (int w = 0; w < AppIcon.Icon.Width; w++)
-                    AppIcon.Icon.SetPixel(w, AppIcon.Icon.Width - 1 - h, Frames[0].FramePalette.Palette[reader.ReadByte()]);
+            Image img = new Image();
+            img.Handle = 0;
+            img.Width = 32;
+            img.Height = 32;
+            img.ImageData = reader.ReadBytes(490);
+            img.TransparentColor = Color.Black;
+            img.GraphicMode = 3;
+            img.Flags["RLE"] = true;
+            AppIcon.Icon = img.GetBitmap();
 
             NebulaCore.CurrentReader.Icons.Add(16,  AppIcon.Icon.ResizeImage(16));
             NebulaCore.CurrentReader.Icons.Add(32,  AppIcon.Icon);
@@ -233,9 +264,6 @@ namespace Nebula.Core.Data.PackageReaders
         public void FinishParsing()
         {
             EditorFilename = FilePath + ".mfa";
-            AppHeader.AppWidth = (short)Frames[0].FrameHeader.Width;
-            AppHeader.AppHeight = (short)Frames[0].FrameHeader.Height;
-            AppHeader.GraphicMode = 3;
             for (int i = 0; i < Frames.Count; i++)
             {
                 if (string.IsNullOrEmpty(Frames[i].FrameName))
@@ -250,22 +278,7 @@ namespace Nebula.Core.Data.PackageReaders
             AppHeader.OtherFlags["Direct3D8or11"] = false;
             ExtendedHeader.Flags.Value = 3288334336;
             ExtendedHeader.CompressionFlags.Value = 1049120;
-        }
-
-        public override void CliUpdate()
-        {
-            AnsiConsole.Progress().Start(ctx =>
-            {
-                ProgressTask? mainTask = ctx.AddTask("[DeepSkyBlue3]Reading Klik n Play game.[/]");
-                mainTask.Value = 0;
-                mainTask.MaxValue = 1;
-
-                while (!mainTask.IsFinished)
-                {
-                    if (Finished)
-                        mainTask.Value = 1;
-                }
-            });
+            Reader.Skip(1);
         }
     }
 }

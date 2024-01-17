@@ -11,6 +11,7 @@ using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using Nebula.Core.FileReaders;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
+using Spectre.Console;
 
 namespace Nebula.Core.Data
 {
@@ -64,7 +65,45 @@ namespace Nebula.Core.Data
         public FontBank FontBank = new();                   // 0x6667
         public SoundBank SoundBank = new();                 // 0x6668
 
-        public abstract void Read(ByteReader reader);
-        public abstract void CliUpdate();
+        public ByteReader Reader = new(new byte[0]);
+        public void Read(ByteReader reader)
+        {
+            Reader = reader;
+            Read();
+        }
+
+        public abstract void Read();
+        public void CliUpdate()
+        {
+            AnsiConsole.Progress().Start(ctx =>
+            {
+                ProgressTask? chunkReading = ctx.AddTask($"[{NebulaCore.ColorRules[4]}]Reading chunks[/]", false);
+                ProgressTask? imageReading = null;
+
+                while (!chunkReading.IsFinished)
+                {
+                    if (NebulaCore.Fusion == 1.1f)
+                        return;
+
+                    if (NebulaCore.PackageData != null && Reader != null && Reader.Size() > 0)
+                    {
+                        if (!chunkReading.IsStarted)
+                            chunkReading.StartTask();
+
+                        chunkReading.Value = Reader.Tell();
+                        chunkReading.MaxValue = Reader.Size();
+
+                        if (NebulaCore.PackageData.ImageBank.ImageCount > 0)
+                        {
+                            if (imageReading == null)
+                                imageReading = ctx.AddTask($"[{NebulaCore.ColorRules[4]}]Reading images[/]", true);
+
+                            imageReading.Value = Chunks.BankChunks.Images.ImageBank.LoadedImageCount;
+                            imageReading.MaxValue = NebulaCore.PackageData.ImageBank.ImageCount;
+                        }
+                    }
+                }
+            });
+        }
     }
 }

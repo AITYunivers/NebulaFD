@@ -25,20 +25,20 @@
                 <TreeViewItem Header="Example Frame" Foreground="#FFE6E8E6"/>
             </TreeViewItem>
         </TreeView>-->
-        <ListBox Grid.Row="1" Background="{x:Null}" BorderThickness="0,0,1,0" BorderBrush="#FF957FEF">
+        <ListBox Grid.Row="1" Background="{x:Null}" BorderThickness="0,0,1,0" BorderBrush="#FF957FEF" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
             <ListBoxItem Height="30" Width="35" ToolTip="Home">
-                <Image Source="/Resources/HomeIcon.png"/>
+                <Image Source="/Resources/HomeIcon.png" MouseLeftButtonDown="Interface_OpenHomeTab"/>
             </ListBoxItem>
             <ListBoxItem Height="30" Width="35" ToolTip="App Info">
                 <Image Source="/Resources/InfoIcon.png"/>
             </ListBoxItem>
             <ListBoxItem Height="30" Width="35" ToolTip="Frames">
-                <Image Source="/Resources/FramesIcon.png"/>
+                <Image Source="/Resources/FramesIcon.png" MouseLeftButtonDown="Interface_OpenFramesList"/>
             </ListBoxItem>
         </ListBox>
-        <Button Grid.Row="1" Width="30" Height="35" VerticalAlignment="Bottom" HorizontalAlignment="Center" Background="{x:Null}" BorderBrush="{x:Null}">
-            <Image Source="/Resources/SettingIcon.png" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
-        </Button>
+        <ListBoxItem Grid.Row="1" Width="35" Height="30" VerticalAlignment="Bottom" HorizontalAlignment="Center" Background="{x:Null}" BorderBrush="{x:Null}" Margin="0,0,2,0">
+            <Image Source="/Resources/SettingIcon.png"/>
+        </ListBoxItem>
         <Menu Grid.Column="0" Foreground="#FFE6E8E6" Grid.RowSpan="1" Grid.ColumnSpan="2" BorderBrush="#FF957FEF" BorderThickness="0,0,0,1">
             <Menu.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -66,41 +66,19 @@
                     </Image>
                 </MenuItem.Icon>
             </MenuItem>-->
-            <MenuItem Header="_File">
-                <MenuItem Header="_Open" Foreground="Black"/>
-                <MenuItem Header="_Close" Foreground="Black"/>
-                <MenuItem Header="_Save" Foreground="Black"/>
+            <MenuItem Header="_File" Foreground="#FFE6E8E6">
+                <MenuItem Header="_Open" Click="Nebula_OpenFileDialog"/>
             </MenuItem>
         </Menu>
-        <TabControl Grid.Column="1" Grid.Row="1" Background="{x:Null}" Foreground="#FFE6E8E6" BorderBrush="#FF957FEF" BorderThickness="0,1,0,0">
-            <TabItem x:Name="FrameView" Header="Frame" Background="{x:Null}" Foreground="#FFE6E8E6" BorderBrush="#FF957FEF" Visibility="Collapsed">
-                <Grid MouseWheel="FrameView_OnScroll" MouseMove="FrameView_MoveView" ClipToBounds="True" MouseLeave="FrameView_ResetMouse">
-                    <Viewbox RenderTransformOrigin="0.5,0.5">
-                        <Viewbox.RenderTransform>
-                            <TransformGroup>
-                                <ScaleTransform ScaleX="0.5" ScaleY="0.5"/>
-                                <SkewTransform/>
-                                <RotateTransform/>
-                                <TranslateTransform X="0"/>
-                            </TransformGroup>
-                        </Viewbox.RenderTransform>
-                        <!--<Rectangle Fill="Black" Width="1280" Height="720" HorizontalAlignment="Center" VerticalAlignment="Center" />-->
-                    </Viewbox>
+        <TabControl x:Name="Tabs" Grid.Column="1" Grid.Row="1" Background="{x:Null}" Foreground="#FFE6E8E6" BorderBrush="#FF957FEF" BorderThickness="0,1,0,0">
+            <!--<TabItem x:Name="Test" Header="Test" Background="{x:Null}" Foreground="#FFE6E8E6" BorderBrush="#FF957FEF">
+                <Grid ClipToBounds="True" Margin="-3,-3,-3,-3">
+                    <Label Content="Welcome to Nebula!" Foreground="#FFE6E8E6" FontWeight="Bold" Margin="10,0,0,0"/>
+                    <Separator Margin="10,25,10,0" VerticalAlignment="Top"/>
+                    <Label Content="Open a Fusion file to get started, then click on the items on the left to view them." Foreground="#FFE6E8E6" Margin="10,23,0,0"/>
+                    <Button Content="Open File" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="15,1,15,1" Margin="10,50,0,0" Background="{x:Null}" BorderBrush="#FF957FEF" Foreground="#FFE6E8E6"/>
                 </Grid>
-            </TabItem>
-            <TabItem x:Name="FramesListView" Header="Frame List" Background="{x:Null}" Foreground="#FFE6E8E6" BorderBrush="#FF957FEF">
-                <Grid ClipToBounds="True" Margin="-2,-2,-2,-2">
-                    <ListBox Background="{x:Null}" BorderThickness="0,0,0,0">
-                        <!--<ListBoxItem Height="90" BorderBrush="#FF957FEF" BorderThickness="0,0,0,1">
-                            <Grid>
-                                <Image Source="" Width="130" Stretch="Fill" Height="82" HorizontalAlignment="Left" Margin="3,0,0,0"/>
-                                <Label Content="Example Frame" Foreground="#FFE6E8E6" Padding="140,0,0,0" FontSize="16"/>
-                                <Label Content="640x480" Foreground="#90E6E8E6" Padding="140,22,0,0" FontSize="12"/>
-                            </Grid>
-                        </ListBoxItem>-->
-                    </ListBox>
-                </Grid>
-            </TabItem>
+            </TabItem>-->
         </TabControl>
 
     </Grid>

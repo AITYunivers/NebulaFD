@@ -6,6 +6,7 @@ using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 using System;
 using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 {
@@ -200,6 +201,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                             {
                                 ParameterMovement param = (ParameterMovement)Parameters[0].Data;
                                 ObjectCommon oC = (ObjectCommon)NebulaCore.PackageData.FrameItems.Items[ObjectInfo].Properties;
+                                if (oC.ObjectMovements.Movements.Length <= param.ID)
+                                    break;
                                 string name = oC.ObjectMovements.Movements[param.ID].Name;
                                 param.Name = string.IsNullOrEmpty(name) ? "Movement #" + param.ID : name;
                             }

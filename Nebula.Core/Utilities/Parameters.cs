@@ -5,5 +5,6 @@
         public static bool DontIncludeImages = false;
         public static bool DontIncludeFonts = false;
         public static bool DontIncludeSounds = false;
+        public static bool DontIncludeEvents = false;
     }
 }

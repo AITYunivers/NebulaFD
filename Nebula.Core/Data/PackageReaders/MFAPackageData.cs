@@ -23,129 +23,127 @@ namespace Nebula.Core.Data.PackageReaders
         public MFAQualifiers Qualifiers = new();
         public int[] FrameOffsets = new int[0];
 
-        public bool Finished;
-
-        public override void Read(ByteReader reader)
+        public override void Read()
         {
             Logger.Log(this, $"Running {NebulaCore.BuildDate} build.");
-            Header = reader.ReadAscii(4);
+            Header = Reader.ReadAscii(4);
             NebulaCore._unicode = Header == "MFU2";
             NebulaCore.MFA = true;
             Logger.Log(this, "Project Header: " + Header);
 
-            RuntimeVersion = (short)reader.ReadUInt16();
-            RuntimeSubversion = (short)reader.ReadUInt16();
-            ProductVersion = reader.ReadInt32();
-            ProductBuild = reader.ReadInt32();
-            reader.Skip(4); // Stamp
+            RuntimeVersion = (short)Reader.ReadUInt16();
+            RuntimeSubversion = (short)Reader.ReadUInt16();
+            ProductVersion = Reader.ReadInt32();
+            ProductBuild = Reader.ReadInt32();
+            Reader.Skip(4); // Stamp
             NebulaCore.Build = ProductBuild;
             Logger.Log(this, "Fusion Build: " + ProductBuild);
 
-            AppName = reader.ReadAutoYuniversal();
-            reader.ReadAutoYuniversal();
-            EditorFilename = reader.ReadAutoYuniversal();
+            AppName = Reader.ReadAutoYuniversal();
+            Reader.ReadAutoYuniversal();
+            EditorFilename = Reader.ReadAutoYuniversal();
 
-            int stampLength = reader.ReadInt32();
-            byte[] stamp = reader.ReadBytes(stampLength);
+            int stampLength = Reader.ReadInt32();
+            byte[] stamp = Reader.ReadBytes(stampLength);
 
-            reader.Skip(4); // ATNF
-            FontBank.ReadMFA(reader);
+            Reader.Skip(4); // ATNF
+            FontBank.ReadMFA(Reader);
 
-            reader.Skip(4); // APMS
-            SoundBank.ReadMFA(reader);
+            Reader.Skip(4); // APMS
+            SoundBank.ReadMFA(Reader);
 
-            reader.Skip(4); // ASUM
-            reader.Skip(4);
-            //MusicBank.ReadMFA(reader);
+            Reader.Skip(4); // ASUM
+            Reader.Skip(4);
+            //MusicBank.ReadMFA(Reader);
 
-            reader.Skip(4); // AGMI
-            IconBank.ReadMFA(reader);
+            Reader.Skip(4); // AGMI
+            IconBank.ReadMFA(Reader);
 
-            reader.Skip(4); // AGMI
-            ImageBank.ReadMFA(reader);
+            Reader.Skip(4); // AGMI
+            ImageBank.ReadMFA(Reader);
 
-            AppName = reader.ReadAutoYuniversal();
-            Author = reader.ReadAutoYuniversal();
-            Description = reader.ReadAutoYuniversal();
-            Copyright = reader.ReadAutoYuniversal();
-            Company = reader.ReadAutoYuniversal();
-            Version = reader.ReadAutoYuniversal();
-            AppHeader.AppWidth = (short)reader.ReadInt();
-            AppHeader.AppHeight = (short)reader.ReadInt();
-            AppHeader.BorderColor = reader.ReadColor();
-            AppHeader.DisplayFlags.Value = reader.ReadUInt();
-            AppHeader.GraphicFlags.Value = reader.ReadUInt();
+            AppName = Reader.ReadAutoYuniversal();
+            Author = Reader.ReadAutoYuniversal();
+            Description = Reader.ReadAutoYuniversal();
+            Copyright = Reader.ReadAutoYuniversal();
+            Company = Reader.ReadAutoYuniversal();
+            Version = Reader.ReadAutoYuniversal();
+            AppHeader.AppWidth = (short)Reader.ReadInt();
+            AppHeader.AppHeight = (short)Reader.ReadInt();
+            AppHeader.BorderColor = Reader.ReadColor();
+            AppHeader.DisplayFlags.Value = Reader.ReadUInt();
+            AppHeader.GraphicFlags.Value = Reader.ReadUInt();
             AppHeader.SyncFlags(true);
-            HelpFile = reader.ReadAutoYuniversal();
-            reader.ReadAutoYuniversal();
-            AppHeader.InitScore = (reader.ReadInt() + 1) * -1;
-            AppHeader.InitLives = (reader.ReadInt() + 1) * -1;
-            AppHeader.FrameRate = reader.ReadInt();
-            reader.Skip(4); // Build Type
-            TargetFilename = reader.ReadAutoYuniversal();
-            reader.ReadAutoYuniversal();
-            reader.ReadAutoYuniversal();
-            About = reader.ReadAutoYuniversal();
-            reader.Skip(4);
-            BinaryFiles.ReadMFA(reader);
+            HelpFile = Reader.ReadAutoYuniversal();
+            Reader.ReadAutoYuniversal();
+            AppHeader.InitScore = (Reader.ReadInt() + 1) * -1;
+            AppHeader.InitLives = (Reader.ReadInt() + 1) * -1;
+            AppHeader.FrameRate = Reader.ReadInt();
+            Reader.Skip(4); // Build Type
+            TargetFilename = Reader.ReadAutoYuniversal();
+            Reader.ReadAutoYuniversal();
+            Reader.ReadAutoYuniversal();
+            About = Reader.ReadAutoYuniversal();
+            Reader.Skip(4);
+            BinaryFiles.ReadMFA(Reader);
 
-            AppHeader.ControlType = new int[reader.ReadInt()];
+            AppHeader.ControlType = new int[Reader.ReadInt()];
             AppHeader.ControlKeys = new int[AppHeader.ControlType.Length][];
             for (int i = 0; i < AppHeader.ControlType.Length; i++)
             {
-                AppHeader.ControlType[i] = reader.ReadInt();
-                AppHeader.ControlKeys[i] = new int[reader.ReadInt()];
+                AppHeader.ControlType[i] = Reader.ReadInt();
+                AppHeader.ControlKeys[i] = new int[Reader.ReadInt()];
                 for (int ii = 0; ii < AppHeader.ControlKeys[i].Length; ii++)
-                    AppHeader.ControlKeys[i][ii] = reader.ReadInt();
+                    AppHeader.ControlKeys[i][ii] = Reader.ReadInt();
             }
 
-            MenuBar.ReadMFA(reader);
-            AppHeader.WindowMenu = reader.ReadInt();
+            MenuBar.ReadMFA(Reader);
+            AppHeader.WindowMenu = Reader.ReadInt();
 
             // Menu Images (Not implemented yet)
-            reader.Skip(reader.ReadInt() * 8);
+            Reader.Skip(Reader.ReadInt() * 8);
 
-            GlobalValues.ReadMFA(reader, GlobalValueNames);
-            GlobalStrings.ReadMFA(reader, GlobalStringNames);
-            GlobalEvents.ReadMFA(reader, true);
+            GlobalValues.ReadMFA(Reader, GlobalValueNames);
+            GlobalStrings.ReadMFA(Reader, GlobalStringNames);
+            GlobalEvents.ReadMFA(Reader, true);
 
-            AppHeader.GraphicMode = (short)reader.ReadInt();
+            AppHeader.GraphicMode = (short)Reader.ReadInt();
             {
-                int cnt = reader.ReadInt();
-                long end = reader.Tell() + cnt * 4;
+                int cnt = Reader.ReadInt();
+                long end = Reader.Tell() + cnt * 4;
                 if (cnt >= 3)
                 {
-                    NebulaCore.CurrentReader.Icons.Add(64, IconBank.Images[reader.ReadUInt()].GetBitmap());
-                    NebulaCore.CurrentReader.Icons.Add(32, IconBank.Images[reader.ReadUInt()].GetBitmap());
-                    NebulaCore.CurrentReader.Icons.Add(16, IconBank.Images[reader.ReadUInt()].GetBitmap());
+                    NebulaCore.CurrentReader.Icons.Add(64, IconBank.Images[Reader.ReadUInt()].GetBitmap());
+                    NebulaCore.CurrentReader.Icons.Add(32, IconBank.Images[Reader.ReadUInt()].GetBitmap());
+                    NebulaCore.CurrentReader.Icons.Add(16, IconBank.Images[Reader.ReadUInt()].GetBitmap());
                 }
-                reader.Seek(end);
+                Reader.Seek(end);
             }
-            Qualifiers.ReadMFA(reader);
-            Extensions.ReadMFA(reader);
+            Qualifiers.ReadMFA(Reader);
+            Extensions.ReadMFA(Reader);
 
-            if (reader.PeekInt() > 900)
-                reader.Skip(2);
+            if (Reader.PeekInt() > 900)
+                Reader.Skip(2);
 
-            FrameOffsets = new int[reader.ReadInt()];
+            FrameOffsets = new int[Reader.ReadInt()];
             for (int i = 0; i < FrameOffsets.Length; i++)
-                FrameOffsets[i] = reader.ReadInt();
-            int returnOffset = reader.ReadInt();
+                FrameOffsets[i] = Reader.ReadInt();
+            int returnOffset = Reader.ReadInt();
 
             foreach (int offset in FrameOffsets)
             {
-                reader.Seek(offset);
+                Reader.Seek(offset);
                 Frame frame = new Frame();
-                frame.ReadMFA(reader);
+                frame.ReadMFA(Reader);
                 Frames.Add(frame);
                 FrameHandles.Add((short)frame.Handle);
             }
 
-            reader.Seek(returnOffset);
+            Reader.Seek(returnOffset);
 
             while (true)
             {
-                Chunk newChunk = Chunk.InitMFAChunk(reader);
+                Chunk newChunk = Chunk.InitMFAChunk(Reader);
                 Logger.Log(this, $"Reading MFA Object Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
 
                 ByteReader chunkReader = new ByteReader(newChunk.ChunkData!);
@@ -156,7 +154,6 @@ namespace Nebula.Core.Data.PackageReaders
             }
 
             FinishParsing();
-            Finished = true;
         }
 
         public void FinishParsing()
@@ -344,72 +341,6 @@ namespace Nebula.Core.Data.PackageReaders
 
             FrameItems.Count = frameItems.Count;
             FrameItems.Items = frameItems;
-        }
-
-        public override void CliUpdate()
-        {
-            AnsiConsole.Progress().Start(ctx =>
-            {
-                ProgressTask? mainTask = ctx.AddTask("[DeepSkyBlue3]Reading MFA[/]");
-                mainTask.Value = 0;
-                mainTask.MaxValue = 7;
-                ProgressTask? secondaryTask = ctx.AddTask("[DeepSkyBlue3]Reading Font Bank[/]");
-
-                while (!mainTask.IsFinished)
-                {
-                    if (Finished)
-                        mainTask.Value = 7;
-                    else if (FrameOffsets.Length > 0)
-                    {
-                        mainTask.Value = 6;
-
-                        secondaryTask.Description = "[DeepSkyBlue3]Reading Frames[/]";
-                        secondaryTask.Value = Frames.Count;
-                        secondaryTask.MaxValue = FrameOffsets.Length;
-                    }
-                    else if (BinaryFiles.Count > 0)
-                    {
-                        mainTask.Value = 5;
-
-                        secondaryTask.Description = "[DeepSkyBlue3]Reading Binary Files[/]";
-                        secondaryTask.Value = BinaryFiles.Items.Count;
-                        secondaryTask.MaxValue = BinaryFiles.Count;
-                    }
-                    else if (ImageBank.ImageCount > 0)
-                    {
-                        mainTask.Value = 4;
-
-                        secondaryTask.Description = "[DeepSkyBlue3]Reading Image Bank[/]";
-                        secondaryTask.Value = ImageBank.Images.Count;
-                        secondaryTask.MaxValue = ImageBank.ImageCount;
-                    }
-                    else if (IconBank.ImageCount > 0)
-                    {
-                        mainTask.Value = 3;
-
-                        secondaryTask.Description = "[DeepSkyBlue3]Reading Icon Bank[/]";
-                        secondaryTask.Value = IconBank.Images.Count;
-                        secondaryTask.MaxValue = IconBank.ImageCount;
-                    }
-                    // Insert Music Bank Here
-                    else if (SoundBank.Count > 0)
-                    {
-                        mainTask.Value = 1;
-
-                        secondaryTask.Description = "[DeepSkyBlue3]Reading Sound Bank[/]";
-                        secondaryTask.Value = SoundBank.Sounds.Count;
-                        secondaryTask.MaxValue = SoundBank.Count;
-                    }
-                    else if (FontBank.Count > 0)
-                    {
-                        mainTask.Value = 0;
-
-                        secondaryTask.Description = "[DeepSkyBlue3]Reading Font Bank[/]";
-                        secondaryTask.Value = FontBank.Fonts.Count;
-                        secondaryTask.MaxValue = FontBank.Count;
-                    }
-                }
-            });
         }
     }
 }

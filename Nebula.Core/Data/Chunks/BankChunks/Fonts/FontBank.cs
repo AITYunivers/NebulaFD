@@ -48,7 +48,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Fonts
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteInt(Count);
+            writer.WriteInt(Fonts.Count);
             foreach (Font fnt in Fonts.Values)
                 fnt.WriteMFA(writer);
         }

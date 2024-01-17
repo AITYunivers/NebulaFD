@@ -1,4 +1,5 @@
-﻿using Nebula.Core.Memory;
+﻿using Nebula.Core.Data.Chunks.AppChunks;
+using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 
 namespace Nebula.Core.Data.Chunks.ObjectChunks
@@ -27,6 +28,8 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
                 ByteReader chunkReader = new ByteReader(newChunk.ChunkData!);
                 newChunk.ReadCCN(chunkReader, this);
                 newChunk.ChunkData = null;
+                if (newChunk is Last)
+                    break;
             }
         }
 
