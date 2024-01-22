@@ -21,6 +21,7 @@ using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using Nebula.Core.Data.Chunks.BankChunks.Images;
 using Image = System.Windows.Controls.Image;
 using Bitmap = System.Drawing.Bitmap;
+using System.Windows.Documents;
 
 namespace Nebula.GUI
 {
@@ -404,7 +405,7 @@ namespace Nebula.GUI
         {
             ListBoxItem tVI = (ListBoxItem)sender;
             Frame frm = NebulaCore.PackageData.Frames[(int)tVI.Tag];
-            TabItem FrameView = Interface_CreateTab(frm.FrameName);
+            TabItem FrameView = Interface_CreateTab(frm.FrameName + " - Objects");
             FrameView.Visibility = Visibility.Visible;
             FrameView.Content = FrameView_CreateView(frm);
             FrameView.Tag = tVI.Tag;
@@ -462,10 +463,12 @@ namespace Nebula.GUI
             Grid grid = new Grid();
             grid.ClipToBounds = true;
             grid.Margin = new Thickness(-3);
+            grid.HorizontalAlignment = HorizontalAlignment.Stretch;
 
             ListBox listBox = new ListBox();
             listBox.Background = Brushes.Transparent;
             listBox.BorderThickness = new Thickness(0);
+            listBox.HorizontalAlignment = HorizontalAlignment.Stretch;
             grid.Children.Add(listBox);
 
             int tag = 0;
@@ -473,13 +476,14 @@ namespace Nebula.GUI
             {
                 ListBoxItem lBI = new ListBoxItem();
                 lBI.Height = 90;
+                lBI.HorizontalContentAlignment = HorizontalAlignment.Stretch;
                 lBI.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF957FEF"));
                 lBI.BorderThickness = new Thickness(0, 0, 0, 1);
                 lBI.MouseDoubleClick += Interface_FrameSelected;
                 lBI.Tag = tag++;
 
                 Grid lBIGrid = new Grid();
-                grid.ClipToBounds = true;
+                lBIGrid.ClipToBounds = true;
 
                 Image lBIImg = new Image();
                 lBIImg.Width = 130;
@@ -510,15 +514,64 @@ namespace Nebula.GUI
                 lBIObjCnt.Padding = new Thickness(140, 38, 0, 0);
                 lBIObjCnt.FontSize = 12;
 
+                Button lBIVFBtn = new Button();
+                lBIVFBtn.Width = 95;
+                lBIVFBtn.Content = "View Frame";
+                lBIVFBtn.HorizontalAlignment = HorizontalAlignment.Right;
+                lBIVFBtn.VerticalAlignment = VerticalAlignment.Top;
+                lBIVFBtn.Padding = new Thickness(12, 1, 12, 1);
+                lBIVFBtn.Margin = new Thickness(0, 3, 5, 0);
+                lBIVFBtn.Background = Brushes.Transparent;
+                lBIVFBtn.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF957FEF"));
+                lBIVFBtn.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFE6E8E6"));
+                lBIVFBtn.Click += FramesList_ViewFrame;
+
+                Button lBIVOBtn = new Button();
+                lBIVOBtn.Width = 95;
+                lBIVOBtn.Content = "View Objects";
+                lBIVOBtn.HorizontalAlignment = HorizontalAlignment.Right;
+                lBIVOBtn.VerticalAlignment = VerticalAlignment.Top;
+                lBIVOBtn.Padding = new Thickness(12, 1, 12, 1);
+                lBIVOBtn.Margin = new Thickness(0, 28, 5, 0);
+                lBIVOBtn.Background = Brushes.Transparent;
+                lBIVOBtn.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF957FEF"));
+                lBIVOBtn.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFE6E8E6"));
+                lBIVOBtn.Click += FramesList_ViewObjects;
+
                 lBIGrid.Children.Add(lBIImg);
                 lBIGrid.Children.Add(lBIName);
                 lBIGrid.Children.Add(lBISize);
                 lBIGrid.Children.Add(lBIObjCnt);
+                lBIGrid.Children.Add(lBIVFBtn);
+                lBIGrid.Children.Add(lBIVOBtn);
                 lBI.Content = lBIGrid;
 
                 listBox.Items.Add(lBI);
             }
             return grid;
+        }
+
+        private void FramesList_ViewFrame(object sender, RoutedEventArgs e)
+        {
+            ListBoxItem tVI = (ListBoxItem)((Grid)((Button)sender).Parent).Parent;
+            Frame frm = NebulaCore.PackageData.Frames[(int)tVI.Tag];
+            TabItem FrameView = Interface_CreateTab(frm.FrameName + " - Frame");
+            FrameView.Visibility = Visibility.Visible;
+            FrameView.Content = FrameView_CreateView(frm);
+            FrameView.Tag = tVI.Tag;
+            FrameView_RefreshView();
+            FrameView.Focus();
+        }
+
+        private void FramesList_ViewObjects(object sender, RoutedEventArgs e)
+        {
+            ListBoxItem tVI = (ListBoxItem)((Grid)((Button)sender).Parent).Parent;
+            Frame frm = NebulaCore.PackageData.Frames[(int)tVI.Tag];
+            TabItem FrameView = Interface_CreateTab(frm.FrameName + " - Objects");
+            FrameView.Visibility = Visibility.Visible;
+            FrameView.Content = ObjectList_CreateView(frm);
+            FrameView.Tag = tVI.Tag;
+            FrameView.Focus();
         }
 
         private Grid Home_CreateView()
@@ -557,6 +610,155 @@ namespace Nebula.GUI
             grid.Children.Add(separator);
             grid.Children.Add(desc);
             grid.Children.Add(openFile);
+            return grid;
+        }
+
+        private Grid ObjectList_CreateView(Frame frm)
+        {
+            Grid grid = new Grid();
+            grid.ClipToBounds = true;
+            grid.Margin = new Thickness(-3);
+            grid.HorizontalAlignment = HorizontalAlignment.Stretch;
+
+            ListBox list = new ListBox();
+            list.Background = Brushes.Transparent;
+            list.BorderBrush = Brushes.Transparent;
+            list.BorderThickness = new Thickness(0);
+            list.HorizontalAlignment = HorizontalAlignment.Stretch;
+
+            foreach (FrameInstance inst in frm.FrameInstances.Instances)
+            {
+                if (!NebulaCore.PackageData.FrameItems.Items.ContainsKey((int)inst.ObjectInfo))
+                    continue;
+                ObjectInfo oI = NebulaCore.PackageData.FrameItems.Items[(int)inst.ObjectInfo];
+
+                ListBoxItem listItem = new ListBoxItem();
+                listItem.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF957FEF"));
+                listItem.BorderThickness = new Thickness(0, 0, 0, 1);
+                listItem.HorizontalAlignment = HorizontalAlignment.Stretch;
+
+                Grid itemGrid = new Grid();
+                itemGrid.Height = 50;
+                itemGrid.HorizontalAlignment = HorizontalAlignment.Stretch;
+
+                ColumnDefinition imgDef = new ColumnDefinition();
+                imgDef.Width = new GridLength(48, GridUnitType.Pixel);
+                itemGrid.ColumnDefinitions.Add(imgDef);
+
+                ColumnDefinition contDef = new ColumnDefinition();
+                contDef.Width = new GridLength(1, GridUnitType.Star);
+                itemGrid.ColumnDefinitions.Add(contDef);
+
+                Border bdr = new Border();
+                bdr.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF957FEF"));
+                bdr.BorderThickness = new Thickness(0, 0, 1, 0);
+                bdr.Margin = new Thickness(0, -1, -4, -1);
+
+                Image img = new Image();
+                img.Width = 48;
+                img.Height = 48;
+                img.Stretch = Stretch.Uniform;
+                img.StretchDirection = StretchDirection.DownOnly;
+                img.HorizontalAlignment = HorizontalAlignment.Center;
+                img.VerticalAlignment = VerticalAlignment.Center;
+
+                Label lbl = new Label();
+                lbl.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFE6E8E6"));
+                lbl.HorizontalAlignment = HorizontalAlignment.Left;
+                lbl.Margin = new Thickness(8, 0, 0, 29);
+                lbl.Padding = new Thickness(0);
+                lbl.Content = oI.Name;
+
+                Grid.SetColumn(bdr, 0);
+                Grid.SetColumn(img, 0);
+                Grid.SetColumn(lbl, 1);
+                itemGrid.Children.Add(bdr);
+                itemGrid.Children.Add(img);
+                itemGrid.Children.Add(lbl);
+                listItem.Content = itemGrid;
+
+                ImageBank imgBank = NebulaCore.PackageData.ImageBank;
+                string BaseUri = "pack://application:,,,/Nebula.GUI;component/Plugins/ObjectIcons/";
+                switch (oI.Header.Type)
+                {
+                    case 0: // Quick Backdrop
+                        ObjectQuickBackdrop oQB = (ObjectQuickBackdrop)oI.Properties;
+                        if (oQB.Shape.FillType != 3)
+                            img.Source = new BitmapImage(new Uri("Plugins\\ObjectIcons\\MMFQuickBackdrop.png", UriKind.Relative));
+                        else
+                            img.Source = Imaging.CreateBitmapSourceFromHBitmap(imgBank.Images[oQB.Shape.Image].GetBitmap().GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                        break;
+                    case 1: // Backdrop
+                        ObjectBackdrop oB = (ObjectBackdrop)oI.Properties;
+                        if (imgBank.Images.ContainsKey(oB.Image))
+                            img.Source = Imaging.CreateBitmapSourceFromHBitmap(imgBank.Images[oB.Image].GetBitmap().GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                        else
+                            img.Source = new BitmapImage(new Uri("Plugins\\ObjectIcons\\MMFBackdrop.png", UriKind.Relative));
+                        break;
+                    default:
+                        ObjectCommon oC = (ObjectCommon)oI.Properties;
+                        switch (oI.Header.Type)
+                        {
+                            case 2: // Active
+                                if (oC.ObjectAnimations.Animations.Count > 0 &&
+                                    oC.ObjectAnimations.Animations.First().Value.Directions.Count > 0 &&
+                                    oC.ObjectAnimations.Animations.First().Value.Directions.First().Frames.Length > 0 &&
+                                    imgBank.Images.ContainsKey(oC.ObjectAnimations.Animations.First().Value.Directions.First().Frames[0]))
+                                    img.Source = Imaging.CreateBitmapSourceFromHBitmap(imgBank.Images[oC.ObjectAnimations.Animations.First().Value.Directions.First().Frames[0]].GetBitmap().GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                                else
+                                    img.Source = new BitmapImage(new Uri(Path.GetFullPath("Plugins\\ObjectIcons\\MMFActive.png")));
+                                break;
+                            case 3: // String
+                                img.Source = new BitmapImage(new Uri(Path.GetFullPath("Plugins\\ObjectIcons\\MMFString.png")));
+                                break;
+                            case 4: // Question and Answer
+                                img.Source = new BitmapImage(new Uri(Path.GetFullPath("Plugins\\ObjectIcons\\MMFQ&A.png")));
+                                break;
+                            case 5: // Score
+                                ObjectCounter scr = oC.ObjectCounter;
+                                Bitmap scrBmp = Utilities.GetCounterBmp(scr, oC.ObjectValue);
+                                if (scrBmp != null)
+                                    img.Source = Imaging.CreateBitmapSourceFromHBitmap(scrBmp.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                                else
+                                    img.Source = new BitmapImage(new Uri(Path.GetFullPath("Plugins\\ObjectIcons\\MMFScore.png")));
+                                break;
+                            case 6: // Lives
+                                ObjectCounter lvs = oC.ObjectCounter;
+                                Bitmap lvsBmp = Utilities.GetCounterBmp(lvs, oC.ObjectValue);
+                                if (lvsBmp != null)
+                                    img.Source = Imaging.CreateBitmapSourceFromHBitmap(lvsBmp.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                                else
+                                    img.Source = new BitmapImage(new Uri(Path.GetFullPath("Plugins\\ObjectIcons\\MMFLives.png")));
+                                break;
+                            case 7: // Counter
+                                ObjectCounter cntr = oC.ObjectCounter;
+                                Bitmap cntrBmp = Utilities.GetCounterBmp(cntr, oC.ObjectValue);
+                                if (cntrBmp != null)
+                                    img.Source = Imaging.CreateBitmapSourceFromHBitmap(cntrBmp.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                                else
+                                    img.Source = new BitmapImage(new Uri(Path.GetFullPath("Plugins\\ObjectIcons\\MMFCounter.png")));
+                                break;
+                            case 8: // Formatted Text
+                                img.Source = new BitmapImage(new Uri(Path.GetFullPath("Plugins\\ObjectIcons\\MMFFormattedText.png")));
+                                break;
+                            case 9: // Sub-Application
+                                img.Source = new BitmapImage(new Uri(Path.GetFullPath("Plugins\\ObjectIcons\\MMFSubApplication.png")));
+                                break;
+                            default: // Extensions
+                                foreach (Core.Data.Chunks.AppChunks.Extension posExt in NebulaCore.PackageData.Extensions.Exts.Values)
+                                    if (posExt.Handle == oI.Header.Type - 32 && File.Exists("Plugins\\ObjectIcons\\" + posExt.Name + ".png"))
+                                    {
+                                        img.Source = new BitmapImage(new Uri(Path.GetFullPath("Plugins\\ObjectIcons\\" + posExt.Name + ".png")));
+                                        break;
+                                    }
+                                break;
+                        }
+                        break;
+                }
+                list.Items.Add(listItem);
+            }
+
+            grid.Children.Add(list);
             return grid;
         }
     }

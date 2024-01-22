@@ -72,11 +72,23 @@
         </Menu>
         <TabControl x:Name="Tabs" Grid.Column="1" Grid.Row="1" Background="{x:Null}" Foreground="#FFE6E8E6" BorderBrush="#FF957FEF" BorderThickness="0,1,0,0">
             <!--<TabItem x:Name="Test" Header="Test" Background="{x:Null}" Foreground="#FFE6E8E6" BorderBrush="#FF957FEF">
-                <Grid ClipToBounds="True" Margin="-3,-3,-3,-3">
-                    <Label Content="Welcome to Nebula!" Foreground="#FFE6E8E6" FontWeight="Bold" Margin="10,0,0,0"/>
-                    <Separator Margin="10,25,10,0" VerticalAlignment="Top"/>
-                    <Label Content="Open a Fusion file to get started, then click on the items on the left to view them." Foreground="#FFE6E8E6" Margin="10,23,0,0"/>
-                    <Button Content="Open File" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="15,1,15,1" Margin="10,50,0,0" Background="{x:Null}" BorderBrush="#FF957FEF" Foreground="#FFE6E8E6"/>
+                <Grid ClipToBounds="True" Margin="-3,-3,-2,-3">
+                    <ListBox Background="{x:Null}" BorderBrush="{x:Null}" BorderThickness="0,0,0,0">
+                        <ListBoxItem BorderBrush="#FF957FEF" BorderThickness="0,0,0,1" HorizontalContentAlignment="Stretch">
+                            <ListBoxItem.Content>
+                                <Grid Height="50" Margin="0,0,12,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="48"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border BorderBrush="#FF957FEF" BorderThickness="0,0,1,0" Margin="0,-1,-4,-1"/>
+                                    <Image Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Center" Source="/42.png" Grid.ColumnSpan="1" StretchDirection="DownOnly"/>
+                                    <Label Foreground="#FFE6E8E6" HorizontalAlignment="Left" Margin="8,0,0,29" Content="Object Name" Padding="0,0,0,0" Grid.Column="1"/>
+                                    <Button HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1" Width="30" Height="5"/>
+                                </Grid>
+                            </ListBoxItem.Content>
+                        </ListBoxItem>
+                    </ListBox>
                 </Grid>
             </TabItem>-->
         </TabControl>
