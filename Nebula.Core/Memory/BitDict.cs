@@ -24,26 +24,46 @@
         }
 
         public BitDict(params string[] keys) => Keys = keys;
+        public BitDict(Type baseEnum) => Keys = Enum.GetNames(baseEnum);
+
         public bool this[string key]
         {
             get => GetFlag(key);
             set => SetFlag(key, value);
         }
 
-        public bool GetFlag(string key)
+        public bool this[int pos]
         {
-            int pos = Array.IndexOf(Keys, key);
+            get => GetFlag(pos);
+            set => SetFlag(pos, value);
+        }
+
+        public bool this[object pos]
+        {
+            get => GetFlag((int)pos);
+            set => SetFlag((int)pos, value);
+        }
+
+        public static bool operator ==(BitDict dict, object pos) => dict.GetFlag((int)pos);
+        public static bool operator !=(BitDict dict, object pos) => !dict.GetFlag((int)pos);
+
+        public bool GetFlag(string key) => GetFlag(Array.IndexOf(Keys, key));
+        public bool GetFlag(object pos) => GetFlag((int)pos);
+        public bool GetFlag(int pos)
+        {
             if (pos >= 0)
                 return (Value & ((uint)Math.Pow(2, pos))) != 0;
             return false;
         }
 
-        public void SetFlag(string key, bool flag)
+        public void SetFlag(string key, bool flag) => SetFlag(Array.IndexOf(Keys, key), flag);
+        public void SetFlag(object pos, bool flag) => SetFlag((int)pos, flag);
+        public void SetFlag(int pos, bool flag)
         {
             if (flag)
-                Value |= (uint)Math.Pow(2, Array.IndexOf(Keys, key));
+                Value |= (uint)Math.Pow(2, pos);
             else
-                Value &= ~(uint)Math.Pow(2, Array.IndexOf(Keys, key));
+                Value &= ~(uint)Math.Pow(2, pos);
         }
 
         public override string ToString()
@@ -52,7 +72,7 @@
             foreach (var key in Keys)
                 actualKeys[key] = this[key];
 
-            return string.Join(";\n", actualKeys.Select(kv => kv.Key + ": " + kv.Value).ToArray());
+            return string.Join(";\n", actualKeys.Select(kv => kv.Key + ": " + kv.Value).ToArray()) + ';';
         }
     }
 }

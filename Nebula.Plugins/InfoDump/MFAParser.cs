@@ -298,57 +298,62 @@ namespace GameDumper
                 {
                     if (!NebulaCore.PackageData.FrameItems.Items.ContainsKey((int)inst.ObjectInfo))
                         continue;
-                    ObjectInfo oi = NebulaCore.PackageData.FrameItems.Items[(int)inst.ObjectInfo];
-                    Image? img = null;
-                    float alpha = 0f;
-                    if (oi.Header.InkEffect != 1)
-                        alpha = oi.Header.BlendCoeff / 255.0f;
-                    else
-                        alpha = oi.Header.InkEffectParam * 2.0f / 255.0f;
-                    switch (oi.Header.Type)
+                    try
                     {
-                        case 0: // Quick Backdrop
-                            if (((ObjectQuickBackdrop)oi.Properties).Shape.FillType == 0)
-                            {
-                                img = NebulaCore.PackageData.ImageBank.Images[((ObjectQuickBackdrop)oi.Properties).Shape.Image];
-                                destRect = new Rectangle(inst.PositionX, inst.PositionY,
-                                                         ((ObjectQuickBackdrop)oi.Properties).Width,
-                                                         ((ObjectQuickBackdrop)oi.Properties).Height);
-                                doDraw(graphics, img.GetBitmap(), destRect, alpha);
-                            }
-                            break;
-                        case 1: // Backdrop
-                            img = NebulaCore.PackageData.ImageBank.Images[((ObjectBackdrop)oi.Properties).Image];
-                            destRect = new Rectangle(inst.PositionX, inst.PositionY,
-                                                     img.Width, img.Height);
-                            doDraw(graphics, img.GetBitmap(), destRect, alpha);
-                            break;
-                        case 2: // Active
-                            img = NebulaCore.PackageData.ImageBank.Images[((ObjectCommon)oi.Properties).ObjectAnimations.Animations.First().Value.Directions.First().Frames.First()];
-                            destRect = new Rectangle(inst.PositionX - img.HotspotX,
-                                                     inst.PositionY - img.HotspotY,
-                                                     img.Width, img.Height);
-                            doDraw(graphics, img.GetBitmap(), destRect, alpha);
-                            break;
-                        case 7: // Counter
-                            ObjectCounter cntr = ((ObjectCommon)oi.Properties).ObjectCounter;
-                            Bitmap cntrImg = getCounterBmp(cntr, ((ObjectCommon)oi.Properties).ObjectValue);
 
-                            if (cntr.DisplayType == 1)
-                            {
-                                destRect = new Rectangle(inst.PositionX - cntrImg.Width,
-                                                         inst.PositionY - cntrImg.Height,
-                                                         cntrImg.Width, cntrImg.Height);
-                                doDraw(graphics, cntrImg, destRect, alpha);
-                            }
-                            else if (cntr.DisplayType == 4)
-                            {
+                        ObjectInfo oi = NebulaCore.PackageData.FrameItems.Items[(int)inst.ObjectInfo];
+                        Image? img = null;
+                        float alpha = 0f;
+                        if (oi.Header.InkEffect != 1)
+                            alpha = oi.Header.BlendCoeff / 255.0f;
+                        else
+                            alpha = oi.Header.InkEffectParam * 2.0f / 255.0f;
+                        switch (oi.Header.Type)
+                        {
+                            case 0: // Quick Backdrop
+                                if (((ObjectQuickBackdrop)oi.Properties).Shape.FillType == 0)
+                                {
+                                    img = NebulaCore.PackageData.ImageBank.Images[((ObjectQuickBackdrop)oi.Properties).Shape.Image];
+                                    destRect = new Rectangle(inst.PositionX, inst.PositionY,
+                                                             ((ObjectQuickBackdrop)oi.Properties).Width,
+                                                             ((ObjectQuickBackdrop)oi.Properties).Height);
+                                    doDraw(graphics, img.GetBitmap(), destRect, alpha);
+                                }
+                                break;
+                            case 1: // Backdrop
+                                img = NebulaCore.PackageData.ImageBank.Images[((ObjectBackdrop)oi.Properties).Image];
                                 destRect = new Rectangle(inst.PositionX, inst.PositionY,
-                                                         cntrImg.Width, cntrImg.Height);
-                                doDraw(graphics, cntrImg, destRect, alpha);
-                            }
-                            break;
+                                                         img.Width, img.Height);
+                                doDraw(graphics, img.GetBitmap(), destRect, alpha);
+                                break;
+                            case 2: // Active
+                                img = NebulaCore.PackageData.ImageBank.Images[((ObjectCommon)oi.Properties).ObjectAnimations.Animations.First().Value.Directions.First().Frames.First()];
+                                destRect = new Rectangle(inst.PositionX - img.HotspotX,
+                                                         inst.PositionY - img.HotspotY,
+                                                         img.Width, img.Height);
+                                doDraw(graphics, img.GetBitmap(), destRect, alpha);
+                                break;
+                            case 7: // Counter
+                                ObjectCounter cntr = ((ObjectCommon)oi.Properties).ObjectCounter;
+                                Bitmap cntrImg = getCounterBmp(cntr, ((ObjectCommon)oi.Properties).ObjectValue);
+
+                                if (cntr.DisplayType == 1)
+                                {
+                                    destRect = new Rectangle(inst.PositionX - cntrImg.Width,
+                                                             inst.PositionY - cntrImg.Height,
+                                                             cntrImg.Width, cntrImg.Height);
+                                    doDraw(graphics, cntrImg, destRect, alpha);
+                                }
+                                else if (cntr.DisplayType == 4)
+                                {
+                                    destRect = new Rectangle(inst.PositionX, inst.PositionY,
+                                                             cntrImg.Width, cntrImg.Height);
+                                    doDraw(graphics, cntrImg, destRect, alpha);
+                                }
+                                break;
+                        }
                     }
+                    catch {}
                 }
             }
             if (Directory.Exists("junk"))

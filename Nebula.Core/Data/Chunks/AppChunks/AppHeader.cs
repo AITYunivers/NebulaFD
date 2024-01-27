@@ -1,46 +1,14 @@
 ﻿using Nebula.Core.Memory;
 using System.Drawing;
+using static Nebula.Core.Utilities.Enums;
 
 namespace Nebula.Core.Data.Chunks.AppChunks
 {
     public class AppHeader : Chunk
     {
-        public BitDict Flags = new BitDict( // Flags
-            "HeadingWhenMaximized",    // Heading When Maximized
-            "HeadingDisabled",         // Heading Disabled
-            "FitInside",               // Fit inside (black bars)
-            "MachineIndependentSpeed", // Machine-independent speed
-            "ResizeDisplay", "", "",   // Resize display to fill window size
-            "MenuDisplayedDisabled",   // Menu displayed on boot-up Disabled
-            "MenuBar",                 // Menu Bar
-            "MaximizedOnBoot",         // Maximized on boot-up
-            "MultiSamples",            // Multi-Samples
-            "ChangeResolutionMode",    // Change Resolution Mode
-            "AllowFullscreenSwitch"    // Allow user to switch to/from full screen
-        );
-        public BitDict NewFlags = new BitDict( // New Flags
-            "PlaySoundsOverFrames", "", "", // Play sounds over frames
-            "DontMuteOnLostFocus",          // Do not mute samples when application loses focus
-            "NoMinimizeBox",                // No Minimize box
-            "NoMaximizeBox",                // No Maximize box
-            "NoThickFrame",                 // No Thick frame
-            "DontCenterFrame",              // Do not center frame area in window
-            "DontStopScreenSaver",          // Do not stop screen saver when input event
-            "DisableCloseButton",           // Disable Close button
-            "HiddenAtStart",                // Hidden at start
-            "EnableVisualThemes",           // Enable Visual Themes
-            "VSync",                        // V-Sync
-            "RunWhenMinimized", "",         // Run when minimized
-            "RunWhileResizing"              // Run while resizing
-        );
-        public BitDict OtherFlags = new BitDict( // Other Flags
-            "DebuggerShortcuts", "", "",            // Enable debugger keyboard shortcuts
-            "DontShareSubAppData", "", "",          // Do not share data if run as sub-application
-            "IncludeExternalFiles",                 // Include external files
-            "ShowDebugger", "", "", "", "", "", "", // Show Debugger
-            "Direct3D9or11",                        // Display Mode: Direct 3D 9 / Direct 3D 11
-            "Direct3D8or11"                         // Display Mode: Direct 3D 8 / Direct 3D 11
-        );
+        public BitDict Flags = new BitDict(typeof(AppHeaderFlags));
+        public BitDict NewFlags = new BitDict(typeof(AppHeaderNewFlags));
+        public BitDict OtherFlags = new BitDict(typeof(AppHeaderOtherFlags));
         public BitDict DisplayFlags = new BitDict( // Display Flags (MFA Only)
             "MaximizedOnBoot",       // Maximized on boot-up
             "ResizeDisplay",         // Resize display to fill window size
@@ -61,7 +29,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             "RightToLeftReading",    // Right-to-left reading
             "RightToLeftLayout", "", // Right-to-left layout
             "FitInside"              // Fit inside (black bars)
-        );
+        ); // MFA Only
         public BitDict GraphicFlags = new BitDict( // Graphic Flags (MFA Only)
             "MultiSamples",                  // Multi-samples
             "MachineIndependentSpeed",       // Machine-independent speed
@@ -86,7 +54,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             "PremultipliedAlpha",            // Premultiplied alpha
             "DontOptimizeEvents",            // Optimize events Disabled
             "RecordSlowestLoops"             // Record slowest app loops
-        );
+        ); // MFA Only
 
         public short GraphicMode = 4; /* Color Mode
                                        * 3: 256 colors
@@ -173,83 +141,82 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             if (!fromMFA)
             {
                 DisplayFlags.Value = 240; // Default Value
-                DisplayFlags["MaximizedOnBoot"] = Flags["MaximizedOnBoot"];
-                DisplayFlags["ResizeDisplay"] = Flags["ResizeDisplay"];
-                DisplayFlags["ChangeResolutionMode"] = Flags["ChangeResolutionMode"];
-                DisplayFlags["AllowFullscreenSwitch"] = Flags["AllowFullscreenSwitch"];
-                DisplayFlags["Heading"] = !Flags["HeadingDisabled"];
-                DisplayFlags["HeadingWhenMaximized"] = Flags["HeadingWhenMaximized"];
-                DisplayFlags["MenuBar"] = Flags["MenuBar"];
-                DisplayFlags["MenuDisplayed"] = !Flags["MenuDisplayedDisabled"];
-                DisplayFlags["NoMinimizeBox"] = NewFlags["NoMinimizeBox"];
-                DisplayFlags["NoMaximizeBox"] = NewFlags["NoMaximizeBox"];
-                DisplayFlags["NoThickFrame"] = NewFlags["NoThickFrame"];
-                DisplayFlags["DontCenterFrame"] = NewFlags["DontCenterFrame"];
-                DisplayFlags["DisableCloseButton"] = NewFlags["DisableCloseButton"];
-                DisplayFlags["HiddenAtStart"] = NewFlags["HiddenAtStart"];
+                DisplayFlags["MaximizedOnBoot"] = Flags == AppHeaderFlags.MaximizedOnBoot;
+                DisplayFlags["ResizeDisplay"] = Flags == AppHeaderFlags.ResizeDisplay;
+                DisplayFlags["ChangeResolutionMode"] = Flags == AppHeaderFlags.ChangeResolutionMode;
+                DisplayFlags["AllowFullscreenSwitch"] = Flags == AppHeaderFlags.AllowFullscreenSwitch;
+                DisplayFlags["Heading"] = Flags != AppHeaderFlags.HeadingDisabled;
+                DisplayFlags["HeadingWhenMaximized"] = Flags == AppHeaderFlags.HeadingWhenMaximized;
+                DisplayFlags["MenuBar"] = Flags == AppHeaderFlags.MenuBar;
+                DisplayFlags["MenuDisplayed"] = Flags != AppHeaderFlags.MenuDisplayedDisabled;
+                DisplayFlags["NoMinimizeBox"] = NewFlags == AppHeaderNewFlags.NoMinimizeBox;
+                DisplayFlags["NoMaximizeBox"] = NewFlags == AppHeaderNewFlags.NoMaximizeBox;
+                DisplayFlags["NoThickFrame"] = NewFlags == AppHeaderNewFlags.NoThickFrame;
+                DisplayFlags["DontCenterFrame"] = NewFlags == AppHeaderNewFlags.DontCenterFrame;
+                DisplayFlags["DisableCloseButton"] = NewFlags == AppHeaderNewFlags.DisableCloseButton;
+                DisplayFlags["HiddenAtStart"] = NewFlags == AppHeaderNewFlags.HiddenAtStart;
                 DisplayFlags["KeepScreenRatio"] = ext.Flags["KeepScreenRatio"];
                 DisplayFlags["AntiAliasing"] = ext.Flags["AntiAliasing"];
                 DisplayFlags["RightToLeftReading"] = ext.Flags["RightToLeftReading"];
                 DisplayFlags["RightToLeftLayout"] = ext.Flags["RightToLeftLayout"];
-                DisplayFlags["FitInside"] = Flags["FitInside"];
+                DisplayFlags["FitInside"] = Flags == AppHeaderFlags.FitInside;
 
                 GraphicFlags.Value = 807471233; // Default Value
-                GraphicFlags["MultiSamples"] = Flags["MultiSamples"];
-                GraphicFlags["MachineIndependentSpeed"] = Flags["MachineIndependentSpeed"];
-                GraphicFlags["PlaySoundsOverFrames"] = NewFlags["PlaySoundsOverFrames"];
-                GraphicFlags["DontMuteOnLostFocus"] = NewFlags["DontMuteOnLostFocus"];
+                GraphicFlags["MultiSamples"] = Flags == AppHeaderFlags.MultiSamples;
+                GraphicFlags["MachineIndependentSpeed"] = Flags == AppHeaderFlags.MachineIndependentSpeed;
+                GraphicFlags["PlaySoundsOverFrames"] = NewFlags == AppHeaderNewFlags.PlaySoundsOverFrames;
+                GraphicFlags["DontMuteOnLostFocus"] = NewFlags == AppHeaderNewFlags.DontMuteOnLostFocus;
                 GraphicFlags["DontStopScreenSaver"] = NewFlags["DontStopScreenSaver"];
                 GraphicFlags["EnableVisualThemes"] = NewFlags["EnableVisualThemes"];
-                GraphicFlags["VSync"] = NewFlags["VSync"];
-                GraphicFlags["RunWhenMinimized"] = NewFlags["RunWhenMinimized"];
-                GraphicFlags["RunWhileResizing"] = NewFlags["RunWhileResizing"];
-                GraphicFlags["DebuggerShortcuts"] = OtherFlags["DebuggerShortcuts"];
-                GraphicFlags["DontShowDebugger"] = !OtherFlags["ShowDebugger"];
-                GraphicFlags["DontShareSubAppData"] = OtherFlags["DontShareSubAppData"];
-                GraphicFlags["Direct3D9"] = OtherFlags["Direct3D9or11"] && !OtherFlags["Direct3D8or11"];
-                GraphicFlags["Direct3D8"] = OtherFlags["Direct3D8or11"] && !OtherFlags["Direct3D9or11"];
+                GraphicFlags["VSync"] = NewFlags == AppHeaderNewFlags.VSync;
+                GraphicFlags["RunWhenMinimized"] = NewFlags == AppHeaderNewFlags.RunWhenMinimized;
+                GraphicFlags["RunWhileResizing"] = NewFlags == AppHeaderNewFlags.RunWhileResizing;
+                GraphicFlags["DebuggerShortcuts"] = OtherFlags == AppHeaderOtherFlags.DebuggerShortcuts;
+                GraphicFlags["DontShowDebugger"] = OtherFlags != AppHeaderOtherFlags.ShowDebugger;
+                GraphicFlags["DontShareSubAppData"] = OtherFlags == AppHeaderOtherFlags.DontShareSubAppData;
+                GraphicFlags["Direct3D9"] = OtherFlags == AppHeaderOtherFlags.Direct3D9or11 && OtherFlags != AppHeaderOtherFlags.Direct3D8or11;
+                GraphicFlags["Direct3D8"] = OtherFlags != AppHeaderOtherFlags.Direct3D9or11 && OtherFlags == AppHeaderOtherFlags.Direct3D8or11;
                 GraphicFlags["DontIgnoreDestroyFar"] = ext.Flags["DontIgnoreDestroyFar"];
                 GraphicFlags["DisableIME"] = ext.Flags["DisableIME"];
                 GraphicFlags["ReduceCPUUsage"] = ext.Flags["ReduceCPUUsage"];
-                GraphicFlags["Direct3D11"] = OtherFlags["Direct3D9or11"] && OtherFlags["Direct3D8or11"];
+                GraphicFlags["Direct3D11"] = OtherFlags == AppHeaderOtherFlags.Direct3D9or11 && OtherFlags == AppHeaderOtherFlags.Direct3D8or11;
                 GraphicFlags["PremultipliedAlpha"] = ext.Flags["PremultipliedAlpha"];
             }
             else
             {
                 Flags.Value = 4294944001; // Default Value
-                Flags["HeadingWhenMaximized"] = DisplayFlags["HeadingWhenMaximized"];
-                Flags["HeadingDisabled"] = !DisplayFlags["Heading"];
-                Flags["FitInside"] = DisplayFlags["FitInside"];
-                Flags["MachineIndependentSpeed"] = GraphicFlags["MachineIndependentSpeed"];
-                Flags["ResizeDisplay"] = DisplayFlags["ResizeDisplay"];
-                Flags["MenuDisplayedDisabled"] = !DisplayFlags["MenuDisplayed"];
-                Flags["MenuBar"] = DisplayFlags["MenuBar"];
-                Flags["MaximizedOnBoot"] = DisplayFlags["MaximizedOnBoot"];
-                Flags["MultiSamples"] = GraphicFlags["MultiSamples"];
-                Flags["ChangeResolutionMode"] = DisplayFlags["ChangeResolutionMode"];
-                Flags["AllowFullscreenSwitch"] = DisplayFlags["AllowFullscreenSwitch"];
+                Flags.SetFlag(AppHeaderFlags.HeadingWhenMaximized, DisplayFlags["HeadingWhenMaximized"]);
+                Flags.SetFlag(AppHeaderFlags.HeadingDisabled, !DisplayFlags["Heading"]);
+                Flags.SetFlag(AppHeaderFlags.FitInside, DisplayFlags["FitInside"]);
+                Flags.SetFlag(AppHeaderFlags.MachineIndependentSpeed, GraphicFlags["MachineIndependentSpeed"]);
+                Flags.SetFlag(AppHeaderFlags.ResizeDisplay, DisplayFlags["ResizeDisplay"]);
+                Flags.SetFlag(AppHeaderFlags.MenuDisplayedDisabled, !DisplayFlags["MenuDisplayed"]);
+                Flags.SetFlag(AppHeaderFlags.MenuBar, DisplayFlags["MenuBar"]);
+                Flags.SetFlag(AppHeaderFlags.MaximizedOnBoot, DisplayFlags["MaximizedOnBoot"]);
+                Flags.SetFlag(AppHeaderFlags.MultiSamples, GraphicFlags["MultiSamples"]);
+                Flags.SetFlag(AppHeaderFlags.ChangeResolutionMode, DisplayFlags["ChangeResolutionMode"]);
+                Flags.SetFlag(AppHeaderFlags.AllowFullscreenSwitch, DisplayFlags["AllowFullscreenSwitch"]);
 
                 NewFlags.Value = 2048; // Default Value
-                NewFlags["PlaySoundsOverFrames"] = GraphicFlags["PlaySoundsOverFrames"];
-                NewFlags["DontMuteOnLostFocus"] = GraphicFlags["DontMuteOnLostFocus"];
-                NewFlags["NoMinimizeBox"] = DisplayFlags["NoMinimizeBox"];
-                NewFlags["NoMaximizeBox"] = DisplayFlags["NoMaximizeBox"];
-                NewFlags["NoThickFrame"] = DisplayFlags["NoThickFrame"];
-                NewFlags["DontCenterFrame"] = DisplayFlags["DontCenterFrame"];
-                NewFlags["DontStopScreenSaver"] = GraphicFlags["DontStopScreenSaver"];
-                NewFlags["DisableCloseButton"] = DisplayFlags["DisableCloseButton"];
-                NewFlags["HiddenAtStart"] = DisplayFlags["HiddenAtStart"];
-                NewFlags["EnableVisualThemes"] = GraphicFlags["EnableVisualThemes"];
-                NewFlags["VSync"] = GraphicFlags["VSync"];
-                NewFlags["RunWhenMinimized"] = GraphicFlags["RunWhenMinimized"];
-                NewFlags["RunWhileResizing"] = GraphicFlags["RunWhileResizing"];
+                NewFlags.SetFlag(AppHeaderNewFlags.PlaySoundsOverFrames, GraphicFlags["PlaySoundsOverFrames"]);
+                NewFlags.SetFlag(AppHeaderNewFlags.DontMuteOnLostFocus, GraphicFlags["DontMuteOnLostFocus"]);
+                NewFlags.SetFlag(AppHeaderNewFlags.NoMinimizeBox, DisplayFlags["NoMinimizeBox"]);
+                NewFlags.SetFlag(AppHeaderNewFlags.NoMaximizeBox, DisplayFlags["NoMaximizeBox"]);
+                NewFlags.SetFlag(AppHeaderNewFlags.NoThickFrame, DisplayFlags["NoThickFrame"]);
+                NewFlags.SetFlag(AppHeaderNewFlags.DontCenterFrame, DisplayFlags["DontCenterFrame"]);
+                NewFlags.SetFlag(AppHeaderNewFlags.DontStopScreenSaver, GraphicFlags["DontStopScreenSaver"]);
+                NewFlags.SetFlag(AppHeaderNewFlags.DisableCloseButton, DisplayFlags["DisableCloseButton"]);
+                NewFlags.SetFlag(AppHeaderNewFlags.HiddenAtStart, DisplayFlags["HiddenAtStart"]);
+                NewFlags.SetFlag(AppHeaderNewFlags.VSync, GraphicFlags["VSync"]);
+                NewFlags.SetFlag(AppHeaderNewFlags.RunWhenMinimized, GraphicFlags["RunWhenMinimized"]);
+                NewFlags.SetFlag(AppHeaderNewFlags.RunWhileResizing, GraphicFlags["RunWhileResizing"]);
 
                 OtherFlags.Value = 4294951041; // Default Value
-                OtherFlags["DebuggerShortcuts"] = GraphicFlags["DebuggerShortcuts"];
-                OtherFlags["DontShareSubAppData"] = GraphicFlags["DontShareSubAppData"];
-                OtherFlags["ShowDebugger"] = !GraphicFlags["DontShowDebugger"];
-                OtherFlags["Direct3D9or11"] = GraphicFlags["Direct3D9"] || GraphicFlags["Direct3D11"];
-                OtherFlags["Direct3D8or11"] = GraphicFlags["Direct3D8"] || GraphicFlags["Direct3D11"];
+                OtherFlags.SetFlag(AppHeaderOtherFlags.DebuggerShortcuts, GraphicFlags["DebuggerShortcuts"]);
+                OtherFlags.SetFlag(AppHeaderOtherFlags.DontShareSubAppData, GraphicFlags["DontShareSubAppData"]);
+                OtherFlags.SetFlag(AppHeaderOtherFlags.ShowDebugger, !GraphicFlags["DontShowDebugger"]);
+                OtherFlags.SetFlag(AppHeaderOtherFlags.Direct3D9or11, GraphicFlags["Direct3D9"] || GraphicFlags["Direct3D11"]);
+                OtherFlags.SetFlag(AppHeaderOtherFlags.Direct3D8or11, GraphicFlags["Direct3D8"] || GraphicFlags["Direct3D11"]);
 
                 ext.Flags.Value = 3288334336; // Default Value
                 ext.Flags["KeepScreenRatio"] = DisplayFlags["KeepScreenRatio"];
