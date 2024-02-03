@@ -29,7 +29,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             if (!Flags["Parent"])
                 ID = reader.ReadUShort();
 
-            Name = reader.ReadWideString();
+            Name = reader.ReadYunicode();
             for (int i = 0; i < Name.Length; i++)
             {
                 if (Name[i] == '&')
@@ -59,7 +59,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             writer.WriteUShort((ushort)Flags.Value);
             if (!Flags["Parent"])
                 writer.WriteUShort(ID);
-            writer.WriteUnicode(string.IsNullOrEmpty(Mnemonic) ? Name : Name.ReplaceFirst(Mnemonic, "&" + Mnemonic), true);
+            writer.WriteYunicode(string.IsNullOrEmpty(Mnemonic) ? Name : Name.ReplaceFirst(Mnemonic, "&" + Mnemonic), true);
 
             if (Flags["Parent"])
                 foreach (MenuItem menuItem in Items)

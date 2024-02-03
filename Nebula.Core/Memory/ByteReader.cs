@@ -110,7 +110,7 @@ namespace Nebula.Core.Memory
             return str;
         }
 
-        public string ReadWideString(int length = -1)
+        public string ReadYunicode(int length = -1)
         {
             string str = "";
             if (Tell() >= Size()) return str;
@@ -131,7 +131,7 @@ namespace Nebula.Core.Memory
             return str;
         }
 
-        public string ReadWideStringStop(int length = -1)
+        public string ReadYunicodeStop(int length = -1)
         {
             string str = "";
             long debut = Tell();
@@ -151,38 +151,38 @@ namespace Nebula.Core.Memory
         {
             short len = ReadShort();
             Skip(2);
-            if (NebulaCore.Unicode)
-                return ReadWideString(len);
+            if (NebulaCore.Yunicode)
+                return ReadYunicode(len);
             else
                 return ReadAscii(len);
         }
 
         public string ReadYuniversal(int len = -1)
         {
-            if (NebulaCore._unicode == null)
+            if (NebulaCore._yunicode == null)
             {
                 Skip(1);
-                NebulaCore._unicode = ReadByte() == 0;
+                NebulaCore._yunicode = ReadByte() == 0;
                 Skip(-2);
             }
 
-            if (NebulaCore.Unicode)
-                return ReadWideString(len); 
+            if (NebulaCore.Yunicode)
+                return ReadYunicode(len); 
             else
                 return ReadAscii(len);
         }
 
         public string ReadYuniversalStop(int len = -1)
         {
-            if (NebulaCore._unicode == null)
+            if (NebulaCore._yunicode == null)
             {
                 Skip(1);
-                NebulaCore._unicode = ReadByte() == 0;
+                NebulaCore._yunicode = ReadByte() == 0;
                 Skip(-2);
             }
 
-            if (NebulaCore.Unicode)
-                return ReadWideStringStop(len); 
+            if (NebulaCore.Yunicode)
+                return ReadYunicodeStop(len); 
             else
                 return ReadAsciiStop(len);
         }

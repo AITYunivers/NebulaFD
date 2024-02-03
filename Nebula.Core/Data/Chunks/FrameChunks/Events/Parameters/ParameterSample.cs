@@ -27,7 +27,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         {
             writer.WriteShort(Handle);
             writer.WriteUShort((ushort)SampleFlags.Value);
-            writer.WriteUnicode(Name, true);
+            writer.WriteYunicode(Name, true);
         }
 
         public override string ToString()

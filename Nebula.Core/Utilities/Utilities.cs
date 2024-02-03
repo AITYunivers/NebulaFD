@@ -26,7 +26,7 @@ namespace Nebula.Core.Utilities
         }
         public static string ReadYuniversal(this ByteReader reader, int len=-1)
         {
-            if (NebulaCore.Unicode) return reader.ReadWideString(len);
+            if (NebulaCore.Yunicode) return reader.ReadYunicode(len);
             else return reader.ReadAscii(len);
         }
         public static byte[] GetBuffer(this ByteWriter writer)

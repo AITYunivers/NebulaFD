@@ -36,7 +36,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
             writer.WriteShort((short)FileName.Length);
-            writer.WriteUnicode(FileName);
+            writer.WriteYunicode(FileName);
             writer.WriteInt(FileData.Length);
             writer.WriteBytes(FileData);
         }

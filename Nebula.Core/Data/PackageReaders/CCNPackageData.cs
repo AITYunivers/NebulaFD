@@ -18,7 +18,7 @@ namespace Nebula.Core.Data.PackageReaders
                 return;
 
             Header = Reader.ReadAscii(4);
-            NebulaCore._unicode = Header != "PAME";
+            NebulaCore._yunicode = Header != "PAME";
             if (Header == "CRUF")
                 NebulaCore.Fusion = 3f;
             Logger.Log(this, "Game Header: " + Header);

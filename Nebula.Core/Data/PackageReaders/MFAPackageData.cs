@@ -27,7 +27,7 @@ namespace Nebula.Core.Data.PackageReaders
         {
             Logger.Log(this, $"Running {NebulaCore.BuildDate} build.");
             Header = Reader.ReadAscii(4);
-            NebulaCore._unicode = Header == "MFU2";
+            NebulaCore._yunicode = Header == "MFU2";
             NebulaCore.MFA = true;
             Logger.Log(this, "Project Header: " + Header);
 

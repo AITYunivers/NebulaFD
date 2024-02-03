@@ -22,7 +22,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         {
             Handle = reader.ReadShort();
             Name = reader.ReadAutoYuniversal();
-            UUID = reader.ReadWideString(75).Trim();
+            UUID = reader.ReadYunicode(75).Trim();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

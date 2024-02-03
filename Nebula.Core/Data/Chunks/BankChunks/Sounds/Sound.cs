@@ -94,7 +94,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             int nameLength = reader.ReadInt();
             ByteReader soundData;
             soundData = new ByteReader(reader.ReadBytes(decompressedSize));
-            Name = soundData.ReadWideString(nameLength);
+            Name = soundData.ReadYunicode(nameLength);
             if (Flags["Decompressed"]) soundData.Seek(0);
             Data = soundData.ReadBytes();
         }
@@ -120,7 +120,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
                 writer.WriteBytes(Data);
             else
             {
-                writer.WriteUnicode(Name);
+                writer.WriteYunicode(Name);
                 writer.WriteBytes(Data);
             }
         }

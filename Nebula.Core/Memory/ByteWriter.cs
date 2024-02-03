@@ -42,9 +42,9 @@ namespace Nebula.Core.Memory
         public void WriteDouble(double value) => Write(value);
         public void WriteString(string value) => Write(value);
 
-        /*public void WriteUniversal(string value, bool addZero = false)
+        /*public void WriteYuniversal(string value, bool addZero = false)
         {
-            if (Settings.Unicode) WriteUnicode(value, addZero);
+            if (Settings.Yunicode) WriteUnicode(value, addZero);
             else WriteAscii(value);
         }*/
 
@@ -60,12 +60,12 @@ namespace Nebula.Core.Memory
             Array.Resize(ref toWrite, length);
             WriteBytes(toWrite);
         }
-        public void WriteUnicode(string value, bool appendZero = false)
+        public void WriteYunicode(string value, bool appendZero = false)
         {
             WriteBytes(Encoding.Unicode.GetBytes(value));
             if (appendZero) WriteShort(0);
         }
-        public void WriteUnicode(string value, int length)
+        public void WriteYunicode(string value, int length)
         {
             byte[] toWrite = Encoding.Unicode.GetBytes(value);
             Array.Resize(ref toWrite, length * 2);
@@ -76,7 +76,7 @@ namespace Nebula.Core.Memory
         {
             WriteShort((short)value.Length);
             WriteShort(-32768);
-            WriteUnicode(value);
+            WriteYunicode(value);
         }
 
         public void WriteColor(Color color)

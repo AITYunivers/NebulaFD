@@ -21,7 +21,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
             writer.WriteShort(ID);
-            writer.WriteUnicode(Name, 33);
+            writer.WriteYunicode(Name, 33);
         }
 
         public override string ToString()

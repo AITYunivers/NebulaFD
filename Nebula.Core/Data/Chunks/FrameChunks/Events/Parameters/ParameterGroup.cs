@@ -35,7 +35,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         {
             writer.WriteUShort((ushort)GroupFlags.Value);
             writer.WriteShort(ID);
-            writer.WriteUnicode(Name, 79);
+            writer.WriteYunicode(Name, 79);
             // Weird password check
             {
                 writer.WriteLong(-4317047546775076864);

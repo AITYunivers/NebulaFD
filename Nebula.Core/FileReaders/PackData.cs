@@ -13,12 +13,12 @@ namespace Nebula.Core.FileReaders
             else if (reader.PeekInt() == 32639 || reader.PeekInt() == 8748)
             {
                 NebulaCore.Fusion = 1.5f; // Multimedia Fusion 1.5
-                NebulaCore._unicode = false;
+                NebulaCore._yunicode = false;
             }
             else if (reader.PeekShort() == 1)
             {
                 NebulaCore.Fusion = 1.1f; // The Games Factory
-                NebulaCore._unicode = false;
+                NebulaCore._yunicode = false;
             }
             else
                 reader.Skip(28); // Click Protector

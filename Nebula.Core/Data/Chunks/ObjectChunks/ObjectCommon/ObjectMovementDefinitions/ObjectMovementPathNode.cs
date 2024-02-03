@@ -29,7 +29,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDefini
             Sin = reader.ReadShort();
             Length = reader.ReadShort();
             Pause = reader.ReadShort();
-            Name = reader.ReadWideString();
+            Name = reader.ReadYunicode();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -52,7 +52,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDefini
             writer.WriteShort(Sin);
             writer.WriteShort(Length);
             writer.WriteShort(Pause);
-            writer.WriteUnicode(Name, true);
+            writer.WriteYunicode(Name, true);
         }
     }
 }

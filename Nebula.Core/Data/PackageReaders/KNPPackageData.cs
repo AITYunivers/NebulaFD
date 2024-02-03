@@ -20,7 +20,7 @@ namespace Nebula.Core.Data.PackageReaders
         {
             Reader = new ByteReader(new byte[1]);
             Logger.Log(this, $"Running {NebulaCore.BuildDate} build.");
-            NebulaCore._unicode = false;
+            NebulaCore._yunicode = false;
             NebulaCore.Fusion = 0.0f;
             AppName = Path.GetFileNameWithoutExtension(FilePath);
 

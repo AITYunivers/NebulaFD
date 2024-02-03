@@ -28,8 +28,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
             writer.WriteUShort((ushort)FileFlags.Value);
-            writer.WriteUnicode(FileName, 260);
-            writer.WriteUnicode(Command, true);
+            writer.WriteYunicode(FileName, 260);
+            writer.WriteYunicode(Command, true);
         }
     }
 }

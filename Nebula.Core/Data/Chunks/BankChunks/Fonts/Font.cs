@@ -105,7 +105,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Fonts
             writer.WriteByte(ClipPrecision);
             writer.WriteByte(Quality);
             writer.WriteByte(PitchAndFamily);
-            writer.WriteUnicode(Name, 32);
+            writer.WriteYunicode(Name, 32);
         }
     }
 }

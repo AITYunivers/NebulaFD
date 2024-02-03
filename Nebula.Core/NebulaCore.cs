@@ -44,8 +44,8 @@ namespace Nebula
         }
 
         public static int Build;
-        public static bool? _unicode = null;
-        public static bool Unicode => _unicode != null && _unicode == true;
+        public static bool? _yunicode = null;
+        public static bool Yunicode => _yunicode != null && _yunicode == true;
 
         public static string FilePath = string.Empty;
         public static IFileReader? CurrentReader;

@@ -18,7 +18,7 @@ namespace Nebula.Core.Data.Chunks
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteUnicode(Value);
+            writer.WriteYunicode(Value);
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)

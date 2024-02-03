@@ -55,7 +55,7 @@
 
             var rawData = reader.ReadBytes((int)reader.Size());
 
-            if ((chunkId & 1) == 1 && NebulaCore.Build > 284)
+            if ((chunkId & 1) == 1 && NebulaCore.Build > 285)
                 rawData[0] ^= (byte)((byte)(chunkId & 0xFF) ^ (byte)(chunkId >> 0x8));
 
             TransformChunk(rawData);
