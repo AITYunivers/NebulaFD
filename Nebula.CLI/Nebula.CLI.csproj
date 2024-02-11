@@ -8,6 +8,8 @@
     <Platforms>AnyCPU;x64</Platforms>
     <ApplicationIcon>Resources\AppIcon.ico</ApplicationIcon>
     <AssemblyName>Nebula</AssemblyName>
+	<OutputPath>..\build\</OutputPath>
+	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,5 +27,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Nebula.Core\Nebula.Core.csproj" />
   </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="copy &quot;..\.resources\zlibwapi.dll&quot; &quot;..\build&quot;" />
+  </Target>
 
 </Project>

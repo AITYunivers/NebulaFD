@@ -46,10 +46,8 @@ namespace Nebula.Plugins.GameDumper
                         for (int i = 0; i < images.Length; i++)
                         {
                             Directory.CreateDirectory(path);
-                            File.WriteAllBytes(path + "\\" + images[i].Handle + ".bin", images[i].ImageData);
                             images[i].GetBitmap().Save(path + "\\" + images[i].Handle + ".png");
                             task.Value = ++progress;
-                            Debug.Assert(images[i].GraphicMode == 0);
                         }
 
                         if (NebulaCore.PackageData is MFAPackageData && (NebulaCore.PackageData as MFAPackageData).IconBank != null)

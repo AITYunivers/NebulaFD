@@ -54,6 +54,8 @@ namespace Nebula.Plugins.GameDumper
         {
             if (data[0] == 'R' && data[1] == 'I' && data[2] == 'F' && data[3] == 'F')
                 return ".wav";
+            if (data[0] == 0xFF && data[1] == 0xFB && data[2] == 0x90)
+                return ".wav";
             if (data[0] == 'O' && data[1] == 'g' && data[2] == 'g' && data[3] == 'S')
                 return ".ogg";
             if (data[0] == 'F' && data[1] == 'O' && data[2] == 'R' && data[3] == 'M')
@@ -63,7 +65,7 @@ namespace Nebula.Plugins.GameDumper
 
             // Because of Clickteam stole the MOD replayer from open-source OpenMPT library,
             // there's more file formats that can be supported by modflt.sft.
-            return string.Empty;
+            return ".wav";
         }
     }
 }
