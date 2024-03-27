@@ -229,7 +229,7 @@ namespace Nebula.Core.Utilities
             return output;
         }
 
-        private static void doDraw(Graphics g, Bitmap sourceBitmap, Rectangle dest, float alpha)
+        public static void doDraw(Graphics g, Bitmap sourceBitmap, Rectangle dest, float alpha)
         {
             using (ImageAttributes imageAttributes = new ImageAttributes())
             {
