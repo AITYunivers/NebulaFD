@@ -57,6 +57,7 @@ namespace Nebula.Plugins.EncKeyDumper
             switch (extName)
             {
                 case "INI++15.mfx":
+                case "INI++.mfx": // Who tf renames this?? SUNKENSTUDIOS!!!
                     IniPlusPlus inipp = new IniPlusPlus(reader);
                     return inipp.UseEncryption ? inipp.EncryptionKey : "";
             }
