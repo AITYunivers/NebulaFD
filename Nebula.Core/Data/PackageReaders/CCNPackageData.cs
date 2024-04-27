@@ -33,7 +33,7 @@ namespace Nebula.Core.Data.PackageReaders
             if (NebulaCore.Build < 280)
                 NebulaCore.Fusion = 2f + (ProductVersion == 1 ? 0.1f : 0);
 
-            Frames = new List<Frame>();
+            Frames = new Dictionary<int, Frame>();
             while (Reader.HasMemory(8))
             {
                 var newChunk = Chunk.InitChunk(Reader);

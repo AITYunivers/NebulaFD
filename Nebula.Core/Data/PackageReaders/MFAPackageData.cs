@@ -135,7 +135,7 @@ namespace Nebula.Core.Data.PackageReaders
                 Reader.Seek(offset);
                 Frame frame = new Frame();
                 frame.ReadMFA(Reader);
-                Frames.Add(frame);
+                Frames.Add(frame.Handle, frame);
                 FrameHandles.Add((short)frame.Handle);
             }
 
@@ -159,7 +159,7 @@ namespace Nebula.Core.Data.PackageReaders
         public void FinishParsing()
         {
             Dictionary<int, ObjectInfo> frameItems = new Dictionary<int, ObjectInfo>();
-            foreach (Frame frame in Frames)
+            foreach (Frame frame in Frames.Values)
             {
                 foreach (MFAObjectInfo oI in frame.MFAFrameInfo.Objects)
                 {

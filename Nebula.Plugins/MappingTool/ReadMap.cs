@@ -1,6 +1,7 @@
 ﻿using Nebula;
 using Nebula.Core.Utilities;
 using Spectre.Console;
+using Newtonsoft.Json;
 
 namespace MappingTool
 {
@@ -14,8 +15,7 @@ namespace MappingTool
             AnsiConsole.Write(NebulaCore.ConsoleFiglet);
             AnsiConsole.Write(NebulaCore.ConsoleRule);
 
-            AnsiConsole.Markup("[Red]WORK IN PROGRESS![/]");
-            Console.ReadKey();
+            JsonConvert.PopulateObject(File.ReadAllText("test.json"), NebulaCore.PackageData, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All});
         }
     }
 }

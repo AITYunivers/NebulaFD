@@ -102,7 +102,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                         if (NebulaCore.Android)
                             colorArray = ImageTranslator.AndroidMode3ToRGBA(ImageData, Width, Height, false);
                         else
-                            colorArray = ImageTranslator.ColorPaletteToRGBA(ImageData, Width, Height, NebulaCore.PackageData.Frames.First().FramePalette.Palette, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
+                            colorArray = ImageTranslator.ColorPaletteToRGBA(ImageData, Width, Height, NebulaCore.PackageData.Frames.First().Value.FramePalette.Palette, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                         break;
                     case 4:
                         if (NebulaCore.Android)
@@ -258,7 +258,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                     if (NebulaCore.Android)
                         ImageData = ImageTranslator.AndroidMode3ToRGBA(ImageData, Width, Height, Flags["Alpha"]);
                     else
-                        ImageData = ImageTranslator.ColorPaletteToRGBA(ImageData, Width, Height, NebulaCore.PackageData.Frames.First().FramePalette.Palette, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
+                        ImageData = ImageTranslator.ColorPaletteToRGBA(ImageData, Width, Height, NebulaCore.PackageData.Frames.First().Value.FramePalette.Palette, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                     ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
                     GraphicMode = 4;
                     break;

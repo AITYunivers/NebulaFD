@@ -18,6 +18,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         public Qualifier[] Qualifiers = new Qualifier[0];
 
         public int EventCount;
+        [NonSerialized]
         public List<Event> Events = new();
 
         // For MFA

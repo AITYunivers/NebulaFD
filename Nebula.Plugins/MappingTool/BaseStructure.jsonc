@@ -24,7 +24,7 @@
         "EnableProfiler": false,
         "StartProfilingAtStartOfFrame": true,
         "ProfileTopLevelConditionsOnly": false,
-        "RecordSlowestAppLoads": false,
+        "RecordSlowestAppLoops": false,
 
         // Optimizations
         "OptimizeEvents": true,
@@ -47,14 +47,14 @@
         "DisableCloseButton": false,
         "NoMinimizeBox": false,
         "NoMaximizeBox": false,
-        "NoThicFrame": false,
+        "NoThickFrame": false,
         "MaximizedOnBootup": false,
         "HiddenAtStart": false,
         
         // Menu
+        "ShowMenuBar": true,
         "MenuBar":
         {
-            "Enabled": true,
             "MenuItems":
             [
                 "&File",
@@ -84,14 +84,14 @@
                 ]
             ],
             "Colors": false,
-            "Background": [0, 255, 255, 255], // ARGB
-            "BarBackground": [0, 255, 255, 255], // ARGB
-            "Checkbox": [0, 0, 0, 0], // ARGB
-            "GrayedText": [0, 109, 109, 109], // ARGB
-            "SelectedItemBackground": [0, 0, 120, 215], // ARGB
-            "SelectedItemText": [0, 255, 255, 255], // ARGB
-            "Separator": [0, 160, 160, 160], // ARGB
-            "Text": [0, 0, 0, 0] // ARGB
+            "BackgroundColor": [255, 255, 255], // RGB
+            "BarBackgroundColor": [255, 255, 255], // RGB
+            "CheckboColorx": [0, 0, 0], // RGB
+            "GrayedTextColor": [109, 109, 109], // RGB
+            "SelectedItemBackgroundColor": [0, 120, 215], // RGB
+            "SelectedItemTextColor": [255, 255, 255], // RGB
+            "SeparatorColor": [160, 160, 160], // RGB
+            "TextColor": [0, 0, 0] // RGB
         },
         "MenuDisplayedOnBootup": true,
 
@@ -297,16 +297,17 @@
         ],
         "AllowAlterablesForCounterString": false
     },
-  "About": // Application Properties -> About Tab
-  {
-    "Name": "Application 1",
-    "Filename": "",
-    "HelpFile": "",
-    "Language": 48, // English (United States)
-    "Author": "",
-    "Copyright": "",
-    "AboutBox": ""
-  },
+    "About": // Application Properties -> About Tab
+    {
+      "Name": "Application 1",
+      "Icons": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "Filename": "",
+      "HelpFile": "",
+      "Language": 47, // English (United States)
+      "Author": "",
+      "Copyright": "",
+      "AboutBox": ""
+    },
     "Windows": // Application Properties -> Windows Tab
     {
         "ImageFilters":
@@ -527,5 +528,421 @@
             }
         },
         "ExecutionLevel": 1 // As invoker
-    }
+    },
+    "Frames":
+    [
+        {
+            "Settings": // Frame Properties -> Settings Tab
+            {
+                "Size": [640, 480],
+                "VirtualWidth": 640,
+                "VirtualHeight": 480,
+                "BackgroundColor": [255, 255, 255],
+                // Ignore palette for now
+                "DontIncludeAtBuildTime": false,
+                "FadeIn":
+                {
+                    "FileName": "cctrans.dll",
+                    "ModuleName": "None",
+                    "Module": 0,
+                    "ModuleID": "",
+                    "Duration": 0,
+                    "UseColor": false,
+                    "Color": [0, 0, 0]
+                    // Transition Data
+                },
+                "FadeOut":
+                {
+                    "FileName": "cctrans.dll",
+                    "ModuleName": "None",
+                    "Module": 0,
+                    "ModuleID": "",
+                    "Duration": 0,
+                    "UseColor": false,
+                    "Color": [0, 0, 0]
+                    // Transition Data
+                },
+                "Effect":
+                {
+                    // Probably more to do here
+                    "InkEffect": 0,
+                    "InkEffectParams": 0
+                },
+                "BlendCoefficient": 0,
+                "RGBCoefficient": [255, 255, 255],
+                "DemoFile": "",
+                "RNGSeed": -1,
+                "IncludeAnotherFrame": -1
+            },
+            "RuntimeOptions": // Frame Properties -> Runtime options Tab
+            {
+                "GrabDesktopAtStart": false,
+                "KeepDisplayFromPreviousFrame": false,
+                "HandleBackgroundCollisionsEvenOutOfWindow": true,
+                "DisplayFrameTitleInWindowCaption": false,
+                "ResizeToScreenSizeAtStart": false,
+                "Direct3DDontEraseBackground": false,
+                "ForceLoadOnCall": 0, // No
+                "ScreenSaverSetupFrame": false,
+                "IncludeGlobalEvents": true,
+                "NumberOfObjects": 1000,
+                "TimerBasedMovements": true,
+                "MovementTimerBase": 60,
+                "Password": ""
+            },
+            "About": // Frame Properties -> About Tab
+            {
+                "Name": "Frame 1"
+            },
+            "Layers":
+            [
+                {
+                    "Settings": // Layer Properties -> Settings Tab
+                    {
+                        "Name": "Untitled",
+                        "VisibleAtStart": true,
+                        "SaveBackground": true,
+                        "XCoefficient": 1.0,
+                        "YCoefficient": 1.0,
+                        "WrapHorizontally": false,
+                        "WrapVertically": false,
+                        "SameEffectAsPreviousLayer": false,
+                        "Effect":
+                        {
+                            "InkEffect": 0,
+                            "Shader":
+                            {
+                                "Handle": 0,
+                                "Parameters":
+                                [
+                                    {
+                                        "Name": "",
+                                        "Type": 0,
+                                        "Value": 0,
+                                        "FloatValue": 0.0
+                                    }
+                                ]
+                            }
+                        },
+                        "BlendCoefficient": 0,
+                        "RGBCoefficient": [255, 255, 255]
+                    },
+                    "VisibleInEditor": true,
+                    "LockedInEditor": false
+                }
+            ],
+            "Instances":
+            [
+                {
+                    "Handle": 0,
+                    "Size/Position": // Object Properties -> Size/Position Tab
+                    {
+                        "X": 30,
+                        "Y": 42
+                    },
+                    "Values": // Object Properties -> Values Tab
+                    {
+                        "InstanceValue": 0
+                    },
+                    "Layer": 0,
+                    "Locked": false,
+                    "CreateOnly": false
+                }
+            ]
+        }
+    ],
+    "ObjectInfos":
+    [
+        {
+            "DisplayOptions": // Object Properties -> Display Options Tab
+            {
+                "VisibleAtStart": true,
+                "DisplayAsBackground": true,
+                "SaveBackground": true,
+                "WipeWithColor": false,
+                "WipeColor": [255, 255, 255],
+                "Transparent": true,
+                "Effect":
+                {
+                    "InkEffect": 0,
+                    "InkEffectParams": 0,
+                    "Shader":
+                    {
+                        "Handle": 0,
+                        "Parameters":
+                        [
+                            {
+                                "Name": "",
+                                "Type": 0,
+                                "Value": 0,
+                                "FloatValue": 0.0
+                            }
+                        ]
+                    }
+                },
+                "BlendCoefficient": 0,
+                "RGBCoefficient": [255, 255, 255],
+                "AntiAliasing": false,
+                "FadeIn":
+                {
+                    "FileName": "cctrans.dll",
+                    "ModuleName": "None",
+                    "Module": 0,
+                    "ModuleID": "",
+                    "Duration": 0,
+                    "UseColor": false,
+                    "Color": [0, 0, 0]
+                    // Transition Data
+                },
+                "FadeOut":
+                {
+                    "FileName": "cctrans.dll",
+                    "ModuleName": "None",
+                    "Module": 0,
+                    "ModuleID": "",
+                    "Duration": 0,
+                    "UseColor": false,
+                    "Color": [0, 0, 0]
+                    // Transition Data
+                }
+            },
+            "Size": // Object Properties -> Size / Position Tab
+            {
+                "Width": 32,
+                "Height": 32
+            },
+            "TextOptions": // Object Properties -> Text Options Tab
+            {
+                "Font": 0,
+                "Bold": false,
+                "Italic": false,
+                "Underline": false,
+                "Strikeout": false,
+                "Color": [0, 0, 0],
+                "HorizontalAllignment": 0, // Left
+                "VerticalAllignment": 0, // Top
+                "RightToLeftReading": false
+            },
+            "Movements": // Object Properties -> Movement Tab
+            {
+                "Type": 0
+            },
+            "RuntimeOptions": // Object Properties -> RunTime Options Tab
+            {
+                "DontIncludeAtBuildTime": false,
+                "CreateAtStart": true,
+                "CreateBeforeFrameTransition": false,
+                "FollowTheFrame": true,
+                "DestroyObjectIfTooFar": true,
+                "InactivateIfTooFar": 2, // Automatic
+                "UseFineDetection": true,
+                "ObstacleType": 0, // None
+                "CollisionWithBox": false,
+                "LoadOnCall": false,
+                "GlobalObject": false,
+                "EditorSynchronization": 2, // Same Name and Type
+                "AutomaticRotations": false,
+                "DoNotResetFrameDuration": false
+            },
+            "Values": // Object Properties -> Values Tab
+            {
+                "AlterableValues":
+                [
+                    {
+                        "Name": "Alterable Value A",
+                        "Value": 0
+                    }
+                ],
+                "AlterableStrings":
+                [
+                    {
+                        "Name": "Alterable String A",
+                        "Value": ""
+                    }
+                ],
+                "AlterableFlags":
+                [
+                    {
+                        "Name": "Flag 0",
+                        "Value": false
+                    }
+                ]
+            },
+            "Events": // Object Properties -> Events Tab
+            {
+                "Qualifiers": [-1, -1, -1, -1, -1, -1, -1, -1]
+            },
+            "About": // Object Properties -> About Tab
+            {
+                "Name": "Active",
+                "AutoUpdate": true
+            },
+            "QuickBackdropData":
+            {
+                "Shape": 1, // Rectangle
+                "BorderColor": [0, 0, 0],
+                "BorderWidth": 0,
+
+                "FillType": 1, // Solid Color
+                "FillColor1": [128, 128, 128],
+                "FillColor2": [255, 255, 255],
+                "VerticalGradient": false,
+
+                "Motif": 0,
+                "IntegralDimensions": false
+            },
+            "BackdropData":
+            {
+                "Image": 0
+            },
+            "ActiveData":
+            {
+                "Animations":
+                [
+                    {
+                        "Name": "Stopped",
+                        "Directions":
+                        [
+                            {
+                                "Index": 0,
+                                "MinimumSpeed": 50,
+                                "MaximumSpeed": 50,
+                                "Repeat": 1,
+                                "RepeatFrame": 0,
+                                "Frames":
+                                [
+                                    0
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "StringData":
+            {
+                "Paragraphs":
+                [
+                    "Text"
+                ]
+            },
+            "QuestionAndAnswerData":
+            {
+                "Question":
+                {
+                    "Paragraph": "Question",
+                    "Font": 0,
+                    "Color": [0, 0, 0],
+                    "Relief": false
+                },
+                "Answers":
+                {
+                    "Paragraphs":
+                    [
+                        {
+                            "Paragraph": "Answer",
+                            "IsCorrect": false
+                        }
+                    ],
+                    "Font": 0,
+                    "Color": [0, 0, 0],
+                    "Relief": false
+                }
+            },
+            "ScoreData":
+            {
+                "Player": 1,
+                "Type": 0, // Numbers
+                "UseFixedDigitCount" : false,
+                "FixedNumberOfDigits": 9,
+                "Images":
+                [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                ]
+            },
+            "LivesData":
+            {
+                "Player": 1,
+                "Type": 0, // Image
+                "UseFixedDigitCount" : false,
+                "FixedNumberOfDigits": 2,
+                "Images":
+                [
+                    0
+                ]
+            },
+            "CounterData":
+            {
+                "InitialValue": 0,
+                "MinimumValue": -999999999,
+                "MaximumValue": 999999999,
+
+                "UseFixedDigitCount" : false,
+                "FixedNumberOfDigits": 0,
+
+                "UseSignificantDigitCount": false,
+                "NumberOfSignificantDigits": 16,
+                "UseDecimalDigitCount": false,
+                "NumberOfDigitsAfterDecimalPoint": 2,
+                "AddZerosToTheLeft": false,
+
+                "Type": 1, // Numbers
+                "Images":
+                [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                ],
+                
+                "Count": 1, // Up
+                "FillType": 1, // Gradient
+                "FillColor1": [128, 128, 128],
+                "FillColor2": [255, 255, 255],
+                "VerticalGradient": false
+            },
+            "FormattedTextData":
+            {
+                "BackgroundColor": [255, 255, 255],
+                "AutoVerticalScrollbar": true
+            },
+            "SubApplicationData":
+            {
+                "Source": 1, // Frame from this application
+                "Filename": "",
+                "FrameNumber": 0,
+                
+                "ShareGlobalValues": false,
+                "ShareLives": false,
+                "ShareScores": false,
+                "SharePlayerControls": false,
+
+                "WindowIcon": -1,
+                "CustomizableSize": false,
+                "StretchFrameToObjectSize": false,
+                "DisplayAsSprite": false,
+
+                "IgnoreParentsResizeDisplay": false,
+
+                "PopupWindow": false,
+                "ClipSiblings": false,
+                "Border": false,
+                "Resizable": false,
+                "Caption": false,
+                "ToolCaption": false,
+                "SystemMenu": false,
+                "DisableClose": false,
+                "HiddenOnClose": false,
+                "Modal": false
+            },
+            "ExtensionData":
+            {
+                "Type": 0,
+                "Name": "",
+                "FileName": "",
+                "Magic": 0,
+                "SubType": "",
+                "Version": 0,
+                "ID": 0,
+                "Private": 0,
+                "Data": [ 0 ] // Byte Array
+            }
+        }
+    ]
 }

@@ -9,6 +9,7 @@ using Nebula.Core.Data.Chunks.ObjectChunks;
 using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -34,9 +35,9 @@ namespace GameDumper
             ByteWriter writer = new ByteWriter(new FileStream(path + Utilities.ClearName(Path.GetFileName(string.IsNullOrEmpty(dat.EditorFilename) ? dat.AppName + ".mfa" : dat.EditorFilename)), FileMode.Create));
 
             IconBank.GraphicMode = dat.ImageBank.GraphicMode = dat.AppHeader.GraphicMode;
-            IconBank.PaletteVersion = dat.ImageBank.PaletteVersion = dat.Frames.First().FramePalette.PaletteVersion;
-            IconBank.PaletteEntries = dat.ImageBank.PaletteEntries = (short)dat.Frames.First().FramePalette.PaletteEntries;
-            IconBank.Palette = dat.ImageBank.Palette = dat.Frames.First().FramePalette.Palette;
+            IconBank.PaletteVersion = dat.ImageBank.PaletteVersion = dat.Frames.First().Value.FramePalette.PaletteVersion;
+            IconBank.PaletteEntries = dat.ImageBank.PaletteEntries = (short)dat.Frames.First().Value.FramePalette.PaletteEntries;
+            IconBank.Palette = dat.ImageBank.Palette = dat.Frames.First().Value.FramePalette.Palette;
 
             // Initialize images on multiple threads for speed
             List<Task> imgTasks = new List<Task>();
@@ -119,7 +120,7 @@ namespace GameDumper
                 IconBank.Images.Add(newIconImage.Handle, newIconImage);
                 objectInfo.IconHandle = newIconImage.Handle;
             }
-            foreach (Frame frm in dat.Frames)
+            foreach (Frame frm in dat.Frames.Values)
             {
                 Image frmImg = new Image();
                 frmImg.Handle = (uint)IconBank.Images.Count;
@@ -215,10 +216,9 @@ namespace GameDumper
             for (int i = 0; i < dat.Frames.Count; i++)
             {
                 writer.WriteUInt((uint)(offsetEnd + frameWriter.Tell()));
-                Frame frm = dat.Frames[i];
-                if (!NebulaCore.MFA && NebulaCore.Fusion >= 1.0f)
-                    frm.Handle = dat.FrameHandles.IndexOf((short)i);
+                Frame frm = dat.Frames[dat.FrameHandles.IndexOf((short)i)];
                 frm.WriteMFA(frameWriter);
+                Debug.WriteLine("Writing frame '" + frm.FrameName + "'");
             }
 
             writer.WriteUInt((uint)(offsetEnd + frameWriter.Tell()));
@@ -227,7 +227,6 @@ namespace GameDumper
             if (AppIcons != null)
                 AppIcons.WriteMFA(writer);
             writer.WriteByte(0);
-            //writer.WriteBytes(File.ReadAllBytes("Plugins\\MFAChunks.bin"));
 
             frameWriter.Flush();
             frameWriter.Close();

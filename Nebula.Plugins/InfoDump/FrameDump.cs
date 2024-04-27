@@ -36,7 +36,7 @@ namespace Nebula.Plugins.GameDumper
                         task.Value = progress;
                         task.MaxValue = NebulaCore.PackageData.Frames.Count;
 
-                        foreach (Frame frm in NebulaCore.PackageData.Frames)
+                        foreach (Frame frm in NebulaCore.PackageData.Frames.Values)
                         {
                             string frmPath = Path.Combine(path, Utilities.ClearName(frm.FrameName));
                             Directory.CreateDirectory(frmPath);

@@ -383,7 +383,7 @@ namespace Nebula.GUI
             Task frmsListTask = new Task(() =>
             {
                 if (NebulaCore.CurrentReader != null)
-                    foreach (Frame frm in NebulaCore.PackageData.Frames)
+                    foreach (Frame frm in NebulaCore.PackageData.Frames.Values)
                         if (frm.BitmapCache == null)
                             Utilities.MakeFrameImg(frm);
 
@@ -472,7 +472,7 @@ namespace Nebula.GUI
             grid.Children.Add(listBox);
 
             int tag = 0;
-            foreach (Frame frm in NebulaCore.PackageData.Frames)
+            foreach (Frame frm in NebulaCore.PackageData.Frames.Values)
             {
                 ListBoxItem lBI = new ListBoxItem();
                 lBI.Height = 90;
