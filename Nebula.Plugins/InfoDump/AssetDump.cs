@@ -15,7 +15,7 @@ using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 
 namespace Nebula.Plugins.GameDumper
 {
-    public class AssetDump : INebulaPlugin
+    public class AssetDump : INebulaTool
     {
         public string Name => "Asset Dumper";
 

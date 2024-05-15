@@ -23,5 +23,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             writer.WriteByte(Button);
             writer.WriteByte(IsDouble);
         }
+
+        public override string ToString()
+        {
+            return "Click " + Button + ", " + IsDouble;
+        }
     }
 }

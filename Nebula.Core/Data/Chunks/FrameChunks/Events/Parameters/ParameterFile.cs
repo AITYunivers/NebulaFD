@@ -31,5 +31,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             writer.WriteYunicode(FileName, 260);
             writer.WriteYunicode(Command, true);
         }
+
+        public override string ToString()
+        {
+            return "File " + FileFlags + ", " + FileName + ", " + Command;
+        }
     }
 }

@@ -46,6 +46,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             byte cndCnt = reader.ReadByte();
             byte actCnt = reader.ReadByte();
             EventFlags.Value = reader.ReadUShort();
+            Parent = (FrameEvents)extraInfo[0];
 
             if (NebulaCore.Build >= 284 && !(NebulaCore.MFA || NebulaCore.Android && NebulaCore.Build == 287))
             {
@@ -84,7 +85,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             }
 
             reader.Seek(endPosition);
-            Parent = (FrameEvents)extraInfo[0];
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace Nebula.Plugins.GameDumper
 {
-    public class InfoDump : INebulaPlugin
+    public class InfoDump : INebulaTool
     {
         public string Name => "Info Dumper";
 

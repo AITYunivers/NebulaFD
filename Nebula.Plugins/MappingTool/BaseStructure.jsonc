@@ -342,7 +342,7 @@
         {
             "ProductTitle": "Application 1",
             "DefaultInstallDirectory": "#Program Files#\\#Title",
-            "Font": "Arial",
+            "Font": 0,
             "Files":
             [
                 {
@@ -534,7 +534,8 @@
         {
             "Settings": // Frame Properties -> Settings Tab
             {
-                "Size": [640, 480],
+                "Width": 640,
+                "Height": 480,
                 "VirtualWidth": 640,
                 "VirtualHeight": 480,
                 "BackgroundColor": [255, 255, 255],
@@ -635,7 +636,7 @@
             [
                 {
                     "Handle": 0,
-                    "Size/Position": // Object Properties -> Size/Position Tab
+                    "Position": // Object Properties -> Size/Position Tab
                     {
                         "X": 30,
                         "Y": 42

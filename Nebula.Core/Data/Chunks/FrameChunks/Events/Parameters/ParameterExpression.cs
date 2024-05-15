@@ -1,4 +1,5 @@
-﻿using Nebula.Core.Memory;
+﻿using Nebula.Core.Data.Chunks.ObjectChunks;
+using Nebula.Core.Memory;
 using System.Diagnostics;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
@@ -11,6 +12,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         public ExpressionChunk Expression = new();
         public ushort ObjectInfo;
         public short ObjectInfoList;
+
+        public FrameEvents? FrameEvents;
 
         public ParameterExpression()
         {
@@ -83,18 +86,18 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         {
             switch (ObjectType)
             {
-                default: return base.ToString();
+                default: return $"[ERROR] Could not find ObjectType {ObjectType}, Num {Num}";
                 case -4:
                     switch (Num)
                     {
-                        default: return base.ToString();
+                        default: return $"[ERROR] Could not find ObjectType {ObjectType}, Num {Num}";
                         case 0:
                             return "timer";
                     }
                 case -1:
                     switch (Num)
                     {
-                        default: return base.ToString();
+                        default: return $"[ERROR] Could not find ObjectType {ObjectType}, Num {Num}";
                         case -3:
                             return ", ";
                         case -2:
@@ -171,7 +174,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
                 case 0:
                     switch (Num)
                     {
-                        default: return base.ToString();
+                        default: return $"[ERROR] Could not find ObjectType {ObjectType}, Num {Num}";
                         case 2:
                             return " + ";
                         case 4:
@@ -191,7 +194,34 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
                         case 18:
                             return " xor ";
                     }
+                case > 0:
+                    switch (Num)
+                    {
+                        default:
+                            if (ObjectType < 32)
+                                switch (Num)
+                                {
+                                    default: return $"[ERROR] Could not find ObjectType {ObjectType}, Num {Num}";
+                                    case 27:
+                                        return $"AlphaCoef(\"{GetObjectName()}\")";
+                                }
+                            switch (ObjectType)
+                            {
+                                default:
+                                    string output = $"{GetObjectName()}: Expression ID {Num}";
+                                    return output;
+                            }
+                    }
             }
         }
+
+        public ObjectInfo GetObject()
+        {
+            if (FrameEvents?.EventObjects.Count > 0)
+                return NebulaCore.PackageData.FrameItems.Items[(int)FrameEvents.EventObjects[ObjectInfo].ItemHandle];
+            else return NebulaCore.PackageData.FrameItems.Items[ObjectInfo];
+        }
+
+        public string GetObjectName() => GetObject().Name;
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Nebula.Core.Utilities
 {
-    public interface INebulaPlugin
+    public interface INebulaTool
     {
         string Name { get; }
         void Execute();

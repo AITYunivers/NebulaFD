@@ -48,6 +48,7 @@ namespace Nebula.Core.Data.PackageReaders
                 newChunk.ReadCCN(chunkReader);
                 newChunk.ChunkData = new byte[0];
             }
+            Reader.Seek(Reader.Size());
         }
     }
 }

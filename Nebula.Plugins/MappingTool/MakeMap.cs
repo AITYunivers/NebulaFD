@@ -5,7 +5,9 @@ using Newtonsoft.Json;
 
 namespace MappingTool
 {
-    public class MakeMap : INebulaPlugin
+    // I'll probably have every map have to be created manually
+
+    /*public class MakeMap : INebulaPlugin
     {
         public string Name => "Make Map File";
 
@@ -22,5 +24,5 @@ namespace MappingTool
                     TypeNameHandling = TypeNameHandling.All }
                 ));
         }
-    }
+    }*/
 }

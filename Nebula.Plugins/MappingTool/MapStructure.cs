@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
-
-namespace MappingTool
+﻿namespace MappingTool
 {
     public class MapStructure
     {
@@ -730,212 +723,225 @@ namespace MappingTool
 
         public class ObjectRuntimeOptions
         {
-            public bool DontIncludeAtBuildTime { get; set; }
-            public bool CreateAtStart { get; set; }
-            public bool CreateBeforeFrameTransition { get; set; }
-            public bool FollowTheFrame { get; set; }
-            public bool DestroyObjectIfTooFar { get; set; }
-            public int InactivateIfTooFar { get; set; }
-            public bool UseFineDetection { get; set; }
-            public int ObstacleType { get; set; }
-            public bool CollisionWithBox { get; set; }
-            public bool LoadOnCall { get; set; }
-            public bool GlobalObject { get; set; }
-            public int EditorSynchronization { get; set; }
-            public bool AutomaticRotations { get; set; }
-            public bool DoNotResetFrameDuration { get; set; }
+            public bool DontIncludeAtBuildTime = false;
+            public bool CreateAtStart = true;
+            public bool CreateBeforeFrameTransition = false;
+            public bool FollowTheFrame = true;
+            public bool DestroyObjectIfTooFar = true;
+            public InactivateIfTooFar InactivateIfTooFar = InactivateIfTooFar.Automatic;
+            public bool UseFineDetection = true;
+            public ObstacleType ObstacleType = ObstacleType.None;
+            public bool CollisionWithBox = false;
+            public bool LoadOnCall = false;
+            public bool GlobalObject = false;
+            public EditorSynchronization EditorSynchronization = EditorSynchronization.SameNameAndType;
+            public bool AutomaticRotations = false;
+            public bool DoNotResetFrameDuration = false;
         }
 
         public class ObjectValues
         {
-            public Alterablevalue[] AlterableValues { get; set; }
-            public Alterablestring[] AlterableStrings { get; set; }
-            public Alterableflag[] AlterableFlags { get; set; }
+            public AlterableValue[] AlterableValues = new AlterableValue[0];
+            public AlterableString[] AlterableStrings = new AlterableString[0];
+            public AlterableFlag[] AlterableFlags = new AlterableFlag[0];
         }
 
-        public class Alterablevalue
+        public class AlterableValue
         {
-            public string Name { get; set; }
-            public int Value { get; set; }
+            public string Name = "Alterable Value A";
+            public int Value = 0;
         }
 
-        public class Alterablestring
+        public class AlterableString
         {
-            public string Name { get; set; }
-            public string Value { get; set; }
+            public string Name = "Alterable String A";
+            public string Value = string.Empty;
         }
 
-        public class Alterableflag
+        public class AlterableFlag
         {
-            public string Name { get; set; }
-            public bool Value { get; set; }
+            public string Name = "Flag 0";
+            public bool Value = false;
         }
 
         public class ObjectEvents
         {
-            public int[] Qualifiers { get; set; }
+            public int[] Qualifiers = new int[8]
+            {
+                -1, -1, -1, -1, -1, -1, -1, -1
+            };
         }
 
         public class ObjectAbout
         {
-            public string Name { get; set; }
-            public bool AutoUpdate { get; set; }
+            public string Name = "Active";
+            public bool AutoUpdate = true;
         }
 
         public class QuickBackdropData
         {
-            public int Shape { get; set; }
-            public int[] BorderColor { get; set; }
-            public int BorderWidth { get; set; }
-            public int FillType { get; set; }
-            public int[] FillColor1 { get; set; }
-            public int[] FillColor2 { get; set; }
-            public bool VerticalGradient { get; set; }
-            public int Motif { get; set; }
-            public bool IntegralDimensions { get; set; }
+            public BackdropShape Shape = BackdropShape.Rectangle;
+            public int[] BorderColor = new int[3] { 0, 0, 0 };
+            public int BorderWidth = 0;
+
+            public BackdropFillType FillType = BackdropFillType.SolidColor;
+            public int[] FillColor1 = new int[3] { 128, 128, 128 };
+            public int[] FillColor2 = new int[3] { 255, 255, 255 };
+            public bool VerticalGradient = false;
+
+            public int Motif = 0;
+            public bool IntegralDimensions = false;
         }
 
         public class BackdropData
         {
-            public int Image { get; set; }
+            public int Image = 0;
         }
 
         public class ActiveData
         {
-            public Animation[] Animations { get; set; }
+            public Animation[] Animations = new Animation[0];
         }
 
         public class Animation
         {
-            public string Name { get; set; }
-            public Direction[] Directions { get; set; }
+            public string Name = "Stopped";
+            public Direction[] Directions = new Direction[0];
         }
 
         public class Direction
         {
-            public int Index { get; set; }
-            public int MinimumSpeed { get; set; }
-            public int MaximumSpeed { get; set; }
-            public int Repeat { get; set; }
-            public int RepeatFrame { get; set; }
-            public int[] Frames { get; set; }
+            public int Index = 0;
+            public int MinimumSpeed = 50;
+            public int MaximumSpeed = 50;
+            public int Repeat = 1;
+            public int RepeatFrame = 0;
+            public int[] Frames = new int[0];
         }
 
         public class StringData
         {
-            public string[] Paragraphs { get; set; }
+            public string[] Paragraphs = new string[0];
         }
 
         public class QNAData
         {
-            public Question Question { get; set; }
-            public Answers Answers { get; set; }
+            public Question Question = new Question();
+            public Answers Answers = new Answers();
         }
 
         public class Question
         {
-            public string Paragraph { get; set; }
-            public int Font { get; set; }
-            public int[] Color { get; set; }
-            public bool Relief { get; set; }
+            public string Paragraph = "Question";
+            public int Font = 0;
+            public int[] Color = new int[3] { 0, 0, 0 };
+            public bool Relief = false;
         }
 
         public class Answers
         {
-            public Paragraph[] Paragraphs { get; set; }
-            public int Font { get; set; }
-            public int[] Color { get; set; }
-            public bool Relief { get; set; }
+            public Paragraph[] Paragraphs = new Paragraph[0];
+            public int Font = 0;
+            public int[] Color = new int[3] { 0, 0, 0 };
+            public bool Relief = false;
         }
 
         public class Paragraph
         {
-            public string Text { get; set; }
-            public bool IsCorrect { get; set; }
+            public string Text = "Answer";
+            public bool IsCorrect = false;
         }
 
         public class ScoreData
         {
-            public int Player { get; set; }
-            public int Type { get; set; }
-            public bool UseFixedDigitCount { get; set; }
-            public int FixedNumberOfDigits { get; set; }
-            public int[] Images { get; set; }
+            public int Player = 1;
+            public ScoreType Type = ScoreType.Numbers;
+            public bool UseFixedDigitCount = false;
+            public int FixedNumberOfDigits = 9;
+            public int[] Images = new int[14];
         }
 
         public class LivesData
         {
-            public int Player { get; set; }
-            public int Type { get; set; }
-            public bool UseFixedDigitCount { get; set; }
-            public int FixedNumberOfDigits { get; set; }
-            public int[] Images { get; set; }
+            public int Player = 1;
+            public LivesType Type = LivesType.Image;
+            public bool UseFixedDigitCount = false;
+            public int FixedNumberOfDigits = 2;
+            public int[] Images = new int[1];
         }
 
         public class CounterData
         {
-            public int InitialValue { get; set; }
-            public int MinimumValue { get; set; }
-            public int MaximumValue { get; set; }
-            public bool UseFixedDigitCount { get; set; }
-            public int FixedNumberOfDigits { get; set; }
-            public bool UseSignificantDigitCount { get; set; }
-            public int NumberOfSignificantDigits { get; set; }
-            public bool UseDecimalDigitCount { get; set; }
-            public int NumberOfDigitsAfterDecimalPoint { get; set; }
-            public bool AddZerosToTheLeft { get; set; }
-            public int Type { get; set; }
-            public int[] Images { get; set; }
-            public int Count { get; set; }
-            public int FillType { get; set; }
-            public int[] FillColor1 { get; set; }
-            public int[] FillColor2 { get; set; }
-            public bool VerticalGradient { get; set; }
+            public int InitialValue = 0;
+            public int MinimumValue = -999999999;
+            public int MaximumValue = 999999999;
+
+            public bool UseFixedDigitCount = false;
+            public int FixedNumberOfDigits = 0;
+
+            public bool UseSignificantDigitCount = false;
+            public int NumberOfSignificantDigits = 16;
+            public bool UseDecimalDigitCount = false;
+            public int NumberOfDigitsAfterDecimalPoint = 2;
+            public bool AddZerosToTheLeft = false;
+
+            public CounterType Type = CounterType.Numbers;
+            public int[] Images = new int[14];
+
+            public CounterCount Count = CounterCount.UpLeft;
+            public CounterFillType FillType = CounterFillType.Gradient;
+            public int[] FillColor1 = new int[3] { 128, 128, 128 };
+            public int[] FillColor2 = new int[3] { 255, 255, 255 };
+            public bool VerticalGradient = false;
         }
 
         public class FormattedTextData
         {
-            public int[] BackgroundColor { get; set; }
-            public bool AutoVerticalScrollbar { get; set; }
+            public int[] BackgroundColor = new int[3] { 255, 255, 255 };
+            public bool AutoVerticalScrollbar = true;
         }
 
         public class SubAppData
         {
-            public int Source { get; set; }
-            public string Filename { get; set; }
-            public int FrameNumber { get; set; }
-            public bool ShareGlobalValues { get; set; }
-            public bool ShareLives { get; set; }
-            public bool ShareScores { get; set; }
-            public bool SharePlayerControls { get; set; }
-            public int WindowIcon { get; set; }
-            public bool CustomizableSize { get; set; }
-            public bool StretchFrameToObjectSize { get; set; }
-            public bool DisplayAsSprite { get; set; }
-            public bool IgnoreParentsResizeDisplay { get; set; }
-            public bool PopupWindow { get; set; }
-            public bool ClipSiblings { get; set; }
-            public bool Border { get; set; }
-            public bool Resizable { get; set; }
-            public bool Caption { get; set; }
-            public bool ToolCaption { get; set; }
-            public bool SystemMenu { get; set; }
-            public bool DisableClose { get; set; }
-            public bool HiddenOnClose { get; set; }
-            public bool Modal { get; set; }
+            public SubAppSource Source = SubAppSource.FrameFromThisApplication;
+            public string Filename = string.Empty;
+            public int FrameNumber = 0;
+
+            public bool ShareGlobalValues = false;
+            public bool ShareLives = false;
+            public bool ShareScores = false;
+            public bool SharePlayerControls = false;
+
+            public int WindowIcon = -1;
+            public bool CustomizableSize = false;
+            public bool StretchFrameToObjectSize = false;
+            public bool DisplayAsSprite = false;
+
+            public bool IgnoreParentsResizeDisplay = false;
+
+            public bool PopupWindow = false;
+            public bool ClipSiblings = false;
+            public bool Border = false;
+            public bool Resizable = false;
+            public bool Caption = false;
+            public bool ToolCaption = false;
+            public bool SystemMenu = false;
+            public bool DisableClose = false;
+            public bool HiddenOnClose = false;
+            public bool Modal = false;
         }
 
         public class ExtensionData
         {
-            public int Type { get; set; }
-            public string Name { get; set; }
-            public string FileName { get; set; }
-            public int Magic { get; set; }
-            public string SubType { get; set; }
-            public int Version { get; set; }
-            public int ID { get; set; }
-            public int Private { get; set; }
-            public int[] Data { get; set; }
+            public int Type = 0;
+            public string Name = string.Empty;
+            public string FileName = string.Empty;
+            public int Magic = 0;
+            public string SubType = string.Empty;
+            public int Version = 0;
+            public int ID = 0;
+            public int Private = 0;
+            public int[] Data = new int[0];
         }
 
         public enum GraphicMode
@@ -1282,16 +1288,10 @@ namespace MappingTool
             Text
         }
 
-        public enum CounterVerticalCount
+        public enum CounterCount
         {
-            Up,
-            Down
-        }
-
-        public enum CounterHorizontalCount
-        {
-            FromLeft,
-            FromRight
+            UpLeft,
+            DownRight
         }
 
         public enum CounterFillType
@@ -1300,7 +1300,7 @@ namespace MappingTool
             Gradient
         }
 
-        public enum SubApplicationSource
+        public enum SubAppSource
         {
             OtherApplication,
             FrameFromThisApplication

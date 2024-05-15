@@ -4,7 +4,7 @@ using Spectre.Console;
 
 namespace Nebula.Plugins.GameDumper
 {
-    public class FrameDump : INebulaPlugin
+    public class FrameDump : INebulaTool
     {
         public string Name => "Frame Dumper";
         private bool ShowHiddenObjects = false;

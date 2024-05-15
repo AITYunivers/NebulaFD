@@ -23,5 +23,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             writer.WriteInt(Pointer);
             writer.WriteShort(ID);
         }
+
+        public override string ToString()
+        {
+            return "Group Pointer " + Pointer + ", " + ID;
+        }
     }
 }

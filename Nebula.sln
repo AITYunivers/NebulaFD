@@ -7,15 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nebula.CLI", "Nebula.CLI\Ne
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nebula.Core", "Nebula.Core\Nebula.Core.csproj", "{4E60957A-985A-422D-B0A9-C5426977535B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nebula.Plugins", "Nebula.Plugins", "{044E6E66-F3B5-4034-B627-B4669EB304C9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nebula.Tools", "Nebula.Tools", "{044E6E66-F3B5-4034-B627-B4669EB304C9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameDumper", "Nebula.Plugins\InfoDump\GameDumper.csproj", "{6D8F0E12-6E18-4F2F-8066-091CFBCB5B8B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MappingTool", "Nebula.Plugins\MappingTool\MappingTool.csproj", "{FA990FDC-66CD-47C8-8E24-5DAE78709F96}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IniEncKeyDumper", "Nebula.Plugins\IniEncKeyDumper\IniEncKeyDumper.csproj", "{A39A2C22-C4ED-44B3-81CF-2E9BB43F69E9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nebula.GUI", "Nebula.GUI\Nebula.GUI.csproj", "{620E1944-3E51-451E-A8F8-3E886171B5E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,14 +63,6 @@ Global
 		{A39A2C22-C4ED-44B3-81CF-2E9BB43F69E9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A39A2C22-C4ED-44B3-81CF-2E9BB43F69E9}.Release|x64.ActiveCfg = Release|Any CPU
 		{A39A2C22-C4ED-44B3-81CF-2E9BB43F69E9}.Release|x64.Build.0 = Release|Any CPU
-		{620E1944-3E51-451E-A8F8-3E886171B5E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{620E1944-3E51-451E-A8F8-3E886171B5E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{620E1944-3E51-451E-A8F8-3E886171B5E0}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{620E1944-3E51-451E-A8F8-3E886171B5E0}.Debug|x64.Build.0 = Debug|Any CPU
-		{620E1944-3E51-451E-A8F8-3E886171B5E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{620E1944-3E51-451E-A8F8-3E886171B5E0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{620E1944-3E51-451E-A8F8-3E886171B5E0}.Release|x64.ActiveCfg = Release|Any CPU
-		{620E1944-3E51-451E-A8F8-3E886171B5E0}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

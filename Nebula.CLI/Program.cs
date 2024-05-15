@@ -32,7 +32,7 @@ namespace Nebula
             WaitForFile();
             SelectReader();
             ReadPackage();
-            SelectPlugin();
+            SelectTool();
         }
 
         static void WaitForFile()
@@ -47,7 +47,14 @@ namespace Nebula
             if (File.Exists(path))
             {
                 NebulaCore.FilePath = path;
-                fileReader = new ByteReader(File.ReadAllBytes(path));
+
+                AnsiConsole.Clear();
+                AnsiConsole.Write(NebulaCore.ConsoleFiglet);
+                AnsiConsole.Write(NebulaCore.ConsoleRule);
+                AnsiConsole.Status().Spinner(Spinner.Known.Dots2).Start("Loading file", ctx =>
+                {
+                    fileReader = new ByteReader(File.ReadAllBytes(path));
+                });
             }
             else WaitForFile();
         }
@@ -148,29 +155,33 @@ namespace Nebula
             readStopwatch.Stop();
         }
 
-        static void SelectPlugin()
+        static Stopwatch? toolStopwatch = null;
+        static void SelectTool()
         {
             AnsiConsole.Clear();
             AnsiConsole.Write(NebulaCore.ConsoleFiglet);
             AnsiConsole.Write(NebulaCore.ConsoleRule);
 
-            AnsiConsole.MarkupLine($"[{NebulaCore.ColorRules[1]}]Reading finished in {readStopwatch.Elapsed.TotalSeconds} seconds[/]");
-            List<INebulaPlugin> plugins = new();
-            List<string> pluginNames = new()
+            if (toolStopwatch == null)
+                AnsiConsole.MarkupLine($"[{NebulaCore.ColorRules[1]}]Reading finished in {readStopwatch.Elapsed.TotalSeconds} seconds[/]");
+            else
+                AnsiConsole.MarkupLine($"[{NebulaCore.ColorRules[1]}]Tool(s) finished in {toolStopwatch.Elapsed.TotalSeconds} seconds[/]");
+            List<INebulaTool> tools = new();
+            List<string> toolNames = new()
             {
                 $"[{NebulaCore.ColorRules[3]}]Quit[/]"
             };
 
-            Directory.CreateDirectory("Plugins");
-            foreach (var item in Directory.GetFiles("Plugins", "*.dll"))
+            Directory.CreateDirectory("Tools");
+            foreach (var item in Directory.GetFiles("Tools", "*.dll"))
             {
                 var newAsm = Assembly.LoadFrom(Path.GetFullPath(item));
-                foreach (var pluginType in newAsm.GetTypes())
-                    if (pluginType.GetInterface(typeof(INebulaPlugin).FullName) != null)
+                foreach (var toolType in newAsm.GetTypes())
+                    if (toolType.GetInterface(typeof(INebulaTool).FullName) != null)
                     {
-                        INebulaPlugin plugin = (INebulaPlugin)Activator.CreateInstance(pluginType);
-                        plugins.Add(plugin);
-                        pluginNames.Add($"[{NebulaCore.ColorRules[3]}]{plugin.Name}[/]");
+                        INebulaTool tool = (INebulaTool)Activator.CreateInstance(toolType);
+                        tools.Add(tool);
+                        toolNames.Add($"[{NebulaCore.ColorRules[3]}]{tool.Name}[/]");
                     }
             }
 
@@ -180,17 +191,18 @@ namespace Nebula
                     .InstructionsText(
                         $"[{NebulaCore.ColorRules[2]}](Press [{NebulaCore.ColorRules[1]}]<space>[/] to select a task, " +
                         $"[{NebulaCore.ColorRules[1]}]<enter>[/] to execute)\n(Quit will always execute last.)[/]")
-                    .AddChoices(pluginNames)
+                    .AddChoices(toolNames)
                     .HighlightStyle(NebulaCore.ColorRules[4]));
 
-
-            foreach (INebulaPlugin plugin in plugins)
-                if (selectedTasks.Contains($"[{NebulaCore.ColorRules[3]}]{plugin.Name}[/]"))
-                    plugin.Execute();
+            toolStopwatch = Stopwatch.StartNew();
+            foreach (INebulaTool tool in tools)
+                if (selectedTasks.Contains($"[{NebulaCore.ColorRules[3]}]{tool.Name}[/]"))
+                    tool.Execute();
+            toolStopwatch.Stop();
 
             if (selectedTasks.Contains($"[{NebulaCore.ColorRules[3]}]Quit[/]"))
                 Environment.Exit(0);
-            else SelectPlugin();
+            else SelectTool();
         }
     }
 }

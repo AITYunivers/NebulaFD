@@ -11,7 +11,7 @@ using Color = System.Drawing.Color;
 
 namespace Nebula.Plugins.EncKeyDumper
 {
-    public class KeyDumper : INebulaPlugin
+    public class KeyDumper : INebulaTool
     {
         public string Name => "Ini Encryption Key Dumper";
         private HashSet<string> Keys = new();

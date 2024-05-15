@@ -70,10 +70,10 @@ namespace Nebula.Core.Data.Chunks
             //0x223E         MovementExtensions
             { 0x223F, typeof(FrameItems)          },
             { 0x2240, typeof(ExeOnly)             },
-            //0x2241
+            //0x2241         AppHeaderExtra
             { 0x2242, typeof(Protection)          },
             { 0x2243, typeof(ShaderBank)          },
-            //0x2244
+            //0x2244         BluRayAppOptions
             { 0x2245, typeof(ExtendedHeader)      },
             { 0x2246, typeof(AppCodePage)         },
             //0x2247         FrameOffset

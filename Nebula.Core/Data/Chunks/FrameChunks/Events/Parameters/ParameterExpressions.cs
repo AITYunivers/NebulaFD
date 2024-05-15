@@ -7,6 +7,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         public short Comparison;
         public List<ParameterExpression> Expressions = new();
 
+        public FrameEvents? FrameEvents;
+
         public ParameterExpressions()
         {
             ChunkName = "ParameterExpressions";
@@ -23,7 +25,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
                 if (newExpression.ObjectType == 0 && newExpression.Num == 0)
                     break;
-
+                
+                newExpression.FrameEvents = FrameEvents;
                 Expressions.Add(newExpression);
             }
         }

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Nebula.CLI": {
+      "commandName": "Project",
+      "workingDirectory": "..\\build"
+    }
+  }
+}

@@ -23,5 +23,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             writer.WriteInt(Delay);
             writer.WriteInt(Compteur);
         }
+
+        public override string ToString()
+        {
+            return "Every " + Delay + ", " + Compteur;
+        }
     }
 }

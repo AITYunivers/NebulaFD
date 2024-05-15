@@ -62,6 +62,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             {
                 Parameters[i] = new Parameter();
                 Parameters[i].ReadCCN(reader);
+                Parameters[i].FrameEvents = ((Event)extraInfo[1]).Parent;
             }
 
             reader.Seek(endPosition);
@@ -87,6 +88,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             {
                 Parameters[i] = new Parameter();
                 Parameters[i].ReadCCN(reader);
+                Parameters[i].FrameEvents = ((Event)extraInfo[1]).Parent;
             }
 
             reader.Seek(endPosition);
@@ -152,8 +154,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                     switch (Num)
                     {
                         case -25:
-                            Num = -27;
-                            DoAdd = false; // TODO
+                            if (ObjectType != 3)
+                            {
+                                Num = -27;
+                                DoAdd = false; // TODO
+                            }
                             break;
                         case -42:
                             Num = -27;
@@ -172,11 +177,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
         {
             switch (ObjectType)
             {
-                default: return base.ToString();// throw new NotImplementedException($"Could not find ObjectType {ObjectType}");
+                default: return $"[ERROR] Could not find ObjectType {ObjectType}, Num {Num}";
                 case -7:
                     switch (Num)
                     {
-                        default: return base.ToString();// throw new NotImplementedException($"Could not find ObjectType -7, Num {Num}");
+                        default: return $"[ERROR] Could not find ObjectType {ObjectType}, Num {Num}";
                         case -6:
                             return $"Repeat while Player {ObjectInfo + 1} {GetJoystickString(((ParameterShort)Parameters[0].Data).Value)}";
                         case -5:
@@ -191,7 +196,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 case -6:
                     switch (Num)
                     {
-                        default: return base.ToString();// throw new NotImplementedException($"Could not find ObjectType -6, Num {Num}");
+                        default: return $"[ERROR] Could not find ObjectType {ObjectType}, Num {Num}";
                         case -12:
                             return "On mouse wheel down";
                         case -11:
@@ -255,7 +260,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 case -5:
                     switch (Num)
                     {
-                        default: return base.ToString();// throw new NotImplementedException($"Could not find ObjectType -5, Num {Num}");
+                        default: return $"[ERROR] Could not find ObjectType {ObjectType}, Num {Num}";
                         case -23:
                             return $"Pick all objects in line ({Parameters[0]},{Parameters[1]}) to ({Parameters[2]},{Parameters[3]})";
                         case -22:
@@ -282,7 +287,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 case -4:
                     switch (Num)
                     {
-                        default: return base.ToString();//throw new NotImplementedException($"Could not find ObjectType -4, Num {Num}");
+                        default: return $"[ERROR] Could not find ObjectType {ObjectType}, Num {Num}";
                         case -8:
                             return $"Every {Parameters[0]}";
                         case -7:
@@ -299,7 +304,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 case -3:
                     switch (Num)
                     {
-                        default: return base.ToString();// throw new NotImplementedException($"Could not find ObjectType -3, Num {Num}");
+                        default: return $"[ERROR] Could not find ObjectType {ObjectType}, Num {Num}";
                         case -10:
                             return "Frame position has just been saved";
                         case -9:
@@ -322,7 +327,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 case -2:
                     switch (Num)
                     {
-                        default: return base.ToString();// throw new NotImplementedException($"Could not find ObjectType -2, Num {Num}");
+                        default: return $"[ERROR] Could not find ObjectType {ObjectType}, Num {Num}";
                         case -9:
                             return $"Is channel {Parameters[0]} paused?";
                         case -8:
@@ -341,7 +346,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 case -1:
                     switch (Num)
                     {
-                        default: return base.ToString();// throw new NotImplementedException($"Could not find ObjectType -1, Num {Num}");
+                        default: return $"[ERROR] Could not find ObjectType {ObjectType}, Num {Num}";
                         case -42:
                             return "Never";
                         case -41:
@@ -418,7 +423,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                             if (ObjectType < 32)
                                 switch (Num)
                                 {
-                                    default: return base.ToString();// throw new NotImplementedException($"Could not find ObjectType {ObjectType}, Num {Num}");
+                                    default: return $"[ERROR] Could not find ObjectType {ObjectType}, Num {Num}";
                                     case -84:
                                         if (ObjectType == 9)
                                             return $"Application {GetObjectName()} is paused";

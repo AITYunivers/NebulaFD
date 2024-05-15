@@ -4,9 +4,12 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 {
     public class ParameterChunk : Chunk
     {
-        public ParameterChunk()
+        public int? Code = null;
+
+        public ParameterChunk(int? code = null)
         {
             ChunkName = "ParameterChunk";
+            Code = code;
         }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
@@ -31,7 +34,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override string ToString()
         {
-            return "";
+            return "Unknown Parameter Chunk " + Code == null ? "" : Code.ToString()!;
         }
     }
 }

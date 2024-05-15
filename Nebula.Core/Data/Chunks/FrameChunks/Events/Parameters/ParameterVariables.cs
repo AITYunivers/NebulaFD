@@ -51,5 +51,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             foreach (ParameterVariable variable in Variables)
                 variable.WriteMFA(writer);
         }
+
+        public override string ToString()
+        {
+            return "Parameter Variables";
+        }
     }
 }

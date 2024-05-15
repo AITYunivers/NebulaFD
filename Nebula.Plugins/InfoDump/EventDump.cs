@@ -5,7 +5,7 @@ using Spectre.Console;
 
 namespace Nebula.Plugins.GameDumper
 {
-    public class EventDump : INebulaPlugin
+    public class EventDump : INebulaTool
     {
         public string Name => "Event Dumper";
 

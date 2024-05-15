@@ -24,5 +24,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             foreach (short oI in ObjectInfos)
                 writer.WriteShort(oI);
         }
+
+        public override string ToString()
+        {
+            return "Child Events";
+        }
     }
 }

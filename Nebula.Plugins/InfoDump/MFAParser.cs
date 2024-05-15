@@ -20,7 +20,7 @@ using Size = System.Drawing.Size;
 #pragma warning disable CA1416 // Validate platform compatibility
 namespace GameDumper
 {
-    public class MFAParser : INebulaPlugin
+    public class MFAParser : INebulaTool
     {
         public string Name => "MFA Parser";
 
@@ -46,6 +46,7 @@ namespace GameDumper
                 Task imgTask = new Task(() =>
                 {
                     img.GetBitmap();
+                    img.PrepareForMfa();
                 });
                 imgTasks.Add(imgTask);
             }
@@ -175,7 +176,7 @@ namespace GameDumper
             writer.WriteAutoYunicode(dat.TargetFilename);
             writer.WriteAutoYunicode("");
             writer.WriteAutoYunicode("");
-            writer.WriteAutoYunicode(dat.About + (string.IsNullOrEmpty(dat.About) ? "" : " | ")  + "Decompiled using SapphireD");
+            writer.WriteAutoYunicode(dat.About + (string.IsNullOrEmpty(dat.About) ? "" : " | ")  + "Decompiled using Nebula");
             writer.WriteInt(0);
             dat.BinaryFiles.WriteMFA(writer);
 

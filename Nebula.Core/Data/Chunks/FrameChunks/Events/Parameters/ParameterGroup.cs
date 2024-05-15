@@ -53,5 +53,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
                 output += (uint)(c ^ 0x7FFF);
             return output;
         }
+
+        public override string ToString()
+        {
+            return "[GROUP] " + Name;
+        }
     }
 }

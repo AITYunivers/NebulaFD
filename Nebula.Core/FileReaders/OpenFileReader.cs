@@ -19,7 +19,8 @@ namespace Nebula.Core.FileReaders
         public void LoadGame(ByteReader fileReader, string filePath)
         {
             ByteReader? ccnReader = null;
-            Directory.Delete("Temp", true);
+            if (Directory.Exists("Temp"))
+                Directory.Delete("Temp", true);
             ZipArchive archive = ZipFile.OpenRead(filePath);
             foreach (ZipArchiveEntry entry in archive.Entries)
             {
@@ -27,8 +28,10 @@ namespace Nebula.Core.FileReaders
                 {
                     if (Path.GetExtension(entry.Name) == ".cc1")
                     {
-                        File.Delete("openccj.zip");
-                        File.Delete("open.ccj");
+                        if (File.Exists("openccj.zip"))
+                            File.Delete("openccj.zip");
+                        if (File.Exists("open.ccj"))
+                            File.Delete("open.ccj");
                         entry.ExtractToFile("openccj.zip");
                         ZipArchive ccjarchive = ZipFile.OpenRead("openccj.zip");
                         ccjarchive.Entries.First().ExtractToFile("open.ccj");
@@ -55,7 +58,11 @@ namespace Nebula.Core.FileReaders
             if (ccnReader != null)
             {
                 Package.Read(ccnReader);
-                Directory.Delete("Temp", true);
+                try
+                {
+                    Directory.Delete("Temp", true);
+                }
+                catch {}
             }
         }
 

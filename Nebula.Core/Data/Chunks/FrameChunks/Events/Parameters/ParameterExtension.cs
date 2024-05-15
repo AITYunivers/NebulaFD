@@ -28,5 +28,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             writer.WriteShort(Code);
             writer.WriteBytes(Data);
         }
+
+        public override string ToString()
+        {
+            return "Extension " + Type + ", " + Code + ", Data Length: " + Data.Length;
+        }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
 using Nebula.Core.Memory;
-using System.Linq.Expressions;
-using System;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 {
@@ -9,6 +7,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
     {
         public int Code;
         public ParameterChunk Data = new();
+
+        public FrameEvents? FrameEvents;
 
         public Parameter()
         {
@@ -46,9 +46,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 68 => new ParameterVariables(),
                 69 => new ParameterChildEvent(),
                 57 => new ParameterMovement(),
-                _ => new ParameterChunk()
+                _ => new ParameterChunk(Code)
             };
             Data.ReadCCN(reader);
+            if (Data is ParameterExpressions)
+                ((ParameterExpressions)Data).FrameEvents = FrameEvents;
 
             reader.Seek(endPosition);
         }

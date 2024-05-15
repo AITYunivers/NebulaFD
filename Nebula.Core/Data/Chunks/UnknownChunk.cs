@@ -7,7 +7,7 @@ namespace Nebula.Core.Data.Chunks
     {
         public UnknownChunk()
         {
-            ChunkName = "Unknown Chunk";
+            ChunkName = "UnknownChunk";
             ChunkID = 0x0;
         }
 

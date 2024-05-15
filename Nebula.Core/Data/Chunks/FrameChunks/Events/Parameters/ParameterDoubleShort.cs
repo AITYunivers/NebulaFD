@@ -23,5 +23,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             writer.WriteShort(Value1);
             writer.WriteShort(Value2);
         }
+
+        public override string ToString()
+        {
+            return "Double Short " + Value1 + ", " + Value2;
+        }
     }
 }
