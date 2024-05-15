@@ -12,3 +12,4 @@ Just another Clickteam Fusion 2.5 decompiler made by [Yunivers](https://github.c
 |--|--|
 | [Yunivers](https://github.com/AITYunivers)| Creator of Nebula. |
 | [Kostya](https://github.com/1987kostya1)| Developer of the Image Bank.|
+| [KewlSokudo](https://github.com/KewlSokudo)| Made the engine translator.|
