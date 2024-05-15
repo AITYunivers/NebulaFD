@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>ZelTranslator_SD</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Parsers\GameMaker Studio 2\Resources\Active_BeginStep.gml" />
+    <None Remove="Parsers\GameMaker Studio 2\Resources\Camera_Create.gml" />
+    <None Remove="Parsers\GameMaker Studio 2\Resources\Camera_EndStep.gml" />
+    <None Remove="Parsers\GameMaker Studio 2\Resources\IniSaveLoad.gml" />
+    <None Remove="Parsers\GameMaker Studio 2\Resources\Kotfile.gml" />
+    <None Remove="Parsers\GameMaker Studio 2\Resources\PlatformMovement.gml" />
+    <None Remove="Parsers\GameMaker Studio 2\Resources\TextFileWrite.gml" />
+    <None Remove="Parsers\GameMaker Studio 2\Resources\ZelCTF.gml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Parsers\GameMaker Studio 2\Resources\Active_BeginStep.gml" />
+    <EmbeddedResource Include="Parsers\GameMaker Studio 2\Resources\Camera_Create.gml" />
+    <EmbeddedResource Include="Parsers\GameMaker Studio 2\Resources\Camera_EndStep.gml" />
+    <EmbeddedResource Include="Parsers\GameMaker Studio 2\Resources\IniSaveLoad.gml" />
+    <EmbeddedResource Include="Parsers\GameMaker Studio 2\Resources\Kotfile.gml" />
+    <EmbeddedResource Include="Parsers\GameMaker Studio 2\Resources\PlatformMovement.gml" />
+    <EmbeddedResource Include="Parsers\GameMaker Studio 2\Resources\TextFileWrite.gml" />
+    <EmbeddedResource Include="Parsers\GameMaker Studio 2\Resources\ZelCTF.gml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Nebula.Core\Nebula.Core.csproj" />
+  </ItemGroup>
+
+</Project>
