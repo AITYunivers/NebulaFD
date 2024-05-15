@@ -3,8 +3,8 @@
 ###############################################################################
 * text=auto
 # Re-classify .gml files
-*.gml linguist-language=csharp
-*.yy linguist-language=csharp
+*.gml linguist-language=C#
+*.yy linguist-language=C#
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
