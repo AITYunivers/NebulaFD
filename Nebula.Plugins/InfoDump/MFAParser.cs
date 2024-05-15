@@ -35,25 +35,11 @@ namespace GameDumper
             ByteWriter writer = new ByteWriter(new FileStream(path + Utilities.ClearName(Path.GetFileName(string.IsNullOrEmpty(dat.EditorFilename) ? dat.AppName + ".mfa" : dat.EditorFilename)), FileMode.Create));
 
             IconBank.GraphicMode = dat.ImageBank.GraphicMode = dat.AppHeader.GraphicMode;
-            IconBank.PaletteVersion = dat.ImageBank.PaletteVersion = dat.Frames.First().Value.FramePalette.PaletteVersion;
-            IconBank.PaletteEntries = dat.ImageBank.PaletteEntries = (short)dat.Frames.First().Value.FramePalette.PaletteEntries;
-            IconBank.Palette = dat.ImageBank.Palette = dat.Frames.First().Value.FramePalette.Palette;
+            IconBank.PaletteVersion = dat.ImageBank.PaletteVersion = dat.Frames.First().FramePalette.PaletteVersion;
+            IconBank.PaletteEntries = dat.ImageBank.PaletteEntries = (short)dat.Frames.First().FramePalette.PaletteEntries;
+            IconBank.Palette = dat.ImageBank.Palette = dat.Frames.First().FramePalette.Palette;
 
-            // Initialize images on multiple threads for speed
-            List<Task> imgTasks = new List<Task>();
-            foreach (Image img in dat.ImageBank.Images.Values)
-            {
-                Task imgTask = new Task(() =>
-                {
-                    img.GetBitmap();
-                    img.PrepareForMfa();
-                });
-                imgTasks.Add(imgTask);
-            }
-            foreach (Task imgTask in imgTasks)
-                imgTask.Start();
-            foreach (Task imgTask in imgTasks)
-                imgTask.Wait();
+            // Initialize images on multiple threads for speed made it 2x slower
 
             if (NebulaCore.CurrentReader!.Icons.Count == 5)
             {
@@ -121,7 +107,7 @@ namespace GameDumper
                 IconBank.Images.Add(newIconImage.Handle, newIconImage);
                 objectInfo.IconHandle = newIconImage.Handle;
             }
-            foreach (Frame frm in dat.Frames.Values)
+            foreach (Frame frm in dat.Frames)
             {
                 Image frmImg = new Image();
                 frmImg.Handle = (uint)IconBank.Images.Count;
@@ -217,7 +203,9 @@ namespace GameDumper
             for (int i = 0; i < dat.Frames.Count; i++)
             {
                 writer.WriteUInt((uint)(offsetEnd + frameWriter.Tell()));
-                Frame frm = dat.Frames[dat.FrameHandles.IndexOf((short)i)];
+                Frame frm = dat.Frames[i];
+                if (!NebulaCore.MFA && NebulaCore.Fusion >= 1.0f)
+                    frm.Handle = dat.FrameHandles.IndexOf((short)i);
                 frm.WriteMFA(frameWriter);
                 Debug.WriteLine("Writing frame '" + frm.FrameName + "'");
             }

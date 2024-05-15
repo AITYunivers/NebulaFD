@@ -106,7 +106,7 @@ namespace Nebula.Core.Data.PackageReaders
             //for (int i = 0; i < ObjectCount; i++)
                 //ReadObjectData(reader);
             reader.Seek(endOffset);
-            Frames.Add(Frames.Count, frm);
+            Frames.Add(frm);
         }
 
         public void ReadObjectData(ByteReader reader)

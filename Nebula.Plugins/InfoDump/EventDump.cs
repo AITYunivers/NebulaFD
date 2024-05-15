@@ -22,7 +22,7 @@ namespace Nebula.Plugins.GameDumper
                 int progress = 0;
                 int max = 0;
                 string path = "Dumps\\" + Utilities.ClearName(NebulaCore.PackageData.AppName) + "\\Events";
-                foreach (Frame frm in NebulaCore.PackageData.Frames.Values)
+                foreach (Frame frm in NebulaCore.PackageData.Frames)
                     max += frm.FrameEvents.Events.Count;
 
                 while (!task.IsFinished)
@@ -39,7 +39,7 @@ namespace Nebula.Plugins.GameDumper
                         task.MaxValue = max;
 
                         Directory.CreateDirectory(path);
-                        foreach (Frame frm in NebulaCore.PackageData.Frames.Values)
+                        foreach (Frame frm in NebulaCore.PackageData.Frames)
                         {
                             string frmPath = Path.Combine(path, Utilities.ClearName(frm.FrameName) + ".txt");
                             File.WriteAllLines(frmPath, GetEventsAsString(frm));

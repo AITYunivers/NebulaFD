@@ -11,7 +11,7 @@ namespace MappingTool
 {
     public class ReadMap : INebulaTool
     {
-        public string Name => "Read Map File";
+        public string Name => "Read Map File (Don't Use!!!)";
         public MapStructure.Project? Project;
 
         public void Execute()

@@ -67,7 +67,7 @@ namespace Nebula.Plugins.EncKeyDumper
         public void GetKeysFromEvents()
         {
             PackageData data = NebulaCore.PackageData;
-            foreach (Frame frm in data.Frames.Values)
+            foreach (Frame frm in data.Frames)
             {
                 foreach (Event evt in frm.FrameEvents.Events)
                 {

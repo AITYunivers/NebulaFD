@@ -17,7 +17,6 @@ namespace Nebula.Core.Data
 {
     public abstract class PackageData
     {
-        [NonSerialized]
         public PackData PackData = new();
         public string ModulesDir = string.Empty;
 
@@ -34,7 +33,6 @@ namespace Nebula.Core.Data
         public string ExtensionsPath = string.Empty;        // 0x2227
         public FrameItems FrameItems = new();               // 0x2229 & 0x223F
         public string HelpFile = string.Empty;              // 0x2230
-        [NonSerialized]
         public List<short> FrameHandles = new();            // 0x222B
         public ExtensionData ExtensionData = new();         // 0x222C
         public string EditorFilename = string.Empty;        // 0x222E
@@ -43,7 +41,6 @@ namespace Nebula.Core.Data
         public GlobalValues GlobalValues = new();           // 0x2232
         public GlobalStrings GlobalStrings = new();         // 0x2233
         public Extensions Extensions = new();               // 0x2234
-        [NonSerialized]
         public AppIcon AppIcon = new();                     // 0x2235
         public byte[] SerialNumber = new byte[0];           // 0x2237
         public BinaryFiles BinaryFiles = new();             // 0x2238
@@ -56,7 +53,7 @@ namespace Nebula.Core.Data
         public ShaderBank ShaderBank = new();               // 0x2243
         public ExtendedHeader ExtendedHeader = new();       // 0x2245
         public int AppCodePage;                             // 0x2246
-        public Dictionary<int, Frame> Frames = new();                  // 0x3333
+        public List<Frame> Frames = new();                  // 0x3333
         public ObjectAnimations ObjectAnimations = new();   // 0x4449
         public AnimationOffsets AnimationOffsets = new();   // 0x444A
 
@@ -64,14 +61,10 @@ namespace Nebula.Core.Data
         public FontOffsets FontOffsets = new();             // 0x5556
         public SoundOffsets SoundOffsets = new();           // 0x5557
         public MusicOffsets MusicOffsets = new();           // 0x5558
-        [NonSerialized]
         public ImageBank ImageBank = new();                 // 0x6666
-        [NonSerialized]
         public FontBank FontBank = new();                   // 0x6667
-        [NonSerialized]
         public SoundBank SoundBank = new();                 // 0x6668
 
-        [NonSerialized]
         public ByteReader Reader = new(new byte[0]);
         public void Read(ByteReader reader)
         {

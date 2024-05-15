@@ -30,9 +30,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         public int FrameMoveTimer;                            // 0x3347
         public FrameEffects FrameEffects = new();             // 0x3349
 
-        [NonSerialized]
         public MFAFrameInfo MFAFrameInfo = new();
-        [NonSerialized]
         public Bitmap? BitmapCache = null;
 
         public Frame()
@@ -61,7 +59,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             if (FrameHeader.FrameFlags["DontInclude"])
                 log += " (Not Included)";
             else
-                NebulaCore.PackageData.Frames.Add(Handle = NebulaCore.PackageData.FrameHandles.IndexOf((short)NebulaCore.PackageData.Frames.Count), this);
+                NebulaCore.PackageData.Frames.Add(this);
 
             Logger.Log(this, log, color: ConsoleColor.Green);
         }
