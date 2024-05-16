@@ -2,7 +2,9 @@
 # Set default behavior to automatically normalize line endings.
 ###############################################################################
 * text=auto
-
+# Re-classify .gml files
+*.gml linguist-language=C#
+*.yy linguist-language=C#
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
