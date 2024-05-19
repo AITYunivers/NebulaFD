@@ -14,6 +14,9 @@ using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using Nebula.Core.Data.Chunks.BankChunks.Music;
 using Nebula.Core.Data.Chunks.AppChunks;
 using Nebula.Core.FileReaders;
+using Nebula.Core.Data.Chunks.BankChunks.Shaders;
+using System.Text;
+using System.Xml;
 #pragma warning disable CA1416
 
 namespace Nebula.Plugins.GameDumper
@@ -36,6 +39,7 @@ namespace Nebula.Plugins.GameDumper
                 $"[{NebulaCore.ColorRules[3]}]Dump Sounds[/]",
                 $"[{NebulaCore.ColorRules[3]}]Dump Music[/]",
                 $"[{NebulaCore.ColorRules[3]}]Dump Packed Data[/]",
+                $"[{NebulaCore.ColorRules[3]}]Dump Shaders[/]",
             };
 
             List<string> selectedTasks = AnsiConsole.Prompt(
@@ -67,6 +71,9 @@ namespace Nebula.Plugins.GameDumper
                         break;
                     case "Dump Packed Data":
                         runningTasks.Add(new Task(PackedDump));
+                        break;
+                    case "Dump Shaders":
+                        runningTasks.Add(new Task(ShaderDump));
                         break;
                 }
             }
@@ -356,6 +363,141 @@ namespace Nebula.Plugins.GameDumper
                     Console.ReadKey();
                 }
             }
+        }
+
+        public void ShaderDump()
+        {
+            ProgressTask? task = progressContext!.AddTask($"[{NebulaCore.ColorRules[4]}]Dumping Shaders[/]", false);
+
+            int progress = 0;
+            string path = "Dumps\\" + Utilities.ClearName(NebulaCore.PackageData.AppName) + "\\Shaders";
+            while (!task.IsFinished)
+            {
+                if (NebulaCore.PackageData.ShaderBank != null || NebulaCore.PackageData.DX9ShaderBank != null)
+                {
+                    int count = 0;
+                    if (NebulaCore.PackageData.ShaderBank != null)
+                        count += NebulaCore.PackageData.ShaderBank.Shaders.Count;
+                    if (NebulaCore.PackageData.DX9ShaderBank != null)
+                        count += NebulaCore.PackageData.DX9ShaderBank.Shaders.Count;
+                    if (count == 0)
+                        return;
+
+                    if (!task.IsStarted)
+                        task.StartTask();
+
+                    task.Value = progress;
+                    task.MaxValue = count;
+
+                    Shader[] shdrs;
+                    if (NebulaCore.PackageData.ShaderBank != null)
+                    {
+                        shdrs = NebulaCore.PackageData.ShaderBank.Shaders.Values.ToArray();
+                        int[] keys = NebulaCore.PackageData.ShaderBank.Shaders.Keys.ToArray();
+                        ExtendedHeader eHdr = NebulaCore.PackageData.ExtendedHeader;
+                        for (int i = 0; i < shdrs.Length; i++)
+                        {
+                            Directory.CreateDirectory(path);
+                            string filePath = path + "\\" + Path.GetFileNameWithoutExtension(shdrs[i].Name) + (shdrs[i].Compiled ? (eHdr.Flags["PremultipliedAlpha"] ? ".premultiplied.fxc" : ".fxc") : ".fx");
+                            File.WriteAllBytes(filePath, shdrs[i].FXData);
+                            filePath = path + "\\" + Path.GetFileNameWithoutExtension(shdrs[i].Name) + ".xml";
+                            string fxData = string.Empty;
+                            if (NebulaCore.PackageData.DX9ShaderBank != null)
+                                fxData = Encoding.ASCII.GetString(NebulaCore.PackageData.DX9ShaderBank.Shaders[keys[i]].FXData);
+                            File.WriteAllText(filePath, GenerateXML(shdrs[i], fxData));
+                            task.Value = ++progress;
+                        }
+                    }
+
+                    if (NebulaCore.PackageData.DX9ShaderBank != null)
+                    {
+                        if (NebulaCore.PackageData.DX9ShaderBank.Shaders.Count != 0)
+                        {
+                            shdrs = NebulaCore.PackageData.DX9ShaderBank.Shaders.Values.ToArray();
+                            for (int i = 0; i < shdrs.Length; i++)
+                            {
+                                Directory.CreateDirectory(path);
+                                string filePath = path + "\\" + shdrs[i].Name;
+                                File.WriteAllBytes(filePath, shdrs[i].FXData);
+                                task.Value = ++progress;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine("[Red]Could not find the shader bank.[/]");
+                    Console.ReadKey();
+                }
+            }
+        }
+
+        public string GenerateXML(Shader shdr, string fxData)
+        {
+            StringBuilder sb = new StringBuilder();
+            XmlWriter w = XmlWriter.Create(sb, new XmlWriterSettings()
+            {
+                Indent = true,
+                Encoding = Encoding.Unicode,
+                OmitXmlDeclaration = true
+            });
+            w.WriteStartDocument();
+
+            w.WriteStartElement("effect");
+            w.WriteElementString("name", Path.GetFileNameWithoutExtension(shdr.Name));
+            w.WriteElementString("description", "Decompiled using Nebula by Yunivers");
+            w.WriteElementString("author", "Unknown");
+
+            int[] shdrParams = new int[shdr.Parameters.Length];
+            /*foreach (ObjectInfo obj in NebulaCore.PackageData.FrameItems.Items.Values)
+                if (obj.Shader.ShaderHandle != 0 && obj.Shader.ShaderHandle == shdr.Handle + 1)
+                {
+                    shdrParams = obj.Shader.ShaderParameters;
+                    break;
+                }*/
+
+            for (int i = 0; i < shdr.Parameters.Length; i++)
+            {
+                ShaderParameter param = shdr.Parameters[i];
+                w.WriteStartElement("parameter");
+                string[] name = param.Name.Replace('_', ' ').Replace('-', ' ').Split(' ');
+                for (int ii = 0; ii < name.Length; ii++)
+                    name[ii] = name[ii].Substring(0, 1).ToUpper() + name[ii].Substring(1);
+                w.WriteElementString("name", string.Join(' ', name));
+                w.WriteElementString("code", param.Name);
+                int value = shdrParams[i];
+                switch (param.Type)
+                {
+                    case 0:
+                        w.WriteElementString("type", "int");
+                        if (fxData.Replace(" ", "").Contains("bool" + param.Name + ";") ||
+                            fxData.Replace(" ", "").Contains("bool" + param.Value + "="))
+                            w.WriteElementString("property", "checkbox");
+                        else
+                            w.WriteElementString("property", "edit");
+                        w.WriteElementString("value", value.ToString());
+                        break;
+                    case 1:
+                        w.WriteElementString("type", "float");
+                        w.WriteElementString("property", "edit");
+                        w.WriteElementString("value", value == 0 ? value.ToString() : BitConverter.Int32BitsToSingle(value).ToString());
+                        break;
+                    case 2:
+                        w.WriteElementString("type", "INT_FLOAT4");
+                        w.WriteElementString("property", "COLOR");
+                        w.WriteElementString("value", value.ToString());
+                        break;
+                    case 3:
+                        w.WriteElementString("type", "IMAGE");
+                        w.WriteElementString("property", "image");
+                        break;
+                }
+                w.WriteEndElement();
+            }
+
+            w.WriteEndElement();
+            w.Flush();
+            return sb.ToString();
         }
     }
 }

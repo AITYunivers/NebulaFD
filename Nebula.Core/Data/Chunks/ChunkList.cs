@@ -95,7 +95,7 @@ namespace Nebula.Core.Data.Chunks
             //0x2257         ObjectPropOffsets
             //0x2258         TrueTypeFontInfo
             //0x2259         TrueTypeFonts
-            //0x225A         DX9Shaders
+            { 0x225A, typeof(DX9ShaderBank)       },
             //0x225B
             //0x225C
             //0x225D         PlayerControls

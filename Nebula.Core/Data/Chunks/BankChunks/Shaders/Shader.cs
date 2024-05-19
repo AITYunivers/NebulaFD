@@ -1,4 +1,5 @@
 ﻿using Nebula.Core.Memory;
+using System.Text;
 
 namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
 {
@@ -6,7 +7,8 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
     {
         public int Handle;
         public string Name = string.Empty;
-        public string FXData = string.Empty;
+        public bool Compiled = false;
+        public byte[] FXData = new byte[0];
         public ShaderParameter[] Parameters = new ShaderParameter[0];
 
         public Shader()
@@ -20,6 +22,8 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
             int NameOffset = reader.ReadInt();
             int FXDataOffset = reader.ReadInt();
             int ParameterOffset = reader.ReadInt();
+            reader.Skip(4); // Unknown
+            int FXDataSize = reader.ReadInt();
 
             if (NameOffset != 0)
             {
@@ -30,11 +34,10 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
             if (FXDataOffset != 0)
             {
                 reader.Seek(StartOffset + FXDataOffset);
-                FXData = reader.ReadAscii();
-                if (!string.IsNullOrEmpty(FXData))
-                {
-                    // Do stuff here
-                }
+                string header = reader.ReadAscii(4);
+                    Compiled = header == "DXBC";
+                reader.Skip(-4);
+                FXData = reader.ReadBytes(--FXDataSize);
             }
 
             if (ParameterOffset != 0)

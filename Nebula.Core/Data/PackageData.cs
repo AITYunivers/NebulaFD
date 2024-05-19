@@ -53,6 +53,7 @@ namespace Nebula.Core.Data
         public ShaderBank ShaderBank = new();               // 0x2243
         public ExtendedHeader ExtendedHeader = new();       // 0x2245
         public int AppCodePage;                             // 0x2246
+        public DX9ShaderBank DX9ShaderBank = new();         // 0x225A
         public List<Frame> Frames = new();                  // 0x3333
         public ObjectAnimations ObjectAnimations = new();   // 0x4449
         public AnimationOffsets AnimationOffsets = new();   // 0x444A
