@@ -11,6 +11,9 @@ using Nebula.Core.Data.Chunks.BankChunks.Sounds;
 using System.Reflection;
 using Nebula.Core.Data.Chunks.ObjectChunks;
 using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
+using Nebula.Core.Data.Chunks.BankChunks.Music;
+using Nebula.Core.Data.Chunks.AppChunks;
+using Nebula.Core.FileReaders;
 #pragma warning disable CA1416
 
 namespace Nebula.Plugins.GameDumper
@@ -29,8 +32,10 @@ namespace Nebula.Plugins.GameDumper
             {
                 $"[{NebulaCore.ColorRules[3]}]Exit[/]",
                 $"[{NebulaCore.ColorRules[3]}]Dump Images[/]",
-                $"[{NebulaCore.ColorRules[3]}]Dump Sprite Sheets[/]",
+                //$"[{NebulaCore.ColorRules[3]}]Dump Sprite Sheets[/]",
                 $"[{NebulaCore.ColorRules[3]}]Dump Sounds[/]",
+                $"[{NebulaCore.ColorRules[3]}]Dump Music[/]",
+                $"[{NebulaCore.ColorRules[3]}]Dump Packed Data[/]",
             };
 
             List<string> selectedTasks = AnsiConsole.Prompt(
@@ -46,7 +51,7 @@ namespace Nebula.Plugins.GameDumper
             List<Task> runningTasks = new List<Task>();
             foreach (string task in selectedTasks)
             {
-                switch (task.ReplaceFirst($"[{NebulaCore.ColorRules[3]}]", "").ReplaceLast("[/]", ""))
+                switch (Markup.Remove(task))
                 {
                     case "Dump Images":
                         runningTasks.Add(new Task(ImageDump));
@@ -56,6 +61,12 @@ namespace Nebula.Plugins.GameDumper
                         break;
                     case "Dump Sounds":
                         runningTasks.Add(new Task(SoundDump));
+                        break;
+                    case "Dump Music":
+                        runningTasks.Add(new Task(MusicDump));
+                        break;
+                    case "Dump Packed Data":
+                        runningTasks.Add(new Task(PackedDump));
                         break;
                 }
             }
@@ -256,6 +267,95 @@ namespace Nebula.Plugins.GameDumper
             // Because of Clickteam stole the MOD replayer from open-source OpenMPT library,
             // there's more file formats that can be supported by modflt.sft.
             return ".wav";
+        }
+
+        public void MusicDump()
+        {
+            ProgressTask? task = progressContext!.AddTask($"[{NebulaCore.ColorRules[4]}]Dumping Music[/]", false);
+
+            int progress = 0;
+            string path = "Dumps\\" + Utilities.ClearName(NebulaCore.PackageData.AppName) + "\\Music";
+            while (!task.IsFinished)
+            {
+                if (NebulaCore.PackageData.MusicBank != null)
+                {
+                    if (NebulaCore.PackageData.MusicBank.Music.Count == 0)
+                        return;
+
+                    if (!task.IsStarted)
+                        task.StartTask();
+
+                    task.Value = progress;
+                    task.MaxValue = NebulaCore.PackageData.MusicBank.Music.Count;
+
+                    Music[] music = NebulaCore.PackageData.MusicBank.Music.Values.ToArray();
+                    for (int i = 0; i < music.Length; i++)
+                    {
+                        Directory.CreateDirectory(path);
+                        File.WriteAllBytes(path + "\\" + music[i].Name + ".mid", music[i].Data);
+                        task.Value = ++progress;
+                    }
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine("[Red]Could not find the music bank.[/]");
+                    Console.ReadKey();
+                }
+            }
+        }
+
+        public void PackedDump()
+        {
+            ProgressTask? task = progressContext!.AddTask($"[{NebulaCore.ColorRules[4]}]Dumping Packed Data[/]", false);
+
+            int progress = 0;
+            string path = "Dumps\\" + Utilities.ClearName(NebulaCore.PackageData.AppName) + "\\Packed Data";
+            while (!task.IsFinished)
+            {
+                if (NebulaCore.PackageData.BinaryFiles != null || NebulaCore.PackageData.PackData != null)
+                {
+                    int count = 0;
+                    if (NebulaCore.PackageData.BinaryFiles != null)
+                        count += NebulaCore.PackageData.BinaryFiles.Count;
+                    if (NebulaCore.PackageData.PackData != null)
+                        count += NebulaCore.PackageData.PackData.Items.Length;
+                    if (count == 0)
+                        return;
+
+                    if (!task.IsStarted)
+                        task.StartTask();
+
+                    task.Value = progress;
+                    task.MaxValue = count;
+
+                    if (NebulaCore.PackageData.PackData != null)
+                    {
+                        PackFile[] packFiles = NebulaCore.PackageData.PackData.Items;
+                        for (int i = 0; i < packFiles.Length; i++)
+                        {
+                            Directory.CreateDirectory(path);
+                            File.WriteAllBytes(path + "\\" + Path.GetFileName(packFiles[i].PackFilename), packFiles[i].Data);
+                            task.Value = ++progress;
+                        }
+                    }
+
+                    if (NebulaCore.PackageData.BinaryFiles != null)
+                    {
+                        List<BinaryFile> binFiles = NebulaCore.PackageData.BinaryFiles.Items;
+                        for (int i = 0; i < binFiles.Count; i++)
+                        {
+                            Directory.CreateDirectory(path + "\\Binary Files");
+                            File.WriteAllBytes(path + "\\Binary Files\\" + Path.GetFileName(binFiles[i].FileName), binFiles[i].FileData);
+                            task.Value = ++progress;
+                        }
+                    }
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine("[Red]Could not find any packed data or binary files.[/]");
+                    Console.ReadKey();
+                }
+            }
         }
     }
 }

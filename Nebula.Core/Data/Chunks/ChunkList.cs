@@ -1,7 +1,7 @@
 ﻿using Nebula.Core.Data.Chunks.AppChunks;
-using Nebula.Core.Data.Chunks.BankChunks;
 using Nebula.Core.Data.Chunks.BankChunks.Fonts;
 using Nebula.Core.Data.Chunks.BankChunks.Images;
+using Nebula.Core.Data.Chunks.BankChunks.Music;
 using Nebula.Core.Data.Chunks.BankChunks.Shaders;
 using Nebula.Core.Data.Chunks.BankChunks.Sounds;
 using Nebula.Core.Data.Chunks.FrameChunks;
@@ -82,23 +82,23 @@ namespace Nebula.Core.Data.Chunks
             //0x224A
             //0x224B         AndroidMenu
             //0x224C
-            //0x224D
+            //0x224D         CharEncoding
             //0x224E
-            //0x224F
+            //0x224F         EngineVer
             //0x2250
-            //0x2251
+            //0x2251         AppLanguage
             //0x2252
             { 0x2253, typeof(ObjectHeaders)       },
             { 0x2254, typeof(ObjectNames)         },
             { 0x2255, typeof(ObjectShaders)       },
             { 0x2256, typeof(ObjectProperties)    },
-            //0x2257
+            //0x2257         ObjectPropOffsets
             //0x2258         TrueTypeFontInfo
             //0x2259         TrueTypeFonts
-            //0x225A         Shaders
+            //0x225A         DX9Shaders
             //0x225B
             //0x225C
-            //0x225D
+            //0x225D         PlayerControls
             //0x225E
             //0x225F
             //0x2260
@@ -144,7 +144,7 @@ namespace Nebula.Core.Data.Chunks
             { 0x6666, typeof(ImageBank)           },
             { 0x6667, typeof(FontBank)            },
             { 0x6668, typeof(SoundBank)           },
-            //0x6669         MusicBank
+            { 0x6669, typeof(MusicBank)           },
             //0x7EEE         Fusion3Seed
             { 0x7F7F, typeof(Last)                }
         };

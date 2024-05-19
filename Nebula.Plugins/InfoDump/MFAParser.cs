@@ -40,6 +40,11 @@ namespace GameDumper
             IconBank.Palette = dat.ImageBank.Palette = dat.Frames.First().FramePalette.Palette;
 
             // Initialize images on multiple threads for speed made it 2x slower
+            foreach (Image img in dat.ImageBank.Images.Values)
+            {
+                img.GetBitmap();
+                img.PrepareForMfa();
+            }
 
             if (NebulaCore.CurrentReader!.Icons.Count == 5)
             {
@@ -135,7 +140,7 @@ namespace GameDumper
             writer.WriteAscii("APMS"); // Sound Bank
             dat.SoundBank.WriteMFA(writer);
             writer.WriteAscii("ASUM"); // Music Bank
-            writer.WriteInt(0);
+            dat.MusicBank.WriteMFA(writer);
             writer.WriteAscii("AGMI"); // Icon Bank
             IconBank.WriteMFA(writer);
             writer.WriteAscii("AGMI"); // Image Bank

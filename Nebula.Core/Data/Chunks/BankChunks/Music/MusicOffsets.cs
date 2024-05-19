@@ -1,6 +1,6 @@
 ﻿using Nebula.Core.Memory;
 
-namespace Nebula.Core.Data.Chunks.BankChunks
+namespace Nebula.Core.Data.Chunks.BankChunks.Music
 {
     public class MusicOffsets : Chunk
     {

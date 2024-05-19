@@ -54,7 +54,7 @@ namespace Nebula.Core.Data.Chunks
             if (!ChunkList.ChunkJumpTable.ContainsKey(id))
             {
                 Directory.CreateDirectory("Chunks");
-                File.WriteAllBytes($"Chunks\\[{chunkIndex++}] Chunk-{string.Format("0x{0:X}", id)}.bin", newChunk.ChunkData);
+                File.WriteAllBytes($"Chunks\\Chunk-{string.Format("0x{0:X}", id)}_{Utilities.Utilities.ClearName(NebulaCore.PackageData.AppName)}.bin", newChunk.ChunkData);
             }
 
             if (dataReader == null)
@@ -77,7 +77,7 @@ namespace Nebula.Core.Data.Chunks
             newChunk.ChunkData = data;
 
             if (writeToFile && !ChunkList.ChunkJumpTable.ContainsKey(id))
-                File.WriteAllBytes($"Chunks\\[{chunkIndex++}] MFAChunk-{string.Format("0x{0:X}", id)}.bin", newChunk.ChunkData);
+                File.WriteAllBytes($"Chunks\\MFAChunk-{string.Format("0x{0:X}", id)}_{Utilities.Utilities.ClearName(NebulaCore.PackageData.AppName)}.bin", newChunk.ChunkData);
             return newChunk;
         }
 

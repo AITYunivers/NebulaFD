@@ -1,8 +1,8 @@
 ﻿using Nebula.Core.Data.Chunks;
 using Nebula.Core.Data.Chunks.AppChunks;
-using Nebula.Core.Data.Chunks.BankChunks;
 using Nebula.Core.Data.Chunks.BankChunks.Fonts;
 using Nebula.Core.Data.Chunks.BankChunks.Images;
+using Nebula.Core.Data.Chunks.BankChunks.Music;
 using Nebula.Core.Data.Chunks.BankChunks.Shaders;
 using Nebula.Core.Data.Chunks.BankChunks.Sounds;
 using Nebula.Core.Data.Chunks.FrameChunks;
@@ -64,6 +64,7 @@ namespace Nebula.Core.Data
         public ImageBank ImageBank = new();                 // 0x6666
         public FontBank FontBank = new();                   // 0x6667
         public SoundBank SoundBank = new();                 // 0x6668
+        public MusicBank MusicBank = new();                 // 0x6669
 
         public ByteReader Reader = new(new byte[0]);
         public void Read(ByteReader reader)

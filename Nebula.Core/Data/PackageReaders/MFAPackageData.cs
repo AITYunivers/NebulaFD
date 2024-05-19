@@ -53,8 +53,7 @@ namespace Nebula.Core.Data.PackageReaders
             SoundBank.ReadMFA(Reader);
 
             Reader.Skip(4); // ASUM
-            Reader.Skip(4);
-            //MusicBank.ReadMFA(Reader);
+            MusicBank.ReadMFA(Reader);
 
             Reader.Skip(4); // AGMI
             IconBank.ReadMFA(Reader);
