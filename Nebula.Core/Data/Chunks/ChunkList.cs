@@ -79,15 +79,15 @@ namespace Nebula.Core.Data.Chunks
             //0x2247         FrameOffset
             //0x2248         AdMobID
             //0x2249
-            //0x224A
+            //0x224A         Html5Preloader
             //0x224B         AndroidMenu
-            //0x224C
+            //0x224C         VirtualKeysToChar
             //0x224D         CharEncoding
-            //0x224E
+            //0x224E         PreloaderTouchMsg
             //0x224F         EngineVer
             //0x2250
             //0x2251         AppLanguage
-            //0x2252
+            //0x2252         WUAOptions
             { 0x2253, typeof(ObjectHeaders)       },
             { 0x2254, typeof(ObjectNames)         },
             { 0x2255, typeof(ObjectShaders)       },
@@ -125,8 +125,8 @@ namespace Nebula.Core.Data.Chunks
             { 0x3347, typeof(FrameMoveTimer)      },
             { 0x3348, typeof(FrameMosaicTable)    },
             { 0x3349, typeof(FrameEffects)        },
-            //0x334A         FrameiPhoneOptions
-            //0x334B
+            //0x334A         FrameRuntimeOptions
+            //0x334B         FrameWuaOptions
             //0x334C
             { 0x4444, typeof(ObjectInfoHeader)    },
             { 0x4445, typeof(ObjectInfoName)      },

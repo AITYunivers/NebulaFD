@@ -76,7 +76,7 @@ namespace GameDumper
 
             foreach (ObjectInfo objectInfo in dat.FrameItems.Items.Values)
             {
-                Bitmap iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFActive.png"));
+                Bitmap iconBmp = new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFActive.png"));
                 try
                 {
                     iconBmp = objectInfo.Header.Type switch
@@ -84,21 +84,21 @@ namespace GameDumper
                         0 => MakeIcon(dat.ImageBank.Images[((ObjectQuickBackdrop)objectInfo.Properties).Shape.Image].GetBitmap(), "MMFQuickBackdrop"),
                         1 => MakeIcon(dat.ImageBank.Images[((ObjectBackdrop)objectInfo.Properties).Image].GetBitmap(), "MMFBackdrop"),
                         2 => MakeIcon(dat.ImageBank.Images[((ObjectCommon)objectInfo.Properties).ObjectAnimations.Animations[0].Directions[0].Frames[0]].GetBitmap(), "MMFActive"),
-                        3 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFString.png")),
-                        4 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFQ&A.png")),
-                        5 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFScore.png")),
-                        6 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFLives.png")),
+                        3 => new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFString.png")),
+                        4 => new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFQ&A.png")),
+                        5 => new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFScore.png")),
+                        6 => new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFLives.png")),
                         7 => MakeIcon(getCounterBmp(((ObjectCommon)objectInfo.Properties).ObjectCounter, ((ObjectCommon)objectInfo.Properties).ObjectValue), "MMFCounter"),
-                        8 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFFormattedText.png")),
-                        9 => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFSubApplication.png")),
-                        _ => new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\MMFActive.png"))
+                        8 => new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFFormattedText.png")),
+                        9 => new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFSubApplication.png")),
+                        _ => new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFActive.png"))
                     };
                     if (objectInfo.Header.Type >= 32)
                     {
                         foreach (Extension posExt in dat.Extensions.Exts.Values)
-                            if (posExt.Handle == objectInfo.Header.Type - 32 && File.Exists("Plugins\\ObjectIcons\\" + posExt.Name + ".png"))
+                            if (posExt.Handle == objectInfo.Header.Type - 32 && File.Exists("Tools\\ObjectIcons\\" + posExt.Name + ".png"))
                             {
-                                iconBmp = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\" + posExt.Name + ".png"));
+                                iconBmp = new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\" + posExt.Name + ".png"));
                                 break;
                             }
                     }
@@ -230,7 +230,7 @@ namespace GameDumper
 
         public Bitmap MakeIcon(Bitmap source, string @default)
         {
-            Bitmap output = new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\" + @default + ".png"));
+            Bitmap output = new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\" + @default + ".png"));
             if (source == null) return output;
 
             if (source.Width > 32 || source.Height > 32)
@@ -277,7 +277,7 @@ namespace GameDumper
             }
 
             if (hasPixels && output.Width > 1) return output;
-            else return new Bitmap(Bitmap.FromFile("Plugins\\ObjectIcons\\" + @default + ".png"));
+            else return new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\" + @default + ".png"));
         }
 
         public Bitmap MakeFrameIcon(Frame frm)
