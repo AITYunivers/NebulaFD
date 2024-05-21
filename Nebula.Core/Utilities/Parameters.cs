@@ -1,11 +1,28 @@
-﻿namespace Nebula.Core.Utilities
+﻿using Newtonsoft.Json;
+
+namespace Nebula.Core.Utilities
 {
-    public static class Parameters
+    public class Parameters
     {
-        public static bool DontIncludeImages = false;
-        public static bool DontIncludeFonts = false;
-        public static bool DontIncludeSounds = false;
-        public static bool DontIncludeMusic = false;
-        public static bool DontIncludeEvents = false;
+        public static Parameters Inst = new Parameters();
+        public bool ignore_images = false;
+        public bool ignore_fonts = false;
+        public bool ignore_sounds = false;
+        public bool ignore_music = false;
+        public bool ignore_events = false;
+
+        public Parameters()
+        {
+            if (File.Exists("config.json"))
+                JsonConvert.PopulateObject(File.ReadAllText("config.json"), this);
+            else
+                File.WriteAllText("config.json", JsonConvert.SerializeObject(this, Formatting.Indented));
+        }
+
+        public static bool DontIncludeImages => Inst.ignore_images;
+        public static bool DontIncludeFonts => Inst.ignore_fonts;
+        public static bool DontIncludeSounds => Inst.ignore_sounds;
+        public static bool DontIncludeMusic => Inst.ignore_music;
+        public static bool DontIncludeEvents => Inst.ignore_events;
     }
 }
