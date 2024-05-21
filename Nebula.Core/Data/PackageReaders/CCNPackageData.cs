@@ -11,33 +11,33 @@ namespace Nebula.Core.Data.PackageReaders
 {
     public class CCNPackageData : PackageData
     {
-        public override void Read()
+        public override void Read(ByteReader reader)
         {
-            Logger.Log(this, $"Running {NebulaCore.BuildDate} build.");
+            this.Log($"Running {NebulaCore.BuildDate} build.");
             if (NebulaCore.Fusion == 1.1f)
                 return;
 
-            Header = Reader.ReadAscii(4);
+            Header = reader.ReadAscii(4);
             NebulaCore._yunicode = Header != "PAME";
             if (Header == "CRUF")
                 NebulaCore.Fusion = 3f;
-            Logger.Log(this, "Game Header: " + Header);
+            this.Log("Game Header: " + Header);
 
-            RuntimeVersion = Reader.ReadShort();
-            RuntimeSubversion = Reader.ReadShort();
-            ProductVersion = Reader.ReadInt();
-            ProductBuild = Reader.ReadInt();
+            RuntimeVersion = reader.ReadShort();
+            RuntimeSubversion = reader.ReadShort();
+            ProductVersion = reader.ReadInt();
+            ProductBuild = reader.ReadInt();
             NebulaCore.Build = ProductBuild;
-            Logger.Log(this, "Fusion Build: " + ProductBuild);
+            this.Log("Fusion Build: " + ProductBuild);
 
             if (NebulaCore.Build < 280)
                 NebulaCore.Fusion = 2f + (ProductVersion == 1 ? 0.1f : 0);
 
             Frames = new List<Frame>();
-            while (Reader.HasMemory(8))
+            while (reader.HasMemory(8))
             {
-                var newChunk = Chunk.InitChunk(Reader);
-                Logger.Log(this, $"Reading Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
+                var newChunk = Chunk.InitChunk(reader);
+                this.Log($"Reading Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
 
                 if (newChunk.ChunkID == 32494)
                     NebulaCore.Seeded = true;
@@ -48,7 +48,7 @@ namespace Nebula.Core.Data.PackageReaders
                 newChunk.ReadCCN(chunkReader);
                 newChunk.ChunkData = new byte[0];
             }
-            Reader.Seek(Reader.Size());
+            reader.Seek(reader.Size());
         }
     }
 }

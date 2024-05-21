@@ -13,6 +13,8 @@ namespace Nebula.Core.FileReaders
 
         public AGMIPackageData Package = new();
 
+        public void Preload(string filePath) {}
+
         public void LoadGame(ByteReader fileReader, string filePath)
         {
             Package.AppName = Path.GetFileNameWithoutExtension(filePath);

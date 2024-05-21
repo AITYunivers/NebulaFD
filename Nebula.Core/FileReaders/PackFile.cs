@@ -33,7 +33,7 @@ namespace Nebula.Core.FileReaders
             }
             else Data = reader.ReadBytes(DataSize);
 
-            Logger.Log(this, $"New packfile: {PackFilename}" + (Compressed ? " (Compressed)" : ""));
+            this.Log($"New packfile: {PackFilename}" + (Compressed ? " (Compressed)" : ""));
         }
     }
 }

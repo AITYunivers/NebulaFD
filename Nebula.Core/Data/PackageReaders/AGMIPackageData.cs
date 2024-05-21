@@ -5,13 +5,13 @@ namespace Nebula.Core.Data.PackageReaders
 {
     public class AGMIPackageData : PackageData
     {
-        public override void Read()
+        public override void Read(ByteReader reader)
         {
-            Logger.Log(this, $"Running {NebulaCore.BuildDate} build.");
-            Header = Reader.ReadAscii(4);
-            Logger.Log(this, "Header: " + Header);
+            this.Log($"Running {NebulaCore.BuildDate} build.");
+            Header = reader.ReadAscii(4);
+            this.Log("Header: " + Header);
             NebulaCore.MFA = true;
-            ImageBank.ReadMFA(Reader);
+            ImageBank.ReadMFA(reader);
         }
     }
 }

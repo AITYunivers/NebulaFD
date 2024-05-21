@@ -47,7 +47,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             {
                 var newChunk = InitChunk(reader);
                 log = $"Reading Frame Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})";
-                Logger.Log(this, log);
+                this.Log(log);
 
                 ByteReader chunkReader = new ByteReader(newChunk.ChunkData!);
                 newChunk.ReadCCN(chunkReader, this);
@@ -61,7 +61,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             else
                 NebulaCore.PackageData.Frames.Add(this);
 
-            Logger.Log(this, log, color: ConsoleColor.Green);
+            this.Log(log, color: ConsoleColor.Green);
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -107,7 +107,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             while (true)
             {
                 Chunk newChunk = InitMFAChunk(reader, false);
-                Logger.Log(this, $"Reading MFA Frame Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
+                this.Log($"Reading MFA Frame Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
 
                 ByteReader chunkReader = new ByteReader(newChunk.ChunkData!);
                 newChunk.ReadMFA(chunkReader, this);
@@ -116,7 +116,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     break;
             }
 
-            Logger.Log(this, $"Frame '{FrameName}' found.", color: ConsoleColor.Green);
+            this.Log($"Frame '{FrameName}' found.", color: ConsoleColor.Green);
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

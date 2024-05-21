@@ -13,22 +13,22 @@ namespace Nebula.Core.Data.Chunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Logger.Log(this, "Unknown Chunk: 0x" + ChunkID.ToString("X"));
+            this.Log("Unknown Chunk: 0x" + ChunkID.ToString("X"));
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            Logger.Log(this, "Unknown Chunk: 0x" + ChunkID.ToString("X"));
+            this.Log("Unknown Chunk: 0x" + ChunkID.ToString("X"));
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
-            Logger.Log(this, "Unknown Chunk: 0x" + ChunkID.ToString("X"));
+            this.Log("Unknown Chunk: 0x" + ChunkID.ToString("X"));
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            Logger.Log(this, "Unknown Chunk: 0x" + ChunkID.ToString("X"));
+            this.Log("Unknown Chunk: 0x" + ChunkID.ToString("X"));
         }
     }
 }

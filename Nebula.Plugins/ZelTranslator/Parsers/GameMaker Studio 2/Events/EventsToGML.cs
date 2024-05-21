@@ -232,7 +232,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
             }
 
 
-            Logger.Log("Parsing extensions");
+            Logger.LogType(typeof(EventsToGML), "Parsing extensions");
             Dictionary<string, int> ExtCodes = new Dictionary<string, int>();
             foreach (var obj in gameData.FrameItems.Items.Values)
             {
@@ -246,12 +246,12 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                             if (!ExtCodes.ContainsKey(common.Identifier))
                             {
                                 ExtCodes.Add(common.Identifier, obj.Header.Type);
-                                Logger.Log($"ID:{common.Identifier}-ObjType:{obj.Header.Type}");
+                                Logger.LogType(typeof(EventsToGML), $"ID:{common.Identifier}-ObjType:{obj.Header.Type}");
                             }
                         }
                         catch (Exception ex)
                         {
-                            Logger.Log($"Error parsing extension: {ex}");
+                            Logger.LogType(typeof(EventsToGML), $"Error parsing extension: {ex}");
                         }
                     }
                 }
@@ -396,7 +396,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                     foreach (var cmt in frame.FrameEvents.Comments)
                     {
                         string cmtLog = $"COMMENT in FRAME {frameCount}: {cmt.Handle} {cmt.Value}";
-                        Logger.Log(cmtLog);
+                        Logger.LogType(typeof(EventsToGML), cmtLog);
                         missing_code.Add(cmtLog);
                     }
                     string evntIfStatement = string.Concat(Enumerable.Repeat("\t", indents)) + $"/*ev{evntCount}*/ if (";
@@ -918,7 +918,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                         }
                         catch (Exception ex)
                         {
-                            Logger.Log($"Problem reading condition ({frameCount}-{evntCount}): {ex}");
+                            Logger.LogType(typeof(EventsToGML), $"Problem reading condition ({frameCount}-{evntCount}): {ex}");
                             Throw.unimplemented(cond, ref evntIfStatement, gameData, ref missing_code); ;
                             condCount++;
                         }
@@ -1423,7 +1423,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                         }
                         catch (Exception ex)
                         {
-                            Logger.Log($"Problem reading action ({frameCount}-{evntCount}): {ex}");
+                            Logger.LogType(typeof(EventsToGML), $"Problem reading action ({frameCount}-{evntCount}): {ex}");
                             Throw.unimplemented(action, ref evntIfStatement, gameData, ref missing_code); ;
 
                             if (!(action.ObjectType == -1 && action.Num > 1)) evntIfStatement += "\n\t";
@@ -1628,7 +1628,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                 }
                 else
                 {
-                    //Logger.Log($"UNIMPLEMENTED_CONDITION/*Obj {ObjType} ~ Cond {condNum}*/");
+                    //Logger.Log(typeof(EventsToGML), $"UNIMPLEMENTED_CONDITION/*Obj {ObjType} ~ Cond {condNum}*/");
                     return $"UNIMPLEMENTED_CONDITION/*{ID} Obj {ObjType} ~ Cnd {condNum}*/";
                 }
             }
@@ -1640,7 +1640,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                 }
                 else
                 {
-                    //Logger.Log($"// UNIMPLEMENTED ACTION: Obj {ObjType} ~ Act {actNum}");
+                    //Logger.Log(typeof(EventsToGML), $"// UNIMPLEMENTED ACTION: Obj {ObjType} ~ Act {actNum}");
                     return $"// UNIMPLEMENTED ACTION:{ID} Obj {ObjType} ~ Act {actNum}";
                 }
             }
@@ -1685,7 +1685,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                 var ItemsList = cond.Parameters;
                 var ID = getID(cond.ObjectInfo, cond.ObjectType, gameData);
                 string errStr = Throw.missingCond(cond.ObjectType, cond.Num, ID) + "/* ";
-                //Logger.Log("69420 UNIMPLEMENTED CONDITION");
+                //Logger.Log(typeof(EventsToGML), "69420 UNIMPLEMENTED CONDITION");
                 writeitems(ItemsList, ref errStr, gameData);
                 missing_code.Add(errStr);
                 evntIfStatement += errStr;
@@ -1697,7 +1697,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                 var ItemsList = action.Parameters;
                 var ID = getID(action.ObjectInfo, action.ObjectType, gameData);
                 string errStr = Throw.missingAction(action.ObjectType, action.Num, ID) + " ";
-                //Logger.Log("1337 UNIMPLEMENTED ACTION");
+                //Logger.Log(typeof(EventsToGML), "1337 UNIMPLEMENTED ACTION");
                 writeitems(ItemsList, ref errStr, gameData);
                 missing_code.Add(errStr);
                 evntIfStatement += errStr;

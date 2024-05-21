@@ -15,6 +15,8 @@ namespace Nebula.Core.FileReaders
 
         public bool Unpacked;
 
+        public void Preload(string filePath) { }
+
         public void LoadGame(ByteReader fileReader, string filePath)
         {
             if (Unpacked)

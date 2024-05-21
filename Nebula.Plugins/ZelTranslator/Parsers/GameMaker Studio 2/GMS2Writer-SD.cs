@@ -196,7 +196,7 @@ namespace ZelTranslator_SD.Parsers
             var Resources = new List<ProjectYYP.Resource>();
             foreach (var Frame in gameData.Frames)
             {
-                Logger.Log("Loading Frame " + Frame.FrameName + " - MvmtSpd=" + Frame.FrameMoveTimer.ToString());
+                Logger.LogType(typeof(GMS2Writer), "Loading Frame " + Frame.FrameName + " - MvmtSpd=" + Frame.FrameMoveTimer.ToString());
                 var newRoom = new RoomYY.RootObject();
                 newRoom.name = $"rm{FrameOrder}_{CleanStringFull(Frame.FrameName)}";
 
@@ -311,7 +311,7 @@ namespace ZelTranslator_SD.Parsers
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log($"Error with frame layer: {ex}");
+                    Logger.LogType(typeof(GMS2Writer), $"Error with frame layer: {ex}");
                 }
 
                 var newRoomLayers = new List<RoomYY.Layer>();
@@ -356,7 +356,7 @@ namespace ZelTranslator_SD.Parsers
                     // Counters sprites
                     if (obj.Properties is ObjectCommon commonCntr && (commonCntr.Identifier == "CNTR" || commonCntr.Identifier == "CN" || !NebulaCore.Plus && obj.Header.Type == 7))
                     {
-                        Logger.Log($"Counter found: {obj.Name}");
+                        Logger.LogType(typeof(GMS2Writer), $"Counter found: {obj.Name}");
                         var counter = commonCntr.ObjectCounter;
 
                         var newSprite = new SpriteYY.RootObject();
@@ -556,7 +556,7 @@ namespace ZelTranslator_SD.Parsers
                     // Quick Backdrop sprites (functions fine, but needs a fix/rework)
                     if (obj.Properties is ObjectQuickBackdrop quickbackdrop)
                     {
-                        Logger.Log($"QUICK BACKDROP Found - ShapeType: {quickbackdrop.Shape.ShapeType} | FillType: {quickbackdrop.Shape.FillType}");
+                        Logger.LogType(typeof(GMS2Writer), $"QUICK BACKDROP Found - ShapeType: {quickbackdrop.Shape.ShapeType} | FillType: {quickbackdrop.Shape.FillType}");
 
                         if (quickbackdrop.Shape.FillType == 3)
                         {
@@ -687,12 +687,12 @@ namespace ZelTranslator_SD.Parsers
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log(ex);
+                    Logger.LogType(typeof(GMS2Writer), ex);
                 }
             }
 
             // Fonts (ty Yunivers)
-            Logger.Log($"Parsing Fonts");
+            Logger.LogType(typeof(GMS2Writer), $"Parsing Fonts");
             RegistryKey? rk = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts");
             RegistryKey? rk2 = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts");
             Dictionary<string, string> fontsToWrite = new();
@@ -702,7 +702,7 @@ namespace ZelTranslator_SD.Parsers
                 foreach (var item in gameData.FontBank.Fonts)
                 {
                     var fnt = item.Value;
-                    Logger.Log($"FONT: Handle={fnt.Handle} [{fnt}]");
+                    Logger.LogType(typeof(GMS2Writer), $"FONT: Handle={fnt.Handle} [{fnt}]");
                     if (fontsToWrite.ContainsKey(fnt.Name)) continue;
                     bool found = false;
                     foreach (var key in rk.GetValueNames())
@@ -738,7 +738,7 @@ namespace ZelTranslator_SD.Parsers
                     //Counters objects
                     if (obj.Header.Type == 7)
                     {
-                        Logger.Log($"Counter Object: {obj.Name}|{common.Identifier}");
+                        Logger.LogType(typeof(GMS2Writer), $"Counter Object: {obj.Name}|{common.Identifier}");
                         var counters = common.ObjectCounter;
                         var counter = common.ObjectValue;
                         var str = common.ObjectAlterableStrings;
@@ -749,7 +749,7 @@ namespace ZelTranslator_SD.Parsers
                         }
                         catch
                         {
-                            Logger.Log("ERROR: Counter does not have Frames?");
+                            Logger.LogType(typeof(GMS2Writer), "ERROR: Counter does not have Frames?");
                         }
 
                         var newObj = new ObjectYY.RootObject();
@@ -884,7 +884,7 @@ namespace ZelTranslator_SD.Parsers
                                 catch // If font is missing from PC (-1 = default GML draw font)
                                 {
                                     fontVar = $"-1; // MISSING FONT: \"{font.Name}\"";
-                                    Logger.Log($"NOTICE: Font \"{font.Name}\" is errored or not installed!");
+                                    Logger.LogType(typeof(GMS2Writer), $"NOTICE: Font \"{font.Name}\" is errored or not installed!");
                                 }
 
                                 break;
@@ -892,7 +892,7 @@ namespace ZelTranslator_SD.Parsers
                         }
                         var str = common.ObjectParagraphs;
                         var items = str.Paragraphs;
-                        Logger.Log($"String Object: {obj.Name}|{common.Identifier}|{font.Name}|{font.Weight}|{font.Width}x{font.Height}|{font.PitchAndFamily}");
+                        Logger.LogType(typeof(GMS2Writer), $"String Object: {obj.Name}|{common.Identifier}|{font.Name}|{font.Weight}|{font.Width}x{font.Height}|{font.PitchAndFamily}");
 
                         var newObj = new ObjectYY.RootObject();
                         newObj.name = GMS2Writer.ObjectName(obj);
@@ -1066,7 +1066,7 @@ if (flash[1] > 0) {
                     // Actives/Common Objs objects
                     if (obj.Header.Type == 2 || obj.Header.Type > 7)
                     {
-                        Logger.Log($"Common Object: {obj.Name}|{common.Identifier}");
+                        Logger.LogType(typeof(GMS2Writer), $"Common Object: {obj.Name}|{common.Identifier}");
                         
                         if (common.ObjectAnimations.Animations.Count == 0 ||
                             (common.Identifier != "SPRI" && common.Identifier != "SP"))
@@ -1370,7 +1370,7 @@ if (flash[1] > 0) {
             {
                 foreach (var soundItem in gameData.SoundBank.Sounds.Values)
                 {
-                    Logger.Log($"Sound: {soundItem.Name}");
+                    Logger.LogType(typeof(GMS2Writer), $"Sound: {soundItem.Name}");
 
                     // Determine audio file type
                     var ext = ".wav";
@@ -1404,7 +1404,7 @@ if (flash[1] > 0) {
                 }
             }
 
-            Logger.Log("Writing Frame Events (unfinished)");
+            Logger.LogType(typeof(GMS2Writer), "Writing Frame Events (unfinished)");
             List<string> missing_code = new List<string>();
             try
             {
@@ -1412,7 +1412,7 @@ if (flash[1] > 0) {
             }
             catch (Exception ex)
             {
-                Logger.Log($"Problem trying to write Frame Events: {ex}");
+                Logger.LogType(typeof(GMS2Writer), $"Problem trying to write Frame Events: {ex}");
             }
             missing_code = missing_code.Distinct().ToList();
             missing_code.Sort();
@@ -1430,13 +1430,13 @@ if (flash[1] > 0) {
             try
             {
                 WriteToFile(outPath, outName, gameData, ProjectJSON, Rooms, Sprites, Objects, Sounds, GMLFiles, fontsToWrite, missing_code);
-                Logger.Log($"GMS2 Project File created at: {outPath}");
+                Logger.LogType(typeof(GMS2Writer), $"GMS2 Project File created at: {outPath}");
                 string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, outPath);
                 Process.Start("explorer.exe", fullPath);
             }
             catch (Exception ex)
             {
-                Logger.Log($"Problem trying to write Project File: {ex}");
+                Logger.LogType(typeof(GMS2Writer), $"Problem trying to write Project File: {ex}");
             }
         }
 
@@ -1455,7 +1455,7 @@ if (flash[1] > 0) {
             if (Directory.Exists(outPath))
                 Directory.Delete(outPath, true);
 
-            Logger.Log("Writing YYP/Project File");
+            Logger.LogType(typeof(GMS2Writer), "Writing YYP/Project File");
             var WriteProjectJSON = JsonConvert.SerializeObject(ProjectJSON);
             Directory.CreateDirectory(outPath);
             File.WriteAllText($"{outPath}\\{outName}.yyp", WriteProjectJSON);
@@ -1469,14 +1469,14 @@ if (flash[1] > 0) {
             foreach (string fontPath in fontsToWrite.Values)
             {
                 string dest = $"{AssetsDir}\\Fonts\\{Path.GetFileName(fontPath)}";
-                Logger.Log(fontPath + " ; " + dest);
+                Logger.LogType(typeof(GMS2Writer), fontPath + " ; " + dest);
                 File.Copy(fontPath, dest, true);
             }
             #endregion
 
             Task[] tasks = new Task[RoomJSONs.Count];
             int i = 0;
-            Logger.Log("Writing rooms");
+            Logger.LogType(typeof(GMS2Writer), "Writing rooms");
             foreach (var room in RoomJSONs)
             {
                 var newTask = new Task(() =>
@@ -1494,7 +1494,7 @@ if (flash[1] > 0) {
                 item.Wait();
             }
 
-            Logger.Log("Writing sprites (may take a while)");
+            Logger.LogType(typeof(GMS2Writer), "Writing sprites (may take a while)");
             foreach (var spr in SpriteJSONs)
             {
                 foreach (var frame in spr.frames)
@@ -1511,7 +1511,7 @@ if (flash[1] > 0) {
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log($"Problem saving image: {ex}");
+                        Logger.LogType(typeof(GMS2Writer), $"Problem saving image: {ex}");
                         goto RETRY_SAVE;
                     }
                 }
@@ -1531,7 +1531,7 @@ if (flash[1] > 0) {
             if (!Args["-nosnds"]) {
                 tasks = new Task[SoundJSONs.Count];
                 i = 0;
-                Logger.Log("Writing sounds (may take a while)");
+                Logger.LogType(typeof(GMS2Writer), "Writing sounds (may take a while)");
                 foreach (var snd in SoundJSONs)
                 {
                     var newTask = new Task(() =>
@@ -1553,7 +1553,7 @@ if (flash[1] > 0) {
                         }
                         catch (Exception ex)
                         {
-                            Logger.Log($"Problem writing sound file: {ex}");
+                            Logger.LogType(typeof(GMS2Writer), $"Problem writing sound file: {ex}");
                             //goto RETRY_SAVE;
                         }
                     RETRY_SAVE_YY:
@@ -1564,7 +1564,7 @@ if (flash[1] > 0) {
                         }
                         catch (Exception ex)
                         {
-                            Logger.Log($"Problem writing sound YY: {ex}");
+                            Logger.LogType(typeof(GMS2Writer), $"Problem writing sound YY: {ex}");
                             //goto RETRY_SAVE_YY;
                         }
                     });
@@ -1581,7 +1581,7 @@ if (flash[1] > 0) {
             // Write Objects
             tasks = new Task[ObjectJSONs.Count];
             i = 0;
-            Logger.Log("Writing objects");
+            Logger.LogType(typeof(GMS2Writer), "Writing objects");
             foreach (var obj in ObjectJSONs)
             {
                 var newTask = new Task(() =>
@@ -1601,7 +1601,7 @@ if (flash[1] > 0) {
 
             tasks = new Task[gmlFiles.Count];
             i = 0;
-            Logger.Log("Writing GML files");
+            Logger.LogType(typeof(GMS2Writer), "Writing GML files");
             if (missing_code.Count > 0) File.WriteAllLines($"{outPath}\\unimplemented.txt", missing_code);
             foreach (var obj in gmlFiles)
             {
@@ -1620,11 +1620,11 @@ if (flash[1] > 0) {
                             File.WriteAllText($"{outPath}\\scripts\\{zelCtfScript.name}\\{zelCtfScript.name}.yy", WriteScriptJSON);
                         }
                         File.WriteAllText($"{outPath}\\{obj.path}\\{obj.name}.gml", obj.code);
-                        //Logger.Log($"Wrote GML to {outPath}\\{obj.path}\\{obj.name}.gml");
+                        //Logger.Log(typeof(GMS2Writer), $"Wrote GML to {outPath}\\{obj.path}\\{obj.name}.gml");
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log($"Problem writing GML: {ex}");
+                        Logger.LogType(typeof(GMS2Writer), $"Problem writing GML: {ex}");
                         goto RETRY_SAVE_GML;
                     }
 
@@ -1712,7 +1712,7 @@ if (flash[1] > 0) {
                 {
                     int initialdir = movement.StartingDirection;
                     bool moveatstart = Convert.ToBoolean(movement.Move);
-                    Logger.Log($"Movement: {movement.MovementDefinition.GetType().Name} - Dir@Start={initialdir}");
+                    Logger.LogType(typeof(GMS2Writer), $"Movement: {movement.MovementDefinition.GetType().Name} - Dir@Start={initialdir}");
                     string movementType = "";
                     short player = movement.Player;
                     bool moving = false;
@@ -1748,7 +1748,7 @@ if (flash[1] > 0) {
                     if (movement.MovementDefinition is ObjectMovementGeneric eightdirs)
                     {
                         movementType = "eightdirections";
-                        Logger.Log($"eightdirs.Directions = {eightdirs.Direction} eightdirs.player = ");
+                        Logger.LogType(typeof(GMS2Writer), $"eightdirs.Directions = {eightdirs.Direction} eightdirs.player = ");
                         moving = Convert.ToBoolean(moveatstart);
                         allowedDirs = eightdirs.Direction;
                         dir = $"{initialdir}";
@@ -1814,7 +1814,7 @@ if (flash[1] > 0) {
             }
             catch (Exception ex)
             {
-                Logger.Log($"Unable to write object movement: {ex}");
+                Logger.LogType(typeof(GMS2Writer), $"Unable to write object movement: {ex}");
             }
         }
         public static void WriteMovement(ObjectCommon common, GMLFile createEvFile)
@@ -1833,7 +1833,7 @@ if (flash[1] > 0) {
 
                     int initialdir = movement.StartingDirection;
                     bool moveatstart = Convert.ToBoolean(movement.Move);
-                    Logger.Log($"Movement: {movement.MovementDefinition.GetType().Name} - Dir@Start={initialdir}");
+                    Logger.LogType(typeof(GMS2Writer), $"Movement: {movement.MovementDefinition.GetType().Name} - Dir@Start={initialdir}");
                     string movementType = "";
                     short player = movement.Player;
                     bool moving = false;
@@ -1893,7 +1893,7 @@ security : {ball.Security}
                     if (movement.MovementDefinition is ObjectMovementGeneric eightdirs && false)
                     {
                         movementType = "CMoveGeneric";
-                        Logger.Log($"eightdirs.Directions = {eightdirs.Direction} eightdirs.player = ");
+                        Logger.LogType(typeof(GMS2Writer), $"eightdirs.Directions = {eightdirs.Direction} eightdirs.player = ");
                         moving = Convert.ToBoolean(moveatstart);
                         allowedDirs = eightdirs.Direction;
                         dir = $"{initialdir}";
@@ -1977,7 +1977,7 @@ nodes : [
             }
             catch (Exception ex)
             {
-                Logger.Log($"Unable to write object movement: {ex}");
+                Logger.LogType(typeof(GMS2Writer), $"Unable to write object movement: {ex}");
             }
         }
         public static void WriteAnimations(ObjectCommon common, string ObjectName, GMLFile createEvFile, GMLFile beginstepEvFile)
@@ -2054,7 +2054,7 @@ nodes : [
             }
             catch (Exception ex)
             {
-                Logger.Log($"Unable to write object animations: {ex}");
+                Logger.LogType(typeof(GMS2Writer), $"Unable to write object animations: {ex}");
             }
         }
     }

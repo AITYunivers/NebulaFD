@@ -16,6 +16,8 @@ namespace Nebula.Core.FileReaders
 
         public CCNPackageData Package = new();
 
+        public void Preload(string filePath) { }
+
         public void LoadGame(ByteReader fileReader, string filePath)
         {
             ByteReader? ccnReader = null;

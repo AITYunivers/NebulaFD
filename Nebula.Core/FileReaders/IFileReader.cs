@@ -10,6 +10,7 @@ namespace Nebula.Core.FileReaders
         Dictionary<int, Bitmap> Icons { get; set; }
 
         PackageData getPackageData();
+        void Preload(string filePath);
         void LoadGame(ByteReader fileReader, string filePath);
         IFileReader Copy();
     }

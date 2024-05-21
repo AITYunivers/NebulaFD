@@ -17,9 +17,13 @@ namespace Nebula.Core.FileReaders
 
         public CCNPackageData Package = new();
 
-        public void LoadGame(ByteReader fileReader, string filePath)
+        public void Preload(string filePath)
         {
             loadIcons(filePath);
+        }
+
+        public void LoadGame(ByteReader fileReader, string filePath)
+        {
             calculateEntryPoint(fileReader);
 
             if (!fileReader.HasMemory(1)) // Check for Unpacked
@@ -89,7 +93,7 @@ namespace Nebula.Core.FileReaders
         {
             var sig = exeReader.ReadAscii(2);
             if (sig != "MZ")
-                Logger.Log(this, "Invalid executable signature", 2, ConsoleColor.Red);
+                this.Log("Invalid executable signature", ConsoleColor.Red);
             exeReader.Seek(60);
             var hdrOffset = exeReader.ReadUShort();
             exeReader.Seek(hdrOffset + 6);

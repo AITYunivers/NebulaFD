@@ -58,9 +58,9 @@ namespace Nebula.Core.Data.Chunks
             }
 
             if (dataReader == null)
-                Logger.Log(newChunk, $"Chunk data is null for chunk {newChunk.ChunkName} with flag {flag}");
+                newChunk.Log($"Chunk data is null for chunk {newChunk.ChunkName} with flag {flag}");
             else if (dataReader.BaseStream.Length == 0 && id != 32639)
-                Logger.Log(newChunk, $"Chunk data is empty for chunk {newChunk.ChunkName} with flag {flag}");
+                newChunk.Log($"Chunk data is empty for chunk {newChunk.ChunkName} with flag {flag}");
 
             return newChunk;
         }

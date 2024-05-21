@@ -16,10 +16,9 @@ namespace Nebula.Core.Data.PackageReaders
     {
         public string FilePath = string.Empty;
 
-        public override void Read()
+        public override void Read(ByteReader reader)
         {
-            Reader = new ByteReader(new byte[1]);
-            Logger.Log(this, $"Running {NebulaCore.BuildDate} build.");
+            this.Log($"Running {NebulaCore.BuildDate} build.");
             NebulaCore._yunicode = false;
             NebulaCore.Fusion = 0.0f;
             AppName = Path.GetFileNameWithoutExtension(FilePath);
@@ -278,7 +277,6 @@ namespace Nebula.Core.Data.PackageReaders
             AppHeader.OtherFlags["Direct3D8or11"] = false;
             ExtendedHeader.Flags.Value = 3288334336;
             ExtendedHeader.CompressionFlags.Value = 1049120;
-            Reader.Skip(1);
         }
     }
 }

@@ -5,52 +5,49 @@ namespace Nebula.Core.Utilities
 {
     public static class Logger
     {
-        public static bool doLog = false;
+        const bool DoLog = true;
+        private static string FileName = string.Empty;
+        private static string TimeStamp = string.Empty;
         private static List<string> Logs = new();
 
-        public static void Log(object parent, object message, int type = 0, ConsoleColor color = ConsoleColor.Black)
+        public static void Log(this object parent, object message, Color? color = null)
         {
-            if (parent.GetType().Name != "Event")
-                Debug.WriteLine(message);
-            if (doLog)
-            {
-                /*Console.ForegroundColor = ConsoleColor.Cyan;
-                string info = $"[{DateTime.Now.ToString("HH:mm:ss")}] ";
-                Console.Write(info);
-                Console.ForegroundColor = color;
-                if (color == ConsoleColor.Black)
-                    Console.ResetColor();
-                Console.WriteLine(message);
-                Console.ResetColor();*/
+            LogType(parent.GetType(), message, color);
+        }
 
-                //string outInfo = $"[{(type != 0 ? type + "\\" : "")}{parent.GetType().Name}\\{DateTime.Now.ToString("HH:mm:ss.ff")}] ";
-                Logs.Add(message.ToString());
-                try
-                {
-                    if (parent.GetType().Name != "Event")
-                        File.WriteAllLines("Latest.log", Logs);
-                }
-                catch { }
+        public static void LogType(Type parentType, object message, Color? color = null)
+        {
+            if (color == null)
+                color = NebulaCore.ColorRules[3];
+            if (parentType.Name != "Event")
+                Debug.WriteLine(message);
+            if (DoLog)
+            {
+                if (parentType.Name != "Event")
+                    AnsiConsole.MarkupLine($"[{NebulaCore.ColorRules[1]}][[{DateTime.Now.ToString("HH:mm:ss")}]][/] [{color}]{Markup.Escape(message.ToString()!)}[/]");
+                Logs.Add($"[{parentType.Name}\\{DateTime.Now.ToString("HH:mm:ss.ff")}] {message}");
             }
         }
 
-        public static void Log(object message, int type = 0, ConsoleColor color = ConsoleColor.Black)
+        public static void Save()
         {
-            if (doLog)
+            if (!Directory.Exists("Logs"))
+                Directory.CreateDirectory("Logs");
+
+            if (string.IsNullOrEmpty(TimeStamp))
+                TimeStamp = DateTime.Now.ToString("s").Replace(':', '-');
+
+            if (string.IsNullOrEmpty(FileName))
             {
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                string info = $"[{DateTime.Now.ToString("HH:mm:ss")}] ";
-                Console.Write(info);
-                Console.ForegroundColor = color;
-                if (color == ConsoleColor.Black)
-                    Console.ResetColor();
-                Console.WriteLine(message);
+                int id = 0;
+                foreach (string dir in Directory.GetFiles("Logs"))
+                    if (Path.GetFileName(dir).StartsWith("log_" + TimeStamp))
+                        id++;
+                FileName = $"log_{TimeStamp}_{id}";
             }
 
-            string outInfo = $"[{(type != 0 ? type + "\\" : "")}{DateTime.Now.ToString("HH:mm:ss.ff")}] ";
-            File.AppendAllText("Latest.log", outInfo + message + "\n");
-
-            Console.ResetColor();
+            File.WriteAllLines($"Logs\\{FileName}.log", Logs);
+            File.WriteAllLines("Logs\\latest.log", Logs);
         }
     }
 }

@@ -3,6 +3,7 @@ using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 using Spectre.Console;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 
 namespace Nebula
@@ -23,6 +24,7 @@ namespace Nebula
             }
 
             NebulaCore.Init();
+            Logger.Save();
             
             SpectreMain();
         }
@@ -45,17 +47,7 @@ namespace Nebula
             
             string path = Console.ReadLine().Trim().Trim('"');
             if (File.Exists(path))
-            {
                 NebulaCore.FilePath = path;
-
-                AnsiConsole.Clear();
-                AnsiConsole.Write(NebulaCore.ConsoleFiglet);
-                AnsiConsole.Write(NebulaCore.ConsoleRule);
-                AnsiConsole.Status().Spinner(Spinner.Known.Dots2).Start("Loading file", ctx =>
-                {
-                    fileReader = new ByteReader(File.ReadAllBytes(path));
-                });
-            }
             else WaitForFile();
         }
 
@@ -142,16 +134,26 @@ namespace Nebula
 
             readStopwatch.Restart();
             AnsiConsole.MarkupLine($"[{NebulaCore.ColorRules[1]}]Reading game as \"{NebulaCore.CurrentReader.Name}\"[/]");
-            Task readTask = new Task(() => NebulaCore.CurrentReader.LoadGame(fileReader!, NebulaCore.FilePath));
-            readTask.Start();
-            while (true)
+            try
             {
-                if (NebulaCore.PackageData != null)
+                AnsiConsole.Clear();
+                AnsiConsole.Write(NebulaCore.ConsoleFiglet);
+                AnsiConsole.Write(NebulaCore.ConsoleRule);
+                AnsiConsole.Status().Spinner(Spinner.Known.Dots2).Start("Loading file", ctx =>
                 {
-                    NebulaCore.PackageData.CliUpdate();
-                    break;
-                }
+                    NebulaCore.CurrentReader.Preload(NebulaCore.FilePath);
+                    fileReader = new ByteReader(new FileStream(NebulaCore.FilePath, FileMode.Open));
+                });
+
+                NebulaCore.CurrentReader.LoadGame(fileReader!, NebulaCore.FilePath);
             }
+            catch
+            {
+                Logger.Save();
+                throw;
+            }
+            Logger.Save();
+            GC.Collect();
             readStopwatch.Stop();
         }
 
@@ -193,11 +195,24 @@ namespace Nebula
                         $"[{NebulaCore.ColorRules[1]}]<enter>[/] to execute)\n(Quit will always execute last.)[/]")
                     .AddChoices(toolNames)
                     .HighlightStyle(NebulaCore.ColorRules[4]));
+            selectedTasks = selectedTasks.Select(str => Markup.Remove(str)).ToList();
 
             toolStopwatch = Stopwatch.StartNew();
             foreach (INebulaTool tool in tools)
-                if (selectedTasks.Contains($"[{NebulaCore.ColorRules[3]}]{tool.Name}[/]"))
-                    tool.Execute();
+                if (selectedTasks.Contains(tool.Name))
+                {
+                    try
+                    {
+                        tool.Execute();
+                    }
+                    catch
+                    {
+                        Logger.Save();
+                        throw;
+                    }
+                    Logger.Save();
+                    GC.Collect();
+                }
             toolStopwatch.Stop();
 
             if (selectedTasks.Contains($"[{NebulaCore.ColorRules[3]}]Quit[/]"))
