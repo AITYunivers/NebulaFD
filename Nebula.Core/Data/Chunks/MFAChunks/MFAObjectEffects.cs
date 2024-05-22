@@ -1,5 +1,6 @@
 ﻿using Nebula.Core.Data.Chunks.BankChunks.Shaders;
 using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 using System.Drawing;
 using System.Reflection.PortableExecutable;
 
@@ -9,7 +10,7 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
     {
         public Color RGBCoeff = Color.White;
         public byte BlendCoeff;
-        public int ShaderHandle;
+        public bool HasShader = false;
         public Shader Shader = new Shader();
         public ShaderParameter[] ShaderParameters = new ShaderParameter[0];
 
@@ -31,12 +32,14 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
             var r = reader.ReadByte();
             RGBCoeff = Color.FromArgb(0, r, g, b);
             BlendCoeff = (byte)(255 - reader.ReadByte());
-            ShaderHandle = reader.ReadInt();
+            HasShader = reader.ReadInt() == 1;
 
-            if (ShaderHandle != 0)
+            ShaderBank bnk = NebulaCore.PackageData.ShaderBank;
+            if (HasShader)
             {
                 Shader = new Shader();
                 Shader.ReadMFA(reader);
+                Shader.Handle = bnk.MFAShaderLookup.Contains(Shader.Name) ? bnk.MFAShaderLookup.IndexOf(Shader.Name) : bnk.Shaders.Count;
                 ShaderParameters = new ShaderParameter[Shader.Parameters.Length];
                 for (int i = 0; i < Shader.Parameters.Length; i++)
                 {
@@ -47,8 +50,11 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
                     ShaderParameters[i].FloatValue = Shader.Parameters[i].FloatValue;
                 }
 
-                if (!NebulaCore.PackageData.ShaderBank.Shaders.ContainsKey(ShaderHandle))
-                    NebulaCore.PackageData.ShaderBank.Shaders.Add(ShaderHandle, Shader);
+                if (!bnk.Shaders.ContainsKey(Shader.Handle))
+                {
+                    bnk.Shaders.Add(Shader.Handle, Shader);
+                    bnk.MFAShaderLookup.Add(Shader.Name);
+                }
             }
 
             (extraInfo[0] as MFAObjectInfo).ObjectEffects = this;
@@ -67,12 +73,17 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
             chunkWriter.WriteByte(RGBCoeff.G);
             chunkWriter.WriteByte(RGBCoeff.R);
             chunkWriter.WriteByte((byte)(255 - BlendCoeff));
-            chunkWriter.WriteInt(0);//ShaderHandle);
-            if (true == false && ShaderHandle != 0)
+
+            if (Parameters.DontIncludeShaders)
+                HasShader = false;
+
+            chunkWriter.WriteInt(HasShader ? 1 : 0);
+            if (HasShader)
             {
                 Shader.Parameters = ShaderParameters;
                 Shader.WriteMFA(chunkWriter);
             }
+
             writer.WriteInt((int)chunkWriter.Tell());
             writer.WriteWriter(chunkWriter);
             chunkWriter.Flush();

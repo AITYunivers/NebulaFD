@@ -402,7 +402,7 @@ namespace Nebula.Plugins.GameDumper
                             File.WriteAllBytes(filePath, shdrs[i].FXData);
                             filePath = path + "\\" + Path.GetFileNameWithoutExtension(shdrs[i].Name) + ".xml";
                             string fxData = string.Empty;
-                            if (NebulaCore.PackageData.DX9ShaderBank != null)
+                            if (NebulaCore.PackageData.DX9ShaderBank != null && NebulaCore.PackageData.DX9ShaderBank.Shaders.ContainsKey(keys[i]))
                                 fxData = Encoding.ASCII.GetString(NebulaCore.PackageData.DX9ShaderBank.Shaders[keys[i]].FXData);
                             File.WriteAllText(filePath, GenerateXML(shdrs[i], fxData));
                             task.Value = ++progress;
@@ -444,24 +444,30 @@ namespace Nebula.Plugins.GameDumper
             w.WriteStartDocument();
 
             w.WriteStartElement("effect");
+            List<string> shdName = Path.GetFileNameWithoutExtension(shdr.Name).Replace('_', ' ').Replace('-', ' ').Split(' ').ToList();
+            shdName.RemoveAll(x => x.Length == 0);
+            for (int i = 0; i < shdName.Count; i++)
+                shdName[i] = shdName[i].Substring(0, 1).ToUpper() + shdName[i].Substring(1);
+            w.WriteElementString("name", string.Join(' ', shdName));
             w.WriteElementString("name", Path.GetFileNameWithoutExtension(shdr.Name));
             w.WriteElementString("description", "Decompiled using Nebula by Yunivers");
             w.WriteElementString("author", "Unknown");
 
             int[] shdrParams = new int[shdr.Parameters.Length];
-            /*foreach (ObjectInfo obj in NebulaCore.PackageData.FrameItems.Items.Values)
-                if (obj.Shader.ShaderHandle != 0 && obj.Shader.ShaderHandle == shdr.Handle + 1)
+            foreach (ObjectInfo obj in NebulaCore.PackageData.FrameItems.Items.Values)
+                if (obj.Shader.ShaderHandle == shdr.Handle)
                 {
                     shdrParams = obj.Shader.ShaderParameters;
                     break;
-                }*/
+                }
 
             for (int i = 0; i < shdr.Parameters.Length; i++)
             {
                 ShaderParameter param = shdr.Parameters[i];
                 w.WriteStartElement("parameter");
-                string[] name = param.Name.Replace('_', ' ').Replace('-', ' ').Split(' ');
-                for (int ii = 0; ii < name.Length; ii++)
+                List<string> name = Path.GetFileNameWithoutExtension(shdr.Name).Replace('_', ' ').Replace('-', ' ').Split(' ').ToList();
+                name.RemoveAll(x => x.Length == 0);
+                for (int ii = 0; ii < name.Count; ii++)
                     name[ii] = name[ii].Substring(0, 1).ToUpper() + name[ii].Substring(1);
                 w.WriteElementString("name", string.Join(' ', name));
                 w.WriteElementString("code", param.Name);

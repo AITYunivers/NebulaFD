@@ -10,13 +10,13 @@ namespace Nebula.Core.Utilities
         public bool ignore_sounds = false;
         public bool ignore_music = false;
         public bool ignore_events = false;
+        public bool ignore_shaders = false;
 
         public Parameters()
         {
             if (File.Exists("config.json"))
                 JsonConvert.PopulateObject(File.ReadAllText("config.json"), this);
-            else
-                File.WriteAllText("config.json", JsonConvert.SerializeObject(this, Formatting.Indented));
+            File.WriteAllText("config.json", JsonConvert.SerializeObject(this, Formatting.Indented));
         }
 
         public static bool DontIncludeImages => Inst.ignore_images;
@@ -24,5 +24,6 @@ namespace Nebula.Core.Utilities
         public static bool DontIncludeSounds => Inst.ignore_sounds;
         public static bool DontIncludeMusic => Inst.ignore_music;
         public static bool DontIncludeEvents => Inst.ignore_events;
+        public static bool DontIncludeShaders => Inst.ignore_shaders;
     }
 }

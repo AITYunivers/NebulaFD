@@ -21,7 +21,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            int startOffset = (int)reader.Tell();
+            long startOffset = (long)extraInfo[0];
             InkEffect = reader.ReadShort();
             reader.Skip(2);
             var b = reader.ReadByte();
@@ -33,10 +33,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             ShaderParameters = new ShaderParameter[reader.ReadInt()];
             int paramOffset = reader.ReadInt();
 
-            if (paramOffset != 0 && startOffset + paramOffset < reader.Size())
+            long returnOffset = reader.Tell();
+            if (paramOffset != 0)
             {
                 reader.Seek(startOffset + paramOffset);
-                Shader = NebulaCore.PackageData.ShaderBank.Shaders[++ShaderHandle];
+                Shader = NebulaCore.PackageData.ShaderBank.Shaders[ShaderHandle];
                 for (int i = 0; i < Shader.Parameters.Length; i++)
                 {
                     ShaderParameters[i] = new ShaderParameter();
@@ -48,6 +49,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                         ShaderParameters[i].Value = reader.ReadInt();
                 }
             }
+            reader.Seek(returnOffset);
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -58,12 +60,14 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             var r = reader.ReadByte();
             RGBCoeff = Color.FromArgb(0, r, g, b);
             BlendCoeff = (byte)(255 - reader.ReadByte());
-            ShaderHandle = reader.ReadInt();
+            bool hasShader = reader.ReadInt() == 1;
 
-            if (ShaderHandle != 0)
+            ShaderBank bnk = NebulaCore.PackageData.ShaderBank;
+            if (hasShader)
             {
                 Shader = new Shader();
                 Shader.ReadMFA(reader);
+                Shader.Handle = bnk.MFAShaderLookup.Contains(Shader.Name) ? bnk.MFAShaderLookup.IndexOf(Shader.Name) : bnk.Shaders.Count;
                 ShaderParameters = new ShaderParameter[Shader.Parameters.Length];
                 for (int i = 0; i < Shader.Parameters.Length; i++)
                 {
@@ -74,8 +78,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     ShaderParameters[i].FloatValue = Shader.Parameters[i].FloatValue;
                 }
 
-                if (!NebulaCore.PackageData.ShaderBank.Shaders.ContainsKey(ShaderHandle))
-                    NebulaCore.PackageData.ShaderBank.Shaders.Add(ShaderHandle, Shader);
+                if (!bnk.Shaders.ContainsKey(Shader.Handle))
+                {
+                    bnk.Shaders.Add(Shader.Handle, Shader);
+                    bnk.MFAShaderLookup.Add(Shader.Name);
+                }
             }
         }
 
@@ -91,8 +98,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             writer.WriteByte(RGBCoeff.G);
             writer.WriteByte(RGBCoeff.R);
             writer.WriteByte((byte)(255 - BlendCoeff));
-            writer.WriteInt(ShaderHandle);
-            if (ShaderHandle != 0)
+            writer.WriteInt(Shader.Handle > 0 ? 1 : 0);
+            if (Shader.Handle > 0)
             {
                 Shader.Parameters = ShaderParameters;
                 Shader.WriteMFA(writer);

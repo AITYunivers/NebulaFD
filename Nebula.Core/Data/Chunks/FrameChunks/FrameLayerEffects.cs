@@ -1,12 +1,4 @@
-﻿using Nebula.Core.Data.Chunks.FrameChunks.LayerChunks;
-using Nebula.Core.Memory;
-using Nebula.Core.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Nebula.Core.Memory;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks
 {
@@ -20,13 +12,16 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            long start_offset = reader.Tell();
+
             for (int i = 0; i < ((Frame)extraInfo[0]).FrameLayers.Layers.Length; i++)
             {
-                if (reader.Tell() < reader.Size()) return;
                 FrameLayerEffect effect = new FrameLayerEffect();
-                effect.ReadCCN(reader);
+                effect.ReadCCN(reader, start_offset);
                 ((Frame)extraInfo[0]).FrameLayers.Layers[i].Effect = effect;
             }
+
+            ((Frame)extraInfo[0]).FrameLayerEffects = this;
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

@@ -6,6 +6,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
     {
         public int[] Offsets = new int[0];
         public Dictionary<int, Shader> Shaders = new();
+        public List<string> MFAShaderLookup = new();
 
         public ShaderBank()
         {
@@ -28,7 +29,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
                     reader.Seek(Offsets[i]);
                     Shader shd = new Shader();
                     shd.ReadCCN(reader);
-                    Shaders.Add(i + 1, shd);
+                    Shaders.Add(shd.Handle = i, shd);
                 }
             }
 

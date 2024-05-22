@@ -54,7 +54,6 @@ namespace Nebula
         public static void Init()
         {
             ZLibInit.GlobalInit("zlibwapi.dll");
-            File.WriteAllText("Latest.log", "");
         }
 
         public static string GameType()

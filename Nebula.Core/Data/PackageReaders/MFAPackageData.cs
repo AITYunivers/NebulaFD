@@ -174,8 +174,8 @@ namespace Nebula.Core.Data.PackageReaders
                     {
                         newOI.Header.RGBCoeff = oI.ObjectEffects.RGBCoeff;
                         newOI.Header.BlendCoeff = oI.ObjectEffects.BlendCoeff;
-                        newOI.Shader.ShaderHandle = oI.ObjectEffects.ShaderHandle;
-                        if (newOI.Shader.ShaderHandle != 0)
+                        newOI.Shader.ShaderHandle = oI.ObjectEffects.Shader.Handle;
+                        if (newOI.Shader.ShaderHandle != null)
                         {
                             newOI.Shader.ShaderParameters = new int[oI.ObjectEffects.ShaderParameters.Length];
                             for (int i = 0; i < newOI.Shader.ShaderParameters.Length; i++)

@@ -22,7 +22,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
             int NameOffset = reader.ReadInt();
             int FXDataOffset = reader.ReadInt();
             int ParameterOffset = reader.ReadInt();
-            reader.Skip(4); // Unknown
+            int OptionsOffset = reader.ReadInt();
             int FXDataSize = reader.ReadInt();
 
             if (NameOffset != 0)
@@ -44,19 +44,22 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
             {
                 reader.Seek(StartOffset + ParameterOffset);
                 Parameters = new ShaderParameter[reader.ReadInt()];
-                int ParameterTypeOffset = reader.ReadInt();
-                int ParameterNameOffset = reader.ReadInt();
-
-                reader.Seek(StartOffset + ParameterOffset + ParameterTypeOffset);
-                for (int i = 0; i < Parameters.Length; i++)
+                if (Parameters.Length > 0)
                 {
-                    Parameters[i] = new ShaderParameter();
-                    Parameters[i].Type = reader.ReadByte();
-                }
+                    int ParameterTypeOffset = reader.ReadInt();
+                    int ParameterNameOffset = reader.ReadInt();
 
-                reader.Seek(StartOffset + ParameterOffset + ParameterNameOffset);
-                for (int i = 0; i < Parameters.Length; i++)
-                    Parameters[i].Name = reader.ReadAscii();
+                    reader.Seek(StartOffset + ParameterOffset + ParameterTypeOffset);
+                    for (int i = 0; i < Parameters.Length; i++)
+                    {
+                        Parameters[i] = new ShaderParameter();
+                        Parameters[i].Type = reader.ReadByte();
+                    }
+
+                    reader.Seek(StartOffset + ParameterOffset + ParameterNameOffset);
+                    for (int i = 0; i < Parameters.Length; i++)
+                        Parameters[i].Name = reader.ReadAscii();
+                }
             }
         }
 

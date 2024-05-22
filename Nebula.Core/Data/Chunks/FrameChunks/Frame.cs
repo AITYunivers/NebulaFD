@@ -27,6 +27,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         public FrameLayers FrameLayers = new();               // 0x3341
         public FrameRect FrameRect = new();                   // 0x3342
         public int FrameSeed;                                 // 0x3344
+        public FrameLayerEffects FrameLayerEffects = new();   // 0x3345
         public int FrameMoveTimer;                            // 0x3347
         public FrameEffects FrameEffects = new();             // 0x3349
 
@@ -172,11 +173,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                         newOI.ObjectEffects = new MFAObjectEffects();
                         newOI.ObjectEffects.RGBCoeff = oI.Header.RGBCoeff;
                         newOI.ObjectEffects.BlendCoeff = oI.Header.BlendCoeff;
-                        newOI.ObjectEffects.ShaderHandle = oI.Shader.ShaderHandle;
-                        if (newOI.ObjectEffects.ShaderHandle != 0)
+                        newOI.ObjectEffects.HasShader = oI.Shader.ShaderHandle != null;
+                        if (newOI.ObjectEffects.HasShader)
                         {
-                            newOI.ObjectEffects.Shader = NebulaCore.PackageData.ShaderBank.Shaders[oI.Shader.ShaderHandle];
-                            newOI.ObjectEffects.ShaderParameters = new ShaderParameter[Math.Min(oI.Shader.ShaderParameters.Length, newOI.ObjectEffects.Shader.Parameters.Length)];
+                            newOI.ObjectEffects.Shader = NebulaCore.PackageData.ShaderBank.Shaders[(int)oI.Shader.ShaderHandle!];
+                            newOI.ObjectEffects.ShaderParameters = new ShaderParameter[oI.Shader.ShaderParameters.Length];
                             for (int i = 0; i < newOI.ObjectEffects.ShaderParameters.Length; i++)
                             {
                                 newOI.ObjectEffects.ShaderParameters[i] = new ShaderParameter();
@@ -437,8 +438,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             FrameEvents.EventObjects = evtObjs;
             FrameEvents.WriteMFA(writer);
 
-            //FrameLayerEffects layerEffects = new();
-            //layerEffects.WriteMFA(writer, this);
+            FrameLayerEffects.WriteMFA(writer, this);
+            FrameEffects.WriteMFA(writer, this);
             writer.WriteByte(0); // Last Chunk
         }
     }

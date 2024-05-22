@@ -147,8 +147,9 @@ namespace Nebula
 
                 NebulaCore.CurrentReader.LoadGame(fileReader!, NebulaCore.FilePath);
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Log(NebulaCore.CurrentReader.GetType(), ex.Message);
                 Logger.Save();
                 throw;
             }
@@ -205,8 +206,9 @@ namespace Nebula
                     {
                         tool.Execute();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Logger.Log(tool.GetType(), ex.Message);
                         Logger.Save();
                         throw;
                     }
@@ -215,7 +217,7 @@ namespace Nebula
                 }
             toolStopwatch.Stop();
 
-            if (selectedTasks.Contains($"[{NebulaCore.ColorRules[3]}]Quit[/]"))
+            if (selectedTasks.Contains($"Quit"))
                 Environment.Exit(0);
             else SelectTool();
         }

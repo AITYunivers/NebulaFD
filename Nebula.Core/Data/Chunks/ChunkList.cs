@@ -23,7 +23,7 @@ namespace Nebula.Core.Data.Chunks
             { 0x0025, typeof(FrameLayerEffects)   },
             //0x0026
             { 0x0027, typeof(FrameMoveTimer)      },
-            //0x0028         FrameEffects
+            { 0x0028, typeof(FrameEffects)        },
             //0x002A
             //0x002B
             //0x002C

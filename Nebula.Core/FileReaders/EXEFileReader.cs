@@ -16,10 +16,19 @@ namespace Nebula.Core.FileReaders
         private Dictionary<int, Bitmap> _icons = new Dictionary<int, Bitmap>();
 
         public CCNPackageData Package = new();
+        string moduleDir = string.Empty;
 
         public void Preload(string filePath)
         {
             loadIcons(filePath);
+            PortableExecutable portableExecutable = new PortableExecutable(filePath);
+            IReadOnlyList<ResourceIdentifier> resourceIdentifiers = portableExecutable.GetResourceIdentifiers();
+            foreach (ResourceIdentifier identifier in resourceIdentifiers)
+                if (identifier.Type.Code == 6 && identifier.Name.Code == 11)
+                {
+                    Package.ModulesDir = Encoding.Unicode.GetString(portableExecutable.GetResource(identifier).Data).Trim('\b', '\0');
+                    break;
+                }
         }
 
         public void LoadGame(ByteReader fileReader, string filePath)
@@ -28,14 +37,7 @@ namespace Nebula.Core.FileReaders
 
             if (!fileReader.HasMemory(1)) // Check for Unpacked
             {
-                var portableExecutable = new PortableExecutable(filePath);
-                foreach (var identifier in portableExecutable.GetResourceIdentifiers())
-                    if (identifier.Type.Code == 6 && identifier.Name.Code == 11)
-                    {
-                        Package.ModulesDir = Encoding.Unicode.GetString(portableExecutable.GetResource(identifier).Data).Trim('\b', '\0');
-                        break;
-                    }
-
+                Package.ModulesDir = moduleDir;
                 fileReader = new ByteReader(Path.ChangeExtension(filePath, "dat"), FileMode.Open);
             }
 

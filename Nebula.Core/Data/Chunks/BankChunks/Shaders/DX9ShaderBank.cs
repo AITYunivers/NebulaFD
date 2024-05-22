@@ -28,7 +28,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
                     reader.Seek(Offsets[i]);
                     Shader shd = new Shader();
                     shd.ReadCCN(reader);
-                    Shaders.Add(i + 1, shd);
+                    Shaders.Add(shd.Handle = i, shd);
                 }
             }
 
