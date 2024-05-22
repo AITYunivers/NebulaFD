@@ -1,5 +1,13 @@
-﻿using Ionic.Zlib;
+﻿#define Joveler
+#if Ionic
+using Ionic.Zlib;
+#endif
+#if Joveler
 using Joveler.Compression.ZLib;
+#endif
+#if !Ionic || !Joveler
+using System.IO.Compression;
+#endif
 
 namespace Nebula.Core.Memory
 {
@@ -48,14 +56,28 @@ namespace Nebula.Core.Memory
             return new ByteReader(Decompress(exeReader, out decompressed));
         }
 
-        public static byte[] DecompressBlock(byte[] data)
-        {
-            return ZlibStream.UncompressBuffer(data);
-        }
-
         public static byte[] DecompressBlock(ByteReader reader, int size)
         {
-            return ZlibStream.UncompressBuffer(reader.ReadBytes(size));
+            return DecompressBlock(reader.ReadBytes(size));
+        }
+
+        public static byte[] DecompressBlock(byte[] data)
+        {
+#if Ionic
+            return ZlibStream.UncompressBuffer(data);
+#else
+            using (var inputStream = new MemoryStream(data, 2, data.Length - 6))
+            {
+                using (var deflateStream = new System.IO.Compression.DeflateStream(inputStream, CompressionMode.Decompress))
+                {
+                    using (var outputStream = new MemoryStream())
+                    {
+                        deflateStream.CopyTo(outputStream);
+                        return outputStream.ToArray();
+                    }
+                }
+            }
+#endif
         }
 
         /*public static byte[] DecompressOld(ByteReader reader)
@@ -85,18 +107,58 @@ namespace Nebula.Core.Memory
 
         public static byte[] CompressBlock(byte[] data)
         {
+#if Joveler
             var compOpts = new ZLibCompressOptions();
             compOpts.Level = ZLibCompLevel.Default;
             var decompressedStream = new MemoryStream(data);
             var compressedStream = new MemoryStream();
             byte[] compressedData = null;
-            var zs = new ZLibStream(compressedStream, compOpts);
+            var zs = new Joveler.Compression.ZLib.ZLibStream(compressedStream, compOpts);
             decompressedStream.CopyTo(zs);
             zs.Close();
 
             compressedData = compressedStream.ToArray();
 
             return compressedData;
+#else
+            // Zlib header (2 bytes): 0x78, 0x9C
+            byte[] zlibHeader = new byte[] { 0x78, 0x9C };
+
+            // Calculate Adler-32 checksum of the uncompressed data
+            uint adler32Checksum = Adler32Checksum(data);
+
+            using (var outputStream = new MemoryStream())
+            {
+                // Write the Zlib header
+                outputStream.Write(zlibHeader, 0, zlibHeader.Length);
+
+                // Compress the data using DeflateStream
+                using (var deflateStream = new DeflateStream(outputStream, CompressionMode.Compress, true))
+                {
+                    deflateStream.Write(data, 0, data.Length);
+                }
+
+                // Write the Adler-32 checksum (big-endian)
+                byte[] adler32Bytes = BitConverter.GetBytes(adler32Checksum);
+                outputStream.Write(adler32Bytes, 0, adler32Bytes.Length);
+
+                return outputStream.ToArray();
+            }
+#endif
+        }
+
+        private static uint Adler32Checksum(byte[] data)
+        {
+            const uint ModAdler = 65521;
+            uint a = 1, b = 0;
+
+            foreach (byte c in data)
+            {
+                a = (a + c) % ModAdler;
+                b = (b + a) % ModAdler;
+            }
+
+            return (b << 16) | a;
         }
     }
 }

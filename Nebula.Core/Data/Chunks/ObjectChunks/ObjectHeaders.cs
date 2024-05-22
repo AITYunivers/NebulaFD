@@ -1,4 +1,5 @@
 ﻿using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 using System.Diagnostics;
 using System.Drawing;
 
@@ -14,6 +15,8 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            if (Parameters.DontIncludeObjects)
+                return;
             FrameItems newItems = new FrameItems();
             while (reader.Size() > reader.Tell())
             {

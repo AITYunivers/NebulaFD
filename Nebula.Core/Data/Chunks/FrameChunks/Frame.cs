@@ -15,6 +15,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 {
     public class Frame : Chunk
     {
+        public static int RealFrameCount = 0;
         public int Handle = 0;
         public FrameHeader FrameHeader = new();               // 0x3334
         public string FrameName = string.Empty;               // 0x3335
@@ -42,6 +43,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            if (Parameters.DontIncludeFrames.Contains(RealFrameCount++))
+                return;
             string log = string.Empty;
 
             while (reader.HasMemory(8))

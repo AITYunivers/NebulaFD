@@ -17,6 +17,8 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            if (Parameters.DontIncludeObjects)
+                return;
             Count = reader.ReadInt();
 
             for (int oi = 0; oi < Count; oi++)

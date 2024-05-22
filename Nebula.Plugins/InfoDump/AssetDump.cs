@@ -17,6 +17,7 @@ using Nebula.Core.FileReaders;
 using Nebula.Core.Data.Chunks.BankChunks.Shaders;
 using System.Text;
 using System.Xml;
+using System.Text.RegularExpressions;
 #pragma warning disable CA1416
 
 namespace Nebula.Plugins.GameDumper
@@ -398,7 +399,7 @@ namespace Nebula.Plugins.GameDumper
                         for (int i = 0; i < shdrs.Length; i++)
                         {
                             Directory.CreateDirectory(path);
-                            string filePath = path + "\\" + Path.GetFileNameWithoutExtension(shdrs[i].Name) + (shdrs[i].Compiled ? (eHdr.Flags["PremultipliedAlpha"] ? ".premultiplied.fxc" : ".fxc") : ".fx");
+                            string filePath = path + "\\" + Path.GetFileNameWithoutExtension(shdrs[i].Name) + (shdrs[i].Compiled ? ".fxc" : ".fx");
                             File.WriteAllBytes(filePath, shdrs[i].FXData);
                             filePath = path + "\\" + Path.GetFileNameWithoutExtension(shdrs[i].Name) + ".xml";
                             string fxData = string.Empty;
@@ -434,6 +435,7 @@ namespace Nebula.Plugins.GameDumper
 
         public string GenerateXML(Shader shdr, string fxData)
         {
+            fxData = Regex.Replace(fxData, @"\s+", "");
             StringBuilder sb = new StringBuilder();
             XmlWriter w = XmlWriter.Create(sb, new XmlWriterSettings()
             {
@@ -453,6 +455,30 @@ namespace Nebula.Plugins.GameDumper
             w.WriteElementString("description", "Decompiled using Nebula by Yunivers");
             w.WriteElementString("author", "Unknown");
 
+            if (fxData.Contains("register(s1)"))
+                w.WriteElementString("BackgroundTexture", "1");
+
+            if (NebulaCore.D3D == 8)
+                w.WriteElementString("dx8", "1"); 
+
+            int sampler = 0;
+            while (true)
+            {
+                if (fxData.Contains($"register(s{sampler})"))
+                {
+                    if (fxData.Contains($"register(s{sampler})=sampler_state{{MinFilter=linear;") ||
+                        fxData.Contains($"register(s{sampler})=sampler_state{{MagFilter=linear;"))
+                    {
+                        w.WriteStartElement("sampler");
+                        w.WriteElementString("index", sampler.ToString());
+                        w.WriteElementString("filter", "LINEAR");
+                        w.WriteEndElement();
+                    }
+                }
+                else break;
+                sampler++;
+            }
+
             int[] shdrParams = new int[shdr.Parameters.Length];
             foreach (ObjectInfo obj in NebulaCore.PackageData.FrameItems.Items.Values)
                 if (obj.Shader.ShaderHandle == shdr.Handle)
@@ -465,7 +491,7 @@ namespace Nebula.Plugins.GameDumper
             {
                 ShaderParameter param = shdr.Parameters[i];
                 w.WriteStartElement("parameter");
-                List<string> name = Path.GetFileNameWithoutExtension(shdr.Name).Replace('_', ' ').Replace('-', ' ').Split(' ').ToList();
+                List<string> name = param.Name.Replace('_', ' ').Replace('-', ' ').Split(' ').ToList();
                 name.RemoveAll(x => x.Length == 0);
                 for (int ii = 0; ii < name.Count; ii++)
                     name[ii] = name[ii].Substring(0, 1).ToUpper() + name[ii].Substring(1);
@@ -476,8 +502,8 @@ namespace Nebula.Plugins.GameDumper
                 {
                     case 0:
                         w.WriteElementString("type", "int");
-                        if (fxData.Replace(" ", "").Contains("bool" + param.Name + ";") ||
-                            fxData.Replace(" ", "").Contains("bool" + param.Value + "="))
+                        if (fxData.Contains("bool" + param.Name + ";") ||
+                            fxData.Contains("bool" + param.Value + "="))
                             w.WriteElementString("property", "checkbox");
                         else
                             w.WriteElementString("property", "edit");

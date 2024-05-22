@@ -11,6 +11,9 @@ namespace Nebula.Core.Utilities
         public bool ignore_music = false;
         public bool ignore_events = false;
         public bool ignore_shaders = false;
+        public bool ignore_objects = false;
+        public bool ignore_binaryfiles = false;
+        public int[] ignore_frames = new int[0];
 
         public Parameters()
         {
@@ -25,5 +28,8 @@ namespace Nebula.Core.Utilities
         public static bool DontIncludeMusic => Inst.ignore_music;
         public static bool DontIncludeEvents => Inst.ignore_events;
         public static bool DontIncludeShaders => Inst.ignore_shaders;
+        public static bool DontIncludeObjects => Inst.ignore_objects;
+        public static bool DontIncludeBinaryFiles => Inst.ignore_binaryfiles;
+        public static int[] DontIncludeFrames => Inst.ignore_frames;
     }
 }

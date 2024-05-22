@@ -1,4 +1,5 @@
 ﻿using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks
 {
@@ -14,6 +15,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            if (Parameters.DontIncludeObjects)
+                return;
             Instances = new FrameInstance[reader.ReadInt()];
             for (int i = 0; i < Instances.Length; i++)
             {

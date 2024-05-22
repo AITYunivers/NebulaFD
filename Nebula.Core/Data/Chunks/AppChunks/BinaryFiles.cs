@@ -1,4 +1,5 @@
 ﻿using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 
 namespace Nebula.Core.Data.Chunks.AppChunks
 {
@@ -15,6 +16,9 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            if (Parameters.DontIncludeBinaryFiles)
+                return;
+
             Count = reader.ReadInt32();
             for (int i = 0; i < Count; i++)
             {

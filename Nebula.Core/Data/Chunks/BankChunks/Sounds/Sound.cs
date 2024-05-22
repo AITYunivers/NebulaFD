@@ -71,9 +71,12 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             Flags.Value = reader.ReadUInt();
             Frequency = reader.ReadInt();
             nameLength = reader.ReadInt();
+            bool saveDebug = false;
             if (Compressed && !Flags["Decompressed"])
             {
                 int size = reader.ReadInt();
+                if (saveDebug)
+                    File.WriteAllBytes("test.bin", reader.ReadBytes(size));
                 soundData = new ByteReader(Decompressor.DecompressBlock(reader, size));
             }
             else

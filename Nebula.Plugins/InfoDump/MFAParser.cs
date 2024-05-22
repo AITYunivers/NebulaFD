@@ -35,9 +35,12 @@ namespace GameDumper
             ByteWriter writer = new ByteWriter(new FileStream(path + Utilities.ClearName(Path.GetFileName(string.IsNullOrEmpty(dat.EditorFilename) ? dat.AppName + ".mfa" : dat.EditorFilename)), FileMode.Create));
 
             IconBank.GraphicMode = dat.ImageBank.GraphicMode = dat.AppHeader.GraphicMode;
-            IconBank.PaletteVersion = dat.ImageBank.PaletteVersion = dat.Frames.First().FramePalette.PaletteVersion;
-            IconBank.PaletteEntries = dat.ImageBank.PaletteEntries = (short)dat.Frames.First().FramePalette.PaletteEntries;
-            IconBank.Palette = dat.ImageBank.Palette = dat.Frames.First().FramePalette.Palette;
+            if (dat.Frames.Count > 0)
+            {
+                IconBank.PaletteVersion = dat.ImageBank.PaletteVersion = dat.Frames.First().FramePalette.PaletteVersion;
+                IconBank.PaletteEntries = dat.ImageBank.PaletteEntries = (short)dat.Frames.First().FramePalette.PaletteEntries;
+                IconBank.Palette = dat.ImageBank.Palette = dat.Frames.First().FramePalette.Palette;
+            }
 
             // Initialize images on multiple threads for speed made it 2x slower
             foreach (Image img in dat.ImageBank.Images.Values)

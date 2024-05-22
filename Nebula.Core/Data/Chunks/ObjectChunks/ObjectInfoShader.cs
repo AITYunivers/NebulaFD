@@ -1,4 +1,5 @@
-﻿using Nebula.Core.Memory;
+﻿using Nebula.Core.Data.Chunks.BankChunks.Shaders;
+using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 
 namespace Nebula.Core.Data.Chunks.ObjectChunks
@@ -17,9 +18,12 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             ShaderHandle = reader.ReadInt();
-            ShaderParameters = new int[reader.ReadInt()];
+            int paramN = NebulaCore.PackageData.ShaderBank.Shaders[(int)ShaderHandle!].Parameters.Length;
+            int fakeN = reader.ReadInt();
+            ShaderParameters = new int[paramN];
+            reader.Skip((fakeN - paramN) * 4);
 
-            for (int i = 0; i < ShaderParameters.Length; i++)
+            for (int i = 0; i < paramN; i++)
                 ShaderParameters[i] = reader.ReadInt();
 
             ((ObjectInfo)extraInfo[0]).Shader = this;

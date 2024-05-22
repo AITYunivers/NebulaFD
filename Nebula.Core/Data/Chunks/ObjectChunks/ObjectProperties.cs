@@ -1,5 +1,6 @@
 ﻿using Ionic.Zlib;
 using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 using ObjCommon = Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectCommon;
 
 namespace Nebula.Core.Data.Chunks.ObjectChunks
@@ -14,6 +15,8 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            if (Parameters.DontIncludeObjects)
+                return;
             int curHandle = 0;
             FrameItems listItems = NebulaCore.PackageData.FrameItems;
             reader.Skip(4);
