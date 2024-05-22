@@ -19,8 +19,6 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
             ShaderHandle = reader.ReadInt();
             ShaderParameters = new int[reader.ReadInt()];
 
-            this.Log($"Shader ID {ShaderHandle}, Parameters: {ShaderParameters.Length}", Spectre.Console.Color.DeepPink1_1);
-
             for (int i = 0; i < ShaderParameters.Length; i++)
                 ShaderParameters[i] = reader.ReadInt();
 

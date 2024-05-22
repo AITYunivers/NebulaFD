@@ -83,6 +83,15 @@ namespace Nebula
                     break;
                 }
 
+
+            AnsiConsole.Clear();
+            AnsiConsole.Write(NebulaCore.ConsoleFiglet);
+            AnsiConsole.Write(NebulaCore.ConsoleRule);
+            AnsiConsole.Status().Spinner(Spinner.Known.Dots2).Start("Loading file", ctx =>
+            {
+                fileReader = new ByteReader(File.ReadAllBytes(NebulaCore.FilePath));
+            });
+
             if (NebulaCore.CurrentReader == null)
                 AutoDetectReader();
         }
@@ -136,15 +145,6 @@ namespace Nebula
             AnsiConsole.MarkupLine($"[{NebulaCore.ColorRules[1]}]Reading game as \"{NebulaCore.CurrentReader.Name}\"[/]");
             try
             {
-                AnsiConsole.Clear();
-                AnsiConsole.Write(NebulaCore.ConsoleFiglet);
-                AnsiConsole.Write(NebulaCore.ConsoleRule);
-                AnsiConsole.Status().Spinner(Spinner.Known.Dots2).Start("Loading file", ctx =>
-                {
-                    NebulaCore.CurrentReader.Preload(NebulaCore.FilePath);
-                    fileReader = new ByteReader(new FileStream(NebulaCore.FilePath, FileMode.Open));
-                });
-
                 NebulaCore.CurrentReader.LoadGame(fileReader!, NebulaCore.FilePath);
             }
             catch (Exception ex)

@@ -13,8 +13,6 @@ namespace Nebula.Core.FileReaders
 
         public MFAPackageData Package = new();
 
-        public void Preload(string filePath) { }
-
         public void LoadGame(ByteReader fileReader, string filePath)
         {
             Package.Read(fileReader);
