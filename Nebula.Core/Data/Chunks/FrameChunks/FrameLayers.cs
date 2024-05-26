@@ -1,12 +1,4 @@
-﻿using Nebula.Core.Data.Chunks.FrameChunks.LayerChunks;
-using Nebula.Core.Memory;
-using Nebula.Core.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Nebula.Core.Memory;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks
 {
