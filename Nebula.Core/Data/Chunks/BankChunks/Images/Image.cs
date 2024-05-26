@@ -117,7 +117,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                         colorArray = ImageTranslator.Normal15BitToRGBA(ImageData, Width, Height, false, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                         break;
                     case 7:
-                        colorArray = ImageTranslator.Normal16BitToRGBA(ImageData, Width, Height, false, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
+                        colorArray = ImageTranslator.Normal16BitToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                         break;
                     case 8:
                         colorArray = ImageTranslator.TwoFivePlusToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], NebulaCore.Seeded);

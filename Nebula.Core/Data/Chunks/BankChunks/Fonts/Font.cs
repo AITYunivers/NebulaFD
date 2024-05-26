@@ -32,6 +32,8 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Fonts
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Handle = reader.ReadUInt();
+            if (NebulaCore.Build < 284)
+                Handle++;
 
             ByteReader dataReader = null;
             if (Compressed) dataReader = Decompressor.DecompressAsReader(reader, out var decompSize);

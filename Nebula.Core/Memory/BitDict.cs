@@ -24,7 +24,17 @@
         }
 
         public BitDict(params string[] keys) => Keys = keys;
-        public BitDict(Type baseEnum) => Keys = Enum.GetNames(baseEnum);
+        public BitDict(Type baseEnum)
+        {
+            string[] enumKeys = Enum.GetNames(baseEnum);
+            int[] enumValues = (int[])Enum.GetValues(baseEnum);
+            int keyCount = 0;
+            foreach (int val in enumValues)
+                keyCount = Math.Max(keyCount, val);
+            Keys = new string[keyCount + 1];
+            for (int i = 0; i < enumValues.Length; i++)
+                Keys[enumValues[i]] = enumKeys[i];
+        }
 
         public bool this[string key]
         {

@@ -1,4 +1,5 @@
 ﻿using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 using System.Diagnostics;
 
 namespace Nebula.Core.Data.Chunks.AppChunks
@@ -89,12 +90,6 @@ namespace Nebula.Core.Data.Chunks.AppChunks
                 AccelId.Add(reader.ReadInt16());
                 reader.Skip(2);
             }
-
-            reader.Seek(realStartOffset);
-            Data = reader.ReadBytes((int)mainSize + 4);
-            //File.WriteAllBytes(ChunkName, Data);
-            Debug.Assert(reader.Tell() == startOffset + mainSize);
-            //reader.Seek(startOffset + mainSize);
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
@@ -104,8 +99,6 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteBytes(File.ReadAllBytes(ChunkName));
-            return;
             ByteWriter menuWriter = new ByteWriter(new MemoryStream());
 
             menuWriter.WriteInt(20);
@@ -123,11 +116,9 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
             for (int i = 0; i < AccelKey.Count; i++)
             {
-                menuWriter.WriteByte(AccelShift[i]);
-                menuWriter.WriteByte(0);
+                menuWriter.WriteShort(AccelShift[i]);
                 menuWriter.WriteShort(AccelKey[i]);
-                menuWriter.WriteShort(AccelId[i]);
-                menuWriter.WriteShort(0);
+                menuWriter.WriteInt(AccelId[i]);
             }
 
             writer.WriteUInt((uint)menuWriter.Tell());
