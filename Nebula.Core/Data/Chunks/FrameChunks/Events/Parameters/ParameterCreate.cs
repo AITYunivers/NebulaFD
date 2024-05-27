@@ -11,7 +11,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             "DontInheritDirection"   // Orientation: Normal
         );
 
-        public short ObjectInfoParent;
+        public ushort ObjectInfoParent;
         public short X;
         public short Y;
         public short Slope;
@@ -31,7 +31,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            ObjectInfoParent = reader.ReadShort();
+            ObjectInfoParent = reader.ReadUShort();
             CreateFlags.Value = reader.ReadUShort();
             X = reader.ReadShort();
             Y = reader.ReadShort();
@@ -48,7 +48,12 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteShort(ObjectInfoParent);
+            if (FrameEvents.QualifierJumptable.ContainsKey(ObjectInfo))
+                ObjectInfo = FrameEvents.QualifierJumptable[ObjectInfo];
+            if (FrameEvents.QualifierJumptable.ContainsKey(ObjectInfoParent))
+                ObjectInfo = FrameEvents.QualifierJumptable[ObjectInfoParent];
+
+            writer.WriteUShort(ObjectInfoParent);
             writer.WriteUShort((ushort)CreateFlags.Value);
             writer.WriteShort(X);
             writer.WriteShort(Y);
@@ -66,7 +71,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         public override string ToString()
         {
             string output = $"{NebulaCore.PackageData.FrameItems.Items[ObjectInfo].Name} at ({X},{Y})";
-            if (ObjectInfoParent != -1)
+            if (ObjectInfoParent != ushort.MaxValue)
                 output += " from " + NebulaCore.PackageData.FrameItems.Items[ObjectInfoParent].Name;
             else
                 output += " layer " + (Layer + 1);

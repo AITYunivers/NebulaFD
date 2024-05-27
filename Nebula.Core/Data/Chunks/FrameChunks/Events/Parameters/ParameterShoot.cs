@@ -8,7 +8,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             "", "", "CalculateDirection" // Launch in select directions Disabled
         );
 
-        public short ObjectInfoParent;
+        public ushort ObjectInfoParent;
         public short X;
         public short Y;
         public short Slope;
@@ -29,7 +29,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            ObjectInfoParent = reader.ReadShort();
+            ObjectInfoParent = reader.ReadUShort();
             ShootFlags.Value = reader.ReadUShort();
             X = reader.ReadShort();
             Y = reader.ReadShort();
@@ -48,7 +48,12 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteShort(ObjectInfoParent);
+            if (FrameEvents.QualifierJumptable.ContainsKey(ObjectInfo))
+                ObjectInfo = FrameEvents.QualifierJumptable[ObjectInfo];
+            if (FrameEvents.QualifierJumptable.ContainsKey(ObjectInfoParent))
+                ObjectInfoParent = FrameEvents.QualifierJumptable[ObjectInfoParent];
+
+            writer.WriteUShort(ObjectInfoParent);
             writer.WriteUShort((ushort)ShootFlags.Value);
             writer.WriteShort(X);
             writer.WriteShort(Y);

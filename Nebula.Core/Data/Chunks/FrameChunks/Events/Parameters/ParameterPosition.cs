@@ -1,4 +1,5 @@
-﻿using Nebula.Core.Memory;
+﻿using Nebula.Core.Data.Chunks.ObjectChunks;
+using Nebula.Core.Memory;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 {
@@ -11,7 +12,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             "DontInheritDirection"   // Orientation: Normal
         );
 
-        public short ObjectInfoParent;
+        public ushort ObjectInfoParent;
         public short X;
         public short Y;
         public short Slope;
@@ -28,7 +29,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            ObjectInfoParent = reader.ReadShort();
+            ObjectInfoParent = reader.ReadUShort();
             PositionFlags.Value = reader.ReadUShort();
             X = reader.ReadShort();
             Y = reader.ReadShort();
@@ -42,7 +43,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteShort(ObjectInfoParent);
+            if (FrameEvents.QualifierJumptable.ContainsKey(ObjectInfoParent))
+                ObjectInfoParent = FrameEvents.QualifierJumptable[ObjectInfoParent];
+
+            writer.WriteUShort(ObjectInfoParent);
             writer.WriteUShort((ushort)PositionFlags.Value);
             writer.WriteShort(X);
             writer.WriteShort(Y);
@@ -57,7 +61,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         public override string ToString()
         {
             string output = $"({X},{Y})";
-            if (ObjectInfoParent != -1)
+            if (ObjectInfoParent != ushort.MaxValue)
                 output += " from " + NebulaCore.PackageData.FrameItems.Items[ObjectInfoParent].Name;
             else
                 output += " layer " + (Layer + 1);

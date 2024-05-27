@@ -30,8 +30,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public short ObjectType;
         public short Num;
-        public short ObjectInfo;
-        public ushort ObjectInfoList;
+        public ushort ObjectInfo;
+        public short ObjectInfoList;
         public Parameter[] Parameters = new Parameter[0];
         public byte DefType;
 
@@ -49,8 +49,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
             ObjectType = reader.ReadShort();
             Num = reader.ReadShort();
-            ObjectInfo = reader.ReadShort();
-            ObjectInfoList = reader.ReadUShort();
+            ObjectInfo = reader.ReadUShort();
+            ObjectInfoList = reader.ReadShort();
             EventFlags.Value = reader.ReadByte();
             OtherFlags.Value = reader.ReadByte();
             Parameters = new Parameter[reader.ReadByte()];
@@ -74,8 +74,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
             ObjectType = reader.ReadShort();
             Num = reader.ReadShort();
-            ObjectInfo = reader.ReadShort();
-            ObjectInfoList = reader.ReadUShort();
+            ObjectInfo = reader.ReadUShort();
+            ObjectInfoList = reader.ReadShort();
             EventFlags.Value = reader.ReadByte();
             OtherFlags.Value = reader.ReadByte();
             Parameters = new Parameter[reader.ReadByte()];
@@ -99,17 +99,14 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            if (FrameEvents.QualifierJumptable.ContainsKey(ObjectInfo))
+                ObjectInfo = FrameEvents.QualifierJumptable[ObjectInfo];
+
             ByteWriter actWriter = new ByteWriter(new MemoryStream());
             actWriter.WriteShort(ObjectType);
             actWriter.WriteShort(Num);
-            short oI = ObjectInfo;
-            if (oI >> 8 == -128)
-            {
-                byte qual = (byte)(oI & 0xFF);
-                oI = (short)((qual | ((128 - ObjectType) << 8)) & 0xFFFF);
-            }
-            actWriter.WriteShort(oI);
-            actWriter.WriteUShort(ObjectInfoList);
+            actWriter.WriteUShort(ObjectInfo);
+            actWriter.WriteShort(ObjectInfoList);
             actWriter.WriteByte((byte)EventFlags.Value);
             actWriter.WriteByte((byte)OtherFlags.Value);
             actWriter.WriteByte((byte)Parameters.Length);
@@ -1132,6 +1129,21 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 11 => "Subtract",
                 _ => throw new Exception("Unknown Ink Effect")
             };
+        }
+
+        public Action Copy()
+        {
+            Action act = new Action();
+            act.ObjectType = ObjectType;
+            act.Num = Num;
+            act.ObjectInfo = ObjectInfo;
+            act.ObjectInfoList = ObjectInfoList;
+            act.EventFlags.Value = EventFlags.Value;
+            act.OtherFlags.Value = OtherFlags.Value;
+            act.DefType = DefType;
+            act.Parent = Parent;
+            act.DoAdd = DoAdd;
+            return act;
         }
     }
 }

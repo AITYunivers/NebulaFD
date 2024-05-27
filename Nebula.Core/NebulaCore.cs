@@ -7,7 +7,7 @@ namespace Nebula
 {
     public static class NebulaCore
     {
-        public const string BuildDate = "1/6/24";
+        public const string BuildDate = "5/27/24";
         public static Color[] ColorRules = new Color[]
         {
             Color.DarkViolet_1,    // Header

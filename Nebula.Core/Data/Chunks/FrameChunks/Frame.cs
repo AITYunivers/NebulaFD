@@ -383,48 +383,21 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             }
             MFAFrameInfo.Folders.WriteMFA(writer);
             FrameInstances.WriteMFA(writer);
-            Dictionary<int, EventObject> evtObjs = new();
-            Dictionary<int, List<short>> quals = new();
-            foreach (MFAObjectInfo oI in objectInfos.Values)
-            {
-                if (oI.ObjectType < 2) continue;
-                EventObject evtObj = new();
-                evtObj.Handle = oI.Handle;
-                evtObj.ObjectType = 1;
-                evtObj.ItemType = (ushort)oI.ObjectType;
-                evtObj.Name = oI.Name;
-                evtObj.TypeName = oI.ObjectType switch
-                {
-                    2 => "Sprite",
-                    3 => "Text",
-                    4 => "Question",
-                    5 => "Score",
-                    6 => "Lives",
-                    7 => "Counter",
-                    _ => string.Empty
-                };
-                evtObj.ItemHandle = (uint)oI.Handle;
-                evtObj.InstanceHandle = -1;
-                evtObjs.Add(evtObj.Handle, evtObj);
 
-                foreach (short qual in oI.ObjectLoader.Qualifiers)
-                {
-                    if (!quals.ContainsKey(oI.ObjectType))
-                        quals.Add(oI.ObjectType, new());
-                    if (qual != -1 && !quals[oI.ObjectType].Contains(qual))
-                        quals[oI.ObjectType].Add(qual);
-                }
-            }
-            foreach (int oType in quals.Keys)
+            FrameEvents.QualifierJumptable = new();
+            if (!NebulaCore.MFA)
             {
-                foreach (short qual in quals[oType])
+                Dictionary<int, EventObject> evtObjs = new();
+                List<short> quals = new();
+                foreach (MFAObjectInfo oI in objectInfos.Values)
                 {
+                    if (oI.ObjectType < 2) continue;
                     EventObject evtObj = new();
-                    evtObj.Handle = (short)((byte)qual | ((128 - oType) << 8));
-                    evtObj.ObjectType = 3;
-                    evtObj.ItemType = (ushort)oType;
-                    evtObj.Name = string.Empty;
-                    evtObj.TypeName = oType switch
+                    evtObj.Handle = NebulaCore.MFA ? evtObjs.Count : oI.Handle;
+                    evtObj.ObjectType = 1;
+                    evtObj.ItemType = (ushort)oI.ObjectType;
+                    evtObj.Name = oI.Name;
+                    evtObj.TypeName = oI.ObjectType switch
                     {
                         2 => "Sprite",
                         3 => "Text",
@@ -434,15 +407,51 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                         7 => "Counter",
                         _ => string.Empty
                     };
-                    evtObj.SystemQualifier = (ushort)qual;
+                    evtObj.ItemHandle = (uint)oI.Handle;
+                    evtObj.InstanceHandle = -1;
                     evtObjs.Add(evtObj.Handle, evtObj);
                 }
+
+                foreach (Qualifier qual in FrameEvents.Qualifiers)
+                {
+                    if (FrameEvents.QualifierJumptable.ContainsKey(qual.ObjectInfo))
+                        continue;
+                    ushort jump;
+                    for (jump = 0; jump < ushort.MaxValue; jump++)
+                        if (!evtObjs.ContainsKey(jump))
+                            break;
+                    FrameEvents.QualifierJumptable.Add(qual.ObjectInfo, jump);
+                    EventObject qualEvtObj = new();
+                    qualEvtObj.Handle = jump;
+                    qualEvtObj.ObjectType = 3;
+                    qualEvtObj.ItemType = (ushort)qual.Type;
+                    qualEvtObj.Name = string.Empty;
+                    qualEvtObj.TypeName = qual.Type switch
+                    {
+                        2 => "Sprite",
+                        3 => "Text",
+                        4 => "Question",
+                        5 => "Score",
+                        6 => "Lives",
+                        7 => "Counter",
+                        _ => string.Empty
+                    };
+                    qualEvtObj.SystemQualifier = (ushort)(qual.ObjectInfo & 0x7FFF);
+                    evtObjs.Add(qualEvtObj.Handle, qualEvtObj);
+                }
+
+                FrameEvents.EventObjects = evtObjs;
             }
-            FrameEvents.EventObjects = evtObjs;
+            else
+                foreach (var evtObj in FrameEvents.EventObjects)
+                    if (evtObj.Value.ObjectType == 3)
+                        FrameEvents.QualifierJumptable.Add((ushort)evtObj.Key, (ushort)evtObj.Key);
+
             FrameEvents.WriteMFA(writer);
 
             FrameLayerEffects.WriteMFA(writer, this);
             FrameEffects.WriteMFA(writer, this);
+            FrameRect.WriteMFA(writer, this);
             writer.WriteByte(0); // Last Chunk
         }
     }

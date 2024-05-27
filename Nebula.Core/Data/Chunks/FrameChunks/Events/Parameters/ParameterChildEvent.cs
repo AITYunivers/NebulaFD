@@ -1,10 +1,11 @@
-﻿using Nebula.Core.Memory;
+﻿using Nebula.Core.Data.Chunks.ObjectChunks;
+using Nebula.Core.Memory;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 {
     public class ParameterChildEvent : ParameterChunk
     {
-        public short[] ObjectInfos = new short[0];
+        public ushort[] ObjectInfos = new ushort[0];
 
         public ParameterChildEvent()
         {
@@ -13,16 +14,21 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            ObjectInfos = new short[reader.ReadInt() * 2];
+            ObjectInfos = new ushort[reader.ReadInt() * 2];
             for (int i = 0; i < ObjectInfos.Length; i++)
-                ObjectInfos[i] = reader.ReadShort();
+                ObjectInfos[i] = reader.ReadUShort();
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
             writer.WriteInt(ObjectInfos.Length / 2);
-            foreach (short oI in ObjectInfos)
-                writer.WriteShort(oI);
+            foreach (ushort oI in ObjectInfos)
+            {
+                if (FrameEvents.QualifierJumptable.ContainsKey(oI))
+                    writer.WriteUShort(FrameEvents.QualifierJumptable[oI]);
+                else
+                    writer.WriteUShort(oI);
+            }
         }
 
         public override string ToString()

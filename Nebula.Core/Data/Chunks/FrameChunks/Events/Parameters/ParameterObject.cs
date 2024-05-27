@@ -5,7 +5,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
     public class ParameterObject : ParameterChunk
     {
         public short ObjectInfoList;
-        public short ObjectInfo;
+        public ushort ObjectInfo;
         public short ObjectType;
 
         public ParameterObject()
@@ -16,14 +16,17 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             ObjectInfoList = reader.ReadShort();
-            ObjectInfo = reader.ReadShort();
+            ObjectInfo = reader.ReadUShort();
             ObjectType = reader.ReadShort();
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            if (FrameEvents.QualifierJumptable.ContainsKey(ObjectInfo))
+                ObjectInfo = FrameEvents.QualifierJumptable[ObjectInfo];
+
             writer.WriteShort(ObjectInfoList);
-            writer.WriteShort(ObjectInfo);
+            writer.WriteUShort(ObjectInfo);
             writer.WriteShort(ObjectType);
         }
 

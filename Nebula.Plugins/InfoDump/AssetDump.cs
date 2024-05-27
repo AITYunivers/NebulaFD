@@ -455,8 +455,11 @@ namespace Nebula.Plugins.GameDumper
             w.WriteElementString("description", "Decompiled using Nebula by Yunivers");
             w.WriteElementString("author", "Unknown");
 
-            if (fxData.Contains("register(s1)"))
+            int texParamCnt = shdr.Parameters.Where(x => x.Type == 3).ToArray().Length;
+            if (fxData.Contains($"register(s{texParamCnt + 1})"))
                 w.WriteElementString("BackgroundTexture", "1");
+            else if (texParamCnt > 0)
+                w.WriteElementString("BackgroundTexture", "0");
 
             if (NebulaCore.D3D == 8)
                 w.WriteElementString("dx8", "1"); 

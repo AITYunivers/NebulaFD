@@ -23,7 +23,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             if ((bool)extraInfo[1])
                 Value = reader.ReadDouble();
             else
+            {
                 Value = reader.ReadInt();
+                reader.Skip(4);
+            }
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
@@ -33,7 +36,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             if (Value is double)
                 writer.WriteDouble((double)Value);
             else
+            {
                 writer.WriteInt((int)Value);
+                writer.Skip(4);
+            }
         }
     }
 }

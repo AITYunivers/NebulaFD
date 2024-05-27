@@ -4,6 +4,7 @@ using Nebula.Core.Data.Chunks.ObjectChunks;
 using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
 using System.Reflection.Metadata;
@@ -30,7 +31,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public short ObjectType;
         public short Num;
-        public short ObjectInfo;
+        public ushort ObjectInfo;
         public short ObjectInfoList;
         public Parameter[] Parameters = new Parameter[0];
         public byte DefType;
@@ -50,7 +51,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
             ObjectType = reader.ReadShort();
             Num = reader.ReadShort();
-            ObjectInfo = reader.ReadShort();
+            ObjectInfo = reader.ReadUShort();
             ObjectInfoList = reader.ReadShort();
             EventFlags.Value = reader.ReadByte();
             OtherFlags.Value = reader.ReadByte();
@@ -76,7 +77,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
             ObjectType = reader.ReadShort();
             Num = reader.ReadShort();
-            ObjectInfo = reader.ReadShort();
+            ObjectInfo = reader.ReadUShort();
             ObjectInfoList = reader.ReadShort();
             EventFlags.Value = reader.ReadByte();
             OtherFlags.Value = reader.ReadByte();
@@ -102,16 +103,13 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            if (FrameEvents.QualifierJumptable.ContainsKey(ObjectInfo))
+                ObjectInfo = FrameEvents.QualifierJumptable[ObjectInfo];
+
             ByteWriter condWriter = new ByteWriter(new MemoryStream());
             condWriter.WriteShort(ObjectType);
             condWriter.WriteShort(Num);
-            short oI = ObjectInfo;
-            if (oI >> 8 == -128)
-            {
-                byte qual = (byte)(oI & 0xFF);
-                oI = (short)((qual | ((128 - ObjectType) << 8)) & 0xFFFF);
-            }
-            condWriter.WriteShort(oI);
+            condWriter.WriteUShort(ObjectInfo);
             condWriter.WriteShort(ObjectInfoList);
             condWriter.WriteByte((byte)EventFlags.Value);
             condWriter.WriteByte((byte)OtherFlags.Value);
@@ -154,10 +152,75 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                     switch (Num)
                     {
                         case -25:
-                            if (ObjectType != 3)
+                            if (Parameters[0].Code == 68)
                             {
-                                Num = -27;
-                                DoAdd = false; // TODO
+                                ParameterVariables varsData = (ParameterVariables)Parameters[0].Data;
+
+                                foreach (ParameterVariable varData in varsData.Variables)
+                                {
+                                    Condition varCond = Copy();
+                                    if (varData.Global)
+                                    {
+                                        varCond.ObjectInfo = 0;
+                                        varCond.ObjectType = -1;
+                                        varCond.Num = -8;
+                                    }
+                                    else
+                                        varCond.Num = -27;
+                                    ParameterInt varParamIndexVal = new ParameterInt();
+                                    varParamIndexVal.Value = varData.Index;
+                                    Parameter varParamIndex = new Parameter();
+                                    varParamIndex.Data = varParamIndexVal;
+                                    varParamIndex.Code = varData.Global ? 49 : 50;
+                                    ExpressionChunk varExpVal;
+                                    if (varData.Value is double)
+                                        varExpVal = new ExpressionDouble()
+                                        {
+                                            Value = (double)varData.Value
+                                        };
+                                    else
+                                        varExpVal = new ExpressionInt()
+                                        {
+                                            Value = (int)varData.Value
+                                        };
+                                    ParameterExpression varExp = new ParameterExpression();
+                                    varExp.Expression = varExpVal;
+                                    varExp.ObjectType = -1;
+                                    ParameterExpressions varExps = new ParameterExpressions();
+                                    varExps.Comparison = (short)varData.Operator;
+                                    varExps.Expressions.Add(varExp);
+                                    Parameter varParamVal = new Parameter();
+                                    varParamVal.Data = varExps;
+                                    varParamVal.Code = 23;
+                                    varCond.Parameters = new Parameter[2];
+                                    varCond.Parameters[0] = varParamIndex;
+                                    varCond.Parameters[1] = varParamVal;
+                                    evntList.Add(varCond);
+                                }
+
+                                for (int flag = 0; flag < 32; flag++)
+                                {
+                                    if (varsData.FlagMasks != flag)
+                                        continue;
+                                    bool flagValue = varsData.FlagValues == flag;
+                                    Condition flagCond = Copy();
+                                    flagCond.Num = (short)(flagValue ? -25 : -24);
+                                    ExpressionInt flagExpInt = new ExpressionInt();
+                                    flagExpInt.Value = flag;
+                                    ParameterExpression flagExp = new ParameterExpression();
+                                    flagExp.Expression = flagExpInt;
+                                    flagExp.ObjectType = -1;
+                                    ParameterExpressions flagExps = new ParameterExpressions();
+                                    flagExps.Expressions.Add(flagExp);
+                                    Parameter flagParam = new Parameter();
+                                    flagParam.Data = flagExps;
+                                    flagParam.Code = 22;
+                                    flagCond.Parameters = new Parameter[1];
+                                    flagCond.Parameters[0] = flagParam;
+                                    evntList.Add(flagCond);
+                                }
+
+                                DoAdd = false;
                             }
                             break;
                         case -42:
@@ -946,6 +1009,22 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 };
             }
             else return oC.ObjectAnimations.Animations[id].Name;
+        }
+
+        public Condition Copy()
+        {
+            Condition cnd = new Condition();
+            cnd.ObjectType = ObjectType;
+            cnd.Num = Num;
+            cnd.ObjectInfo = ObjectInfo;
+            cnd.ObjectInfoList = ObjectInfoList;
+            cnd.EventFlags.Value = EventFlags.Value;
+            cnd.OtherFlags.Value = OtherFlags.Value;
+            cnd.DefType = DefType;
+            cnd.Identifier = Identifier;
+            cnd.Parent = Parent;
+            cnd.DoAdd = DoAdd;
+            return cnd;
         }
     }
 }

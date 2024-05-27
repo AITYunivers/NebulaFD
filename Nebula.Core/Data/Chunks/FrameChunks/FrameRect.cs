@@ -42,7 +42,12 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteByte(0x21);
+            writer.WriteInt(16);
+            writer.WriteInt(left);
+            writer.WriteInt(top);
+            writer.WriteInt(right);
+            writer.WriteInt(bottom);
         }
     }
 }
