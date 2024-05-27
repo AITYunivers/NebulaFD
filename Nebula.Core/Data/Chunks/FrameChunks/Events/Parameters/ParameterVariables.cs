@@ -45,7 +45,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             for (int i = 0; i < Count; i++)
             {
                 Variables[i] = new ParameterVariable();
-                Variables[i].ReadCCN(reader, ValueFlags == Count * 4 + 1, ValueFlags == Count * 4 + 2);
+                Variables[i].ReadCCN(reader, ValueFlags == i * 4 + 1, ValueFlags == i * 4 + 2);
             }
         }
 
