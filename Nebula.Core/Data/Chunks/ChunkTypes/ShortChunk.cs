@@ -1,14 +1,14 @@
 ﻿using Nebula.Core.Memory;
 
-namespace Nebula.Core.Data.Chunks
+namespace Nebula.Core.Data.Chunks.ChunkTypes
 {
-    public abstract class DataChunk : Chunk
+    public abstract class ShortChunk : Chunk
     {
-        public byte[] Value = new byte[0];
+        public short Value;
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Value = reader.ReadBytes();
+            Value = reader.ReadShort();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -18,7 +18,7 @@ namespace Nebula.Core.Data.Chunks
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteBytes(Value);
+            writer.WriteShort(Value);
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)

@@ -1,29 +1,29 @@
 ﻿using Nebula.Core.Memory;
 
-namespace Nebula.Core.Data.Chunks
+namespace Nebula.Core.Data.Chunks.ChunkTypes
 {
-    public abstract class BoolChunk : Chunk
+    public abstract class IntChunk : Chunk
     {
-        public bool Value;
+        public int Value;
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Value = reader.ReadInt() != 0;
+            Value = reader.ReadInt();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-
+            Value = reader.ReadInt();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteInt(Value ? 1 : 0);
+            writer.WriteInt(Value);
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteInt(Value);
         }
     }
 }

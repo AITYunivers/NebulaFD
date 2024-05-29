@@ -51,7 +51,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             //if (FrameEvents.QualifierJumptable.ContainsKey(ObjectInfo))
                 //ObjectInfo = FrameEvents.QualifierJumptable[ObjectInfo];
             if (FrameEvents.QualifierJumptable.ContainsKey(Tuple.Create(ObjectInfoParent, TypeParent)))
-                ObjectInfo = FrameEvents.QualifierJumptable[Tuple.Create(ObjectInfoParent, TypeParent)];
+            {
+                ObjectInfoParent = FrameEvents.QualifierJumptable[Tuple.Create(ObjectInfoParent, TypeParent)];
+                TypeParent = 0;
+            }
 
             writer.WriteUShort(ObjectInfoParent);
             writer.WriteUShort((ushort)CreateFlags.Value);
@@ -72,7 +75,12 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         {
             string output = $"{NebulaCore.PackageData.FrameItems.Items[ObjectInfo].Name} at ({X},{Y})";
             if (ObjectInfoParent != ushort.MaxValue)
-                output += " from " + NebulaCore.PackageData.FrameItems.Items[ObjectInfoParent].Name;
+            {
+                if (NebulaCore.PackageData.FrameItems.Items.ContainsKey(ObjectInfoParent))
+                    output += " from " + NebulaCore.PackageData.FrameItems.Items[ObjectInfoParent].Name;
+                else
+                    output += " from Qualifier " + (ObjectInfoParent & 0x7FFF) + ", Type " + TypeParent;
+            }
             else
                 output += " layer " + (Layer + 1);
             if (CreateFlags.Value != 8)

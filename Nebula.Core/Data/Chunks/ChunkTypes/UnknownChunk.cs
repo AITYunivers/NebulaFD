@@ -1,7 +1,7 @@
 ﻿using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 
-namespace Nebula.Core.Data.Chunks
+namespace Nebula.Core.Data.Chunks.ChunkTypes
 {
     public class UnknownChunk : Chunk
     {

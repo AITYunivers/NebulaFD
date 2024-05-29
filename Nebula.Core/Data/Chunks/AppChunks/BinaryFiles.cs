@@ -19,7 +19,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             if (Parameters.DontIncludeBinaryFiles)
                 return;
 
-            Count = reader.ReadInt32();
+            Count = reader.ReadInt();
             for (int i = 0; i < Count; i++)
             {
                 BinaryFile item = new BinaryFile();
@@ -32,7 +32,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            Count = reader.ReadInt32();
+            Count = reader.ReadInt();
             for (int i = 0; i < Count; i++)
             {
                 BinaryFile item = new BinaryFile();

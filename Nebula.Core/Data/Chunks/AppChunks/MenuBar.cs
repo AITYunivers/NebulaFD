@@ -21,10 +21,10 @@ namespace Nebula.Core.Data.Chunks.AppChunks
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             reader.Skip(4);
-            int menuOffset = reader.ReadInt32();
-            int menuSize = reader.ReadInt32();
-            int accelOffset = reader.ReadInt32();
-            int accelSize = reader.ReadInt32();
+            int menuOffset = reader.ReadInt();
+            int menuSize = reader.ReadInt();
+            int accelOffset = reader.ReadInt();
+            int accelSize = reader.ReadInt();
 
             reader.Seek(menuOffset);
             reader.Skip(4);
@@ -36,8 +36,8 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             {
                 AccelShift.Add(reader.ReadByte());
                 reader.Skip(1);
-                AccelKey.Add(reader.ReadInt16());
-                AccelId.Add(reader.ReadInt16());
+                AccelKey.Add(reader.ReadShort());
+                AccelId.Add(reader.ReadShort());
                 reader.Skip(2);
             }
 
@@ -86,8 +86,8 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             {
                 AccelShift.Add(reader.ReadByte());
                 reader.Skip(1);
-                AccelKey.Add(reader.ReadInt16());
-                AccelId.Add(reader.ReadInt16());
+                AccelKey.Add(reader.ReadShort());
+                AccelId.Add(reader.ReadShort());
                 reader.Skip(2);
             }
         }

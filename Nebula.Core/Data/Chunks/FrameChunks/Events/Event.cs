@@ -69,7 +69,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 if (cnd.DoAdd)
                 {
                     Conditions.Add(cnd);
-                    this.Log($"[COND] Type: {cnd.ObjectType}, Num: {cnd.Num}, Params: {cnd.Parameters.Length}");
+                    this.SilentLog($"[COND] Type: {cnd.ObjectType}, Num: {cnd.Num}, Params: {cnd.Parameters.Length}");
                 }
             }
 
@@ -80,7 +80,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 if (act.DoAdd)
                 {
                     Actions.Add(act);
-                    this.Log($"[ACT] Type: {act.ObjectType}, Num: {act.Num}, Params: {act.Parameters.Length}");
+                    this.SilentLog($"[ACT] Type: {act.ObjectType}, Num: {act.Num}, Params: {act.Parameters.Length}");
                 }
             }
 
@@ -104,7 +104,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 Condition cnd = new Condition();
                 cnd.ReadMFA(reader, Conditions, this);
                 Conditions.Add(cnd);
-                this.Log($"[COND] Type: {cnd.ObjectType}, Num: {cnd.Num}, Params: {cnd.Parameters.Length}");
+                this.SilentLog($"[COND] Type: {cnd.ObjectType}, Num: {cnd.Num}, Params: {cnd.Parameters.Length}");
             }
 
             for (int i = 0; i < actCnt; i++)
@@ -112,7 +112,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 Action act = new Action();
                 act.ReadMFA(reader, Actions, this);
                 Actions.Add(act);
-                this.Log($"[ACT] Type: {act.ObjectType}, Num: {act.Num}, Params: {act.Parameters.Length}");
+                this.SilentLog($"[ACT] Type: {act.ObjectType}, Num: {act.Num}, Params: {act.Parameters.Length}");
             }
 
             reader.Seek(endPosition);

@@ -145,11 +145,11 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
 
                 // Read extension data
                 var reader = new ByteReader(common.ObjectExtension.ExtensionData);
-                BackgroundInput = Convert.ToBoolean(reader.ReadInt32());
-                MMFOrder = Convert.ToBoolean(reader.ReadInt32());
-                DetectNewDevices = Convert.ToBoolean(reader.ReadInt32());
-                PollEveryLoop = Convert.ToBoolean(reader.ReadInt32());
-                TestForXbox = Convert.ToBoolean(reader.ReadInt32());
+                BackgroundInput = Convert.ToBoolean(reader.ReadInt());
+                MMFOrder = Convert.ToBoolean(reader.ReadInt());
+                DetectNewDevices = Convert.ToBoolean(reader.ReadInt());
+                PollEveryLoop = Convert.ToBoolean(reader.ReadInt());
+                TestForXbox = Convert.ToBoolean(reader.ReadInt());
 
                 dump_data(common, newObj.name);
 
@@ -200,10 +200,10 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                 iniName = reader.ReadYunicode();
                 if (string.IsNullOrEmpty(iniName))
                     iniName = "Default.ini";
-                //UTF8 = Convert.ToBoolean(reader.ReadInt32());
-                //CreateInMMFApps = Convert.ToBoolean(reader.ReadInt32());
-                //Win_ReadChanges = Convert.ToBoolean(reader.ReadInt32());
-                //Win_WriteChanges = Convert.ToBoolean(reader.ReadInt32());
+                //UTF8 = Convert.ToBoolean(reader.ReadInt());
+                //CreateInMMFApps = Convert.ToBoolean(reader.ReadInt());
+                //Win_ReadChanges = Convert.ToBoolean(reader.ReadInt());
+                //Win_WriteChanges = Convert.ToBoolean(reader.ReadInt());
 
                 dump_data(common, newObj.name);
 

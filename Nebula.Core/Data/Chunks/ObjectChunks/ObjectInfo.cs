@@ -23,7 +23,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
             while (reader.HasMemory(8))
             {
                 Chunk newChunk = InitChunk(reader);
-                this.Log($"Reading Object Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
+                this.SilentLog($"Reading Object Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
 
                 ByteReader chunkReader = new ByteReader(newChunk.ChunkData!);
                 newChunk.ReadCCN(chunkReader, this);

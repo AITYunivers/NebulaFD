@@ -8,14 +8,14 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Handle = reader.ReadUShort();
-            Width = reader.ReadInt16();
-            Height = reader.ReadInt16();
-            HotspotX = reader.ReadInt16();
-            HotspotY = reader.ReadInt16();
-            ActionPointX = reader.ReadInt16();
-            ActionPointY = reader.ReadInt16();
+            Width = reader.ReadShort();
+            Height = reader.ReadShort();
+            HotspotX = reader.ReadShort();
+            HotspotY = reader.ReadShort();
+            ActionPointX = reader.ReadShort();
+            ActionPointY = reader.ReadShort();
 
-            var size = reader.ReadInt32();
+            var size = reader.ReadInt();
             var compressedBuffer = reader.ReadBytes(size);
             GraphicMode = 9;
             ImageData = Decompressor.DecompressBlock(compressedBuffer);

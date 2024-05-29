@@ -1,15 +1,21 @@
-﻿using Nebula.Core.Memory;
+﻿using Nebula.Core.Data.Chunks.ObjectChunks;
+using Nebula.Core.Memory;
 
-namespace Nebula.Core.Data.Chunks.MFAChunks
+namespace Nebula.Core.Data.Chunks.MFAChunks.MFAFrameChunks
 {
-    public class MFAQualifier : Chunk
+    public class MFAFrameInfo : Chunk
     {
-        public string Name = string.Empty;
         public int Handle;
+        public int EditorX;
+        public int EditorY;
+        public int IconHandle;
+        public int EditorLayer;
+        public MFAObjectInfo[] Objects = new MFAObjectInfo[0];
+        public MFAFolders Folders = new();
 
-        public MFAQualifier()
+        public MFAFrameInfo()
         {
-            ChunkName = "MFAQualifier";
+            ChunkName = "MFAFrameInfo";
         }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
@@ -19,8 +25,7 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            Name = reader.ReadAutoYuniversal();
-            Handle = reader.ReadInt();
+
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

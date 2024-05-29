@@ -10,28 +10,28 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
             if (NebulaCore.Build >= 284)
                 Handle--;
 
-            var decompressedSize = reader.ReadInt32();
-            var compSize = reader.ReadInt32();
+            var decompressedSize = reader.ReadInt();
+            var compSize = reader.ReadInt();
             var compressedBuffer = reader.ReadBytes(compSize);
             Task task = new Task(() =>
             {
                 ByteReader decompressedReader = new ByteReader(Decompressor.DecompressBlock(compressedBuffer));
                 Checksum = decompressedReader.ReadInt();
                 References = decompressedReader.ReadInt();
-                var dataSize = decompressedReader.ReadInt32();
-                Width = decompressedReader.ReadInt16();
-                Height = decompressedReader.ReadInt16();
+                var dataSize = decompressedReader.ReadInt();
+                Width = decompressedReader.ReadShort();
+                Height = decompressedReader.ReadShort();
                 GraphicMode = decompressedReader.ReadByte();
                 Flags.Value = decompressedReader.ReadByte();
-                decompressedReader.ReadInt16();
-                HotspotX = decompressedReader.ReadInt16();
-                HotspotY = decompressedReader.ReadInt16();
-                ActionPointX = decompressedReader.ReadInt16();
-                ActionPointY = decompressedReader.ReadInt16();
+                decompressedReader.ReadShort();
+                HotspotX = decompressedReader.ReadShort();
+                HotspotY = decompressedReader.ReadShort();
+                ActionPointX = decompressedReader.ReadShort();
+                ActionPointY = decompressedReader.ReadShort();
                 TransparentColor = decompressedReader.ReadColor();
                 if (Flags["LZX"])
                 {
-                    decompressedSize = decompressedReader.ReadInt32();
+                    decompressedSize = decompressedReader.ReadInt();
                     ImageData = Decompressor.DecompressBlock(decompressedReader, (int)(decompressedReader.Size() - decompressedReader.Tell()));
                 }
                 else ImageData = decompressedReader.ReadBytes(dataSize);

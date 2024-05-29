@@ -1,7 +1,7 @@
 ﻿using Nebula.Core.Memory;
 using System.Drawing;
 
-namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
+namespace Nebula.Core.Data.Chunks.ChunkTypes
 {
     public class TransitionChunk : Chunk
     {

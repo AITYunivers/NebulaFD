@@ -1,21 +1,15 @@
-﻿using Nebula.Core.Data.Chunks.ObjectChunks;
-using Nebula.Core.Memory;
+﻿using Nebula.Core.Memory;
 
 namespace Nebula.Core.Data.Chunks.MFAChunks
 {
-    public class MFAFrameInfo : Chunk
+    public class MFAAltFlagIndex : Chunk
     {
-        public int Handle;
-        public int EditorX;
-        public int EditorY;
-        public int IconHandle;
-        public int EditorLayer;
-        public MFAObjectInfo[] Objects = new MFAObjectInfo[0];
-        public MFAFolders Folders = new();
+        public int[] Index = new int[0];
 
-        public MFAFrameInfo()
+        public MFAAltFlagIndex()
         {
-            ChunkName = "MFAFrameInfo";
+            ChunkName = "MFAAltFlagIndex";
+            ChunkID = 0x003C;
         }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
@@ -25,7 +19,10 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
+            Index = new int[reader.ReadInt()];
 
+            for (int i = 0; i < Index.Length; i++)
+                Index[i] = reader.ReadInt();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

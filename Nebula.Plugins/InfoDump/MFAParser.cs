@@ -26,6 +26,7 @@ namespace GameDumper
 
         public ImageBank IconBank = new ImageBank();
         public MFAAppIcon? AppIcons = null;
+        public MFAExtraFlags ExtraFlags = new();
 
         public void Execute()
         {
@@ -247,6 +248,8 @@ namespace GameDumper
 
             if (AppIcons != null)
                 AppIcons.WriteMFA(writer);
+            ExtraFlags.ExtraFlags.Value = 576;
+            ExtraFlags.WriteMFA(writer);
             writer.WriteByte(0);
 
             frameWriter.Flush();

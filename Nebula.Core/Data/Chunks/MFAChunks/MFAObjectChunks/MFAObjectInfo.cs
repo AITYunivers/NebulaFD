@@ -61,7 +61,7 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
 
             while (true)
             {
-                Chunk newChunk = InitMFAChunk(reader);
+                Chunk newChunk = InitMFAObjectChunk(reader);
                 this.Log($"Reading MFA Object Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
 
                 ByteReader chunkReader = new ByteReader(newChunk.ChunkData!);

@@ -1,4 +1,4 @@
-﻿using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
+﻿using Nebula.Core.Data.Chunks.ChunkTypes;
 using Nebula.Core.Memory;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks

@@ -1,4 +1,7 @@
 ﻿using Nebula.Core.Data.Chunks.AppChunks;
+using Nebula.Core.Data.Chunks.ChunkTypes;
+using Nebula.Core.Data.Chunks.MFAChunks;
+using Nebula.Core.Data.Chunks.MFAChunks.MFAFrameChunks;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 
@@ -72,12 +75,44 @@ namespace Nebula.Core.Data.Chunks
             int size = byteReader.ReadInt();
             var data = byteReader.ReadBytes(size);
 
-            Chunk newChunk = ChunkJumpTable(id);
+            Chunk newChunk = MFAChunkJumpTable(id);
             newChunk.ChunkSize = size;
             newChunk.ChunkData = data;
 
-            if (writeToFile && !ChunkList.ChunkJumpTable.ContainsKey(id))
+            if (writeToFile && !MFAChunkList.ChunkJumpTable.ContainsKey(id))
                 File.WriteAllBytes($"Chunks\\MFAChunk-{string.Format("0x{0:X}", id)}_{Utilities.Utilities.ClearName(NebulaCore.PackageData.AppName)}.bin", newChunk.ChunkData);
+            return newChunk;
+        }
+
+        public static Chunk InitMFAFrameChunk(ByteReader byteReader, bool writeToFile = true)
+        {
+            short id = byteReader.ReadByte();
+            if (id == 0) return new Last();
+            int size = byteReader.ReadInt();
+            var data = byteReader.ReadBytes(size);
+
+            Chunk newChunk = MFAFrameChunkJumpTable(id);
+            newChunk.ChunkSize = size;
+            newChunk.ChunkData = data;
+
+            if (writeToFile && !MFAFrameChunkList.ChunkJumpTable.ContainsKey(id))
+                File.WriteAllBytes($"Chunks\\MFAFrameChunk-{string.Format("0x{0:X}", id)}_{Utilities.Utilities.ClearName(NebulaCore.PackageData.AppName)}.bin", newChunk.ChunkData);
+            return newChunk;
+        }
+
+        public static Chunk InitMFAObjectChunk(ByteReader byteReader, bool writeToFile = true)
+        {
+            short id = byteReader.ReadByte();
+            if (id == 0) return new Last();
+            int size = byteReader.ReadInt();
+            var data = byteReader.ReadBytes(size);
+
+            Chunk newChunk = MFAObjectChunkJumpTable(id);
+            newChunk.ChunkSize = size;
+            newChunk.ChunkData = data;
+
+            if (writeToFile && !MFAObjectChunkList.ChunkJumpTable.ContainsKey(id))
+                File.WriteAllBytes($"Chunks\\MFAObjectChunk-{string.Format("0x{0:X}", id)}_{Utilities.Utilities.ClearName(NebulaCore.PackageData.AppName)}.bin", newChunk.ChunkData);
             return newChunk;
         }
 
@@ -96,6 +131,54 @@ namespace Nebula.Core.Data.Chunks
             if (ChunkList.ChunkJumpTable.ContainsKey(id))
             {
                 Chunk unkChunk = (Chunk)Activator.CreateInstance(ChunkList.ChunkJumpTable[id]);
+                unkChunk.ChunkID = id;
+                return unkChunk;
+            }
+            else
+            {
+                Chunk unkChunk = new UnknownChunk();
+                unkChunk.ChunkID = id;
+                return unkChunk;
+            }
+        }
+
+        public static Chunk MFAChunkJumpTable(short id)
+        {
+            if (MFAChunkList.ChunkJumpTable.ContainsKey(id))
+            {
+                Chunk unkChunk = (Chunk)Activator.CreateInstance(MFAChunkList.ChunkJumpTable[id]);
+                unkChunk.ChunkID = id;
+                return unkChunk;
+            }
+            else
+            {
+                Chunk unkChunk = new UnknownChunk();
+                unkChunk.ChunkID = id;
+                return unkChunk;
+            }
+        }
+
+        public static Chunk MFAFrameChunkJumpTable(short id)
+        {
+            if (MFAFrameChunkList.ChunkJumpTable.ContainsKey(id))
+            {
+                Chunk unkChunk = (Chunk)Activator.CreateInstance(MFAFrameChunkList.ChunkJumpTable[id]);
+                unkChunk.ChunkID = id;
+                return unkChunk;
+            }
+            else
+            {
+                Chunk unkChunk = new UnknownChunk();
+                unkChunk.ChunkID = id;
+                return unkChunk;
+            }
+        }
+
+        public static Chunk MFAObjectChunkJumpTable(short id)
+        {
+            if (MFAObjectChunkList.ChunkJumpTable.ContainsKey(id))
+            {
+                Chunk unkChunk = (Chunk)Activator.CreateInstance(MFAObjectChunkList.ChunkJumpTable[id]);
                 unkChunk.ChunkID = id;
                 return unkChunk;
             }

@@ -19,14 +19,25 @@ namespace Nebula.Core.Utilities
         {
             if (color == null)
                 color = NebulaCore.ColorRules[3];
-            if (parentType.Name != "Event")
-                Debug.WriteLine(message);
+            Debug.WriteLine(message);
             if (DoLog)
             {
-                if (parentType.Name != "Event")
-                    AnsiConsole.MarkupLine($"[{NebulaCore.ColorRules[1]}][[{DateTime.Now.ToString("HH:mm:ss")}]][/] [{color}]{Markup.Escape(message.ToString()!)}[/]");
+                AnsiConsole.MarkupLine($"[{NebulaCore.ColorRules[1]}][[{DateTime.Now.ToString("HH:mm:ss")}]][/] [{color}]{Markup.Escape(message.ToString()!)}[/]");
                 Logs.Add($"[{parentType.Name}\\{DateTime.Now.ToString("HH:mm:ss.ff")}] {message}");
             }
+        }
+
+        public static void SilentLog(this object parent, object message, Color? color = null)
+        {
+            SilentLogType(parent.GetType(), message, color);
+        }
+
+        public static void SilentLogType(Type parentType, object message, Color? color = null)
+        {
+            if (color == null)
+                color = NebulaCore.ColorRules[3];
+            if (DoLog)
+                Logs.Add($"[{parentType.Name}\\{DateTime.Now.ToString("HH:mm:ss.ff")}] {message}");
         }
 
         public static void Save()

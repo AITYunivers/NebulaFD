@@ -12,6 +12,7 @@ using Nebula.Core.Data.Chunks.BankChunks.Images;
 using Image = Nebula.Core.Data.Chunks.BankChunks.Images.Image;
 using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
 using System.Xml.Linq;
+using Nebula.Core.Data.Chunks.MFAChunks.MFAFrameChunks;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks
 {
@@ -111,7 +112,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
             while (true)
             {
-                Chunk newChunk = InitMFAChunk(reader, false);
+                Chunk newChunk = InitMFAFrameChunk(reader, false);
                 this.Log($"Reading MFA Frame Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
 
                 ByteReader chunkReader = new ByteReader(newChunk.ChunkData!);
@@ -427,6 +428,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
                 foreach (Qualifier qual in FrameEvents.Qualifiers)
                 {
+                    if (FrameEvents.QualifierJumptable.ContainsKey(Tuple.Create(qual.ObjectInfo, qual.Type)))
+                        continue;
                     ushort jump;
                     for (jump = 0; jump < ushort.MaxValue; jump++)
                         if (!evtObjs.ContainsKey(jump))

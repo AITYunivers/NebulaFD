@@ -25,7 +25,7 @@ namespace Nebula.Core.FileReaders
 
             if (NebulaCore.Fusion > 1.5f)
             {
-                Items = new PackFile[reader.ReadUInt32()];
+                Items = new PackFile[reader.ReadUInt()];
                 for (int i = 0; i < Items.Length; i++)
                 {
                     Items[i] = new PackFile();

@@ -1,15 +1,15 @@
 ﻿using Nebula.Core.Memory;
 
-namespace Nebula.Core.Data.Chunks.MFAChunks
+namespace Nebula.Core.Data.Chunks.MFAChunks.MFAFrameChunks
 {
-    public class MFAAltFlagIndex : Chunk
+    public class MFAQualifier : Chunk
     {
-        public int[] Index = new int[0];
+        public string Name = string.Empty;
+        public int Handle;
 
-        public MFAAltFlagIndex()
+        public MFAQualifier()
         {
-            ChunkName = "MFAAltFlagIndex";
-            ChunkID = 0x003C;
+            ChunkName = "MFAQualifier";
         }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
@@ -19,12 +19,8 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            Index = new int[reader.ReadInt()];
-            if (reader.Size() != (Index.Length * 4) + 4)
-                return;
-
-            for (int i = 0; i < Index.Length; i++)
-                Index[i] = reader.ReadInt();
+            Name = reader.ReadAutoYuniversal();
+            Handle = reader.ReadInt();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

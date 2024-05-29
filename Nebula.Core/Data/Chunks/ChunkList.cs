@@ -15,29 +15,6 @@ namespace Nebula.Core.Data.Chunks
     {
         public static Dictionary<short, Type> ChunkJumpTable = new Dictionary<short, Type>()
         {
-            { 0x0016, typeof(MFACounterFlags)     },
-            { 0x0017, typeof(MFACounterAltFlags)  },
-            { 0x0021, typeof(FrameRect)           },
-            //0x0022         FrameDemoPath
-            { 0x0023, typeof(FrameSeed)           },
-            { 0x0025, typeof(FrameLayerEffects)   },
-            //0x0026
-            { 0x0027, typeof(FrameMoveTimer)      },
-            { 0x0028, typeof(FrameEffects)        },
-            //0x002A
-            //0x002B
-            //0x002C
-            { 0x002D, typeof(MFAObjectEffects)    },
-            //0x002E
-            //0x002F
-            //0x0030
-            //0x0031         FrameInclude
-            //0x0032
-            { 0x0039, typeof(MFAAltFlags)         },
-            { 0x003A, typeof(MFAAltValueIndex)    },
-            { 0x003B, typeof(MFAAltStringIndex)   },
-            { 0x003C, typeof(MFAAltFlagIndex)     },
-            { 0x009A, typeof(MFAAppIcon)          },
             //0x1122         Preview
             //0x2222         MiniHeader
             { 0x2223, typeof(AppHeader)           },

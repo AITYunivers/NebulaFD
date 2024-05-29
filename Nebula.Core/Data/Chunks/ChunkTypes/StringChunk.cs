@@ -1,6 +1,6 @@
 ﻿using Nebula.Core.Memory;
 
-namespace Nebula.Core.Data.Chunks
+namespace Nebula.Core.Data.Chunks.ChunkTypes
 {
     public abstract class StringChunk : Chunk
     {

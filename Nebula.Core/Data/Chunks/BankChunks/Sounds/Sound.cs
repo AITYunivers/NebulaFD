@@ -114,16 +114,16 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             writer.WriteUInt(Handle + 1);
             writer.WriteInt(Checksum);
             writer.WriteUInt(References);
-            writer.WriteInt(Data.Length + (Name.Length * 2));
+            writer.WriteInt(Data.Length + Name.Length * 2 + 2);
             writer.WriteUInt(Flags.Value);
             writer.WriteInt(Frequency);
-            writer.WriteInt(Name.Length);
+            writer.WriteInt(Name.Length + 1);
 
             if (Flags["Decompressed"])
                 writer.WriteBytes(Data);
             else
             {
-                writer.WriteYunicode(Name);
+                writer.WriteYunicode(Name, true);
                 writer.WriteBytes(Data);
             }
         }

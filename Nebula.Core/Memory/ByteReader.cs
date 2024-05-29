@@ -116,15 +116,15 @@ namespace Nebula.Core.Memory
             if (Tell() >= Size()) return str;
             if (length >= 0)
                 for (int i = 0; i < length; i++)
-                    str += Convert.ToChar(ReadUInt16());
+                    str += Convert.ToChar(ReadUShort());
             else
             {
-                var b = ReadUInt16();
+                var b = ReadUShort();
                 while (b != 0)
                 {
                     str += Convert.ToChar(b);
-                    if (Tell() >= Size()) break;
-                    b = ReadUInt16();
+                    if (!HasMemory(2)) break;
+                    b = ReadUShort();
                 }
             }
 

@@ -3,6 +3,7 @@ using Nebula.Core.Data.Chunks.AppChunks;
 using Nebula.Core.Data.Chunks.BankChunks.Images;
 using Nebula.Core.Data.Chunks.FrameChunks;
 using Nebula.Core.Data.Chunks.MFAChunks;
+using Nebula.Core.Data.Chunks.MFAChunks.MFAFrameChunks;
 using Nebula.Core.Data.Chunks.MFAChunks.MFAObjectChunks;
 using Nebula.Core.Data.Chunks.ObjectChunks;
 using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
@@ -31,10 +32,10 @@ namespace Nebula.Core.Data.PackageReaders
             NebulaCore.MFA = true;
             this.Log("Project Header: " + Header);
 
-            RuntimeVersion = (short)reader.ReadUInt16();
-            RuntimeSubversion = (short)reader.ReadUInt16();
-            ProductVersion = reader.ReadInt32();
-            ProductBuild = reader.ReadInt32();
+            RuntimeVersion = (short)reader.ReadUShort();
+            RuntimeSubversion = (short)reader.ReadUShort();
+            ProductVersion = reader.ReadInt();
+            ProductBuild = reader.ReadInt();
             reader.Skip(4); // Stamp
             NebulaCore.Build = ProductBuild;
             this.Log("Fusion Build: " + ProductBuild);
@@ -43,7 +44,7 @@ namespace Nebula.Core.Data.PackageReaders
             reader.ReadAutoYuniversal();
             EditorFilename = reader.ReadAutoYuniversal();
 
-            int stampLength = reader.ReadInt32();
+            int stampLength = reader.ReadInt();
             byte[] stamp = reader.ReadBytes(stampLength);
 
             reader.Skip(4); // ATNF

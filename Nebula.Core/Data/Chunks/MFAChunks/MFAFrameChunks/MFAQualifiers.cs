@@ -1,6 +1,6 @@
 ﻿using Nebula.Core.Memory;
 
-namespace Nebula.Core.Data.Chunks.MFAChunks
+namespace Nebula.Core.Data.Chunks.MFAChunks.MFAFrameChunks
 {
     public class MFAQualifiers : Chunk
     {

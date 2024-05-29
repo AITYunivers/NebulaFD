@@ -1,4 +1,5 @@
-﻿using Nebula.Core.Memory;
+﻿using Nebula.Core.Data.Chunks.ChunkTypes;
+using Nebula.Core.Memory;
 using System.Diagnostics;
 using System.Drawing;
 
