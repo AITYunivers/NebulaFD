@@ -29,12 +29,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             ObjectInfo = reader.ReadUShort();
             PositionX = reader.ReadInt();
             PositionY = reader.ReadInt();
+            ParentType = reader.ReadUShort();
+            InstanceFlags["CreateOnly"] = ParentType != 0;
             if (NebulaCore.Fusion < 3)
-            {
-                ParentType = reader.ReadUShort();
-                InstanceFlags["CreateOnly"] = ParentType != 0;
-            }
-            ParentHandle = reader.ReadUShort();
+                ParentHandle = reader.ReadUShort();
             Layer = reader.ReadUShort();
             if (NebulaCore.Fusion < 3)
                 InstanceValue = reader.ReadShort();
