@@ -5,6 +5,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
     public class ParameterGroupPointer : ParameterChunk
     {
         public int Pointer;
+        public long PointerFull;
         public short ID;
 
         public ParameterGroupPointer()
@@ -14,7 +15,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Pointer = reader.ReadInt();
+            PointerFull = reader.Tell();
+            PointerFull += Pointer = reader.ReadInt();
             ID = reader.ReadShort();
         }
 

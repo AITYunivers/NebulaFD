@@ -22,10 +22,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            short fileNameLength = reader.ReadShort();
-            FileName = reader.ReadYuniversal(fileNameLength);
-            int fileDataLength = reader.ReadInt();
-            FileData = reader.ReadBytes(fileDataLength);
+            FileName = reader.ReadAutoYuniversal();
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
@@ -35,10 +32,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteShort((short)FileName.Length);
-            writer.WriteYunicode(FileName);
-            writer.WriteInt(FileData.Length);
-            writer.WriteBytes(FileData);
+            writer.WriteAutoYunicode(FileName);
         }
     }
 }

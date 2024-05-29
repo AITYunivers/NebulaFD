@@ -76,6 +76,35 @@ namespace GameDumper
                     IconBank.Images.Add(newIconImage.Handle, newIconImage);
                 }
             }
+            else
+            {
+                AppIcons = new();
+                AppIcons.IconHandles = new uint[2];
+                AppIcons.IconHandles[0] = 1;
+                AppIcons.IconHandles[1] = 0;
+                Bitmap MMFAppIcon = new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFApplication.png"));
+                int[] iconSizes = new int[5] { 256, 128, 48, 32, 16};
+
+                for (int i = 0; i < 5; i++)
+                {
+                    var newIconImage = new Image();
+                    newIconImage.Handle = (uint)i;
+                    newIconImage.FromBitmap(MMFAppIcon.ResizeImage(iconSizes[i]));
+                    newIconImage.Flags["Alpha"] = true;
+                    newIconImage.Flags["RGBA"] = true;
+                    IconBank.Images.Add(newIconImage.Handle, newIconImage);
+                }
+
+                for (int i = 0, ii = 0; ii < 6; i = (i + 1) % 3, ii++)
+                {
+                    var newIconImage = new Image();
+                    newIconImage.Handle = (uint)ii + 5;
+                    newIconImage.FromBitmap(MMFAppIcon.ResizeImage(iconSizes[2 + i]));
+                    newIconImage.Flags["Alpha"] = true;
+                    newIconImage.Flags["RGBA"] = true;
+                    IconBank.Images.Add(newIconImage.Handle, newIconImage);
+                }
+            }
 
             foreach (ObjectInfo objectInfo in dat.FrameItems.Items.Values)
             {
@@ -194,14 +223,9 @@ namespace GameDumper
             writer.WriteInt(0); // Global Events
 
             writer.WriteInt(dat.AppHeader.GraphicMode);
-            if (NebulaCore.CurrentReader!.Icons.Count == 5)
-            {
-                writer.WriteInt(9); // Icon Images
-                for (int i = 2; i < 11; i++) // Icon Images
-                    writer.WriteInt(i); // Icon Image
-            }
-            else
-                writer.WriteInt(0);
+            writer.WriteInt(9); // Icon Images
+            for (int i = 2; i < 11; i++) // Icon Images
+                writer.WriteInt(i); // Icon Image
             writer.WriteInt(0); // Qualifiers
             dat.Extensions.WriteMFA(writer);
             writer.WriteInt(dat.Frames.Count);

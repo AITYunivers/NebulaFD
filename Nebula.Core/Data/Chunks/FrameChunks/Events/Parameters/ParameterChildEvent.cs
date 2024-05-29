@@ -17,6 +17,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             ObjectInfos = new ushort[reader.ReadInt() * 2];
             for (int i = 0; i < ObjectInfos.Length; i++)
                 ObjectInfos[i] = reader.ReadUShort();
+            reader.Skip(4);
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
@@ -24,9 +25,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             writer.WriteInt(ObjectInfos.Length / 2);
             foreach (ushort oI in ObjectInfos)
             {
-                if (FrameEvents.QualifierJumptable.ContainsKey(oI))
-                    writer.WriteUShort(FrameEvents.QualifierJumptable[oI]);
-                else
+                //if (FrameEvents.QualifierJumptable.ContainsKey(oI))
+                    //writer.WriteUShort(FrameEvents.QualifierJumptable[oI]);
+                //else
                     writer.WriteUShort(oI);
             }
         }

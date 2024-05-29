@@ -104,11 +104,8 @@ namespace Nebula.Plugins.GameDumper
             string path = "Dumps\\" + Utilities.ClearName(NebulaCore.PackageData.AppName) + "\\Images";
             while (!task.IsFinished)
             {
-                if (NebulaCore.PackageData.ImageBank != null)
+                if (NebulaCore.PackageData.ImageBank != null && NebulaCore.PackageData.ImageBank.Images.Count > 0)
                 {
-                    if (NebulaCore.PackageData.ImageBank.Images.Count == 0)
-                        return;
-
                     if (!task.IsStarted)
                         task.StartTask();
 
@@ -124,19 +121,23 @@ namespace Nebula.Plugins.GameDumper
                         images[i].GetBitmap().Save(path + "\\" + images[i].Handle + ".png");
                         task.Value = ++progress;
                     }
-
-                    if (NebulaCore.PackageData is MFAPackageData && ((MFAPackageData)NebulaCore.PackageData).IconBank != null)
+                }
+                else if (NebulaCore.PackageData is MFAPackageData && ((MFAPackageData)NebulaCore.PackageData).IconBank != null && ((MFAPackageData)NebulaCore.PackageData).IconBank.Images.Count > 0)
+                {
+                    if (!task.IsStarted)
                     {
-                        if (((MFAPackageData)NebulaCore.PackageData).IconBank.Images.Count == 0)
-                            return;
+                        task.StartTask();
 
-                        images = ((MFAPackageData)NebulaCore.PackageData).IconBank.Images.Values.ToArray();
-                        for (int i = 0; i < images.Length; i++)
-                        {
-                            Directory.CreateDirectory(path + "\\Icons");
-                            images[i].GetBitmap().Save(path + "\\Icons\\" + images[i].Handle + ".png");
-                            task.Value = ++progress;
-                        }
+                        task.Value = progress;
+                        task.MaxValue = ((MFAPackageData)NebulaCore.PackageData).IconBank.Images.Count;
+                    }
+
+                    Image[] images = ((MFAPackageData)NebulaCore.PackageData).IconBank.Images.Values.ToArray();
+                    for (int i = 0; i < images.Length; i++)
+                    {
+                        Directory.CreateDirectory(path + "\\Icons");
+                        images[i].GetBitmap().Save(path + "\\Icons\\" + images[i].Handle + ".png");
+                        task.Value = ++progress;
                     }
                 }
                 else

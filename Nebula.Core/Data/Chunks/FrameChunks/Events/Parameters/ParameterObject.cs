@@ -22,8 +22,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            if (FrameEvents.QualifierJumptable.ContainsKey(ObjectInfo))
-                ObjectInfo = FrameEvents.QualifierJumptable[ObjectInfo];
+            if (FrameEvents.QualifierJumptable.ContainsKey(Tuple.Create(ObjectInfo, ObjectType)))
+                ObjectInfo = FrameEvents.QualifierJumptable[Tuple.Create(ObjectInfo, ObjectType)];
 
             writer.WriteShort(ObjectInfoList);
             writer.WriteUShort(ObjectInfo);

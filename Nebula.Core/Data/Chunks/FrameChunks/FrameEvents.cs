@@ -11,7 +11,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             "BreakChild" // Break Child
         );
 
-        public short MaxObjects;
+        public int MaxObjects;
         public short MaxObjectInfos;
         public short NumberOfPlayers;
         public short[] ConditionCount = new short[17];
@@ -44,7 +44,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         public uint EventLineY;
         public uint EventLineType;
 
-        public static Dictionary<ushort, ushort> QualifierJumptable = new();
+        /// <summary>
+        /// Key is [ObjectInfo, Type]
+        /// </summary>
+        public static Dictionary<Tuple<ushort, short>, ushort> QualifierJumptable = new();
 
         public FrameEvents()
         {

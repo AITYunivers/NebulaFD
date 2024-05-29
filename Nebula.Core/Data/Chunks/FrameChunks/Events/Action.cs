@@ -99,8 +99,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            if (FrameEvents.QualifierJumptable.ContainsKey(ObjectInfo))
-                ObjectInfo = FrameEvents.QualifierJumptable[ObjectInfo];
+            if (FrameEvents.QualifierJumptable.ContainsKey(Tuple.Create(ObjectInfo, ObjectType)))
+                ObjectInfo = FrameEvents.QualifierJumptable[Tuple.Create(ObjectInfo, ObjectType)];
 
             ByteWriter actWriter = new ByteWriter(new MemoryStream());
             actWriter.WriteShort(ObjectType);
@@ -160,13 +160,29 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case -24:
                             Num = -25;
                             break;
-                        case 0:
+                        case 0: // Skip
+                        case 44: // Skip
                             // DoAdd = false;
                             break;
-                        case 27:
-                            Num = 3;
+                        case 27: // Set Global Integer
+                        case 28: // Set Global
+                        case 29: // Set Global Double
+                        case 30: // Set Global
+                            Num = 3; // Set Global
                             break;
-                        case 43:
+                        case 31: // Add Global Integer
+                        case 32: // Add Global
+                        case 33: // Add Global Double
+                        case 34: // Add Global
+                            Num = 5; // Add Global
+                            break;
+                        case 35: // Subtract Global Integer
+                        case 36: // Subtract Global
+                        case 37: // Subtract Global Double
+                        case 38: // Subtract Global
+                            Num = 4; // Subtract Global
+                            break;
+                        case 43: // Execute Child Events
                             DoAdd = false;
                             break;
                     }

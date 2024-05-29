@@ -1,5 +1,4 @@
-﻿using Joveler.Compression.ZLib.Checksum;
-using Nebula.Core.Memory;
+﻿using Nebula.Core.Memory;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 {
@@ -10,6 +9,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             "Closed"           // Closed
         );
 
+        public long Pointer;
         public short ID;
         public string Name = string.Empty;
 
@@ -20,6 +20,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            Pointer = reader.Tell() - 32;
             GroupFlags.Value = reader.ReadUShort();
             ID = reader.ReadShort();
             Name = reader.ReadYuniversalStop(79);

@@ -10,6 +10,8 @@ using Nebula.Core.Data.Chunks.FrameChunks.Events;
 using System.Drawing;
 using Nebula.Core.Data.Chunks.BankChunks.Images;
 using Image = Nebula.Core.Data.Chunks.BankChunks.Images.Image;
+using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
+using System.Xml.Linq;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks
 {
@@ -75,8 +77,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             FrameHeader.ReadMFA(reader);
             FrameHeader.SyncFlags(true);
 
-            // Max Objects
-            reader.Skip(4);
+            FrameEvents.MaxObjects = reader.ReadInt();
 
             FramePassword = reader.ReadAutoYuniversal();
             reader.Skip(reader.ReadInt()); // ?
@@ -134,7 +135,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             writer.WriteAutoYunicode(FrameName);
             FrameHeader.SyncFlags();
             FrameHeader.WriteMFA(writer);
-            writer.WriteInt(1000); // Max Objects
+            writer.WriteInt(FrameEvents.MaxObjects);
             writer.WriteAutoYunicode(FramePassword);
 
             // No clue, Ibs header
@@ -244,6 +245,18 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                             newOC.AlterableValues = oldOC.ObjectAlterableValues;
                             newOC.AlterableStrings = oldOC.ObjectAlterableStrings;
                             newOC.Movements = oldOC.ObjectMovements;
+
+                            if (newOC.Movements.Movements.Length == 0)
+                            {
+                                newOC.Movements.Movements = new ObjectMovement[]
+                                {
+                                    new ObjectMovement()
+                                    {
+                                        Opt = 1
+                                    }
+                                };
+                            }
+
                             newOC.TransitionIn = oldOC.ObjectTransitionIn;
                             newOC.TransitionOut = oldOC.ObjectTransitionOut;
 
@@ -414,13 +427,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
                 foreach (Qualifier qual in FrameEvents.Qualifiers)
                 {
-                    if (FrameEvents.QualifierJumptable.ContainsKey(qual.ObjectInfo))
-                        continue;
                     ushort jump;
                     for (jump = 0; jump < ushort.MaxValue; jump++)
                         if (!evtObjs.ContainsKey(jump))
                             break;
-                    FrameEvents.QualifierJumptable.Add(qual.ObjectInfo, jump);
+                    FrameEvents.QualifierJumptable.Add(Tuple.Create(qual.ObjectInfo, qual.Type), jump);
                     EventObject qualEvtObj = new();
                     qualEvtObj.Handle = jump;
                     qualEvtObj.ObjectType = 3;
@@ -445,7 +456,36 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             else
                 foreach (var evtObj in FrameEvents.EventObjects)
                     if (evtObj.Value.ObjectType == 3)
-                        FrameEvents.QualifierJumptable.Add((ushort)evtObj.Key, (ushort)evtObj.Key);
+                        FrameEvents.QualifierJumptable.Add(Tuple.Create((ushort)evtObj.Key, (short)evtObj.Value.ObjectType), (ushort)evtObj.Key);
+
+            if (!NebulaCore.MFA)
+            {
+                List<long> groupLookupTable = new List<long>();
+                foreach (Event evnt in FrameEvents.Events)
+                {
+                    List<Parameter> checkParams = new List<Parameter>();
+                    foreach (Condition cond in evnt.Conditions)
+                        checkParams.AddRange(cond.Parameters.Where(x => x.Code == 38 || x.Code == 39));
+                    foreach (Events.Action act in evnt.Actions)
+                        checkParams.AddRange(act.Parameters.Where(x => x.Code == 38 || x.Code == 39));
+                    foreach (Parameter param in checkParams)
+                        if (param.Data is ParameterGroup group)
+                        {
+                            if (!groupLookupTable.Contains(group.Pointer))
+                                groupLookupTable.Add(group.Pointer);
+                            group.ID = (short)groupLookupTable.IndexOf(group.Pointer);
+
+                            if (NebulaCore.Plus)
+                                group.Name = "Group " + group.ID;
+                        }
+                        else if (param.Data is ParameterGroupPointer point)
+                        {
+                            if (!groupLookupTable.Contains(point.PointerFull))
+                                groupLookupTable.Add(point.PointerFull);
+                            point.ID = (short)groupLookupTable.IndexOf(point.PointerFull);
+                        }
+                }
+            }
 
             FrameEvents.WriteMFA(writer);
 

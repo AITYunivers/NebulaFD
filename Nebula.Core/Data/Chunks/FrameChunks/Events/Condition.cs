@@ -103,8 +103,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            if (FrameEvents.QualifierJumptable.ContainsKey(ObjectInfo))
-                ObjectInfo = FrameEvents.QualifierJumptable[ObjectInfo];
+            if (FrameEvents.QualifierJumptable.ContainsKey(Tuple.Create(ObjectInfo, ObjectType)))
+                ObjectInfo = FrameEvents.QualifierJumptable[Tuple.Create(ObjectInfo, ObjectType)];
 
             ByteWriter condWriter = new ByteWriter(new MemoryStream());
             condWriter.WriteShort(ObjectType);
@@ -136,14 +136,25 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 0:
                             DoAdd = false;
                             break;
-                        case -25:
-                            Num = -24;
+                        // Why do I need this??
+                        case -25: // Or (Logical)
+                            Num = -24; // Or
                             break;
-                        case -28:
-                        case -31:
-                            Num = -8;
+                        case -28: // Compare Global Integer Equals
+                        case -29: // Compare Global Integer Doesnt Equal
+                        case -30: // Compare Global Integer Less Or Equal
+                        case -31: // Compare Global Integer Less
+                        case -32: // Compare Global Integer Greater Or Equal
+                        case -33: // Compare Global Integer Greater
+                        case -34: // Compare Global Double Equals
+                        case -35: // Compare Global Double Doesnt Equal
+                        case -36: // Compare Global Double Less Or Equal
+                        case -37: // Compare Global Double Less
+                        case -38: // Compare Global Double Greater Or Equal
+                        case -39: // Compare Global Double Greater
+                            Num = -8; // Compare Global
                             break;
-                        case -43:
+                        case -43: // Start Child Event
                             DoAdd = false;
                             break;
                     }
@@ -151,83 +162,98 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 case >= 0:
                     switch (Num)
                     {
-                        case -25:
-                            if (Parameters[0].Code == 68)
-                            {
-                                ParameterVariables varsData = (ParameterVariables)Parameters[0].Data;
-
-                                foreach (ParameterVariable varData in varsData.Variables)
-                                {
-                                    Condition varCond = Copy();
-                                    if (varData.Global)
-                                    {
-                                        varCond.ObjectInfo = 0;
-                                        varCond.ObjectType = -1;
-                                        varCond.Num = -8;
-                                    }
-                                    else
-                                        varCond.Num = -27;
-                                    ParameterInt varParamIndexVal = new ParameterInt();
-                                    varParamIndexVal.Value = varData.Index;
-                                    Parameter varParamIndex = new Parameter();
-                                    varParamIndex.Data = varParamIndexVal;
-                                    varParamIndex.Code = varData.Global ? 49 : 50;
-                                    ExpressionChunk varExpVal;
-                                    if (varData.Value is double)
-                                        varExpVal = new ExpressionDouble()
-                                        {
-                                            Value = (double)varData.Value
-                                        };
-                                    else
-                                        varExpVal = new ExpressionInt()
-                                        {
-                                            Value = (int)varData.Value
-                                        };
-                                    ParameterExpression varExp = new ParameterExpression();
-                                    varExp.Expression = varExpVal;
-                                    varExp.ObjectType = -1;
-                                    ParameterExpressions varExps = new ParameterExpressions();
-                                    varExps.Comparison = (short)varData.Operator;
-                                    varExps.Expressions.Add(varExp);
-                                    Parameter varParamVal = new Parameter();
-                                    varParamVal.Data = varExps;
-                                    varParamVal.Code = 23;
-                                    varCond.Parameters = new Parameter[2];
-                                    varCond.Parameters[0] = varParamIndex;
-                                    varCond.Parameters[1] = varParamVal;
-                                    evntList.Add(varCond);
-                                }
-
-                                for (int flag = 0; flag < 32; flag++)
-                                {
-                                    if (varsData.FlagMasks != flag)
-                                        continue;
-                                    bool flagValue = varsData.FlagValues == flag;
-                                    Condition flagCond = Copy();
-                                    flagCond.Num = (short)(flagValue ? -25 : -24);
-                                    ExpressionInt flagExpInt = new ExpressionInt();
-                                    flagExpInt.Value = flag;
-                                    ParameterExpression flagExp = new ParameterExpression();
-                                    flagExp.Expression = flagExpInt;
-                                    flagExp.ObjectType = -1;
-                                    ParameterExpressions flagExps = new ParameterExpressions();
-                                    flagExps.Expressions.Add(flagExp);
-                                    Parameter flagParam = new Parameter();
-                                    flagParam.Data = flagExps;
-                                    flagParam.Code = 22;
-                                    flagCond.Parameters = new Parameter[1];
-                                    flagCond.Parameters[0] = flagParam;
-                                    evntList.Add(flagCond);
-                                }
-
-                                DoAdd = false;
-                            }
-                            break;
-                        case -42:
-                            Num = -27;
+                        case -42: // Compare Alterable Integer
+                        case -43: // Compare Alterable Double
+                            Num = -27; // Compare Alterable
                             break;
                     }
                     break;
+            }
+
+
+            for (int i = 0; i < Parameters.Length; i++)
+            {
+                if (Parameters[i].Code == 68)
+                {
+                    ParameterVariables varsData = (ParameterVariables)Parameters[i].Data;
+
+                    DoAdd = false;
+                    if (Parameters.Length > 1)
+                    {
+                        List<Parameter> param = Parameters.ToList();
+                        param.RemoveAt(i);
+                        Parameters = param.ToArray();
+                        evntList.Add(this);
+                    }
+
+                    foreach (ParameterVariable varData in varsData.Variables)
+                    {
+                        Condition varCond = Copy();
+                        if (varData.Global)
+                        {
+                            varCond.ObjectInfo = 0;
+                            varCond.ObjectType = -1;
+                            varCond.Num = -8;
+                        }
+                        else
+                            varCond.Num = -27;
+                        varCond.EventFlags["Always"] = true;
+                        ParameterInt varParamIndexVal = new ParameterInt();
+                        varParamIndexVal.Value = varData.Index;
+                        Parameter varParamIndex = new Parameter();
+                        varParamIndex.Data = varParamIndexVal;
+                        varParamIndex.Code = varData.Global ? 49 : 50;
+                        ExpressionChunk varExpVal;
+                        if (varData.Value is double)
+                            varExpVal = new ExpressionDouble()
+                            {
+                                Value = (double)varData.Value,
+                                Value2 = (float)(double)varData.Value
+                            };
+                        else
+                            varExpVal = new ExpressionInt()
+                            {
+                                Value = (int)varData.Value
+                            };
+                        ParameterExpression varExp = new ParameterExpression();
+                        varExp.Expression = varExpVal;
+                        varExp.ObjectType = -1;
+                        varExp.Num = (short)(varExpVal is ExpressionDouble ? 23 : 0);
+                        ParameterExpressions varExps = new ParameterExpressions();
+                        varExps.Comparison = (short)varData.Operator;
+                        varExps.Expressions.Add(varExp);
+                        Parameter varParamVal = new Parameter();
+                        varParamVal.Data = varExps;
+                        varParamVal.Code = 23;
+                        varCond.Parameters = new Parameter[2];
+                        varCond.Parameters[0] = varParamIndex;
+                        varCond.Parameters[1] = varParamVal;
+                        evntList.Add(varCond);
+                    }
+
+                    for (int flag = 0; flag < 32; flag++)
+                    {
+                        if (varsData.FlagMasks != flag)
+                            continue;
+                        bool flagValue = varsData.FlagValues == flag;
+                        Condition flagCond = Copy();
+                        flagCond.Num = (short)(flagValue ? -25 : -24);
+                        flagCond.EventFlags["Always"] = true;
+                        ExpressionInt flagExpInt = new ExpressionInt();
+                        flagExpInt.Value = flag;
+                        ParameterExpression flagExp = new ParameterExpression();
+                        flagExp.Expression = flagExpInt;
+                        flagExp.ObjectType = -1;
+                        ParameterExpressions flagExps = new ParameterExpressions();
+                        flagExps.Expressions.Add(flagExp);
+                        Parameter flagParam = new Parameter();
+                        flagParam.Data = flagExps;
+                        flagParam.Code = 22;
+                        flagCond.Parameters = new Parameter[1];
+                        flagCond.Parameters[0] = flagParam;
+                        evntList.Add(flagCond);
+                    }
+                }
             }
         }
 
