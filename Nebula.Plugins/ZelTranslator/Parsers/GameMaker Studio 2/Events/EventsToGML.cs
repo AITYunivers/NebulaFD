@@ -1712,14 +1712,14 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                     {
                         foreach (var expressionParam in ExpressParam.Expressions)
                         {
-                            var ID = getID((short)expressionParam.ObjectInfo, expressionParam.ObjectType, gameData);
+                            var ID = getID(expressionParam.ObjectInfo, expressionParam.ObjectType, gameData);
                             evntIfStatement += $"(ExpressParamLdr:{expressionParam.Expression.GetType().Name}{ID} - Obj_{expressionParam.ObjectType} Prm_{expressionParam.Num} OI_{expressionParam.ObjectInfo} OIL_{expressionParam.ObjectInfoList} Size_{expressionParam.Size}) | ";
                         }
                     }
                     evntIfStatement += "], ";
                 }
             }
-            public static string getID(short ObjInf, short ObjectType, PackageData gameData)
+            public static string getID(ushort ObjInf, short ObjectType, PackageData gameData)
             {
                 var ID = "";
                 ObjectInfo Object = new ObjectInfo();
