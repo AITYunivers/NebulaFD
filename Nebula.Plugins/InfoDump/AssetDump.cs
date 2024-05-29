@@ -403,7 +403,7 @@ namespace Nebula.Plugins.GameDumper
                             string filePath = path + "\\" + Path.GetFileNameWithoutExtension(shdrs[i].Name) + (shdrs[i].Compiled ? ".fxc" : ".fx");
                             File.WriteAllBytes(filePath, shdrs[i].FXData);
                             filePath = path + "\\" + Path.GetFileNameWithoutExtension(shdrs[i].Name) + ".xml";
-                            string fxData = string.Empty;
+                            string fxData = Encoding.ASCII.GetString(NebulaCore.PackageData.ShaderBank.Shaders[keys[i]].FXData);
                             if (NebulaCore.PackageData.DX9ShaderBank != null && NebulaCore.PackageData.DX9ShaderBank.Shaders.ContainsKey(keys[i]))
                                 fxData = Encoding.ASCII.GetString(NebulaCore.PackageData.DX9ShaderBank.Shaders[keys[i]].FXData);
                             File.WriteAllText(filePath, GenerateXML(shdrs[i], fxData));

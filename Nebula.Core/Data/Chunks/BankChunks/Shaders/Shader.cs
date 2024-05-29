@@ -37,7 +37,10 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
                 string header = reader.ReadAscii(4);
                     Compiled = header == "DXBC";
                 reader.Skip(-4);
-                FXData = reader.ReadBytes(--FXDataSize);
+                if (Compiled)
+                    FXData = reader.ReadBytes(--FXDataSize);
+                else
+                    FXData = Encoding.ASCII.GetBytes(reader.ReadAscii());
             }
 
             if (ParameterOffset != 0)
