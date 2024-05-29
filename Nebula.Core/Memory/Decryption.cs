@@ -22,6 +22,7 @@
         public static byte[] MakeKeyCombined(byte[] data)
         {
             int dataLen = data.Length;
+            Array.Resize(ref data, 128);
             Array.Resize(ref data, 256);
 
             byte lastKeyByte = 0;

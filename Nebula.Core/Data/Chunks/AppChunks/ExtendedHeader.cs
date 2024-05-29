@@ -35,7 +35,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
         public ExtendedHeader()
         {
-            ChunkName = "AppHeader2";
+            ChunkName = "ExtendedHeader";
             ChunkID = 0x2245;
         }
 
