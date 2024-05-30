@@ -32,10 +32,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             ParentType = reader.ReadUShort();
             InstanceFlags["CreateOnly"] = ParentType != 0;
             if (NebulaCore.Fusion < 3)
-                ParentHandle = reader.ReadUShort();
+                InstanceValue = reader.ReadShort();
             Layer = reader.ReadUShort();
             if (NebulaCore.Fusion < 3)
-                InstanceValue = reader.ReadShort();
+                ParentHandle = reader.ReadUShort();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
