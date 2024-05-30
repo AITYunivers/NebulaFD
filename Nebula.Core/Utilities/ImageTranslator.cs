@@ -266,7 +266,7 @@ namespace Nebula.Core.Utilities
             //newImg.FromBitmap((Bitmap)Bitmap.FromStream(new MemoryStream(imageData)));
             return newImg.ImageData;
         }
-        public static byte[] AndroidMode0ToRGBA(byte[] imageData, int width, int height, bool alpha)
+        public static byte[] AndroidMode0ToRGBA(byte[] imageData, int width, int height)
         {
             var colorArray = new byte[width * height * 4];
             var stride = width * 4;
@@ -288,7 +288,7 @@ namespace Nebula.Core.Utilities
 
             return colorArray;
         }
-        public static byte[] AndroidMode1ToRGBA(byte[] imageData, int width, int height, bool alpha)
+        public static byte[] AndroidMode1ToRGBA(byte[] imageData, int width, int height)
         {
             var colorArray = new byte[width * height * 4];
             var stride = width * 4;
@@ -325,7 +325,7 @@ namespace Nebula.Core.Utilities
 
             return colorArray;
         }
-        public static byte[] AndroidMode2ToRGBA(byte[] imageData, int width, int height, bool alpha)
+        public static byte[] AndroidMode2ToRGBA(byte[] imageData, int width, int height)
         {
             var colorArray = new byte[width * height * 4];
             var stride = width * 4;
@@ -362,7 +362,7 @@ namespace Nebula.Core.Utilities
             }
             return colorArray;
         }
-        public static byte[] AndroidMode3ToRGBA(byte[] imageData, int width, int height, bool alpha)
+        public static byte[] AndroidMode3ToRGBA(byte[] imageData, int width, int height)
         {
             var colorArray = new byte[width * height * 4];
             var stride = width * 4;
@@ -384,7 +384,7 @@ namespace Nebula.Core.Utilities
             }
             return colorArray;
         }
-        public static byte[] AndroidMode4ToRGBA(byte[] imageData, int width, int height, bool alpha)
+        public static byte[] AndroidMode4ToRGBA(byte[] imageData, int width, int height)
         {
             var colorArray = new byte[width * height * 4];
             var stride = width * 4;
@@ -418,10 +418,10 @@ namespace Nebula.Core.Utilities
             }
             return colorArray;
         }
-        public static byte[] AndroidMode5ToRGBA(byte[] imageData, int width, int height, bool alpha, bool RLE)
+        public static byte[] AndroidMode5ToRGBA(byte[] imageData, int width, int height, bool RLE)
         {
             var img = new Data.Chunks.BankChunks.Images.Image();
-            img.FromBitmap((Bitmap)Bitmap.FromStream(new MemoryStream(imageData)));
+            img.FromBitmap(new Bitmap(Bitmap.FromStream(new MemoryStream(imageData))));
             return Normal24BitMaskedToRGBA(img.ImageData, width, height, true, Color.Black, RLE);
         }
         public static byte[] TwoFivePlusToRGBA(byte[] imageData, int width, int height, bool alpha, Color transparent, bool RGBA, bool flipRGB = false)

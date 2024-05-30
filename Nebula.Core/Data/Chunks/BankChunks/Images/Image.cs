@@ -78,7 +78,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
         {
             if (BitmapCache == null)
             {
-                if (GraphicMode == 3 && !NebulaCore.Android)
+                if (GraphicMode == 3 && NebulaCore.Fusion == 0)
                     Width = (short)(Math.Ceiling(Width / 2.0f) * 2);
 
                 BitmapCache = new Bitmap(Width, Height);
@@ -90,28 +90,28 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                 switch (GraphicMode)
                 {
                     case 0:
-                        colorArray = ImageTranslator.AndroidMode0ToRGBA(ImageData, Width, Height, false);
+                        colorArray = ImageTranslator.AndroidMode0ToRGBA(ImageData, Width, Height);
                         break;
                     case 1:
-                        colorArray = ImageTranslator.AndroidMode1ToRGBA(ImageData, Width, Height, false);
+                        colorArray = ImageTranslator.AndroidMode1ToRGBA(ImageData, Width, Height);
                         break;
                     case 2:
-                        colorArray = ImageTranslator.AndroidMode2ToRGBA(ImageData, Width, Height, false);
+                        colorArray = ImageTranslator.AndroidMode2ToRGBA(ImageData, Width, Height);
                         break;
                     case 3:
                         if (NebulaCore.Android)
-                            colorArray = ImageTranslator.AndroidMode3ToRGBA(ImageData, Width, Height, false);
+                            colorArray = ImageTranslator.AndroidMode3ToRGBA(ImageData, Width, Height);
                         else
                             colorArray = ImageTranslator.ColorPaletteToRGBA(ImageData, Width, Height, NebulaCore.PackageData.Frames.First().FramePalette.Palette, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                         break;
                     case 4:
                         if (NebulaCore.Android)
-                            colorArray = ImageTranslator.AndroidMode4ToRGBA(ImageData, Width, Height, false);
+                            colorArray = ImageTranslator.AndroidMode4ToRGBA(ImageData, Width, Height);
                         else
                             colorArray = ImageTranslator.Normal24BitMaskedToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"], NebulaCore.Seeded);
                         break;
                     case 5:
-                        colorArray = ImageTranslator.AndroidMode5ToRGBA(ImageData, Width, Height, Flags["Alpha"], Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
+                        colorArray = ImageTranslator.AndroidMode5ToRGBA(ImageData, Width, Height, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                         break;
                     case 6:
                         colorArray = ImageTranslator.Normal15BitToRGBA(ImageData, Width, Height, false, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
@@ -240,23 +240,23 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
             switch (GraphicMode)
             {
                 case 0:
-                    ImageData = ImageTranslator.AndroidMode0ToRGBA(ImageData, Width, Height, Flags["Alpha"]);
+                    ImageData = ImageTranslator.AndroidMode0ToRGBA(ImageData, Width, Height);
                     ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
                     GraphicMode = 4;
                     break;
                 case 1:
-                    ImageData = ImageTranslator.AndroidMode1ToRGBA(ImageData, Width, Height, Flags["Alpha"]);
+                    ImageData = ImageTranslator.AndroidMode1ToRGBA(ImageData, Width, Height);
                     ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
                     GraphicMode = 4;
                     break;
                 case 2:
-                    ImageData = ImageTranslator.AndroidMode2ToRGBA(ImageData, Width, Height, Flags["Alpha"]);
+                    ImageData = ImageTranslator.AndroidMode2ToRGBA(ImageData, Width, Height);
                     ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
                     GraphicMode = 4;
                     break;
                 case 3:
                     if (NebulaCore.Android)
-                        ImageData = ImageTranslator.AndroidMode3ToRGBA(ImageData, Width, Height, Flags["Alpha"]);
+                        ImageData = ImageTranslator.AndroidMode3ToRGBA(ImageData, Width, Height);
                     else
                         ImageData = ImageTranslator.ColorPaletteToRGBA(ImageData, Width, Height, NebulaCore.PackageData.Frames.First().FramePalette.Palette, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                     ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
@@ -266,7 +266,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                     if (IsFromBitmap) break;
                     if (NebulaCore.Android)
                     {
-                        ImageData = ImageTranslator.AndroidMode4ToRGBA(ImageData, Width, Height, Flags["Alpha"]);
+                        ImageData = ImageTranslator.AndroidMode4ToRGBA(ImageData, Width, Height);
                         ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
                     }
                     else if (NebulaCore.Fusion > 2.5f)
@@ -276,7 +276,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                     }
                     break;
                 case 5:
-                    ImageData = ImageTranslator.AndroidMode5ToRGBA(ImageData, Width, Height, Flags["Alpha"], Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
+                    ImageData = ImageTranslator.AndroidMode5ToRGBA(ImageData, Width, Height, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                     ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
                     GraphicMode = 4;
                     break;

@@ -19,9 +19,10 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Music
             if (Parameters.DontIncludeMusic)
                 return;
 
-            Count = reader.ReadInt();
             if (NebulaCore.Android || NebulaCore.iOS || NebulaCore.Flash || NebulaCore.HTML)
-                Count <<= 16;
+                Count = reader.ReadShort();
+            else
+                Count = reader.ReadInt();
 
             for (int i = 0; i < Count; i++)
             {

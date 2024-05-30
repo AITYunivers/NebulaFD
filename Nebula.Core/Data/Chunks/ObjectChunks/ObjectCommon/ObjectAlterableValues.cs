@@ -6,7 +6,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
     {
         public int[] AlterableValues = new int[0];
         public string[] Names = new string[0];
-        public uint AlterableFlags;
+        public BitDict AlterableFlags = new BitDict();
 
         public ObjectAlterableValues()
         {
@@ -23,7 +23,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                 AlterableValues[i] = reader.ReadInt();
             }
 
-            AlterableFlags = reader.ReadUInt();
+            AlterableFlags.Value = reader.ReadUInt();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

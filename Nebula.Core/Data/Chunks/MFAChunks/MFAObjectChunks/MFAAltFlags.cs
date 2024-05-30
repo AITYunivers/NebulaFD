@@ -34,7 +34,17 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteByte((byte)ChunkID);
+            ByteWriter chunkWriter = new ByteWriter(new MemoryStream());
+            {
+                chunkWriter.WriteInt(AlterableFlags.Length);
+                foreach (MFAAltFlag altFlag in AlterableFlags)
+                    altFlag.WriteMFA(chunkWriter);
+            }
+            writer.WriteInt((int)chunkWriter.Tell());
+            writer.WriteWriter(chunkWriter);
+            chunkWriter.Flush();
+            chunkWriter.Close();
         }
     }
 }

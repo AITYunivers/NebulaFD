@@ -31,7 +31,9 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-
+            writer.WriteAutoYunicode(Name);
+            writer.Skip(4);
+            writer.WriteInt(Value ? 1 : 0);
         }
     }
 }

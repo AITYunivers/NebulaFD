@@ -248,14 +248,22 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                             newOC.Movements = oldOC.ObjectMovements;
 
                             if (newOC.Movements.Movements.Length == 0)
+                                newOC.Movements.Movements = new ObjectMovement[] { new ObjectMovement() { Opt = 1 } };
+
+                            if (newOC.AlterableValues.AlterableFlags.Value != 0)
                             {
-                                newOC.Movements.Movements = new ObjectMovement[]
+                                int count;
+                                for (count = 31; count > 0; count--)
+                                    if (newOC.AlterableValues.AlterableFlags == count - 1)
+                                        break;
+                                newOI.AltFlags = new MFAAltFlags();
+                                newOI.AltFlags.AlterableFlags = new MFAAltFlag[count];
+                                for (int i = 0; i < count; i++)
                                 {
-                                    new ObjectMovement()
-                                    {
-                                        Opt = 1
-                                    }
-                                };
+                                    MFAAltFlag altFlag = new MFAAltFlag();
+                                    altFlag.Value = newOC.AlterableValues.AlterableFlags == i;
+                                    newOI.AltFlags.AlterableFlags[i] = altFlag;
+                                }
                             }
 
                             newOC.TransitionIn = oldOC.ObjectTransitionIn;

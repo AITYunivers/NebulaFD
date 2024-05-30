@@ -32,9 +32,10 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
         public MFAObjectLoader ObjectLoader = new();
 
         // Chunks
-        public MFACounterFlags? CounterFlags = null;   // 0x16
-        public MFACounterAltFlags? CounterAltFlags = null;       // 0x17
-        public MFAObjectEffects? ObjectEffects = null; // 0x2D
+        public MFACounterFlags? CounterFlags = null;        // 0x16
+        public MFACounterAltFlags? CounterAltFlags = null;  // 0x17
+        public MFAObjectEffects? ObjectEffects = null;      // 0x2D
+        public MFAAltFlags? AltFlags = null;           // 0x39
 
         public MFAObjectInfo()
         {
@@ -130,6 +131,8 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
                 CounterFlags.WriteMFA(writer);
             if (CounterAltFlags != null)
                 CounterAltFlags.WriteMFA(writer);
+            if (AltFlags != null)
+                AltFlags.WriteMFA(writer);
             if (ObjectEffects != null && ObjectType != 9)
                 ObjectEffects.WriteMFA(writer);
             writer.WriteByte(0); // Last Chunk
