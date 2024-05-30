@@ -451,7 +451,14 @@ namespace Nebula.Core.Utilities
                     colorArray[newPos + 3] = 255;
                     if (alpha || RGBA)
                     {
-                        colorArray[(y * stride) + (x * 4) + 3] = imageData[position + 3];
+                        if (NebulaCore.PackageData.ExtendedHeader.Flags["PremultipliedAlpha"])
+                        {
+                            float a = imageData[position + 3] / 255f;
+                            colorArray[newPos + 0] = (byte)(colorArray[newPos + 0] / a);
+                            colorArray[newPos + 1] = (byte)(colorArray[newPos + 1] / a);
+                            colorArray[newPos + 2] = (byte)(colorArray[newPos + 2] / a);
+                        }
+                        colorArray[newPos + 3] = imageData[position + 3];
                     }
                     else
                     {
