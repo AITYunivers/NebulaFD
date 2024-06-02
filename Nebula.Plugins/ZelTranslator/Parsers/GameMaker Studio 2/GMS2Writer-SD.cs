@@ -1494,11 +1494,13 @@ if (flash[1] > 0) {
                 item.Wait();
             }
 
+
             Logger.LogType(typeof(GMS2Writer), "Writing sprites (may take a while)");
             foreach (var spr in SpriteJSONs)
             {
                 foreach (var frame in spr.frames)
                 {
+                    
                 RETRY_SAVE:
                     Directory.CreateDirectory($"{outPath}\\sprites\\{spr.name}\\layers\\{frame.name}");
                     try
@@ -1514,18 +1516,20 @@ if (flash[1] > 0) {
                         Logger.LogType(typeof(GMS2Writer), $"Problem saving image: {ex}");
                         goto RETRY_SAVE;
                     }
-                }
-            RETRY_SAVE_YY:
-                try
-                {
-                    var WriteSpriteJSON = JsonConvert.SerializeObject(spr).Replace("ZEROREPLACE", "0");
-                    if (!File.Exists($"{outPath}\\sprites\\{spr.name}\\{spr.name}.yy")) File.WriteAllText($"{outPath}\\sprites\\{spr.name}\\{spr.name}.yy", WriteSpriteJSON);
-                }
-                catch
-                {
-                    goto RETRY_SAVE_YY;
+
+                RETRY_SAVE_YY:
+                    try
+                    {
+                        var WriteSpriteJSON = JsonConvert.SerializeObject(spr).Replace("ZEROREPLACE", "0");
+                        if (!File.Exists($"{outPath}\\sprites\\{spr.name}\\{spr.name}.yy")) File.WriteAllText($"{outPath}\\sprites\\{spr.name}\\{spr.name}.yy", WriteSpriteJSON);
+                    }
+                    catch
+                    {
+                        goto RETRY_SAVE_YY;
+                    }
                 }
             }
+
 
             // Write sounds
             if (!Args["-nosnds"]) {

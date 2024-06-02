@@ -808,6 +808,20 @@ function gp_anybutton(device){
 /*
 	ACTIONS
 */
+function JumpToFrame(num) {
+	var _count = 0;
+	var _len = string_length("rm0_");
+	if (num >= 10) _len++;
+	if (num >= 100) _len++ 
+	while (true) {
+		if (asset_get_type(_count) == asset_room) {
+			if (string_copy(room_get_name(_count),1,_len) == "rm" + string(num) + "_") {
+				room_goto(_count);
+			}
+		}
+		_count++;
+	}
+}
 function SetDirection(obj, dir, paramType, event) {
 	var ParameterInt = 0
 	var ParameterExpression = 1
@@ -911,6 +925,49 @@ function SetAltValue(obj, variable, operation, val, event) {
 						case "-=":
 							AlterableValues[variable] -= val;
 						break;
+					}
+				}
+			}
+		}	
+	}
+}
+function SetAltString(obj, variable, val, event) {
+	if (obj_inst_count(obj, event) == 0){
+		if (instance_number(obj) > 0) {
+			obj.AlterableStrings[variable] = val;
+		}
+	}
+	else {
+		for (var i = 0; i < array_length(global.eventInstLists[event]); i++;){
+			if global.eventInstLists[event][i].object_index == obj {
+				with (global.eventInstLists[event][i]){
+					AlterableStrings[variable] = val;
+				}
+			}
+		}	
+	}
+}
+function SetFlag(obj, flag, val, event) {
+	if (obj_inst_count(obj, event) == 0){
+		if (instance_number(obj) > 0) {
+			for (var i = 0; i < instance_number(obj); i++) {
+				var _inst = instance_find(obj, i)
+				if (val == "toggle") {
+					_inst.Flags[flag] = !_inst.Flags[flag];
+				} else {
+					_inst.Flags[flag] = val;
+				}
+			}
+		}
+	}
+	else {
+		for (var i = 0; i < array_length(global.eventInstLists[event]); i++;){
+			if global.eventInstLists[event][i].object_index == obj {
+				with (global.eventInstLists[event][i]){
+					if (val == "toggle") {
+						Flags[flag] = !Flags[flag];
+					} else {
+						Flags[flag] = val;
 					}
 				}
 			}
@@ -1307,6 +1364,9 @@ function Find(str, substr, index) {
 function ReverseFind(str, substr, index) {
 	return string_last_pos_ext(str, substr, index+1);
 }
+function Global(type, val) {
+	return variable_global_get("Global" + (type == "val" ? "Values" : "Strings"))[floor(val)];
+}
 // Sound
 function ChannelVolume(channelID) {
 	return variable_global_get("channel" + string(channelID)) * 100.0;
@@ -1330,7 +1390,7 @@ function GetGeneralValue(obj, val, type, event) {
 	if type == "val" return 0;
 	if type == "str" return "";
 }
-function Alterable(obj, val, type, event) {
+function Alterable(obj, type, event, val) {
 	if (obj == noone && type == "val") return 0;
 	if (obj == noone && type == "str") return "";
 	if (obj_inst_count(obj, event) == 0){
@@ -1349,6 +1409,22 @@ function Alterable(obj, val, type, event) {
 	}
 	if type == "val" return 0;
 	if type == "str" return "";
+}
+function Flag(obj, event, val) {
+	if (obj == noone) return false;
+	if (obj_inst_count(obj, event) == 0){
+		if (instance_number(obj) > 0) then return obj.Flags[val];
+	}
+	else {
+		for (var i = 0; i < array_length(global.eventInstLists[event]); i++;){
+			if global.eventInstLists[event][i].object_index == obj {
+				with (global.eventInstLists[event][i]){
+					return Flags[val];
+				}
+			}
+		}	
+	}
+	return false;
 }
 
 // Counters
@@ -1461,7 +1537,25 @@ function NPara(obj, event) {
 	}
 	return 0;
 }
-
+// OS object
+function ComputerName(){
+	var _vname = "";
+	switch (os_type){
+		case os_windows:
+			_vname = "COMPUTERNAME";
+		break;
+		case os_macosx:
+			var _tmp = environment_get_variable("COMPUTERNAME");
+			if (_tmp == undefined || _tmp == "") _tmp = environment_get_variable("HOSTNAME");
+			return _tmp;
+			os_get_info()
+		break;
+		case os_linux:
+			_vname = "HOSTNAME";
+		break;
+	}
+	return environment_get_variable(_vname);
+}
 // Joystick 2 Object
 function gp_const(btn) {
 	switch (btn) {

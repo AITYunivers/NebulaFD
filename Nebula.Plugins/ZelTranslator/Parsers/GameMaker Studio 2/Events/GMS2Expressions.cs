@@ -100,6 +100,12 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                 case 10: // FrameRate
                                     buildString += "fps";
                                     break;
+                                case 11: // VirtualWidth -- FIX/REWORK THIS: actually implement accurate Frame/Virtual Width & Height for frames
+                                    buildString += "Frame.VirtualWidth";
+                                    break;
+                                case 12: // VirtualHeight
+                                    buildString += "Frame.VirtualHeight";
+                                    break;
                                 default:
                                     NoParam(exp, gameData, ref missing_code);
                                     break;
@@ -140,8 +146,12 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                 case 1: // Random
                                     buildString += $"irandom(";
                                     break;
+                                case 2: // Global Value from number expression
+                                case 49: // Global String from number expression
+                                    buildString += $"Global(\"{(exp.Num == 2 ? "val" : "str")}\", ";
+                                    break;
                                 case 3: // StringExp
-                                    buildString += $"\"{stringExp.Value}\"";
+                                    buildString += $"\"{stringExp.Value.Replace("\\", "\\\\").Replace("\"", "\\\"")}\"";
                                     break;
                                 case 4: // Str$()
                                     buildString += $"string(";
@@ -175,6 +185,10 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                     break;
                                 case 23: // DoubleExp
                                     buildString += $"{doubleExp.Value2}";
+                                    break;
+                                case 24: // Global Value _
+                                case 50: // Global String _
+                                    buildString += $"global.Global{(exp.Code == 24 ? "Values" : "Strings")}[{(exp.Code == 24 ? globalCommon.Value : globalCommon.Value + 65536)}]";
                                     break;
                                 case 29: // Abs()
                                     buildString += "abs(";
@@ -246,8 +260,13 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                     buildString += " POW ";
                                     break;
                                 case 14: // AND
+                                    buildString += " & ";
+                                    break;
                                 case 16: // OR
+                                    buildString += " | ";
+                                    break;
                                 case 18: // XOR
+                                    buildString += " ^ ";
                                     break;
                                 default:
                                     NoParam(exp, gameData, ref missing_code);
@@ -278,7 +297,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                     buildString += $"{actobjName}.x";
                                     break;
                                 case 13: // Flags (FIX/REWORK to work with multiple instances)
-                                    buildString += $"{actobjName}.Flags[{extensionExp.Value}]";
+                                    buildString += $"Flag({actobjName}, {evnt}, ";
                                     break;
                                 case 14: // Current Animation (FIX/REWORK to work with multiple instances)
                                     buildString += $"{actobjName}.animation";
@@ -287,17 +306,23 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                     buildString += $"instance_number({actobjName})";
                                     break;
                                 case 16: // Alterable Value (FIX/REWORK to work with multiple instances)
-                                    buildString += $"Alterable({actobjName}, {extensionExp.Value}, \"val\", {evnt})";
+                                    buildString += $"Alterable({actobjName}, \"val\", {evnt}, {extensionExp.Value})";
                                     break;
                                 case 17: // SemiTrans (FIX/REWORK to work with multiple instances)
                                     buildString += $"((1 - {actobjName}.image_alpha)*128.0)";
                                     break;
                                 case 19: // Alterable Strings (FIX/REWORK to work with multiple instances)
-                                    buildString += $"Alterable({actobjName}, {extensionExp.Value}, \"str\", {evnt})";
+                                    buildString += $"Alterable({actobjName}, \"str\", {evnt}, {extensionExp.Value})";
                                     break;
                                 //case 25 // XActionPoint
                                 case 27: // BlendCoeff (FIX/REWORK to work with multiple instances)
                                     buildString += $"((1 - {actobjName}.image_alpha)*256.0)";
+                                    break;
+                                case 30: // Alterable Value by specific number [ AltValN() ]
+                                    buildString += $"Alterable({actobjName}, \"val\", {evnt}, ";
+                                    break;
+                                case 31: // Alterable String by specific number [ AltStrN$() ]
+                                    buildString += $"Alterable({actobjName}, \"str\", {evnt}, ";
                                     break;
                                 case 40: // Width (in pixels) (FIX/REWORK to work with multiple instances)
                                     buildString += $"{actobjName}.sprite_width";
@@ -372,6 +397,18 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                     default:
                         {
                             #region ExtensionExpressions
+                            if (exp.ObjectType == try_val("SYSO", extCodes)) // OS object
+                            {
+                                switch (exp.Num)
+                                {
+                                    case 81: // ComputerName$
+                                        buildString += "ComputerName()";
+                                        break;
+                                    default:
+                                        NoParam(exp, gameData, ref missing_code);
+                                        break;
+                                }
+                            }
                             if (exp.ObjectType == try_val("2YOJ", extCodes)) // Joystick 2 Object
                             {
                                 switch (exp.Num)

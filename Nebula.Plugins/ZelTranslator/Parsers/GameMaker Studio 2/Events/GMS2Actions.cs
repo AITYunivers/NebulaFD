@@ -19,6 +19,7 @@ using Action = Nebula.Core.Data.Chunks.FrameChunks.Events.Action;
 using static ZelTranslator_SD.Parsers.GMS2Writer;
 using Nebula.Core.Data;
 using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
+using Nebula.Core.Data.Chunks.FrameChunks.Events;
 
 namespace ZelTranslator_SD.Parsers.GameMakerStudio2
 {
@@ -111,14 +112,43 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
             string ObjectName = object_name(action, gameData);
             return $"DestroyObject({ObjectName}, {evnt});";
         }
+        public static string SetGlobalValue(Action action, int evnt, PackageData gameData, Dictionary<string, int> extCodes, ref List<string> missing_code)
+        {
+            string operation = "=";
+            if (action.Num == 4 || action.Num == 5) operation = (action.Num == 4 ? "-=" : "+=");
+            string global = "";
+            if (action.Parameters[0].Data is ParameterInt prmInt) global = prmInt.Value.ToString();
+            if (action.Parameters[0].Data is ParameterShort prmShrt) global = prmShrt.Value.ToString();
+            if (action.Parameters[0].Data is ParameterExpressions prmExp) global = GMS2Expressions.Evaluate(prmExp, evnt, gameData, extCodes, ref missing_code);
+            string value = GMS2Expressions.Evaluate(action.Parameters[1].Data as ParameterExpressions, evnt, gameData, extCodes, ref missing_code);
+            return $"global.Global{(action.Num == 3 ? "Values" : "Strings")}[{global}] {operation} {value}";
+        }
         public static string SetAltValue(Action action, int evnt, PackageData gameData, Dictionary<string, int> extCodes, ref List<string> missing_code)
         {
             string ObjectName = object_name(action, gameData);
-            var setAltValue = (action.Parameters[0].Data as ParameterShort).Value;
+            string setAltValue = "";
+            if (action.Parameters[0].Data is ParameterShort prmShrt) setAltValue = prmShrt.Value.ToString();
+            else if (action.Parameters[0].Data is ParameterExpressions prmExps) setAltValue = GMS2Expressions.Evaluate(prmExps, evnt, gameData, extCodes, ref missing_code);
             var setExpression = action.Parameters[1].Data as ParameterExpressions;
             //var setValue = (setExpression.Items[0].Data as LongExp).Value;
             string operation = new string[] { "=", "+=", "-=" }[action.Num-31];
             return $"SetAltValue({ObjectName}, {setAltValue}, \"{operation}\", {GMS2Expressions.Evaluate(setExpression, evnt, gameData, extCodes, ref missing_code)}, {evnt});";
+        }
+        public static string SetAltString(Action action, int evnt, PackageData gameData, Dictionary<string, int> extCodes, ref List<string> missing_code)
+        {
+            string ObjectName = object_name(action, gameData);
+            string setAltString = "";
+            if (action.Parameters[0].Data is ParameterShort prmShrt) setAltString = prmShrt.Value.ToString();
+            else if (action.Parameters[0].Data is ParameterExpressions prmExps) setAltString = GMS2Expressions.Evaluate(prmExps, evnt, gameData, extCodes, ref missing_code);
+            var setExpression = action.Parameters[1].Data as ParameterExpressions;
+            return $"SetAltString({ObjectName}, {setAltString}, {GMS2Expressions.Evaluate(setExpression, evnt, gameData, extCodes, ref missing_code)}, {evnt});";
+        }
+        public static string SetFlag(Action action, int evnt, PackageData gameData, Dictionary<string, int> extCodes, ref List<string> missing_code)
+        {
+            string ObjectName = object_name(action, gameData);
+            string val = new string[] { "true", "false", "\"toggle\"" }[action.Num - 35];
+            var flagExp = action.Parameters[0].Data as ParameterExpressions;
+            return $"SetFlag({ObjectName}, {flagExp}, {val}, {evnt});";
         }
         public static string SetAlpha(Action action, int evnt, PackageData gameData, Dictionary<string, int> extCodes, ref List<string> missing_code)
         {
