@@ -5,6 +5,7 @@ using Spectre.Console;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace Nebula
 {
@@ -25,7 +26,9 @@ namespace Nebula
 
             NebulaCore.Init();
             Logger.Save();
-            
+            Console.InputEncoding = Encoding.UTF8;
+            Console.OutputEncoding = Encoding.UTF8;
+
             SpectreMain();
         }
 
@@ -143,9 +146,12 @@ namespace Nebula
 
             readStopwatch.Restart();
             AnsiConsole.MarkupLine($"[{NebulaCore.ColorRules[1]}]Reading game as \"{NebulaCore.CurrentReader.Name}\"[/]");
+#if !DEBUG
             try
             {
+#endif
                 NebulaCore.CurrentReader.LoadGame(fileReader!, NebulaCore.FilePath);
+#if !DEBUG
             }
             catch (Exception ex)
             {
@@ -153,6 +159,7 @@ namespace Nebula
                 Logger.Save();
                 throw;
             }
+#endif
             Logger.Save();
             GC.Collect();
             readStopwatch.Stop();
@@ -202,9 +209,12 @@ namespace Nebula
             foreach (INebulaTool tool in tools)
                 if (selectedTasks.Contains(tool.Name))
                 {
+#if !DEBUG
                     try
                     {
+#endif
                         tool.Execute();
+#if !DEBUG
                     }
                     catch (Exception ex)
                     {
@@ -212,6 +222,7 @@ namespace Nebula
                         Logger.Save();
                         throw;
                     }
+#endif
                     Logger.Save();
                     GC.Collect();
                 }

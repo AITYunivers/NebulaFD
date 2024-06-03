@@ -16,7 +16,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
         public uint ItemHandle;
         public int InstanceHandle;
         public string Code = string.Empty;
-        public string IconBuffer = string.Empty;
+        public byte[] IconBuffer = new byte[0];
         public ushort SystemQualifier;
 
         public EventObject()
@@ -47,7 +47,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 case 2:
                     Code = reader.ReadAscii(4);
                     if (Code == "OIC2")
-                        IconBuffer = reader.ReadAutoYuniversal();
+                        IconBuffer = reader.ReadBytes(reader.ReadInt());
                     break;
                 case 3:
                     SystemQualifier = reader.ReadUShort();
@@ -78,7 +78,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 case 2:
                     writer.WriteAscii(Code);
                     if (Code == "OIC2")
-                        writer.WriteAutoYunicode(IconBuffer);
+                    {
+                        writer.WriteInt(IconBuffer.Length);
+                        writer.WriteBytes(IconBuffer);
+                    }
                     break;
                 case 3:
                     writer.WriteUShort(SystemQualifier);

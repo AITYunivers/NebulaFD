@@ -48,6 +48,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         /// Key is [ObjectInfo, Type]
         /// </summary>
         public static Dictionary<Tuple<ushort, short>, ushort> QualifierJumptable = new();
+        public static bool OptimizedEvents;
 
         public FrameEvents()
         {
@@ -234,7 +235,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             if (Events.Count > 0)
             {
                 writer.WriteAscii("Evts");
-                //writer.WriteUInt(0);
                 ByteWriter evtsWriter = new ByteWriter(new MemoryStream());
                 foreach (Event evt in Events)
                     evt.WriteMFA(evtsWriter);

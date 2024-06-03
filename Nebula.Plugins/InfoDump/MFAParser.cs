@@ -1,6 +1,5 @@
 ﻿using Nebula;
 using Nebula.Core.Data;
-using Nebula.Core.Data.Chunks;
 using Nebula.Core.Data.Chunks.AppChunks;
 using Nebula.Core.Data.Chunks.BankChunks.Images;
 using Nebula.Core.Data.Chunks.FrameChunks;
@@ -27,6 +26,7 @@ namespace GameDumper
         public ImageBank IconBank = new ImageBank();
         public MFAAppIcon? AppIcons = null;
         public MFAExtraFlags ExtraFlags = new();
+        public MFAModulePath ModulePath = new();
 
         public void Execute()
         {
@@ -43,13 +43,17 @@ namespace GameDumper
                 IconBank.Palette = dat.ImageBank.Palette = dat.Frames.First().FramePalette.Palette;
             }
 
-            // Initialize images on multiple threads for speed made it 2x slower
+            this.Log("Converting images to MFA format");
+            Stopwatch sw    = Stopwatch.StartNew();
+            List<Task> imgLoading = new List<Task>();
             foreach (Image img in dat.ImageBank.Images.Values)
-            {
-                img.GetBitmap();
-                img.PrepareForMfa();
-            }
+                imgLoading.Add(Task.Factory.StartNew(img.PrepareForMfa));
+            Task.WaitAll(imgLoading.ToArray());
+            GC.Collect();
+            this.Log($"Done! ({sw.Elapsed.Seconds} seconds)");
 
+            this.Log("Generating Application, Object, and Frame icons");
+            sw.Restart();
             if (NebulaCore.CurrentReader!.Icons.Count == 5)
             {
                 AppIcons = new();
@@ -90,7 +94,9 @@ namespace GameDumper
                 {
                     var newIconImage = new Image();
                     newIconImage.Handle = (uint)i;
-                    newIconImage.FromBitmap(MMFAppIcon.ResizeImage(iconSizes[i]));
+                    Bitmap resizedIcon = MMFAppIcon.ResizeImage(iconSizes[i]);
+                    newIconImage.FromBitmap(resizedIcon);
+                    resizedIcon.Dispose();
                     newIconImage.Flags["Alpha"] = true;
                     newIconImage.Flags["RGBA"] = true;
                     IconBank.Images.Add(newIconImage.Handle, newIconImage);
@@ -100,62 +106,79 @@ namespace GameDumper
                 {
                     var newIconImage = new Image();
                     newIconImage.Handle = (uint)ii + 5;
-                    newIconImage.FromBitmap(MMFAppIcon.ResizeImage(iconSizes[2 + i]));
+                    Bitmap resizedIcon = MMFAppIcon.ResizeImage(iconSizes[2 + i]);
+                    newIconImage.FromBitmap(resizedIcon);
+                    resizedIcon.Dispose();
                     newIconImage.Flags["Alpha"] = true;
                     newIconImage.Flags["RGBA"] = true;
                     IconBank.Images.Add(newIconImage.Handle, newIconImage);
                 }
+
+                MMFAppIcon.Dispose();
             }
 
+            Dictionary<object, Bitmap> IconBmps = new();
             foreach (ObjectInfo objectInfo in dat.FrameItems.Items.Values)
             {
-                Bitmap iconBmp = new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFActive.png"));
+                object iconBmpo = "Tools\\ObjectIcons\\MMFActive.png";
                 try
                 {
-                    iconBmp = objectInfo.Header.Type switch
-                    {
-                        0 => MakeIcon(dat.ImageBank.Images[((ObjectQuickBackdrop)objectInfo.Properties).Shape.Image].GetBitmap(), "MMFQuickBackdrop"),
-                        1 => MakeIcon(dat.ImageBank.Images[((ObjectBackdrop)objectInfo.Properties).Image].GetBitmap(), "MMFBackdrop"),
-                        2 => MakeIcon(dat.ImageBank.Images[((ObjectCommon)objectInfo.Properties).ObjectAnimations.Animations[0].Directions[0].Frames[0]].GetBitmap(), "MMFActive"),
-                        3 => new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFString.png")),
-                        4 => new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFQ&A.png")),
-                        5 => new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFScore.png")),
-                        6 => new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFLives.png")),
-                        7 => MakeIcon(getCounterBmp(((ObjectCommon)objectInfo.Properties).ObjectCounter, ((ObjectCommon)objectInfo.Properties).ObjectValue), "MMFCounter"),
-                        8 => new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFFormattedText.png")),
-                        9 => new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFSubApplication.png")),
-                        _ => new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\MMFActive.png"))
-                    };
-                    if (objectInfo.Header.Type >= 32)
-                    {
-                        foreach (Extension posExt in dat.Extensions.Exts.Values)
-                            if (posExt.Handle == objectInfo.Header.Type - 32 && File.Exists("Tools\\ObjectIcons\\" + posExt.Name + ".png"))
-                            {
-                                iconBmp = new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\" + posExt.Name + ".png"));
-                                break;
-                            }
-                    }
-                } catch {}
+                    iconBmpo = GenerateObjectIcon(objectInfo);
+                }
+                catch {}
 
                 var newIconImage = new Image();
                 newIconImage.Handle = (uint)IconBank.Images.Count;
-                newIconImage.FromBitmap(iconBmp);
+                if (iconBmpo is string iconPath)
+                {
+                    if (!IconBmps.ContainsKey(iconPath))
+                        IconBmps.Add(iconPath, new Bitmap(Bitmap.FromFile(iconPath)));
+                    newIconImage.FromBitmap(IconBmps[iconPath]);
+                }
+                else if (iconBmpo is Bitmap iconBmp)
+                {
+                    if (!IconBmps.ContainsKey(iconBmp))
+                        IconBmps.Add(iconBmp, null!);
+                    newIconImage.FromBitmap(iconBmp);
+                }
+                else
+                {
+                    string activeIconPath = "Tools\\ObjectIcons\\MMFActive.png";
+                    if (!IconBmps.ContainsKey(activeIconPath))
+                        IconBmps.Add(activeIconPath, new Bitmap(Bitmap.FromFile(activeIconPath)));
+                    newIconImage.FromBitmap(IconBmps[activeIconPath]);
+                }
                 newIconImage.Flags["Alpha"] = true;
                 newIconImage.Flags["RGBA"] = true;
                 IconBank.Images.Add(newIconImage.Handle, newIconImage);
                 objectInfo.IconHandle = newIconImage.Handle;
             }
+            GC.Collect();
+
+            foreach (KeyValuePair<object, Bitmap> bmp in IconBmps)
+                if (bmp.Key is Bitmap keyBmp)
+                    keyBmp.Dispose();
+                else if (bmp.Value != null)
+                    bmp.Value.Dispose();
+
             foreach (Frame frm in dat.Frames)
             {
                 Image frmImg = new Image();
                 frmImg.Handle = (uint)IconBank.Images.Count;
-                frmImg.FromBitmap(MakeFrameIcon(frm));
+                if (!Parameters.DontIncludeImages)
+                {
+                    Bitmap frmIcon = MakeFrameIcon(frm);
+                    frmImg.FromBitmap(frmIcon);
+                    frmIcon.Dispose();
+                }
                 frmImg.Flags["Alpha"] = true;
                 frmImg.Flags["RGBA"] = true;
                 IconBank.Images.Add(frmImg.Handle, frmImg);
                 frm.MFAFrameInfo.IconHandle = (int)frmImg.Handle;
             }
+            GC.Collect();
             IconBank.ImageCount = IconBank.Images.Count;
+            this.Log($"Done! ({sw.Elapsed.Seconds} seconds)");
 
             writer.WriteAscii("MFU2");
             writer.WriteShort(6);
@@ -168,6 +191,8 @@ namespace GameDumper
             writer.WriteAutoYunicode(dat.EditorFilename);
             writer.WriteInt(0);
 
+            this.Log("Writing Asset Banks");
+            sw.Restart();
             writer.WriteAscii("ATNF"); // Font Bank
             dat.FontBank.WriteMFA(writer);
             writer.WriteAscii("APMS"); // Sound Bank
@@ -178,6 +203,7 @@ namespace GameDumper
             IconBank.WriteMFA(writer);
             writer.WriteAscii("AGMI"); // Image Bank
             dat.ImageBank.WriteMFA(writer);
+            this.Log($"Done! ({sw.Elapsed.Seconds} seconds)");
 
             writer.WriteAutoYunicode(dat.AppName);
             writer.WriteAutoYunicode(dat.Author);
@@ -239,8 +265,10 @@ namespace GameDumper
                 Frame frm = dat.Frames[i];
                 if (!NebulaCore.MFA && NebulaCore.Fusion >= 1.0f)
                     frm.Handle = dat.FrameHandles.IndexOf((short)i);
+                this.Log("Writing frame '" + frm.FrameName + "'");
+                sw.Restart();
                 frm.WriteMFA(frameWriter);
-                Debug.WriteLine("Writing frame '" + frm.FrameName + "'");
+                this.Log($"Done! ({sw.Elapsed.Seconds} seconds)");
             }
 
             writer.WriteUInt((uint)(offsetEnd + frameWriter.Tell()));
@@ -248,8 +276,10 @@ namespace GameDumper
 
             if (AppIcons != null)
                 AppIcons.WriteMFA(writer);
-            ExtraFlags.ExtraFlags.Value = 576;
+            ExtraFlags.SyncFlags();
             ExtraFlags.WriteMFA(writer);
+            if ((ModulePath.ModulePath = dat.ModulesDir) != string.Empty)
+                ModulePath.WriteMFA(writer);
             writer.WriteByte(0);
 
             frameWriter.Flush();
@@ -258,11 +288,72 @@ namespace GameDumper
             writer.Close();
         }
 
-        public Bitmap MakeIcon(Bitmap source, string @default)
+        public object GenerateObjectIcon(ObjectInfo objectInfo)
         {
-            Bitmap output = new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\" + @default + ".png"));
-            if (source == null) return output;
+            ImageBank imgBnk = NebulaCore.PackageData.ImageBank;
+            switch (objectInfo.Header.Type)
+            {
+                case 0:
+                    Image bmp0 = imgBnk.Images[((ObjectQuickBackdrop)objectInfo.Properties).Shape.Image];
+                    if (MakeIcon(bmp0.GetBitmap(), out Bitmap bmp00))
+                    {
+                        bmp0.DisposeBmp();
+                        return bmp00;
+                    }
+                    bmp0?.DisposeBmp();
+                    return "Tools\\ObjectIcons\\MMFQuickBackdrop.png";
+                case 1:
+                    Image bmp1 = imgBnk.Images[((ObjectBackdrop)objectInfo.Properties).Image];
+                    if (MakeIcon(bmp1.GetBitmap(), out Bitmap bmp01))
+                    {
+                        bmp1.DisposeBmp();
+                        return bmp01;
+                    }
+                    bmp1?.DisposeBmp();
+                    return "Tools\\ObjectIcons\\MMFBackdrop.png";
+                case 2:
+                    Image bmp2 = imgBnk.Images[((ObjectCommon)objectInfo.Properties).ObjectAnimations.Animations[0].Directions[0].Frames[0]];
+                    if (MakeIcon(bmp2.GetBitmap(), out Bitmap bmp02))
+                    {
+                        bmp2.DisposeBmp();
+                        return bmp02;
+                    }
+                    bmp2?.DisposeBmp();
+                    return "Tools\\ObjectIcons\\MMFActive.png";
+                case 3:
+                    return "Tools\\ObjectIcons\\MMFString.png";
+                case 4:
+                    return "Tools\\ObjectIcons\\MMFQ&A.png";
+                case 5:
+                    return "Tools\\ObjectIcons\\MMFScore.png";
+                case 6:
+                    return "Tools\\ObjectIcons\\MMFLives.png";
+                case 7:
+                    Bitmap bmp7 = getCounterBmp(((ObjectCommon)objectInfo.Properties).ObjectCounter, ((ObjectCommon)objectInfo.Properties).ObjectValue);
+                    if (MakeIcon(bmp7, out Bitmap bmp07))
+                    {
+                        bmp7.Dispose();
+                        return bmp07;
+                    }
+                    bmp7?.Dispose();
+                    return "Tools\\ObjectIcons\\MMFCounter.png";
+                case 8:
+                    return "Tools\\ObjectIcons\\MMFFormattedText.png";
+                case 9:
+                    return "Tools\\ObjectIcons\\MMFSubApplication.png";
+                default:
+                    foreach (Extension posExt in NebulaCore.PackageData.Extensions.Exts.Values)
+                        if (posExt.Handle == objectInfo.Header.Type - 32 && File.Exists("Tools\\ObjectIcons\\" + posExt.Name + ".png"))
+                            return "Tools\\ObjectIcons\\" + posExt.Name + ".png";
+                    break;
+            }
+            return "Tools\\ObjectIcons\\MMFActive.png";
+        }
 
+        public bool MakeIcon(Bitmap source, out Bitmap output)
+        {
+            output = null;
+            if (source == null) return false;
             if (source.Width > 32 || source.Height > 32)
             {
                 if (source.Width > source.Height)
@@ -306,8 +397,9 @@ namespace GameDumper
                 output.UnlockBits(bitmapData);
             }
 
-            if (hasPixels && output.Width > 1) return output;
-            else return new Bitmap(Bitmap.FromFile("Tools\\ObjectIcons\\" + @default + ".png"));
+            if (!hasPixels || output.Width <= 1)
+                output.Dispose();
+            return hasPixels && output.Width > 1;
         }
 
         public Bitmap MakeFrameIcon(Frame frm)
@@ -341,6 +433,7 @@ namespace GameDumper
                                                              ((ObjectQuickBackdrop)oi.Properties).Width,
                                                              ((ObjectQuickBackdrop)oi.Properties).Height);
                                     doDraw(graphics, img.GetBitmap(), destRect, alpha);
+                                    img.DisposeBmp();
                                 }
                                 break;
                             case 1: // Backdrop
@@ -348,6 +441,7 @@ namespace GameDumper
                                 destRect = new Rectangle(inst.PositionX, inst.PositionY,
                                                          img.Width, img.Height);
                                 doDraw(graphics, img.GetBitmap(), destRect, alpha);
+                                img.DisposeBmp();
                                 break;
                             case 2: // Active
                                 img = NebulaCore.PackageData.ImageBank.Images[((ObjectCommon)oi.Properties).ObjectAnimations.Animations.First().Value.Directions.First().Frames.First()];
@@ -355,6 +449,7 @@ namespace GameDumper
                                                          inst.PositionY - img.HotspotY,
                                                          img.Width, img.Height);
                                 doDraw(graphics, img.GetBitmap(), destRect, alpha);
+                                img.DisposeBmp();
                                 break;
                             case 7: // Counter
                                 ObjectCounter cntr = ((ObjectCommon)oi.Properties).ObjectCounter;
@@ -373,15 +468,16 @@ namespace GameDumper
                                                              cntrImg.Width, cntrImg.Height);
                                     doDraw(graphics, cntrImg, destRect, alpha);
                                 }
+                                cntrImg?.Dispose();
                                 break;
                         }
                     }
                     catch {}
                 }
             }
-            if (Directory.Exists("junk"))
-                output.Save("junk\\" + frm.FrameName + ".png");
-            return output.ResizeImage(64, 48);
+            Bitmap resizedOutput = output.ResizeImage(64, 48);
+            output.Dispose();
+            return resizedOutput;
         }
 
         private void doDraw(Graphics g, Bitmap sourceBitmap, Rectangle dest, float alpha)
@@ -447,6 +543,7 @@ namespace GameDumper
                     if (prevX != null)
                         xToDraw = (int)prevX - img.Width;
                     g.DrawImageUnscaled(img.GetBitmap(), xToDraw, 0);
+                    img.DisposeBmp();
                     prevX = xToDraw;
                 }
             }
@@ -457,6 +554,7 @@ namespace GameDumper
                 bmp = new Bitmap(img.Width, img.Height);
                 g = Graphics.FromImage(bmp);
                 g.DrawImageUnscaled(img.GetBitmap(), 0, 0);
+                img.DisposeBmp();
             }
 
             if (g != null)

@@ -54,7 +54,7 @@ namespace Nebula.Core.Data.Chunks
             newChunk.ChunkSize = size;
             newChunk.ChunkData = newData;
 
-            if (!ChunkList.ChunkJumpTable.ContainsKey(id))
+            if (Parameters.DumpUnknownChunks && !ChunkList.ChunkJumpTable.ContainsKey(id))
             {
                 Directory.CreateDirectory("Chunks");
                 File.WriteAllBytes($"Chunks\\Chunk-{string.Format("0x{0:X}", id)}_{Utilities.Utilities.ClearName(NebulaCore.PackageData.AppName)}.bin", newChunk.ChunkData);
@@ -68,7 +68,7 @@ namespace Nebula.Core.Data.Chunks
             return newChunk;
         }
 
-        public static Chunk InitMFAChunk(ByteReader byteReader, bool writeToFile = true)
+        public static Chunk InitMFAChunk(ByteReader byteReader)
         {
             short id = byteReader.ReadByte();
             if (id == 0) return new Last();
@@ -79,12 +79,12 @@ namespace Nebula.Core.Data.Chunks
             newChunk.ChunkSize = size;
             newChunk.ChunkData = data;
 
-            if (writeToFile && !MFAChunkList.ChunkJumpTable.ContainsKey(id))
+            if (Parameters.DumpUnknownChunks && !MFAChunkList.ChunkJumpTable.ContainsKey(id))
                 File.WriteAllBytes($"Chunks\\MFAChunk-{string.Format("0x{0:X}", id)}_{Utilities.Utilities.ClearName(NebulaCore.PackageData.AppName)}.bin", newChunk.ChunkData);
             return newChunk;
         }
 
-        public static Chunk InitMFAFrameChunk(ByteReader byteReader, bool writeToFile = true)
+        public static Chunk InitMFAFrameChunk(ByteReader byteReader)
         {
             short id = byteReader.ReadByte();
             if (id == 0) return new Last();
@@ -95,12 +95,12 @@ namespace Nebula.Core.Data.Chunks
             newChunk.ChunkSize = size;
             newChunk.ChunkData = data;
 
-            if (writeToFile && !MFAFrameChunkList.ChunkJumpTable.ContainsKey(id))
+            if (Parameters.DumpUnknownChunks && !MFAFrameChunkList.ChunkJumpTable.ContainsKey(id))
                 File.WriteAllBytes($"Chunks\\MFAFrameChunk-{string.Format("0x{0:X}", id)}_{Utilities.Utilities.ClearName(NebulaCore.PackageData.AppName)}.bin", newChunk.ChunkData);
             return newChunk;
         }
 
-        public static Chunk InitMFAObjectChunk(ByteReader byteReader, bool writeToFile = true)
+        public static Chunk InitMFAObjectChunk(ByteReader byteReader)
         {
             short id = byteReader.ReadByte();
             if (id == 0) return new Last();
@@ -111,7 +111,7 @@ namespace Nebula.Core.Data.Chunks
             newChunk.ChunkSize = size;
             newChunk.ChunkData = data;
 
-            if (writeToFile && !MFAObjectChunkList.ChunkJumpTable.ContainsKey(id))
+            if (Parameters.DumpUnknownChunks && !MFAObjectChunkList.ChunkJumpTable.ContainsKey(id))
                 File.WriteAllBytes($"Chunks\\MFAObjectChunk-{string.Format("0x{0:X}", id)}_{Utilities.Utilities.ClearName(NebulaCore.PackageData.AppName)}.bin", newChunk.ChunkData);
             return newChunk;
         }

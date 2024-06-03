@@ -40,7 +40,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
 
         public byte[] ImageData = new byte[0];
         private Bitmap? BitmapCache = null;
-        public bool IsFromBitmap;
+        public bool IsMasked;
 
         public BitDict Flags = new BitDict(new string[]
         {
@@ -78,6 +78,9 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
         {
             if (BitmapCache == null)
             {
+                if (ImageData.Length == 0)
+                    return new Bitmap(1, 1);
+
                 if (GraphicMode == 3 && NebulaCore.Fusion == 0)
                     Width = (short)(Math.Ceiling(Width / 2.0f) * 2);
 
@@ -105,7 +108,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                             colorArray = ImageTranslator.ColorPaletteToRGBA(ImageData, Width, Height, NebulaCore.PackageData.Frames.First().FramePalette.Palette, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                         break;
                     case 4:
-                        if (NebulaCore.Android)
+                        if (NebulaCore.Android && !IsMasked)
                             colorArray = ImageTranslator.AndroidMode4ToRGBA(ImageData, Width, Height);
                         else
                             colorArray = ImageTranslator.Normal24BitMaskedToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"], NebulaCore.Seeded);
@@ -127,6 +130,13 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                         break;
                 }
 
+                if (!IsMasked && colorArray != null)
+                {
+                    ImageData = ImageTranslator.RGBAToRGBMasked(colorArray, Width, Height, Flags["Alpha"], Flags["RGBA"]);
+                    GraphicMode = 4;
+                    IsMasked = true;
+                }
+
                 Marshal.Copy(colorArray, 0, bmpData.Scan0, colorArray.Length);
                 BitmapCache.UnlockBits(bmpData);
             }
@@ -134,12 +144,21 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
             return BitmapCache;
         }
 
+        public void DisposeBmp()
+        {
+            if (BitmapCache != null)
+            {
+                BitmapCache.Dispose();
+                BitmapCache = null;
+            }
+        }
+
         public void FromBitmap(Bitmap bmp)
         {
             Width = (short)bmp.Width;
             Height = (short)bmp.Height;
             GraphicMode = 4;
-            IsFromBitmap = true;
+            IsMasked = true;
 
             var bitmapData = bmp.LockBits(new Rectangle(0, 0, Width, Height),
                                           ImageLockMode.ReadOnly,
@@ -213,8 +232,8 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
             PrepareForMfa();
-            Flags["LZX"] = true;
 
+            Flags["LZX"] = true;
             byte[] compressedImg = Decompressor.CompressBlock(ImageData);
 
             writer.WriteUInt(Handle);
@@ -242,17 +261,14 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                 case 0:
                     ImageData = ImageTranslator.AndroidMode0ToRGBA(ImageData, Width, Height);
                     ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
-                    GraphicMode = 4;
                     break;
                 case 1:
                     ImageData = ImageTranslator.AndroidMode1ToRGBA(ImageData, Width, Height);
                     ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
-                    GraphicMode = 4;
                     break;
                 case 2:
                     ImageData = ImageTranslator.AndroidMode2ToRGBA(ImageData, Width, Height);
                     ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
-                    GraphicMode = 4;
                     break;
                 case 3:
                     if (NebulaCore.Android)
@@ -260,10 +276,10 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                     else
                         ImageData = ImageTranslator.ColorPaletteToRGBA(ImageData, Width, Height, NebulaCore.PackageData.Frames.First().FramePalette.Palette, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                     ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
-                    GraphicMode = 4;
                     break;
                 case 4:
-                    if (IsFromBitmap) break;
+                    if (IsMasked)
+                        break;
                     if (NebulaCore.Android)
                     {
                         ImageData = ImageTranslator.AndroidMode4ToRGBA(ImageData, Width, Height);
@@ -278,19 +294,18 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                 case 5:
                     ImageData = ImageTranslator.AndroidMode5ToRGBA(ImageData, Width, Height, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
                     ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
-                    GraphicMode = 4;
                     break;
                 case 8:
                     ImageData = ImageTranslator.TwoFivePlusToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], NebulaCore.Fusion > 2.5f);
                     ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"]);
-                    GraphicMode = 4;
                     break;
                 case 9:
                     ImageData = ImageTranslator.FlashToRGBA(ImageData, Width, Height);
                     ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"]);
-                    GraphicMode = 4;
                     break;
             }
+            GraphicMode = 4;
+            IsMasked = true;
         }
 
         public Image Clone()

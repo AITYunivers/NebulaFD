@@ -89,5 +89,10 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
             foreach (var parameter in Parameters)
                 parameter.WriteMFA(writer);
         }
+
+        public string GetFXData()
+        {
+            return Encoding.ASCII.GetString(FXData);
+        }
     }
 }

@@ -7,6 +7,7 @@ using Nebula.Core.Utilities;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
+using System.Formats.Asn1;
 using System.Reflection.Metadata;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks.Events
@@ -59,10 +60,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             DefType = reader.ReadByte();
             Identifier = reader.ReadShort();
 
+            long startPosition = reader.Tell();
             for (int i = 0; i < Parameters.Length; i++)
             {
                 Parameters[i] = new Parameter();
-                Parameters[i].ReadCCN(reader);
+                Parameters[i].ReadCCN(reader, startPosition);
                 Parameters[i].FrameEvents = ((Event)extraInfo[1]).Parent;
             }
 
@@ -117,8 +119,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             condWriter.WriteByte(DefType);
             condWriter.WriteShort(Identifier);
 
+            long startPosition = (long)extraInfo[0] + writer.Tell() + condWriter.Tell() + 4;
             foreach (Parameter parameter in Parameters)
-                parameter.WriteMFA(condWriter);
+                parameter.WriteMFA(condWriter, startPosition);
 
             writer.WriteUShort((ushort)(condWriter.Tell() + 2));
             writer.WriteWriter(condWriter);
@@ -128,6 +131,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         private void Fix(List<Condition> evntList)
         {
+            short oldNum = Num;
+            bool ignoreOptimization = false;
             switch (ObjectType)
             {
                 case -1:
@@ -135,10 +140,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                     {
                         case 0:
                             DoAdd = false;
-                            break;
-                        // Why do I need this??
-                        case -25: // Or (Logical)
-                            Num = -24; // Or
+                            ignoreOptimization = true;
                             break;
                         case -28: // Compare Global Integer Equals
                         case -29: // Compare Global Integer Doesnt Equal
@@ -153,9 +155,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case -38: // Compare Global Double Greater Or Equal
                         case -39: // Compare Global Double Greater
                             Num = -8; // Compare Global
+                            ignoreOptimization = true;
                             break;
                         case -43: // Start Child Event
                             DoAdd = false;
+                            ignoreOptimization = true;
                             break;
                     }
                     break;
@@ -165,6 +169,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case -42: // Compare Alterable Integer
                         case -43: // Compare Alterable Double
                             Num = -27; // Compare Alterable
+                            ignoreOptimization = true;
                             break;
                     }
                     break;
@@ -255,6 +260,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                     }
                 }
             }
+
+            FrameEvents.OptimizedEvents |= ((Num != oldNum) || (DoAdd == false)) && !ignoreOptimization;
         }
 
         public override string ToString()

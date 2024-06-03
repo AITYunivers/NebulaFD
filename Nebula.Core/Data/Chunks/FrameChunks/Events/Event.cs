@@ -21,7 +21,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             "HasOrLogical", // Or Logical
             "Grouped",      // Grouped
             "Inactive",     // Inactive
-            "Has Parent"    // Has Parent
+            "HasParent"     // Has Parent
         );
 
         public List<Condition> Conditions = new List<Condition>();
@@ -84,6 +84,18 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 }
             }
 
+            if (NebulaCore.Plus && EventFlags["Break"] && EventFlags["HasParent"])
+            {
+                if (Actions.Count > 0 && (Actions[0].ObjectType != -1 || Actions[0].Num != 44))
+                {
+                    Action act = new Action();
+                    act.ObjectType = -1;
+                    act.Num = 44;
+                    Actions.Add(act);
+                }
+                EventFlags["Break"] = false;
+            }
+
             reader.Seek(endPosition);
         }
 
@@ -126,6 +138,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            long startPosition = writer.Tell();
             ByteWriter evtWriter = new ByteWriter(new MemoryStream());
             evtWriter.WriteByte((byte)Conditions.Count);
             evtWriter.WriteByte((byte)Actions.Count);
@@ -136,10 +149,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             evtWriter.WriteShort(Undo);
 
             foreach (Condition cond in Conditions)
-                cond.WriteMFA(evtWriter);
+                cond.WriteMFA(evtWriter, startPosition);
 
             foreach (Action act in Actions)
-                act.WriteMFA(evtWriter);
+                act.WriteMFA(evtWriter, startPosition);
 
             writer.WriteShort((short)((evtWriter.Tell() + 2) * -1));
             writer.WriteWriter(evtWriter);

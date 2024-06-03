@@ -4,6 +4,7 @@ using Nebula.Core.Data.Chunks.BankChunks.Images;
 using Nebula.Core.Data.Chunks.BankChunks.Music;
 using Nebula.Core.Data.Chunks.BankChunks.Shaders;
 using Nebula.Core.Data.Chunks.BankChunks.Sounds;
+using Nebula.Core.Data.Chunks.BankChunks.TrueTypeFonts;
 using Nebula.Core.Data.Chunks.FrameChunks;
 using Nebula.Core.Data.Chunks.MFAChunks;
 using Nebula.Core.Data.Chunks.ObjectChunks;
@@ -70,8 +71,8 @@ namespace Nebula.Core.Data.Chunks
             { 0x2255, typeof(ObjectShaders)       },
             { 0x2256, typeof(ObjectProperties)    },
             //0x2257         ObjectPropOffsets
-            //0x2258         TrueTypeFontInfo
-            //0x2259         TrueTypeFonts
+            { 0x2258, typeof(TrueTypeFontInfo)    },
+            { 0x2259, typeof(TrueTypeFontBank)    },
             { 0x225A, typeof(DX9ShaderBank)       },
             //0x225B
             //0x225C
