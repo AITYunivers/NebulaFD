@@ -93,7 +93,8 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            reader.Skip(4);
+            if (NebulaCore.Fusion > 1.5f)
+                reader.Skip(4);
             Flags.Value = (uint)reader.ReadShort();      // Default: 4294944001
             NewFlags.Value = (uint)reader.ReadShort();   // Default: 2048
             GraphicMode = reader.ReadShort();
@@ -109,13 +110,17 @@ namespace Nebula.Core.Data.Chunks.AppChunks
                 ControlType[i] = reader.ReadShort();
 
             for (int i = 0; i < 4; i++)
-                for (int ii = 0; ii < 8; ii++)
+                for (int ii = 0; ii < (NebulaCore.Fusion > 1.5f ? 8 : 6); ii++)
                     ControlKeys[i][ii] = reader.ReadShort();
 
             BorderColor = reader.ReadColor();
             FrameCount = reader.ReadInt();
-            FrameRate = reader.ReadInt();
-            WindowMenu = reader.ReadInt();
+
+            if (NebulaCore.Fusion > 1.5f)
+            {
+                FrameRate = reader.ReadInt();
+                WindowMenu = reader.ReadInt();
+            }
 
             NebulaCore.PackageData.AppHeader = this;
         }

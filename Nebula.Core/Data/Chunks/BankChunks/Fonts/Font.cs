@@ -32,11 +32,22 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Fonts
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Handle = reader.ReadUInt();
-            if (NebulaCore.Build < 284)
+            if (NebulaCore.Fusion >= 2.0f && NebulaCore.Build < 284)
                 Handle++;
 
-            ByteReader dataReader = null;
-            if (Compressed) dataReader = Decompressor.DecompressAsReader(reader, out var decompSize);
+            ByteReader dataReader;
+            if (NebulaCore.Fusion == 1.5f)
+            {
+                List<int> offsets = NebulaCore.PackageData.FontOffsets.SortedOffsets;
+                int startingOffset = (int)reader.Tell();
+                int compressedSize = 3;
+                if (offsets.IndexOf(startingOffset) != offsets.Count - 1)
+                    compressedSize = offsets[offsets.IndexOf(startingOffset) + 1] - startingOffset - 4;
+                int decompressedSize = reader.ReadInt();
+                var compressedBuffer = reader.ReadBytes(compressedSize - 4);
+                dataReader = new ByteReader(Decompressor.DecompressOPFBlock(compressedBuffer));
+            }
+            else if (Compressed) dataReader = Decompressor.DecompressAsReader(reader, out var decompSize);
             else dataReader = reader;
             Checksum = dataReader.ReadInt();
             References = dataReader.ReadInt();

@@ -1,5 +1,6 @@
 ﻿using Nebula.Core.Memory;
 using System.Diagnostics;
+using System.Text;
 
 namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
 {
@@ -65,22 +66,45 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             Handle = reader.ReadUInt();
             if (NebulaCore.Fusion >= 2.5f)
                 Handle--;
-            Checksum = reader.ReadInt();
+            else if (NebulaCore.Fusion == 1.5f)
+            {
+                List<int> offsets = NebulaCore.PackageData.SoundOffsets.SortedOffsets;
+                int startingOffset = (int)reader.Tell();
+                int compressedSize = 3;
+                if (offsets.IndexOf(startingOffset) != offsets.Count - 1)
+                    compressedSize = offsets[offsets.IndexOf(startingOffset) + 1] - startingOffset - 4;
+                decompressedSize = reader.ReadInt();
+                var compressedBuffer = reader.ReadBytes(compressedSize - 4);
+                reader = new ByteReader(Decompressor.DecompressOPFBlock(compressedBuffer));
+            }
+            if (NebulaCore.Fusion == 1.5f)
+                Checksum = reader.ReadShort();
+            else
+                Checksum = reader.ReadInt();
             References = reader.ReadUInt();
             decompressedSize = reader.ReadInt();
             Flags.Value = reader.ReadUInt();
             Frequency = reader.ReadInt();
             nameLength = reader.ReadInt();
-            if (Compressed && !Flags["Decompressed"])
+
+            if (NebulaCore.Fusion == 1.5f)
             {
-                int size = reader.ReadInt();
-                soundData = new ByteReader(Decompressor.DecompressBlock(reader, size));
+                Name = reader.ReadYuniversalStop(nameLength);
+                Data = FixSoundData(reader.ReadBytes());
             }
             else
-                soundData = new ByteReader(reader.ReadBytes(decompressedSize));
-            Name = soundData.ReadYuniversalStop(nameLength);
-            if (Flags["Decompressed"]) soundData.Seek(0);
-            Data = soundData.ReadBytes();
+            {
+                if (Compressed && !Flags["Decompressed"])
+                {
+                    int size = reader.ReadInt();
+                    soundData = new ByteReader(Decompressor.DecompressBlock(reader, size));
+                }
+                else
+                    soundData = new ByteReader(reader.ReadBytes(decompressedSize));
+                Name = soundData.ReadYuniversalStop(nameLength);
+                if (Flags["Decompressed"]) soundData.Seek(0);
+                Data = soundData.ReadBytes();
+            }
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -123,6 +147,20 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
                 writer.WriteYunicode(Name, true);
                 writer.WriteBytes(Data);
             }
+        }
+
+        public static byte[] FixSoundData(byte[] data)
+        {
+            byte[] output = new byte[data.Length + 44];
+            Array.Copy(Encoding.ASCII.GetBytes("RIFF"), 0, output, 0, 4);
+            Array.Copy(BitConverter.GetBytes(8146), 0, output, 4, 4);
+            Array.Copy(Encoding.ASCII.GetBytes("WAVEfmt "), 0, output, 8, 8);
+            Array.Copy(BitConverter.GetBytes(16), 0, output, 16, 4);
+            Array.Copy(data, 0, output, 20, 16);
+            Array.Copy(Encoding.ASCII.GetBytes("data"), 0, output, 36, 4);
+            Array.Copy(BitConverter.GetBytes(data.Length - 16), 0, output, 40, 4);
+            Array.Copy(data, 16, output, 44, data.Length - 16);
+            return output;
         }
     }
 }

@@ -4,6 +4,8 @@ using Ionic.Zlib;
 #endif
 #if Joveler
 using Joveler.Compression.ZLib;
+using System.Diagnostics;
+
 #endif
 #if !Ionic || !Joveler
 using System.IO.Compression;
@@ -31,25 +33,13 @@ namespace Nebula.Core.Memory
             return DecompressBlock(exeReader, compSize);
         }
 
-        /*public static byte[] DecompressOPF(ByteReader exeReader, out int decompressed)
+        public static byte[] DecompressOPF(ByteReader exeReader, out int decompressed)
         {
-            uint decompressed_size = exeReader.ReadUInt();
-            uint saved_size = decompressed_size;
-            byte[] buf = new byte[decompressed_size];
-            long start = exeReader.Tell();
-            byte[] data = exeReader.ReadBytes();
-            byte[] new_data = buf;
-            //ulong crc_ret = 0;
-            long bytesread = 0;
-            bytesread = TinyInflateOLD.TinyInflateOLD.tinf_uncompress(buf, ref decompressed_size, data, (uint)data.Length);
-            //bytesread = TinyInflate.tinflate(data, data.Length, ref new_data, decompressed_size, ref crc_ret);
-            exeReader.Seek(start + bytesread);
-            if (decompressed_size != saved_size)
-                throw new Exception($"Decompression failed ({saved_size}, {decompressed_size})");
-
-            decompressed = (int)decompressed_size;
-            return new_data;
-        }*/
+            var decompSize = exeReader.ReadInt();
+            decompressed = decompSize;
+            TinyInflate.Tinflate(exeReader.ReadBytes(), out List<byte> output, new() { Anaconda = true }, out ulong CRC);
+            return output.ToArray();
+        }
 
         public static ByteReader DecompressAsReader(ByteReader exeReader, out int decompressed)
         {
@@ -59,6 +49,14 @@ namespace Nebula.Core.Memory
         public static byte[] DecompressBlock(ByteReader reader, int size)
         {
             return DecompressBlock(reader.ReadBytes(size));
+        }
+
+        public static byte[] DecompressOPFBlock(byte[] data)
+        {
+            TinyInflate.Error err = TinyInflate.Tinflate(data, out List<byte> output, new() { Anaconda = true }, out ulong CRC);
+            if (err != TinyInflate.Error.OK)
+                throw new Exception(TinyInflate.GetErrorName(err));
+            return output.ToArray();
         }
 
         public static byte[] DecompressBlock(byte[] data)
@@ -79,31 +77,6 @@ namespace Nebula.Core.Memory
             }
 #endif
         }
-
-        /*public static byte[] DecompressOld(ByteReader reader)
-        {
-            var decompressedSize = reader.PeekInt32() != -1 ? reader.ReadInt32() : 0;
-            var start = reader.Tell();
-            var compressedSize = reader.Size();
-            var buffer = reader.ReadBytes((int)compressedSize);
-            int actualSize;
-            var data = DecompressOldBlock(buffer, (int)compressedSize, decompressedSize, out actualSize);
-            reader.Seek(start + actualSize);
-            return data;
-        }
-
-        public static byte[] DecompressOldBlock(byte[] buff, int size, int decompSize, out int actual_size)
-        {
-            var originalBuff = Marshal.AllocHGlobal(size);
-            Marshal.Copy(buff, 0, originalBuff, buff.Length);
-            var outputBuff = Marshal.AllocHGlobal(decompSize);
-            actual_size = NativeLib.decompressOld(originalBuff, size, outputBuff, decompSize);
-            Marshal.FreeHGlobal(originalBuff);
-            var data = new byte[decompSize];
-            Marshal.Copy(outputBuff, data, 0, decompSize);
-            Marshal.FreeHGlobal(outputBuff);
-            return data;
-        }*/
 
         public static byte[] CompressBlock(byte[] data)
         {

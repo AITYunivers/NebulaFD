@@ -16,6 +16,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            NebulaCore.PackageData.SoundBank = this;
             if (Parameters.DontIncludeSounds)
                 return;
 
@@ -27,13 +28,15 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             else
                 Count = reader.ReadInt();
 
+            if (NebulaCore.Fusion == 1.5f)
+                return;
+
             for (int i = 0; i < Count; i++)
             {
                 Sound snd = new Sound();
                 snd.ReadCCN(reader);
                 Sounds[snd.Handle] = snd;
             }
-            NebulaCore.PackageData.SoundBank = this;
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

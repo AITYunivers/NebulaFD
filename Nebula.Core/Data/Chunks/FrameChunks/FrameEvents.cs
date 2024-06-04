@@ -58,6 +58,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            if (Parameters.DontIncludeEvents)
+                return;
+
             while (true)
             {
                 string identifier = reader.ReadAscii(4);

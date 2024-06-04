@@ -44,15 +44,15 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                 ImageCount = reader.ReadInt();
             }
 
+            if (NebulaCore.Fusion == 1.5f)
+                return;
+
             for (int i = 0; i < ImageCount; i++)
             {
                 Image img = Image.NewImage();
                 img.ReadCCN(reader);
                 Images[img.Handle] = img;
             }
-
-            foreach (Task task in TaskManager)
-                task.Wait();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

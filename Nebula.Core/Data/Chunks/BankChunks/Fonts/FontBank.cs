@@ -16,18 +16,20 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Fonts
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            NebulaCore.PackageData.FontBank = this;
             if (Parameters.DontIncludeFonts)
                 return;
 
             Count = reader.ReadInt();
+            if (NebulaCore.Fusion == 1.5f)
+                return;
             for (int i = 0; i < Count; i++)
             {
                 Font fnt = new Font();
-                fnt.Compressed = NebulaCore.Fusion > 1.5f && !NebulaCore.Android && !NebulaCore.iOS && !NebulaCore.Flash && !NebulaCore.HTML;
+                fnt.Compressed = !NebulaCore.Android && !NebulaCore.iOS && !NebulaCore.Flash && !NebulaCore.HTML;
                 fnt.ReadCCN(reader);
                 Fonts[fnt.Handle] = fnt;
             }
-            NebulaCore.PackageData.FontBank = this;
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
