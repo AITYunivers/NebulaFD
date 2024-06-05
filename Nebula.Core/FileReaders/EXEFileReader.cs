@@ -15,11 +15,14 @@ namespace Nebula.Core.FileReaders
         public Dictionary<int, Bitmap> Icons { get { return _icons; } set { _icons = value; } }
         private Dictionary<int, Bitmap> _icons = new Dictionary<int, Bitmap>();
 
+        public string FilePath { get { return _filePath; } set { _filePath = value; } }
+        public string _filePath = string.Empty;
+
         public CCNPackageData Package = new();
 
         public void LoadGame(ByteReader fileReader, string filePath)
         {
-            loadIcons(filePath);
+            loadIcons(_filePath = filePath);
             calculateEntryPoint(fileReader);
 
             if (!fileReader.HasMemory(1)) // Check for Unpacked
@@ -29,7 +32,7 @@ namespace Nebula.Core.FileReaders
                 foreach (ResourceIdentifier identifier in resourceIdentifiers)
                     if (identifier.Type.Code == 6 && identifier.Name.Code == 11)
                     {
-                        Package.ModulesDir = Encoding.Unicode.GetString(portableExecutable.GetResource(identifier).Data).Trim('\b', '\0');
+                        Package.ModulesDir = Utilities.Utilities.ClearName(Encoding.Unicode.GetString(portableExecutable.GetResource(identifier).Data), '\\');
                         break;
                     }
                 fileReader = new ByteReader(Path.ChangeExtension(filePath, "dat"), FileMode.Open);

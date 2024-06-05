@@ -362,3 +362,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Nebula.Plugins/InfoDump/ExtensionDumper.cs
+/.resources/ExtensionDumper.mfx
+/Nebula.Plugins/MappingTool/

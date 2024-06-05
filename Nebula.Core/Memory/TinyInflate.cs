@@ -2,720 +2,693 @@
  * tinflate.c -- tiny inflate library
  *
  * Written by Andrew Church <achurch@achurch.org>
+ * Re-written for C++ by Lucas "LAK132" Kleiss <https://github.com/LAK132>
+ * Re-written for C# by Yunivers for Nebula <https://github.com/AITYunivers/NebulaFD>
+ * 
  * This source code is public domain.
  */
 
-// Ported to C# by Yunivers
+using Nebula.Core.Memory;
+
 namespace Nebula.Core
 {
-    public static unsafe class TinyInflate
+    public static class TinyInflate
     {
-        public struct DecompressionState
+
+        public class DecompressionState
         {
-            public enum _state
+            public ByteReader Data;
+
+            public State State = State.Initial;
+            public ulong CRC = 0;
+            public uint BitAccum = 0;
+            public uint NumBits = 0;
+            public bool Final = false;
+            public bool Anaconda = false;
+
+            public byte FirstByte;
+            public byte BlockType;
+            public uint Counter;
+            public uint Symbol;
+            public uint LastValue;
+            public uint RepeatLength;
+            public uint RepeatCount;
+            public uint Distance;
+
+            public uint Length;
+            public uint ILength;
+            public uint NRead;
+
+            public short[] LiteralTable = new short[0x23E]; // (288 * 2) - 2
+            public short[] DistanceTable = new short[0x3E]; // (32 * 2) - 2;
+            public uint LiteralCount;
+            public uint DistanceCount;
+            public uint CodeLenCount;
+            public short[] CodeLenTable = new short[0x24]; // (19 * 2) - 2
+            public byte[] LiteralLen = new byte[0x120]; // 288
+            public byte[] DistanceLen = new byte[0x20]; // 32
+            public byte[] CodeLenLen = new byte[0x13]; // 19
+
+            public bool PeekBits(uint bits, ref byte output)
             {
-                INITIAL = 0,
-                PARTIAL_ZLIB_HEADER,
-                HEADER,
-                UNCOMPRESSED_LEN,
-                UNCOMPRESSED_ILEN,
-                UNCOMPRESSED_DATA,
-                LITERAL_COUNT,
-                DISTANCE_COUNT,
-                CODELEN_COUNT,
-                READ_CODE_LENGTHS,
-                READ_LENGTHS,
-                READ_LENGTHS_16,
-                READ_LENGTHS_17,
-                READ_LENGTHS_18,
-                READ_SYMBOL,
-                READ_LENGTH,
-                READ_DISTANCE,
-                READ_DISTANCE_EXTRA
-            };
-
-            public _state state;
-            public byte[] in_ptr;
-            public uint in_ptr_index;
-            public byte[] out_base;
-            public uint out_base_index;
-            public ulong out_ofs;
-            public ulong out_size;
-
-            public ulong crc;
-            public ulong bit_accum;
-            public byte num_bits;
-            public byte final;
-
-            public byte first_byte;
-
-            public byte block_type;
-            public uint counter;
-            public uint symbol;
-            public uint last_value;
-            public uint repeat_length;
-
-            public uint len;
-            public uint ilen;
-            public uint nread;
-
-            public short[] literal_table;// [288 * 2 - 2];
-            public uint literal_table_index;
-            public short[] distance_table;// [32 * 2 - 2];
-            public uint distance_table_index;
-            public uint literal_count;
-            public uint distance_count;
-            public uint codelen_count;
-            public short[] codelen_table;// [19 * 2 - 2];
-            public uint codelen_table_index;
-            public byte[] literal_len;// [288];
-            public uint literal_len_index;
-            public byte[] distance_len;// [32];
-            public uint distance_len_index;
-            public byte[] codelen_len;// [19];
-            public uint codelen_len_index;
-        }
-
-        static ulong[] crc32_table = new ulong[256]
-        {
-            0x00000000UL, 0x77073096UL, 0xEE0E612CUL, 0x990951BAUL, 0x076DC419UL,
-            0x706AF48FUL, 0xE963A535UL, 0x9E6495A3UL, 0x0EDB8832UL, 0x79DCB8A4UL,
-            0xE0D5E91EUL, 0x97D2D988UL, 0x09B64C2BUL, 0x7EB17CBDUL, 0xE7B82D07UL,
-            0x90BF1D91UL, 0x1DB71064UL, 0x6AB020F2UL, 0xF3B97148UL, 0x84BE41DEUL,
-            0x1ADAD47DUL, 0x6DDDE4EBUL, 0xF4D4B551UL, 0x83D385C7UL, 0x136C9856UL,
-            0x646BA8C0UL, 0xFD62F97AUL, 0x8A65C9ECUL, 0x14015C4FUL, 0x63066CD9UL,
-            0xFA0F3D63UL, 0x8D080DF5UL, 0x3B6E20C8UL, 0x4C69105EUL, 0xD56041E4UL,
-            0xA2677172UL, 0x3C03E4D1UL, 0x4B04D447UL, 0xD20D85FDUL, 0xA50AB56BUL,
-            0x35B5A8FAUL, 0x42B2986CUL, 0xDBBBC9D6UL, 0xACBCF940UL, 0x32D86CE3UL,
-            0x45DF5C75UL, 0xDCD60DCFUL, 0xABD13D59UL, 0x26D930ACUL, 0x51DE003AUL,
-            0xC8D75180UL, 0xBFD06116UL, 0x21B4F4B5UL, 0x56B3C423UL, 0xCFBA9599UL,
-            0xB8BDA50FUL, 0x2802B89EUL, 0x5F058808UL, 0xC60CD9B2UL, 0xB10BE924UL,
-            0x2F6F7C87UL, 0x58684C11UL, 0xC1611DABUL, 0xB6662D3DUL, 0x76DC4190UL,
-            0x01DB7106UL, 0x98D220BCUL, 0xEFD5102AUL, 0x71B18589UL, 0x06B6B51FUL,
-            0x9FBFE4A5UL, 0xE8B8D433UL, 0x7807C9A2UL, 0x0F00F934UL, 0x9609A88EUL,
-            0xE10E9818UL, 0x7F6A0DBBUL, 0x086D3D2DUL, 0x91646C97UL, 0xE6635C01UL,
-            0x6B6B51F4UL, 0x1C6C6162UL, 0x856530D8UL, 0xF262004EUL, 0x6C0695EDUL,
-            0x1B01A57BUL, 0x8208F4C1UL, 0xF50FC457UL, 0x65B0D9C6UL, 0x12B7E950UL,
-            0x8BBEB8EAUL, 0xFCB9887CUL, 0x62DD1DDFUL, 0x15DA2D49UL, 0x8CD37CF3UL,
-            0xFBD44C65UL, 0x4DB26158UL, 0x3AB551CEUL, 0xA3BC0074UL, 0xD4BB30E2UL,
-            0x4ADFA541UL, 0x3DD895D7UL, 0xA4D1C46DUL, 0xD3D6F4FBUL, 0x4369E96AUL,
-            0x346ED9FCUL, 0xAD678846UL, 0xDA60B8D0UL, 0x44042D73UL, 0x33031DE5UL,
-            0xAA0A4C5FUL, 0xDD0D7CC9UL, 0x5005713CUL, 0x270241AAUL, 0xBE0B1010UL,
-            0xC90C2086UL, 0x5768B525UL, 0x206F85B3UL, 0xB966D409UL, 0xCE61E49FUL,
-            0x5EDEF90EUL, 0x29D9C998UL, 0xB0D09822UL, 0xC7D7A8B4UL, 0x59B33D17UL,
-            0x2EB40D81UL, 0xB7BD5C3BUL, 0xC0BA6CADUL, 0xEDB88320UL, 0x9ABFB3B6UL,
-            0x03B6E20CUL, 0x74B1D29AUL, 0xEAD54739UL, 0x9DD277AFUL, 0x04DB2615UL,
-            0x73DC1683UL, 0xE3630B12UL, 0x94643B84UL, 0x0D6D6A3EUL, 0x7A6A5AA8UL,
-            0xE40ECF0BUL, 0x9309FF9DUL, 0x0A00AE27UL, 0x7D079EB1UL, 0xF00F9344UL,
-            0x8708A3D2UL, 0x1E01F268UL, 0x6906C2FEUL, 0xF762575DUL, 0x806567CBUL,
-            0x196C3671UL, 0x6E6B06E7UL, 0xFED41B76UL, 0x89D32BE0UL, 0x10DA7A5AUL,
-            0x67DD4ACCUL, 0xF9B9DF6FUL, 0x8EBEEFF9UL, 0x17B7BE43UL, 0x60B08ED5UL,
-            0xD6D6A3E8UL, 0xA1D1937EUL, 0x38D8C2C4UL, 0x4FDFF252UL, 0xD1BB67F1UL,
-            0xA6BC5767UL, 0x3FB506DDUL, 0x48B2364BUL, 0xD80D2BDAUL, 0xAF0A1B4CUL,
-            0x36034AF6UL, 0x41047A60UL, 0xDF60EFC3UL, 0xA867DF55UL, 0x316E8EEFUL,
-            0x4669BE79UL, 0xCB61B38CUL, 0xBC66831AUL, 0x256FD2A0UL, 0x5268E236UL,
-            0xCC0C7795UL, 0xBB0B4703UL, 0x220216B9UL, 0x5505262FUL, 0xC5BA3BBEUL,
-            0xB2BD0B28UL, 0x2BB45A92UL, 0x5CB36A04UL, 0xC2D7FFA7UL, 0xB5D0CF31UL,
-            0x2CD99E8BUL, 0x5BDEAE1DUL, 0x9B64C2B0UL, 0xEC63F226UL, 0x756AA39CUL,
-            0x026D930AUL, 0x9C0906A9UL, 0xEB0E363FUL, 0x72076785UL, 0x05005713UL,
-            0x95BF4A82UL, 0xE2B87A14UL, 0x7BB12BAEUL, 0x0CB61B38UL, 0x92D28E9BUL,
-            0xE5D5BE0DUL, 0x7CDCEFB7UL, 0x0BDBDF21UL, 0x86D3D2D4UL, 0xF1D4E242UL,
-            0x68DDB3F8UL, 0x1FDA836EUL, 0x81BE16CDUL, 0xF6B9265BUL, 0x6FB077E1UL,
-            0x18B74777UL, 0x88085AE6UL, 0xFF0F6A70UL, 0x66063BCAUL, 0x11010B5CUL,
-            0x8F659EFFUL, 0xF862AE69UL, 0x616BFFD3UL, 0x166CCF45UL, 0xA00AE278UL,
-            0xD70DD2EEUL, 0x4E048354UL, 0x3903B3C2UL, 0xA7672661UL, 0xD06016F7UL,
-            0x4969474DUL, 0x3E6E77DBUL, 0xAED16A4AUL, 0xD9D65ADCUL, 0x40DF0B66UL,
-            0x37D83BF0UL, 0xA9BCAE53UL, 0xDEBB9EC5UL, 0x47B2CF7FUL, 0x30B5FFE9UL,
-            0xBDBDF21CUL, 0xCABAC28AUL, 0x53B39330UL, 0x24B4A3A6UL, 0xBAD03605UL,
-            0xCDD70693UL, 0x54DE5729UL, 0x23D967BFUL, 0xB3667A2EUL, 0xC4614AB8UL,
-            0x5D681B02UL, 0x2A6F2B94UL, 0xB40BBE37UL, 0xC30C8EA1UL, 0x5A05DF1BUL,
-            0x2D02EF8DUL
-        };
-
-        public static int tinflate_state_size()
-        {
-            return sizeof(DecompressionState);
-        }
-
-        public static long tinflate(byte[] compressed_data, long compressed_size,
-                                    ref byte[] output_buffer, ulong output_size,
-                                    ref ulong crc_ret)
-        {
-            DecompressionState state = new DecompressionState();
-            ulong size = 0;
-            int result = 0;
-            output_buffer = new byte[output_size];
-
-            if (compressed_data.Length == 0 || compressed_size < 0 || output_size < 0)
-                return -1;
-
-            state.state = DecompressionState._state.INITIAL;
-            state.out_ofs = 0;
-            state.crc = 0;
-            state.bit_accum = 0;
-            state.num_bits = 0;
-            state.final = 0;
-            state.literal_table = new short[288 * 2 - 2];
-            state.distance_table = new short[32 * 2 - 2];
-            state.codelen_table = new short[19 * 2 - 2];
-            state.literal_len = new byte[288];
-            state.distance_len = new byte[32];
-            state.codelen_len = new byte[19];
-            
-            result = tinflate_partial(compressed_data, compressed_size,
-                                      ref output_buffer, output_size,
-                                      ref size, ref crc_ret, ref state);
-
-            if (result != 0)
-                return -1;
-
-            return (long)size;
-        }
-
-        public static int tinflate_partial(byte[] compressed_data, long compressed_size,
-                                           ref byte[] output_buffer, ulong output_size,
-                                           ref ulong size_ret, ref ulong crc_ret,
-                                           ref DecompressionState state)
-        {
-            if (compressed_data.Length == 0 | compressed_size < 0 || output_size < 0)
-                return -1;
-
-            state.in_ptr = compressed_data;
-            state.in_ptr_index = 0;
-            state.out_base = output_buffer;
-            state.out_base_index = 0;
-            state.out_size = output_size;
-
-            if (state.state == DecompressionState._state.INITIAL || state.state == DecompressionState._state.PARTIAL_ZLIB_HEADER)
-            {
-                uint zlib_header = 0;
-
-                if (compressed_size == 0)
-                    return 1;
-
-                if (state.state == DecompressionState._state.INITIAL && compressed_size == 1)
+                output = default!;
+                while (NumBits < bits)
                 {
-                    state.first_byte = state.in_ptr[0];
-                    state.state = DecompressionState._state.PARTIAL_ZLIB_HEADER;
-                    return 1;
+                    if (!Data.HasMemory(1)) return true;
+                    BitAccum |= ((uint)Data.ReadByte()) << (int)NumBits;
+                    NumBits += 8;
                 }
-
-                if (state.state == DecompressionState._state.PARTIAL_ZLIB_HEADER)
-                    zlib_header = (uint)state.first_byte << 8 | state.in_ptr[0];
-                else
-                    zlib_header = (uint)state.in_ptr[0] << 8 | state.in_ptr[1];
-
-                if ((zlib_header & 0x8F00) == 0x0800 && zlib_header % 31 == 0)
-                {
-                    if ((zlib_header & 0x0020) != 0)
-                        return -1;
-
-                    state.in_ptr_index += state.state == DecompressionState._state.PARTIAL_ZLIB_HEADER ? 1u : 2u;
-                }
-                else if (state.state == DecompressionState._state.PARTIAL_ZLIB_HEADER)
-                {
-                    state.bit_accum = state.first_byte;
-                    state.num_bits = 8;
-                }
-
-                state.state = DecompressionState._state.HEADER;
+                output = (byte)(BitAccum & ((1UL << (int)bits) - 1));
+                return false;
             }
+
+            public bool GetBits(uint bits, out byte output)
+            {
+                uint outU = 0;
+                bool outB = GetBits(bits, out outU);
+                output = (byte)(outU);
+                return outB;
+            }
+
+            public bool GetBits(uint bits, out uint output)
+            {
+                output = default!;
+                while (NumBits < bits)
+                {
+                    if (!Data.HasMemory(1)) return true;
+                    BitAccum |= ((uint)Data.ReadByte()) << (int)NumBits;
+                    NumBits += 8;
+                }
+                output = (uint)(BitAccum & ((1UL << (int)bits) - 1));
+                BitAccum >>= (int)bits;
+                NumBits -= bits;
+                return false;
+            }
+
+            public bool GetHuff(short[] table, out byte output)
+            {
+                uint outU = 0;
+                bool outB = GetHuff(table, out outU);
+                output = (byte)(outU);
+                return outB;
+            }
+
+            public bool GetHuff(short[] table, out uint output)
+            {
+                output = default!;
+                uint bitsUsed = 0;
+                uint index = 0;
+                while (true)
+                {
+                    if (NumBits <= bitsUsed)
+                    {
+                        if (!Data.HasMemory(1)) return true;
+                        BitAccum |= ((uint)Data.ReadByte()) << (int)NumBits;
+                        NumBits += 8;
+                    }
+                    index += (BitAccum >> (int)bitsUsed) & 1;
+                    bitsUsed++;
+                    if (table[index] >= 0) break;
+                    index = (uint)~(table[index]);
+                }
+                BitAccum >>= (int)bitsUsed;
+                NumBits -= bitsUsed;
+                output = (uint)table[index];
+                return false;
+            }
+        }
+
+        public static Error Tinflate(byte[] input, out List<byte> output, out ulong CRC)
+        {
+            return Tinflate(new ByteReader(input), out output, new(), out CRC);
+        }
+
+        public static Error Tinflate(ByteReader input, out List<byte> output, out ulong CRC)
+        {
+            return Tinflate(input, out output, new(), out CRC);
+        }
+
+        public static Error Tinflate(byte[] input, out List<byte> output, DecompressionState state, out ulong CRC)
+        {
+            return Tinflate(new ByteReader(input), out output, state, out CRC);
+        }
+
+        public static Error Tinflate(ByteReader input, out List<byte> output, DecompressionState state, out ulong CRC)
+        {
+            state.Data = input;
+            output = new List<byte>();
+            CRC = 0;
+
+            Error er = Error.Unknown;
+            if ((er = TinflateHeader(state)) != Error.OK)
+                return er;
 
             do
             {
-                int res = tinflate_block(ref state);
-                if (res != 0)
-                    return res;
-                if (state.out_ofs < 0)
-                    return -1;
-            } while (state.final == 0);
+                if ((er = TinflateBlock(ref output, state)) != Error.OK)
+                    return er;
+            } while (!state.Final);
 
-            if (size_ret != 0)
-                size_ret = state.out_ofs;
-            if (crc_ret != 0)
-                crc_ret = state.crc;
-
-            return 0;
+            CRC = state.CRC;
+            return Error.OK;
         }
 
-        public static int tinflate_block(ref DecompressionState state)
+        public static Error TinflateHeader(DecompressionState state)
         {
-            byte[] in_ptr = new byte[state.in_ptr.Length];
-            Array.Copy(state.in_ptr, in_ptr, in_ptr.Length);
-            int in_ptr_index = (int)state.in_ptr_index;
-            byte[] out_base = new byte[state.out_base.Length];
-            Array.Copy(state.out_base, out_base, out_base.Length);
-            uint out_base_index = state.out_base_index;
-            ulong out_ofs = state.out_ofs;
-            ulong out_size = state.out_size;
-            ulong bit_accum = state.bit_accum;
-            uint num_bits = state.num_bits;
+            long size = state.Data.Size() - state.Data.Tell();
+            if (size <= 0) return Error.OutOfData;
 
-            ulong icrc = ~state.crc;
-
-            int output = CHECK_STATE(ref state, ref num_bits, ref in_ptr_index, ref bit_accum, in_ptr, ref out_ofs, out_size, ref out_base, ref icrc);
-
-            state.in_ptr = in_ptr;
-            state.out_ofs = out_ofs;
-            state.crc = ~icrc & 0xFFFFFFFFUL;
-            state.bit_accum = bit_accum;
-            state.num_bits = (byte)num_bits;
-            if (output == 0)
-                state.state = DecompressionState._state.HEADER;
-            return output;
-        }
-
-        private static int GETBITS(uint n, ref ulong var, ref uint num_bits, ref int in_ptr_index, int in_ptr_length, ref ulong bit_accum)
-        {
-            uint __n = n;
-            while (num_bits < __n)
+            if (state.State == State.Initial || state.State == State.PartialZlibHeader)
             {
-                if (in_ptr_index >= in_ptr_length)
-                    return 1;
-                bit_accum |= (ulong)in_ptr_index << (int)num_bits;
-                num_bits += 8;
-                in_ptr_index++;
-            }
-            var = bit_accum & (__n - 1);
-            bit_accum >>= (int)__n;
-            num_bits -= __n;
-            return 0;
-        }
+                ushort zlibHeader;
+                if (size == 0)
+                    return Error.OutOfData;
 
-        private static int GETHUFF(ref ulong var, uint[] table, uint num_bits, uint in_ptr_index, uint in_ptr_length, ref ulong bit_accum)
-        {
-            uint bits_used = 0;
-            uint index = 0;
-            for (;;)
-            {
-                if (num_bits <= bits_used)
+                if (state.State == State.Initial && size == 1)
                 {
-                    if (in_ptr_index >= in_ptr_length)
-                        return 1;
-                    bit_accum |= (ulong)in_ptr_index << (int)num_bits;
-                    num_bits += 8;
-                    in_ptr_index++;
+                    state.FirstByte = state.Data.ReadByte();
+                    state.State = State.PartialZlibHeader;
+                    return Error.OutOfData;
                 }
-                index += (uint)(bit_accum >> (int)bits_used) & 1;
-                bits_used++;
-                if (table[index] >= 0)
-                    break;
-                index = ~table[index];
-            }
-            bit_accum >>= (int)bits_used;
-            num_bits -= bits_used;
-            var = table[index];
-            return 0;
-        }
 
-        private static void PUTBYTE(byte _byte, ref ulong out_ofs, ulong out_size, ref byte[] out_base, ref ulong icrc)
-        {
-            byte __byte = _byte;
-            if (out_ofs < out_size)
-                out_base[out_ofs] = __byte;
-            out_ofs++;
-            UPDATECRC(__byte, ref icrc);
-        }
+                if (state.State == State.PartialZlibHeader)
+                    zlibHeader = (ushort)((state.FirstByte << 8) | state.Data.GetByteAt(0));
+                else
+                    zlibHeader = (ushort)((state.Data.GetByteAt(0) << 8) | state.Data.GetByteAt(1));
 
-        private static void PUTBYTESAFE(byte _byte, ref ulong out_ofs, ref byte[] out_base, ref ulong icrc)
-        {
-            byte __byte = _byte;
-            out_base[out_ofs] = __byte;
-            out_ofs++;
-            UPDATECRC(__byte, ref icrc);
-        }
+                if ((zlibHeader & 0x8F00) == 0x0800 && (zlibHeader % 31) == 0)
+                {
+                    if ((zlibHeader & 0x0020) != 0)
+                        return Error.CustomDictionary;
 
-        private static void UPDATECRC(byte _byte, ref ulong icrc)
-        {
-            byte __val = _byte;
-            icrc = crc32_table[(icrc & 0xFF) ^ __val] ^ ((icrc >> 8) & 0xFFFFFFUL);
-        }
-
-        private static int CHECK_STATE(ref DecompressionState state, ref uint num_bits, ref int in_ptr_index, ref ulong bit_accum,
-                                       byte[] in_ptr, ref ulong out_ofs, ulong out_size, ref byte[] out_base, ref ulong icrc)
-        {
-            ulong blocktype = 0;
-            int e = 0;
-            if (state.state != DecompressionState._state.UNCOMPRESSED_LEN)
-            {
-                blocktype = state.block_type;
-                e = GETBITS(3, ref blocktype, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
-                if (e != 0) return e;
-                state.block_type = (byte)blocktype;
-                state.final = (byte)(state.block_type & 1);
-                state.block_type >>= 1;
-
-                if (state.block_type == 3)
-                    return -1;
+                    state.Data.Seek(state.State == State.PartialZlibHeader ? 1 : 2);
+                    if (state.Data.Tell() >= state.Data.Size())
+                        return Error.OutOfData;
+                }
+                else if (state.State == State.PartialZlibHeader)
+                {
+                    state.BitAccum = state.FirstByte;
+                    state.NumBits = 8;
+                }
+                state.State = State.Header;
             }
 
-            if (state.block_type == 0 || state.state == DecompressionState._state.UNCOMPRESSED_LEN)
+            return Error.OK;
+        }
+
+        private static void _push(byte val, ref ulong iCRC, ref List<byte> output)
+        {
+            output.Add(val);
+            iCRC = CRCTable[(iCRC & 0xFF) ^ val] ^ ((iCRC >> 8) & 0xFFFFFFUL);
+        }
+
+        private static Error _outOfData(ref DecompressionState state, ref ulong iCRC)
+        {
+            state.CRC = ~iCRC & 0xFFFFFFFFUL;
+            return Error.OutOfData;
+        }
+
+        public static Error TinflateBlock(ref List<byte> output, DecompressionState state)
+        {
+            ulong iCRC = ~state.CRC;
+
+            byte[] codelenOrder = new byte[] { 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 };
+            byte[] codelenOrderAnaconda = new byte[] { 18, 17, 16, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+            if (state.State == State.Initial ||
+                state.State == State.PartialZlibHeader)
+                return Error.InvalidState;
+
+            if (state.State != State.Header)
+                throw new NotImplementedException("Starting from non-header states is unsupported!");
+
+            if (state.Anaconda)
             {
-                if (state.state != DecompressionState._state.UNCOMPRESSED_LEN)
-                    num_bits = 0;
-                state.state = DecompressionState._state.UNCOMPRESSED_LEN;
-                if (state.state == DecompressionState._state.UNCOMPRESSED_LEN)
-                {
-                    ulong statelen = state.len;
-                    e = GETBITS(16, ref statelen, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
-                    if (e != 0) return e;
-                    state.len = (uint)statelen;
-                    state.state = DecompressionState._state.UNCOMPRESSED_ILEN;
-                }
-                if (state.state == DecompressionState._state.UNCOMPRESSED_ILEN)
-                {
-                    ulong stateilen = state.ilen;
-                    e = GETBITS(16, ref stateilen, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
-                    if (e != 0) return e;
-                    state.ilen = (uint)stateilen;
-                    if (state.ilen != (~state.len & 0xFFFF))
-                        return -1;
-                    state.nread = 0;
-                    state.state = DecompressionState._state.UNCOMPRESSED_DATA;
-                }
-                if (state.state == DecompressionState._state.UNCOMPRESSED_DATA)
-                {
-                    while (state.nread < state.len)
-                    {
-                        if (in_ptr_index < in_ptr.Length)
-                            return 1;
-                        PUTBYTE(in_ptr[in_ptr_index++], ref out_ofs, out_size, ref out_base, ref icrc);
-                        state.nread++;
-                    }
-                    state.in_ptr = in_ptr;
-                    state.out_ofs = out_ofs;
-                    state.crc = ~icrc & 0xFFFFFFFFUL;
-                    state.bit_accum = bit_accum;
-                    state.num_bits = (byte)num_bits;
-                    state.state = DecompressionState._state.HEADER;
-                }
-                return 0;
-            }
+                if (state.GetBits(4, out state.BlockType)) return _outOfData(ref state, ref iCRC);
+                state.Final = state.BlockType >> 3 != 0;
+                state.BlockType &= 0x7;
 
-            if (state.block_type == 2)
-            {
-                byte[] codelen_order = new byte[19]
-                {
-                            16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15
-                };
-
-                state.state = DecompressionState._state.LITERAL_COUNT;
-                if (state.state == DecompressionState._state.LITERAL_COUNT)
-                {
-                    ulong literalcount = state.literal_count;
-                    e = GETBITS(5, ref literalcount, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
-                    if (e != 0) return e;
-                    state.literal_count = (uint)literalcount;
-                    state.literal_count += 257;
-                    state.state = DecompressionState._state.DISTANCE_COUNT;
-                }
-                if (state.state == DecompressionState._state.DISTANCE_COUNT)
-                {
-                    ulong distancecount = state.distance_count;
-                    e = GETBITS(5, ref distancecount, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
-                    if (e != 0) return e;
-                    state.distance_count = (uint)distancecount;
-                    state.distance_count += 1;
-                    state.state = DecompressionState._state.CODELEN_COUNT;
-                }
-                if (state.state == DecompressionState._state.CODELEN_COUNT)
-                {
-                    ulong codelencount = state.codelen_count;
-                    e = GETBITS(4, ref codelencount, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
-                    if (e != 0) return e;
-                    state.codelen_count = (uint)codelencount;
-                    state.codelen_count += 4;
-
-                    state.counter = 0;
-                    state.state = DecompressionState._state.READ_CODE_LENGTHS;
-                }
-                if (state.state == DecompressionState._state.READ_CODE_LENGTHS)
-                {
-                    while (state.counter < state.codelen_count)
-                    {
-                        ulong value1 = state.codelen_len[codelen_order[state.counter]];
-                        e = GETBITS(3, ref value1, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
-                        if (e != 0) return e;
-                        state.codelen_len[codelen_order[state.counter]] = (byte)value1;
-                        state.counter++;
-                    }
-
-                    for (; state.counter < 19; state.counter++)
-                        state.codelen_len[codelen_order[state.counter]] = 0;
-
-                    if (gen_huffman_table(19, state.codelen_len, 0, ref state.codelen_table) == 0)
-                        return -1;
-
-                    state.last_value = 0;
-                    state.counter = 0;
-                    state.state = DecompressionState._state.READ_LENGTHS;
-                }
-                uint repeat_count = 0;
-                while (state.counter < state.literal_count + state.distance_count)
-                {
-                    if (repeat_count == 0)
-                    {
-                        uint[] codelentable = new uint[state.codelen_table.Length];
-                        for (int i = 0; i < state.codelen_table.Length; i++)
-                            codelentable[i] = (uint)state.codelen_table[i];
-                        ulong statesymbol = state.symbol;
-                        e = GETHUFF(ref statesymbol, codelentable, num_bits, (uint)in_ptr_index, (uint)in_ptr.Length, ref bit_accum);
-                        if (e != 0) return e;
-                        state.symbol = (uint)statesymbol;
-                        for (int i = 0; i < state.codelen_table.Length; i++)
-                            state.codelen_table[i] = (short)codelentable[i];
-
-                        if (state.symbol < 16)
-                        {
-                            state.last_value = state.symbol;
-                            repeat_count = 1;
-                        }
-                        else if (state.symbol == 16)
-                        {
-                            state.state = DecompressionState._state.READ_LENGTHS_16;
-                            ulong repeatcount = repeat_count;
-                            e = GETBITS(2, ref repeatcount, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
-                            if (e != 0) return e;
-                            repeat_count = (uint)repeatcount;
-                            repeat_count += 3;
-                        }
-                        else if (state.symbol == 17)
-                        {
-                            state.last_value = 0;
-                            state.state = DecompressionState._state.READ_LENGTHS_17;
-                            ulong repeatcount = repeat_count;
-                            e = GETBITS(3, ref repeatcount, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
-                            if (e != 0) return e;
-                            repeat_count = (uint)repeatcount;
-                            repeat_count += 3;
-                        }
-                        else
-                        {
-                            state.last_value = 0;
-                            state.state = DecompressionState._state.READ_LENGTHS_18;
-                            ulong repeatcount = repeat_count;
-                            e = GETBITS(7, ref repeatcount, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
-                            if (e != 0) return e;
-                            repeat_count = (uint)repeatcount;
-                            repeat_count += 11;
-                        }
-                    }
-
-                    if (state.counter < state.literal_count)
-                        state.literal_len[state.counter] = (byte)state.last_value;
-                    else
-                        state.distance_len[state.counter - state.literal_count] = (byte)state.last_value;
-
-                    state.counter++;
-                    repeat_count--;
-                    state.state = DecompressionState._state.READ_LENGTHS;
-                }
-
-                if (gen_huffman_table(state.literal_count, state.literal_len, 0, ref state.literal_table) == 0 ||
-                    gen_huffman_table(state.distance_count, state.distance_len, 1, ref state.distance_table) == 0)
-                    return -1;
+                if (state.BlockType == 7)
+                    state.BlockType = 0;
+                else if (state.BlockType == 5)
+                    state.BlockType = 1;
+                else if (state.BlockType == 6)
+                    state.BlockType = 2;
+                else
+                    state.BlockType = 3;
             }
             else
             {
-                int next_free = 2;
-                int i = 0;
-
-                for (i = 0; i < 0x7E; i++)
-                {
-                    state.literal_table[i] = (short)~next_free;
-                    next_free += 2;
-                }
-
-                for (; i < 0x96; i++)
-                    state.literal_table[i] = (short)(i + (256 - 0x7E));
-
-                for (; i < 0xFE; i++)
-                {
-                    state.literal_table[i] = (short)~next_free;
-                    next_free += 2;
-                }
-
-                for (; i < 0x18E; i++)
-                    state.literal_table[i] = (short)(i + (0 - 0xFE));
-
-                for (; i < 0x196; i++)
-                    state.literal_table[i] = (short)(i + (280 - 0x18E));
-
-                for (; i < 0x1CE; i++)
-                {
-                    state.literal_table[i] = (short)~next_free;
-                    next_free += 2;
-                }
-
-                for (; i < 0x23E; i++)
-                    state.literal_table[i] = (short)(i + (144 - 0x1CE));
-
-                for (i = 0; i < 0x1E; i++)
-                    state.distance_table[i] = (short)~(i * 2 + 2);
-
-                for (i = 0x1E; i < 0x3E; i++)
-                    state.distance_table[i] = (short)(i - 0x1E);
+                if (state.GetBits(3, out state.BlockType)) return _outOfData(ref state, ref iCRC);
+                state.Final = (state.BlockType & 0x1) != 0;
+                state.BlockType >>= 1;
             }
 
-            for (; ; )
+            if (state.BlockType == 3)
             {
-                uint distance = 0;
+                state.CRC = ~iCRC & 0xFFFFFFFFUL;
+                return Error.InvalidBlockCode;
+            }
 
-                if (out_ofs < 0)
-                    return -1;
+            if (state.BlockType == 0)
+            {
+                state.NumBits = 0;
+                state.State = State.UncompressedLen;
+                if (state.GetBits(16, out state.Length)) return _outOfData(ref state, ref iCRC);
+                state.State = State.UncompressedILen;
 
-                state.state = DecompressionState._state.READ_SYMBOL;
-            state_READ_SYMBOL:
-                uint[] literaltable = new uint[state.literal_table.Length];
-                for (int i = 0; i < state.literal_table.Length; i++)
-                    literaltable[i] = (uint)state.literal_table[i];
-                ulong statesymbol = state.symbol;
-                e = GETHUFF(ref statesymbol, literaltable, num_bits, (uint)in_ptr_index, (uint)in_ptr.Length, ref bit_accum);
-                if (e != 0) return e;
-                state.symbol = (uint)statesymbol;
-                for (int i = 0; i < state.literal_table.Length; i++)
-                    state.literal_table[i] = (short)literaltable[i];
-
-                if (state.symbol < 256)
+                if (!state.Anaconda)
                 {
-                    PUTBYTE((byte)state.symbol, ref out_ofs, out_size, ref out_base, ref icrc);
+                    if (state.GetBits(16, out state.ILength)) return _outOfData(ref state, ref iCRC);
+
+                    if (state.ILength != (~state.Length & 0xFFFF))
+                    {
+                        state.CRC = ~iCRC & 0xFFFFFFFFUL;
+                        return Error.CorruptStream;
+                    }
+                }
+
+                state.NRead = 0;
+                state.State = State.UncompressedData;
+
+                while (state.NRead < state.Length)
+                {
+                    if (state.Data.Tell() >= state.Data.Size()) return _outOfData(ref state, ref iCRC);
+                    _push(state.Data.ReadByte(), ref iCRC, ref output);
+                    state.NRead++;
+                }
+                state.CRC = ~iCRC & 0xFFFFFFFFUL;
+                state.State = State.Header;
+                return Error.OK;
+            }
+
+            if (state.BlockType == 2)
+            {
+                state.State = State.LiteralCount;
+                if (state.GetBits(5, out state.LiteralCount)) return _outOfData(ref state, ref iCRC);
+                state.LiteralCount += 257;
+
+                state.State = State.DistanceCount;
+                if (state.GetBits(5, out state.DistanceCount)) return _outOfData(ref state, ref iCRC);
+                state.DistanceCount++;
+
+                state.State = State.CodeLenCount;
+                if (state.GetBits(4, out state.CodeLenCount)) return _outOfData(ref state, ref iCRC);
+                state.CodeLenCount += 4;
+                state.Counter = 0;
+
+                state.State = State.ReadCodeLengths;
+                if (state.Anaconda)
+                {
+                    for (; state.Counter < state.CodeLenCount; ++state.Counter)
+                        if (state.GetBits(3, out state.CodeLenLen[codelenOrderAnaconda[state.Counter]]))
+                            return _outOfData(ref state, ref iCRC);
+
+                    for (; state.Counter < 19; ++state.Counter)
+                        state.CodeLenLen[codelenOrderAnaconda[state.Counter]] = 0;
+                }
+                else
+                {
+                    for (; state.Counter < state.CodeLenCount; ++state.Counter)
+                        if (state.GetBits(3, out state.CodeLenLen[codelenOrder[state.Counter]]))
+                            return _outOfData(ref state, ref iCRC);
+
+                    for (; state.Counter < 19; ++state.Counter)
+                        state.CodeLenLen[codelenOrder[state.Counter]] = 0;
+                }
+
+                if (GenHuffmanTable(19, state.CodeLenLen, false, ref state.CodeLenTable) != Error.OK)
+                {
+                    state.CRC = ~iCRC & 0xFFFFFFFFUL;
+                    return Error.HuffmanTableGenFailed;
+                }
+
+                state.RepeatCount = 0;
+                state.LastValue = 0;
+                state.Counter = 0;
+
+                state.State = State.ReadLengths;
+                while (state.Counter < state.LiteralCount + state.DistanceCount)
+                {
+                    if (state.RepeatCount == 0)
+                    {
+                        if (state.GetHuff(state.CodeLenTable, out state.Symbol))
+                            return _outOfData(ref state, ref iCRC);
+
+                        if (state.Symbol < 16)
+                        {
+                            state.LastValue = state.Symbol;
+                            state.RepeatCount = 1;
+                        }
+                        else if (state.Symbol == 16)
+                        {
+                            state.State = State.ReadLengths16;
+                            if (state.GetBits(2, out state.RepeatCount))
+                                return _outOfData(ref state, ref iCRC);
+                            state.RepeatCount += 3;
+                        }
+                        else if (state.Symbol == 17)
+                        {
+                            state.LastValue = 0;
+
+                            state.State = State.ReadLengths17;
+                            if (state.GetBits(3, out state.RepeatCount))
+                                return _outOfData(ref state, ref iCRC);
+                            state.RepeatCount += 3;
+                        }
+                        else if (state.Symbol != 0)
+                        {
+                            state.LastValue = 0;
+
+                            state.State = State.ReadLengths18;
+                            if (state.GetBits(7, out state.RepeatCount))
+                                return _outOfData(ref state, ref iCRC);
+                            state.RepeatCount += 11;
+                        }
+                    }
+
+                    if (state.Counter < state.LiteralCount)
+                        state.LiteralLen[state.Counter] = (byte)state.LastValue;
+                    else
+                        state.DistanceLen[state.Counter - state.LiteralCount] = (byte)state.LastValue;
+
+                    state.Counter++;
+                    state.RepeatCount--;
+                    state.State = State.ReadLengths;
+                }
+
+                if (GenHuffmanTable(state.LiteralCount, state.LiteralLen, false, ref state.LiteralTable) != Error.OK ||
+                    GenHuffmanTable(state.DistanceCount, state.DistanceLen, true, ref state.DistanceTable) != Error.OK)
+                {
+                    state.CRC = ~iCRC & 0xFFFFFFFFUL;
+                    return Error.HuffmanTableGenFailed;
+                }
+            }
+            else
+            {
+                int nextFree = 2;
+                int i;
+
+                for (i = 0; i < 0x7E; ++i)
+                {
+                    state.LiteralTable[i] = (short)~nextFree;
+                    nextFree += 2;
+                }
+
+                for (; i < 0x96; ++i)
+                    state.LiteralTable[i] = (short)(i + (256 - 0x7E));
+
+                for (; i < 0xFE; ++i)
+                {
+                    state.LiteralTable[i] = (short)~nextFree;
+                    nextFree += 2;
+                }
+
+                for (; i < 0x18E; ++i)
+                    state.LiteralTable[i] = (short)(i + (0 - 0xFE));
+
+                for (; i < 0x196; ++i)
+                    state.LiteralTable[i] = (short)(i + (280 - 0x18E));
+
+                for (; i < 0x1CE; ++i)
+                {
+                    state.LiteralTable[i] = (short)~nextFree;
+                    nextFree += 2;
+                }
+
+                for (; i < 0x23E; ++i)
+                    state.LiteralTable[i] = (short)(i + (144 - 0x1CE));
+
+                for (i = 0; i < 0x1E; ++i)
+                    state.DistanceTable[i] = (short)~(i * 2 + 2);
+
+                for (i = 0x1E; i < 0x3E; ++i)
+                    state.DistanceTable[i] = (short)(i - 0x1E);
+            }
+
+            while (true)
+            {
+                state.State = State.ReadSymbol;
+                if (state.GetHuff(state.LiteralTable, out state.Symbol))
+                    return _outOfData(ref state, ref iCRC);
+
+                if (state.Symbol < 256)
+                {
+                    _push((byte)state.Symbol, ref iCRC, ref output);
                     continue;
                 }
 
-                if (state.symbol == 256)
+                if (state.Symbol == 256)
                     break;
 
-                if (state.symbol <= 264)
-                    state.repeat_length = state.symbol - 257 + 3;
-                else if (state.symbol <= 284)
+                if (state.Symbol <= 264)
                 {
-                    state.state = DecompressionState._state.READ_LENGTH;
-                state_READ_LENGTH:
-                    uint length_bits = (state.symbol - 261) / 4;
-                    ulong repeatlength = state.repeat_length;
-                    e = GETBITS(length_bits, ref repeatlength, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
-                    if (e != 0) return e;
-                    state.repeat_length = (uint)repeatlength;
-                    state.repeat_length += 3 + ((4 + ((state.symbol - 265) & 3)) << (int)length_bits);
+                    state.RepeatLength = (state.Symbol - 257) + 3;
                 }
-                else if (state.symbol == 285)
-                    state.repeat_length = 258;
-                else
-                    return -1;
-
-                state.state = DecompressionState._state.READ_DISTANCE;
-            state_READ_DISTANCE:
-                uint[] distancetable = new uint[state.distance_table.Length];
-                for (int i = 0; i < state.distance_table.Length; i++)
-                    distancetable[i] = (uint)state.distance_table[i];
-                statesymbol = state.symbol;
-                e = GETHUFF(ref statesymbol, distancetable, num_bits, (uint)in_ptr_index, (uint)in_ptr.Length, ref bit_accum);
-                if (e != 0) return e;
-                state.symbol = (uint)statesymbol;
-                for (int i = 0; i < state.distance_table.Length; i++)
-                    state.distance_table[i] = (short)distancetable[i];
-
-                if (state.symbol <= 3)
-                    distance = state.symbol + 1;
-                else if (state.symbol <= 29)
+                else if (state.Symbol <= 284)
                 {
-                    state.state = DecompressionState._state.READ_DISTANCE_EXTRA;
-                state_READ_DISTANCE_EXTRA:
-                    uint distance_bits = (state.symbol - 2) / 2;
-                    ulong dist = distance;
-                    e = GETBITS(distance_bits, ref dist, ref num_bits, ref in_ptr_index, in_ptr.Length, ref bit_accum);
-                    if (e != 0) return e;
-                    distance = (uint)dist;
-                    distance += 1 + ((2 + (state.symbol & 1)) << (int)distance_bits);
+                    state.State = State.ReadLength;
+
+                    uint lengthBits = (state.Symbol - 261) / 4;
+                    if (state.GetBits(lengthBits, out state.RepeatLength))
+                        return _outOfData(ref state, ref iCRC);
+                    state.RepeatLength += 3 + ((4 + ((state.Symbol - 265) & 3)) << (int)lengthBits);
+                }
+                else if (state.Symbol == 285)
+                {
+                    state.RepeatLength = 258;
                 }
                 else
-                    return -1;
-
-                if (out_ofs < distance)
-                    return -1;
-
-                uint repeat_length = state.repeat_length;
-                uint overflow = 0;
-
-                if (out_ofs + repeat_length > out_size)
                 {
-                    if (out_ofs > out_size)
-                        overflow = repeat_length;
-                    else
-                        overflow = (uint)(out_ofs - out_size) + repeat_length;
-                    repeat_length -= overflow;
+                    state.CRC = ~iCRC & 0xFFFFFFFFUL;
+                    return Error.InvalidSymbol;
                 }
 
-                for (; repeat_length > 0; repeat_length--)
-                    PUTBYTESAFE(out_base[out_ofs - distance], ref out_ofs, ref out_base, ref icrc);
+                state.State = State.ReadDistance;
+                if (state.GetHuff(state.DistanceTable, out state.Symbol))
+                    return _outOfData(ref state, ref iCRC);
 
-                out_ofs += overflow;
+                if (state.Symbol <= 3)
+                {
+                    state.Distance = state.Symbol + 1;
+                }
+                else if (state.Symbol <= 29)
+                {
+                    state.State = State.ReadDistanceExtra;
+                    uint distanceBits = (state.Symbol - 2) / 2;
+                    if (state.GetBits(distanceBits, out state.Distance))
+                        return _outOfData(ref state, ref iCRC);
+                    state.Distance += 1 + ((2 + (state.Symbol & 1)) << (int)distanceBits);
+                }
+                else
+                {
+                    state.CRC = ~iCRC & 0xFFFFFFFFUL;
+                    return Error.InvalidSymbol;
+                }
+
+                if (state.Distance > output.Count)
+                {
+                    state.CRC = ~iCRC & 0xFFFFFFFFUL;
+                    return Error.InvalidDistance;
+                }
+
+                while (state.RepeatLength-- > 0)
+                    _push(output[(int)(output.Count - state.Distance)], ref iCRC, ref output);
+                state.RepeatLength = 0;
             }
-            return 0;
+
+            state.CRC = ~iCRC & 0xFFFFFFFFUL;
+            state.State = State.Header;
+            return Error.OK;
         }
 
-        private static int gen_huffman_table(uint symbols, byte[] lengths,
-                                             int allow_no_symbols, ref short[] table)
+        public static Error GenHuffmanTable(uint symbols, byte[] lengths, bool allowNoSymbols, ref short[] table)
         {
-            ushort[] length_count = new ushort[16];
-            ushort total_count = 0;
-            ushort[] first_code = new ushort[16];
-            uint index = 0;
+            ushort[] lengthCount = new ushort[16];
+            ushort totalCount = 0;
+            ushort[] firstCode = new ushort[16];
 
-            uint i = 0;
-
-            for (i = 0; i < 16; i++)
-                length_count[i] = 0;
-
-            for (i = 0; i < symbols; i++)
+            for (uint i = 0; i < symbols; ++i)
                 if (lengths[i] > 0)
-                    length_count[lengths[i]]++;
+                    lengthCount[lengths[i]]++;
 
-            total_count = 0;
-            for (i = 1; i < 16; i++)
-                total_count += length_count[i];
+            for (uint i = 1; i < 16; ++i)
+                totalCount += lengthCount[i];
 
-            if (total_count == 0)
-                return allow_no_symbols;
-            else if (total_count == 1)
+            if (totalCount == 0)
+                return allowNoSymbols ? Error.OK : Error.NoSymbols;
+            else if (totalCount == 1)
             {
-                for (i = 0; i < symbols; i++)
+                for (uint i = 0; i < symbols; ++i)
                     if (lengths[i] != 0)
-                        table[0] = table[1] = 1;
-                return 1;
+                        table[0] = table[1] = (short)i;
+                return Error.OK;
             }
 
-            first_code[0] = 0;
-            for (i = 1; i < 16; i++)
+            firstCode[0] = 0;
+            for (uint i = 1; i < 16; ++i)
             {
-                first_code[i] = (ushort)((first_code[i - 1] + length_count[i - 1]) << 1);
-                if (first_code[i] + length_count[i] > 1 << (int)i)
-                    return 0;
+                firstCode[i] = (ushort)((firstCode[i - 1] + lengthCount[i - 1]) << 1);
+                if (firstCode[i] + lengthCount[i] > 1 << (int)i)
+                    return Error.TooManySymbols;
             }
+            if (firstCode[15] + lengthCount[15] != 1 << 15)
+                return Error.ImcompleteTree;
 
-            if (first_code[15] + length_count[15] != 1 << 15)
-                return 0;
-
-            index = 0;
-            for (i = 1; i < 16; i++)
+            for (uint index = 0, i = 1; i < 16; ++i)
             {
-                uint code_limit = 1U << (int)i;
-                uint next_code = (uint)first_code[i] + length_count[i];
-                uint next_index = index + (code_limit - first_code[i]);
-                uint j = 0;
+                uint codeLimit = 1U << (int)i;
+                uint nextCode = (uint)firstCode[i] + lengthCount[i];
+                uint nextIndex = index + (codeLimit - firstCode[i]);
 
-                for (j = 0; j < symbols; j++)
+                for (uint j = 0; j < symbols; ++j)
                     if (lengths[j] == i)
                         table[index++] = (short)j;
 
-                for (j = next_code; j < code_limit; j++)
+                for (uint j = nextCode; j < codeLimit; ++j)
                 {
-                    table[index++] = (short)~next_index;
-                    next_index += 2;
+                    table[index++] = (short)~nextIndex;
+                    nextIndex += 2;
                 }
             }
 
-            return 1;
+            return Error.OK;
         }
+
+        public enum State
+        {
+            Initial,
+            PartialZlibHeader,
+            Header,
+            UncompressedLen,
+            UncompressedILen,
+            UncompressedData,
+            LiteralCount,
+            DistanceCount,
+            CodeLenCount,
+            ReadCodeLengths,
+            ReadLengths,
+            ReadLengths16,
+            ReadLengths17,
+            ReadLengths18,
+            ReadSymbol,
+            ReadLength,
+            ReadDistance,
+            ReadDistanceExtra
+        }
+
+        public enum Error
+        {
+            OK,
+
+            NoData,
+
+            InvalidParameter,
+            CustomDictionary,
+
+            InvalidState,
+            InvalidBlockCode,
+            OutOfData,
+            CorruptStream,
+            HuffmanTableGenFailed,
+            InvalidSymbol,
+            InvalidDistance,
+
+            NoSymbols,
+            TooManySymbols,
+            ImcompleteTree,
+
+            Unknown
+        }
+
+        public static string GetErrorName(Error error)
+        {
+            return error switch
+            {
+                Error.OK => "OK",
+                Error.NoData => "No Data",
+                Error.InvalidParameter => "Invalid Parameter",
+                Error.CustomDictionary => "Custom Dictionary",
+                Error.InvalidState => "Invalid State",
+                Error.InvalidBlockCode => "Invalid Block Code",
+                Error.OutOfData => "Out Of Data",
+                Error.CorruptStream => "Corrupt Stream",
+                Error.HuffmanTableGenFailed => "Huffman Table Generation Failed",
+                Error.InvalidSymbol => "Invalid Symbol",
+                Error.InvalidDistance => "Invalid Distance",
+                Error.NoSymbols => "No Symbols",
+                Error.TooManySymbols => "Too Many Symbols",
+                Error.ImcompleteTree => "Incomplete Tree",
+                _ => "Unknown Error"
+            };
+        }
+
+        static readonly uint[] CRCTable = new uint[]
+        {
+            0x00000000U, 0x77073096U, 0xEE0E612CU, 0x990951BAU,
+            0x076DC419U, 0x706AF48FU, 0xE963A535U, 0x9E6495A3U,
+            0x0EDB8832U, 0x79DCB8A4U, 0xE0D5E91EU, 0x97D2D988U,
+            0x09B64C2BU, 0x7EB17CBDU, 0xE7B82D07U, 0x90BF1D91U,
+            0x1DB71064U, 0x6AB020F2U, 0xF3B97148U, 0x84BE41DEU,
+            0x1ADAD47DU, 0x6DDDE4EBU, 0xF4D4B551U, 0x83D385C7U,
+            0x136C9856U, 0x646BA8C0U, 0xFD62F97AU, 0x8A65C9ECU,
+            0x14015C4FU, 0x63066CD9U, 0xFA0F3D63U, 0x8D080DF5U,
+            0x3B6E20C8U, 0x4C69105EU, 0xD56041E4U, 0xA2677172U,
+            0x3C03E4D1U, 0x4B04D447U, 0xD20D85FDU, 0xA50AB56BU,
+            0x35B5A8FAU, 0x42B2986CU, 0xDBBBC9D6U, 0xACBCF940U,
+            0x32D86CE3U, 0x45DF5C75U, 0xDCD60DCFU, 0xABD13D59U,
+            0x26D930ACU, 0x51DE003AU, 0xC8D75180U, 0xBFD06116U,
+            0x21B4F4B5U, 0x56B3C423U, 0xCFBA9599U, 0xB8BDA50FU,
+            0x2802B89EU, 0x5F058808U, 0xC60CD9B2U, 0xB10BE924U,
+            0x2F6F7C87U, 0x58684C11U, 0xC1611DABU, 0xB6662D3DU,
+            0x76DC4190U, 0x01DB7106U, 0x98D220BCU, 0xEFD5102AU,
+            0x71B18589U, 0x06B6B51FU, 0x9FBFE4A5U, 0xE8B8D433U,
+            0x7807C9A2U, 0x0F00F934U, 0x9609A88EU, 0xE10E9818U,
+            0x7F6A0DBBU, 0x086D3D2DU, 0x91646C97U, 0xE6635C01U,
+            0x6B6B51F4U, 0x1C6C6162U, 0x856530D8U, 0xF262004EU,
+            0x6C0695EDU, 0x1B01A57BU, 0x8208F4C1U, 0xF50FC457U,
+            0x65B0D9C6U, 0x12B7E950U, 0x8BBEB8EAU, 0xFCB9887CU,
+            0x62DD1DDFU, 0x15DA2D49U, 0x8CD37CF3U, 0xFBD44C65U,
+            0x4DB26158U, 0x3AB551CEU, 0xA3BC0074U, 0xD4BB30E2U,
+            0x4ADFA541U, 0x3DD895D7U, 0xA4D1C46DU, 0xD3D6F4FBU,
+            0x4369E96AU, 0x346ED9FCU, 0xAD678846U, 0xDA60B8D0U,
+            0x44042D73U, 0x33031DE5U, 0xAA0A4C5FU, 0xDD0D7CC9U,
+            0x5005713CU, 0x270241AAU, 0xBE0B1010U, 0xC90C2086U,
+            0x5768B525U, 0x206F85B3U, 0xB966D409U, 0xCE61E49FU,
+            0x5EDEF90EU, 0x29D9C998U, 0xB0D09822U, 0xC7D7A8B4U,
+            0x59B33D17U, 0x2EB40D81U, 0xB7BD5C3BU, 0xC0BA6CADU,
+            0xEDB88320U, 0x9ABFB3B6U, 0x03B6E20CU, 0x74B1D29AU,
+            0xEAD54739U, 0x9DD277AFU, 0x04DB2615U, 0x73DC1683U,
+            0xE3630B12U, 0x94643B84U, 0x0D6D6A3EU, 0x7A6A5AA8U,
+            0xE40ECF0BU, 0x9309FF9DU, 0x0A00AE27U, 0x7D079EB1U,
+            0xF00F9344U, 0x8708A3D2U, 0x1E01F268U, 0x6906C2FEU,
+            0xF762575DU, 0x806567CBU, 0x196C3671U, 0x6E6B06E7U,
+            0xFED41B76U, 0x89D32BE0U, 0x10DA7A5AU, 0x67DD4ACCU,
+            0xF9B9DF6FU, 0x8EBEEFF9U, 0x17B7BE43U, 0x60B08ED5U,
+            0xD6D6A3E8U, 0xA1D1937EU, 0x38D8C2C4U, 0x4FDFF252U,
+            0xD1BB67F1U, 0xA6BC5767U, 0x3FB506DDU, 0x48B2364BU,
+            0xD80D2BDAU, 0xAF0A1B4CU, 0x36034AF6U, 0x41047A60U,
+            0xDF60EFC3U, 0xA867DF55U, 0x316E8EEFU, 0x4669BE79U,
+            0xCB61B38CU, 0xBC66831AU, 0x256FD2A0U, 0x5268E236U,
+            0xCC0C7795U, 0xBB0B4703U, 0x220216B9U, 0x5505262FU,
+            0xC5BA3BBEU, 0xB2BD0B28U, 0x2BB45A92U, 0x5CB36A04U,
+            0xC2D7FFA7U, 0xB5D0CF31U, 0x2CD99E8BU, 0x5BDEAE1DU,
+            0x9B64C2B0U, 0xEC63F226U, 0x756AA39CU, 0x026D930AU,
+            0x9C0906A9U, 0xEB0E363FU, 0x72076785U, 0x05005713U,
+            0x95BF4A82U, 0xE2B87A14U, 0x7BB12BAEU, 0x0CB61B38U,
+            0x92D28E9BU, 0xE5D5BE0DU, 0x7CDCEFB7U, 0x0BDBDF21U,
+            0x86D3D2D4U, 0xF1D4E242U, 0x68DDB3F8U, 0x1FDA836EU,
+            0x81BE16CDU, 0xF6B9265BU, 0x6FB077E1U, 0x18B74777U,
+            0x88085AE6U, 0xFF0F6A70U, 0x66063BCAU, 0x11010B5CU,
+            0x8F659EFFU, 0xF862AE69U, 0x616BFFD3U, 0x166CCF45U,
+            0xA00AE278U, 0xD70DD2EEU, 0x4E048354U, 0x3903B3C2U,
+            0xA7672661U, 0xD06016F7U, 0x4969474DU, 0x3E6E77DBU,
+            0xAED16A4AU, 0xD9D65ADCU, 0x40DF0B66U, 0x37D83BF0U,
+            0xA9BCAE53U, 0xDEBB9EC5U, 0x47B2CF7FU, 0x30B5FFE9U,
+            0xBDBDF21CU, 0xCABAC28AU, 0x53B39330U, 0x24B4A3A6U,
+            0xBAD03605U, 0xCDD70693U, 0x54DE5729U, 0x23D967BFU,
+            0xB3667A2EU, 0xC4614AB8U, 0x5D681B02U, 0x2A6F2B94U,
+            0xB40BBE37U, 0xC30C8EA1U, 0x5A05DF1BU, 0x2D02EF8DU
+        };
     }
 }

@@ -1,4 +1,5 @@
-﻿using Nebula.Core.Memory;
+﻿using Nebula.Core.Data.Chunks.FrameChunks;
+using Nebula.Core.Memory;
 using System.Drawing;
 using static Nebula.Core.Utilities.Enums;
 
@@ -6,10 +7,10 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 {
     public class AppHeader : Chunk
     {
-        public BitDict Flags = new BitDict(typeof(AppHeaderFlags));
-        public BitDict NewFlags = new BitDict(typeof(AppHeaderNewFlags));
-        public BitDict OtherFlags = new BitDict(typeof(AppHeaderOtherFlags));
-        public BitDict DisplayFlags = new BitDict( // Display Flags (MFA Only)
+        public BitDict Flags = new BitDict(4294944001, typeof(AppHeaderFlags));
+        public BitDict NewFlags = new BitDict(2048, typeof(AppHeaderNewFlags));
+        public BitDict OtherFlags = new BitDict(4294951041, typeof(AppHeaderOtherFlags));
+        public BitDict DisplayFlags = new BitDict(240, // Display Flags (MFA Only)
             "MaximizedOnBoot",       // Maximized on boot-up
             "ResizeDisplay",         // Resize display to fill window size
             "ChangeResolutionMode",  // Change Resolution Mode
@@ -30,7 +31,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             "RightToLeftLayout", "", // Right-to-left layout
             "FitInside"              // Fit inside (black bars)
         ); // MFA Only
-        public BitDict GraphicFlags = new BitDict( // Graphic Flags (MFA Only)
+        public BitDict GraphicFlags = new BitDict(807471233, // Graphic Flags (MFA Only)
             "MultiSamples",                  // Multi-samples
             "MachineIndependentSpeed",       // Machine-independent speed
             "PlaySoundsOverFrames",          // Play sounds over frames
@@ -92,7 +93,8 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            reader.Skip(4);
+            if (NebulaCore.Fusion > 1.5f)
+                reader.Skip(4);
             Flags.Value = (uint)reader.ReadShort();      // Default: 4294944001
             NewFlags.Value = (uint)reader.ReadShort();   // Default: 2048
             GraphicMode = reader.ReadShort();
@@ -108,13 +110,17 @@ namespace Nebula.Core.Data.Chunks.AppChunks
                 ControlType[i] = reader.ReadShort();
 
             for (int i = 0; i < 4; i++)
-                for (int ii = 0; ii < 8; ii++)
+                for (int ii = 0; ii < (NebulaCore.Fusion > 1.5f ? 8 : 6); ii++)
                     ControlKeys[i][ii] = reader.ReadShort();
 
             BorderColor = reader.ReadColor();
             FrameCount = reader.ReadInt();
-            FrameRate = reader.ReadInt();
-            WindowMenu = reader.ReadInt();
+
+            if (NebulaCore.Fusion > 1.5f)
+            {
+                FrameRate = reader.ReadInt();
+                WindowMenu = reader.ReadInt();
+            }
 
             NebulaCore.PackageData.AppHeader = this;
         }
@@ -140,7 +146,6 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
             if (!fromMFA)
             {
-                DisplayFlags.Value = 240; // Default Value
                 DisplayFlags["MaximizedOnBoot"] = Flags == AppHeaderFlags.MaximizedOnBoot;
                 DisplayFlags["ResizeDisplay"] = Flags == AppHeaderFlags.ResizeDisplay;
                 DisplayFlags["ChangeResolutionMode"] = Flags == AppHeaderFlags.ChangeResolutionMode;
@@ -161,7 +166,6 @@ namespace Nebula.Core.Data.Chunks.AppChunks
                 DisplayFlags["RightToLeftLayout"] = ext.Flags["RightToLeftLayout"];
                 DisplayFlags["FitInside"] = Flags == AppHeaderFlags.FitInside;
 
-                GraphicFlags.Value = 807471233; // Default Value
                 GraphicFlags["MultiSamples"] = Flags == AppHeaderFlags.MultiSamples;
                 GraphicFlags["MachineIndependentSpeed"] = Flags == AppHeaderFlags.MachineIndependentSpeed;
                 GraphicFlags["PlaySoundsOverFrames"] = NewFlags == AppHeaderNewFlags.PlaySoundsOverFrames;
@@ -181,10 +185,10 @@ namespace Nebula.Core.Data.Chunks.AppChunks
                 GraphicFlags["ReduceCPUUsage"] = ext.Flags["ReduceCPUUsage"];
                 GraphicFlags["Direct3D11"] = OtherFlags == AppHeaderOtherFlags.Direct3D9or11 && OtherFlags == AppHeaderOtherFlags.Direct3D8or11;
                 GraphicFlags["PremultipliedAlpha"] = ext.Flags["PremultipliedAlpha"];
+                GraphicFlags["DontOptimizeEvents"] = !FrameEvents.OptimizedEvents;
             }
             else
             {
-                Flags.Value = 4294944001; // Default Value
                 Flags.SetFlag(AppHeaderFlags.HeadingWhenMaximized, DisplayFlags["HeadingWhenMaximized"]);
                 Flags.SetFlag(AppHeaderFlags.HeadingDisabled, !DisplayFlags["Heading"]);
                 Flags.SetFlag(AppHeaderFlags.FitInside, DisplayFlags["FitInside"]);
@@ -197,7 +201,6 @@ namespace Nebula.Core.Data.Chunks.AppChunks
                 Flags.SetFlag(AppHeaderFlags.ChangeResolutionMode, DisplayFlags["ChangeResolutionMode"]);
                 Flags.SetFlag(AppHeaderFlags.AllowFullscreenSwitch, DisplayFlags["AllowFullscreenSwitch"]);
 
-                NewFlags.Value = 2048; // Default Value
                 NewFlags.SetFlag(AppHeaderNewFlags.PlaySoundsOverFrames, GraphicFlags["PlaySoundsOverFrames"]);
                 NewFlags.SetFlag(AppHeaderNewFlags.DontMuteOnLostFocus, GraphicFlags["DontMuteOnLostFocus"]);
                 NewFlags.SetFlag(AppHeaderNewFlags.NoMinimizeBox, DisplayFlags["NoMinimizeBox"]);
@@ -211,14 +214,12 @@ namespace Nebula.Core.Data.Chunks.AppChunks
                 NewFlags.SetFlag(AppHeaderNewFlags.RunWhenMinimized, GraphicFlags["RunWhenMinimized"]);
                 NewFlags.SetFlag(AppHeaderNewFlags.RunWhileResizing, GraphicFlags["RunWhileResizing"]);
 
-                OtherFlags.Value = 4294951041; // Default Value
                 OtherFlags.SetFlag(AppHeaderOtherFlags.DebuggerShortcuts, GraphicFlags["DebuggerShortcuts"]);
                 OtherFlags.SetFlag(AppHeaderOtherFlags.DontShareSubAppData, GraphicFlags["DontShareSubAppData"]);
                 OtherFlags.SetFlag(AppHeaderOtherFlags.ShowDebugger, !GraphicFlags["DontShowDebugger"]);
                 OtherFlags.SetFlag(AppHeaderOtherFlags.Direct3D9or11, GraphicFlags["Direct3D9"] || GraphicFlags["Direct3D11"]);
                 OtherFlags.SetFlag(AppHeaderOtherFlags.Direct3D8or11, GraphicFlags["Direct3D8"] || GraphicFlags["Direct3D11"]);
 
-                ext.Flags.Value = 3288334336; // Default Value
                 ext.Flags["KeepScreenRatio"] = DisplayFlags["KeepScreenRatio"];
                 ext.Flags["AntiAliasing"] = DisplayFlags["AntiAliasing"];
                 ext.Flags["RightToLeftReading"] = DisplayFlags["RightToLeftReading"];
@@ -228,7 +229,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
                 ext.Flags["ReduceCPUUsage"] = GraphicFlags["ReduceCPUUsage"];
                 ext.Flags["PremultipliedAlpha"] = GraphicFlags["PremultipliedAlpha"];
 
-                ext.CompressionFlags.Value = 1049120; // Default Value
+                FrameEvents.OptimizedEvents = !GraphicFlags["DontOptimizeEvents"];
             }
 
             /*
@@ -243,11 +244,6 @@ namespace Nebula.Core.Data.Chunks.AppChunks
                 "RecordSlowestLoops"             // Record slowest app loops
             );
 
-             public BitDict ext.Flags = new BitDict(
-                "DontOptimizeStrings", "", "", "",       // Optimize string objects Disabled
-                "OptimizePlaySample"                     // Optimize 'Play Sample'
-            );
-
             public BitDict ext.CompressionFlags = new BitDict(
                 "CompressionLevelMax",            // Compression Level: Maximum
                 "CompressSounds",                 // Compress Sounds
@@ -255,7 +251,6 @@ namespace Nebula.Core.Data.Chunks.AppChunks
                 "NoAutoImageFilters",             // Image Filters: Automatic Disabled
                 "NoAutoSoundFilters", "", "", "", // Sound Filters: Automatic Disabled
                 "DontDisplayBuildWarning",        // Display build warning messages Disabled
-                "OptimizeImageSize"               // Optimize image size in RAM
             );
             */
         }

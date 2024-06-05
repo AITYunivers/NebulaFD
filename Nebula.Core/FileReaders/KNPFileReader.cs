@@ -12,13 +12,16 @@ namespace Nebula.Core.FileReaders
         public Dictionary<int, Bitmap> Icons { get { return _icons; } set { _icons = value; } }
         private Dictionary<int, Bitmap> _icons = new Dictionary<int, Bitmap>();
 
+        public string FilePath { get { return _filePath; } set { _filePath = value; } }
+        public string _filePath = string.Empty;
+
         public KNPPackageData Package = new();
 
         public bool Unpacked;
 
         public void LoadGame(ByteReader fileReader, string filePath)
         {
-            Package.FilePath = filePath.ReplaceLast(Path.GetExtension(filePath), "");
+            Package.FilePath = filePath.ReplaceLast(Path.GetExtension(_filePath = filePath), "");
             Package.Read(null!);
         }
 

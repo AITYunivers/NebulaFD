@@ -11,10 +11,13 @@ namespace Nebula.Core.Utilities
 {
     public static class Utilities
     {
-        public static string ClearName(string ogName)
+        public static string ClearName(string ogName, params char[] pardons)
         {
-            var str = string.Join("", ogName.Split(Path.GetInvalidFileNameChars()));
-            str = str.Replace("?", "");
+            List<char> invalidChars = Path.GetInvalidFileNameChars().ToList();
+            invalidChars.Add('?');
+            foreach (char pardon in pardons)
+                invalidChars.Remove(pardon);
+            var str = string.Join("", ogName.Split(invalidChars.ToArray()));
             return str;
         }
         public static string ReadYuniversal(this ByteReader reader, int len=-1)

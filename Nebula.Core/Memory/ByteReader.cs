@@ -210,5 +210,14 @@ namespace Nebula.Core.Memory
                 return base.ReadBytes((int)Size());
             return base.ReadBytes(count);
         }
+
+        public byte GetByteAt(long position)
+        {
+            long orgPos = Tell();
+            Seek(position);
+            byte output = ReadByte();
+            Seek(orgPos);
+            return output;
+        }
     }
 }

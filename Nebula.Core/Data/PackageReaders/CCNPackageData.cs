@@ -18,7 +18,7 @@ namespace Nebula.Core.Data.PackageReaders
                 return;
 
             Header = reader.ReadAscii(4);
-            if (Header == "PAMU" || Header == "PAME")
+            if ((Header == "PAMU" || Header == "PAME") && !Parameters.DontUseHeader)
                 NebulaCore._yunicode = Header != "PAME";
             if (Header == "CRUF" && !Parameters.DontUseHeader)
                 NebulaCore.Fusion = 3f;
@@ -29,10 +29,19 @@ namespace Nebula.Core.Data.PackageReaders
             ProductVersion = reader.ReadInt();
             ProductBuild = reader.ReadInt();
             NebulaCore.Build = ProductBuild;
-            this.Log("Fusion Build: " + ProductBuild);
+            if (RuntimeVersion != 769)
+            {
+                if (NebulaCore.Build < 280)
+                    NebulaCore.Fusion = 2f + (ProductVersion == 1 ? 0.1f : 0);
+                this.Log("Fusion Build: " + ProductBuild + "(Fusion " + NebulaCore.Fusion + ")");
+            }
+            else
+            {
+                NebulaCore.Fusion = 1.5f;
+                this.Log("Fusion 1.5");
+            }
 
-            if (NebulaCore.Build < 280)
-                NebulaCore.Fusion = 2f + (ProductVersion == 1 ? 0.1f : 0);
+
 
             Frames = new List<Frame>();
             while (reader.HasMemory(8))
@@ -47,7 +56,8 @@ namespace Nebula.Core.Data.PackageReaders
 
                 ByteReader chunkReader = new ByteReader(newChunk.ChunkData!);
                 newChunk.ReadCCN(chunkReader);
-                newChunk.ChunkData = new byte[0];
+                if (!(NebulaCore.Fusion == 1.5f && newChunk.ChunkID >= 0x6666 && newChunk.ChunkID <= 0x6669))
+                    newChunk.ChunkData = new byte[0];
             }
             reader.Seek(reader.Size());
         }

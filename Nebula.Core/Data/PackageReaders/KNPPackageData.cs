@@ -157,23 +157,9 @@ namespace Nebula.Core.Data.PackageReaders
                 int sndSize = reader.ReadInt();
                 Sound snd = new Sound();
                 snd.Name = reader.ReadYuniversalStop(22);
-                snd.Data = FixSoundData(reader.ReadBytes(sndSize));
+                snd.Data = Sound.FixSoundData(reader.ReadBytes(sndSize));
                 SoundBank.Sounds.Add(i, snd);
             }
-        }
-
-        public byte[] FixSoundData(byte[] data)
-        {
-            byte[] output = new byte[data.Length + 44];
-            Array.Copy(Encoding.ASCII.GetBytes("RIFF"), 0, output, 0,  4);
-            Array.Copy(BitConverter.GetBytes(8146), 0, output, 4,  4);
-            Array.Copy(Encoding.ASCII.GetBytes("WAVEfmt "), 0, output, 8,  8);
-            Array.Copy(BitConverter.GetBytes(16), 0, output, 16, 4);
-            Array.Copy(data, 0, output, 20, 16);
-            Array.Copy(Encoding.ASCII.GetBytes("data"), 0, output, 36, 4);
-            Array.Copy(BitConverter.GetBytes(data.Length - 16), 0, output, 40, 4);
-            Array.Copy(data, 16, output, 44, data.Length - 16);
-            return output;
         }
 
         public void ReadMusicBank(ByteReader reader)

@@ -8,6 +8,10 @@ namespace Nebula.Core.FileReaders
 
         public void Read(ByteReader reader)
         {
+            if (reader.PeekInt() == 1162690896 || // PAME
+                reader.PeekInt() == 1431126352)   // PAMU
+                return;
+
             if (reader.PeekInt() == 2004318071)
                 reader.Skip(28); // Multimedia Fusion 2 or above
             else if (reader.PeekInt() == 32639 || reader.PeekInt() == 8748)

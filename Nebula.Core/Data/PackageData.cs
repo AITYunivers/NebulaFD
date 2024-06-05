@@ -5,6 +5,7 @@ using Nebula.Core.Data.Chunks.BankChunks.Images;
 using Nebula.Core.Data.Chunks.BankChunks.Music;
 using Nebula.Core.Data.Chunks.BankChunks.Shaders;
 using Nebula.Core.Data.Chunks.BankChunks.Sounds;
+using Nebula.Core.Data.Chunks.BankChunks.TrueTypeFonts;
 using Nebula.Core.Data.Chunks.FrameChunks;
 using Nebula.Core.Data.Chunks.ObjectChunks;
 using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
@@ -53,6 +54,7 @@ namespace Nebula.Core.Data
         public ShaderBank ShaderBank = new();               // 0x2243
         public ExtendedHeader ExtendedHeader = new();       // 0x2245
         public int AppCodePage;                             // 0x2246
+        public TrueTypeFontBank TrueTypeFontBank = new();   // 0x2259
         public DX9ShaderBank DX9ShaderBank = new();         // 0x225A
         public List<Frame> Frames = new();                  // 0x3333
         public ObjectAnimations ObjectAnimations = new();   // 0x4449

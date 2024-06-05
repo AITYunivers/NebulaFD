@@ -13,6 +13,9 @@ namespace Nebula.Core.FileReaders
         public Dictionary<int, Bitmap> Icons { get { return _icons; } set { _icons = value; } }
         private Dictionary<int, Bitmap> _icons = new Dictionary<int, Bitmap>();
 
+        public string FilePath { get { return _filePath; } set { _filePath = value; } }
+        public string _filePath = string.Empty;
+
         public CCNPackageData Package = new();
 
         public bool Unpacked;
@@ -20,7 +23,7 @@ namespace Nebula.Core.FileReaders
         public void LoadGame(ByteReader fileReader, string filePath)
         {
             ByteReader? ccnReader = null;
-            ZipArchive archive = ZipFile.OpenRead(filePath);
+            ZipArchive archive = ZipFile.OpenRead(_filePath = filePath);
             foreach (ZipArchiveEntry entry in archive.Entries)
             {
                 if (Directory.GetParent(entry.FullName)?.Name == "raw")

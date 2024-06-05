@@ -46,10 +46,20 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Width = reader.ReadInt();
-            Height = reader.ReadInt();
-            Background = reader.ReadColor();
-            FrameFlags.Value = reader.ReadUInt();
+            if (NebulaCore.Fusion > 1.5f)
+            {
+                Width = reader.ReadInt();
+                Height = reader.ReadInt();
+                Background = reader.ReadColor();
+                FrameFlags.Value = reader.ReadUInt();
+            }
+            else
+            {
+                Width = reader.ReadShort();
+                Height = reader.ReadShort();
+                Background = reader.ReadColor();
+                FrameFlags.Value = reader.ReadUShort();
+            }
 
             ((Frame)extraInfo[0]).FrameHeader = this;
         }

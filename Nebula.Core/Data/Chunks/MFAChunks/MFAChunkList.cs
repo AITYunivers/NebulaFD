@@ -8,7 +8,8 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
         {
             { 0x0000, typeof(Last)                },
             { 0x003C, typeof(MFAExtraFlags)       },
-            { 0x009A, typeof(MFAAppIcon)          }
+            { 0x009A, typeof(MFAAppIcon)          },
+            { 0x00F5, typeof(MFAModulePath)       }
         };
     }
 }

@@ -5,7 +5,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 {
     public class ExtendedHeader : Chunk
     {
-        public BitDict Flags = new BitDict(
+        public BitDict Flags = new BitDict(3288334336,
             "KeepScreenRatio", "",                   // Keep screen ratio
             "AntiAliasing", "", "",                  // Anti-aliasing when resizing
             "RightToLeftReading", "",                // Right-to-left reading
@@ -19,7 +19,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             "OptimizePlaySample"                     // Optimize 'Play Sample'
         );
 
-        public BitDict CompressionFlags = new BitDict(
+        public BitDict CompressionFlags = new BitDict(1049120,
             "CompressionLevelMax",            // Compression Level: Maximum
             "CompressSounds",                 // Compress Sounds
             "IncludeExternalFiles",           // Include external files

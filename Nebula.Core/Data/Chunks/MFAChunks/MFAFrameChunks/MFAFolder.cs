@@ -22,8 +22,14 @@ namespace Nebula.Core.Data.Chunks.MFAChunks.MFAFrameChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            reader.Skip(3);
             Header = reader.ReadByte();
+            reader.Skip(1);
+            if (Header == 112)
+            {
+                reader.Skip(1);
+                Header = reader.ReadByte();
+            }
+            else reader.Skip(2);
 
             if (Header == 4)
             {

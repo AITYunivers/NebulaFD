@@ -6,6 +6,7 @@ using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Reflection.Metadata.Ecma335;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks.Events
@@ -56,10 +57,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             Parameters = new Parameter[reader.ReadByte()];
             DefType = reader.ReadByte();
 
+            long startPosition = reader.Tell();
             for (int i = 0; i < Parameters.Length; i++)
             {
                 Parameters[i] = new Parameter();
-                Parameters[i].ReadCCN(reader);
+                Parameters[i].ReadCCN(reader, startPosition);
                 Parameters[i].FrameEvents = ((Event)extraInfo[1]).Parent;
             }
 
@@ -112,8 +114,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             actWriter.WriteByte((byte)Parameters.Length);
             actWriter.WriteByte(DefType);
 
+            long startPosition = (long)extraInfo[0] + writer.Tell() + actWriter.Tell() + 4;
             foreach (Parameter parameter in Parameters)
-                parameter.WriteMFA(actWriter);
+                parameter.WriteMFA(actWriter, startPosition);
 
             writer.WriteUShort((ushort)(actWriter.Tell() + 2));
             writer.WriteWriter(actWriter);
@@ -123,42 +126,20 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         private void Fix(List<Action> evntList)
         {
+            short oldNum = Num;
+            bool ignoreOptimization = false;
             switch (ObjectType)
             {
-                case -2:
-                    switch (Num)
-                    {
-                        case 36:
-                            Action act = new Action();
-                            act.ObjectType = ObjectType;
-                            act.Num = 4;
-                            act.ObjectInfo = ObjectInfo;
-                            act.ObjectInfoList = ObjectInfoList;
-                            act.EventFlags = EventFlags;
-                            act.OtherFlags = OtherFlags;
-                            act.Parameters = new Parameter[2];
-                            act.Parameters[0] = Parameters[0];
-                            act.Parameters[1] = Parameters[2];
-                            act.DefType = DefType;
-                            evntList.Add(act);
-
-                            Num = 21;
-                            Parameter param1 = Parameters[0];
-                            Parameter param2 = Parameters[3];
-                            Parameters = new Parameter[2];
-                            Parameters[0] = param1;
-                            Parameters[1] = param2;
-                            break;
-                    }
-                    break;
                 case -1:
                     switch (Num)
                     {
                         case -33:
                             Num = -8;
+                            ignoreOptimization = true;
                             break;
                         case -24:
                             Num = -25;
+                            ignoreOptimization = true;
                             break;
                         case 0: // Skip
                         case 44: // Skip
@@ -169,21 +150,25 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 29: // Set Global Double
                         case 30: // Set Global
                             Num = 3; // Set Global
+                            ignoreOptimization = true;
                             break;
                         case 31: // Add Global Integer
                         case 32: // Add Global
                         case 33: // Add Global Double
                         case 34: // Add Global
                             Num = 5; // Add Global
+                            ignoreOptimization = true;
                             break;
                         case 35: // Subtract Global Integer
                         case 36: // Subtract Global
                         case 37: // Subtract Global Double
                         case 38: // Subtract Global
                             Num = 4; // Subtract Global
+                            ignoreOptimization = true;
                             break;
                         case 43: // Execute Child Events
                             DoAdd = false;
+                            ignoreOptimization = true;
                             break;
                     }
                     break;
@@ -194,16 +179,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 3: // Set Y
                             if (Parameters.Length > 1)
                             {
-                                Action act = new Action();
-                                act.ObjectType = ObjectType;
-                                act.Num = Num;
-                                act.ObjectInfo = ObjectInfo;
-                                act.ObjectInfoList = ObjectInfoList;
-                                act.EventFlags = EventFlags;
-                                act.OtherFlags = OtherFlags;
+                                Action act = Copy();
                                 act.Parameters = new Parameter[1];
                                 act.Parameters[0] = Parameters[0];
-                                act.DefType = DefType;
                                 evntList.Add(act);
 
                                 Num = (short)(Num == 2 ? 3 : 2);
@@ -223,12 +201,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                                 param.Name = string.IsNullOrEmpty(name) ? "Movement #" + param.ID : name;
                             }
                             break;
-                        case -43:
-                            Num = -27;
-                            break;
                     }
                     break;
             }
+
+            FrameEvents.OptimizedEvents |= ((Num != oldNum) || (DoAdd == false)) && !ignoreOptimization;
         }
 
         public override string ToString()

@@ -8,6 +8,7 @@ namespace Nebula.Core.FileReaders
     {
         string Name { get; }
         Dictionary<int, Bitmap> Icons { get; set; }
+        string FilePath { get; set; }
 
         PackageData getPackageData();
         void LoadGame(ByteReader fileReader, string filePath);

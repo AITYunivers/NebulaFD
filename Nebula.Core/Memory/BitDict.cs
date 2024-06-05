@@ -14,6 +14,7 @@
     {
         public string[] Keys = new string[0];
         public uint Value { get; set; }
+        public uint Default { get; set; }
 
         public BitDict()
         {
@@ -24,6 +25,8 @@
         }
 
         public BitDict(params string[] keys) => Keys = keys;
+        public BitDict(uint defaultValue, params string[] keys) : this(keys) => Value = Default = defaultValue;
+        public BitDict(uint defaultValue, Type baseEnum) : this(baseEnum) => Value = Default = defaultValue;
         public BitDict(Type baseEnum)
         {
             string[] enumKeys = Enum.GetNames(baseEnum);

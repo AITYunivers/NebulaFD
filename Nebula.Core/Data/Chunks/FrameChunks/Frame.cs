@@ -13,6 +13,7 @@ using Image = Nebula.Core.Data.Chunks.BankChunks.Images.Image;
 using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
 using System.Xml.Linq;
 using Nebula.Core.Data.Chunks.MFAChunks.MFAFrameChunks;
+using System.Diagnostics;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks
 {
@@ -112,7 +113,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
             while (true)
             {
-                Chunk newChunk = InitMFAFrameChunk(reader, false);
+                Chunk newChunk = InitMFAFrameChunk(reader);
                 this.Log($"Reading MFA Frame Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
 
                 ByteReader chunkReader = new ByteReader(newChunk.ChunkData!);
@@ -471,31 +472,35 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
             if (!NebulaCore.MFA)
             {
-                List<long> groupLookupTable = new List<long>();
+                Dictionary<long, ParameterGroup> groupLookupTable = new();
+                List<Parameter> checkParams = new List<Parameter>();
                 foreach (Event evnt in FrameEvents.Events)
                 {
-                    List<Parameter> checkParams = new List<Parameter>();
                     foreach (Condition cond in evnt.Conditions)
                         checkParams.AddRange(cond.Parameters.Where(x => x.Code == 38 || x.Code == 39));
                     foreach (Events.Action act in evnt.Actions)
                         checkParams.AddRange(act.Parameters.Where(x => x.Code == 38 || x.Code == 39));
-                    foreach (Parameter param in checkParams)
-                        if (param.Data is ParameterGroup group)
-                        {
-                            if (!groupLookupTable.Contains(group.Pointer))
-                                groupLookupTable.Add(group.Pointer);
-                            group.ID = (short)groupLookupTable.IndexOf(group.Pointer);
-
-                            if (NebulaCore.Plus)
-                                group.Name = "Group " + group.ID;
-                        }
-                        else if (param.Data is ParameterGroupPointer point)
-                        {
-                            if (!groupLookupTable.Contains(point.PointerFull))
-                                groupLookupTable.Add(point.PointerFull);
-                            point.ID = (short)groupLookupTable.IndexOf(point.PointerFull);
-                        }
                 }
+                foreach (Parameter param in checkParams.Where(x => x.Code == 38))
+                    if (param.Data is ParameterGroup group)
+                    {
+                        if (!groupLookupTable.ContainsKey(group.CCNPointer))
+                            groupLookupTable.Add(group.CCNPointer, group);
+                        group.ID = (short)groupLookupTable.Keys.ToList().IndexOf(group.CCNPointer);
+
+                        if (NebulaCore.Plus)
+                            group.Name = "Group " + group.ID;
+                    }
+                foreach (Parameter param in checkParams.Where(x => x.Code == 39))
+                    if (param.Data is ParameterGroupPointer point)
+                    {
+                        if (groupLookupTable.ContainsKey(point.CCNPointer))
+                        {
+                            point.ID = groupLookupTable[point.CCNPointer].ID;
+                            point.parentGroup = groupLookupTable[point.CCNPointer];
+                            point.parentGroup.childrenPointers.Add(point);
+                        }
+                    }
             }
 
             FrameEvents.WriteMFA(writer);
