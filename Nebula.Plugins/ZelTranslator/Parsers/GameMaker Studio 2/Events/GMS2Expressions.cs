@@ -58,9 +58,9 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
             {
                 var expParam = exp.Expression;
 
-                var longExp = expParam as ExpressionInt;
+                var intExp = expParam as ExpressionInt;
                 var doubleExp = expParam as ExpressionDouble;
-                var extensionExp = expParam as ExpressionShort;
+                var shortExp = expParam as ExpressionShort;
                 var stringExp = expParam as ExpressionString;
                 var globalCommon = expParam as ExpressionCommon;
 
@@ -140,8 +140,8 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                 case -1: // ( open parentheses
                                     buildString += "(";
                                     break;
-                                case 0: // LongExp
-                                    buildString += $"{longExp.Value}";
+                                case 0: // intExp
+                                    buildString += $"{intExp.Value}";
                                     break;
                                 case 1: // Random
                                     buildString += $"irandom(";
@@ -276,9 +276,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                         }
                     case 2: // Active Objects
                         {
-                            var actobj = gameData.FrameItems.Items[exp.ObjectInfo];
-                            var actobjName = GMS2Writer.CleanString(actobj.Name).Replace(" ", "_") + "_" + actobj.Header.Handle;
-                            actobjName = $"object({GMS2Writer.ObjectName(actobj)})";
+                            string actobjName = GMS2Writer.ObjectName(exp, gameData, true);
                             switch (exp.Num)
                             {
                                 case 1: // Y Position (FIX/REWORK to work with multiple instances)
@@ -306,13 +304,13 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                     buildString += $"instance_number({actobjName})";
                                     break;
                                 case 16: // Alterable Value (FIX/REWORK to work with multiple instances)
-                                    buildString += $"Alterable({actobjName}, \"val\", {evnt}, {extensionExp.Value})";
+                                    buildString += $"Alterable({actobjName}, \"val\", {evnt}, {shortExp.Value})";
                                     break;
                                 case 17: // SemiTrans (FIX/REWORK to work with multiple instances)
                                     buildString += $"((1 - {actobjName}.image_alpha)*128.0)";
                                     break;
                                 case 19: // Alterable Strings (FIX/REWORK to work with multiple instances)
-                                    buildString += $"Alterable({actobjName}, \"str\", {evnt}, {extensionExp.Value})";
+                                    buildString += $"Alterable({actobjName}, \"str\", {evnt}, {shortExp.Value})";
                                     break;
                                 //case 25 // XActionPoint
                                 case 27: // BlendCoeff (FIX/REWORK to work with multiple instances)
@@ -341,9 +339,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                         }
                     case 3: // Strings
                         {
-                            var strobj = gameData.FrameItems.Items[exp.ObjectInfo];
-                            //string StringName = "ZEL_UNKNOWN_OBJECT";
-                            string StringName = $"object({GMS2Writer.ObjectName(strobj)})";
+                            string StringName = GMS2Writer.ObjectName(exp, gameData, true);
                             switch (exp.Num)
                             {
                                 case 80: // Current number of paragraph displayed
@@ -369,12 +365,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                         }
                     case 7: // Counters
                         {
-                            var cntrobj = gameData.FrameItems.Items[exp.ObjectInfo];
-                            string CounterName = "ZEL_UNKNOWN_OBJECT";
-                            if (exp.ObjectInfo <= gameData.FrameItems.Items.Count)
-                                CounterName = GMS2Writer.CleanString(cntrobj.Name).Replace(" ", "_") + "_" + cntrobj.Header.Handle;
-                            CounterName = $"object({GMS2Writer.ObjectName(cntrobj)})";
-
+                            string CounterName = GMS2Writer.ObjectName(exp, gameData, true);
                             switch (exp.Num)
                             {
                                 case 80: // Counter value
@@ -426,7 +417,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                             }
                             else if (exp.ObjectType == try_val("0I", extCodes) || exp.ObjectType == try_val("0INI", extCodes)) // Ini object
                             {
-                                var ini_name = GMS2Writer.ObjectName(gameData.FrameItems.Items[exp.ObjectInfo]);
+                                var ini_name = GMS2Writer.ObjectName(exp, gameData);
                                 switch (exp.Num)
                                 {
                                     case 80: // Get value

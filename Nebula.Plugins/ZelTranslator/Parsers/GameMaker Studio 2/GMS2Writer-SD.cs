@@ -22,10 +22,14 @@ using System.Drawing;
 using Color = System.Drawing.Color;
 using Nebula.Core.Data.Chunks.BankChunks.Fonts;
 using Font = Nebula.Core.Data.Chunks.BankChunks.Fonts.Font;
+using Action = Nebula.Core.Data.Chunks.FrameChunks.Events.Action;
 using static ZelTranslator_SD.Parsers.GameMakerStudio2.ObjectYY;
+using Nebula.Core.Data.Chunks;
 using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDefinitions;
 using System.Reflection;
 using Newtonsoft.Json;
+using Nebula.Core.Data.Chunks.FrameChunks.Events;
+using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
 
 namespace ZelTranslator_SD.Parsers
 {
@@ -56,6 +60,24 @@ namespace ZelTranslator_SD.Parsers
         public static string ObjectName(ObjectInfo obj)
         {
             return "obj_" + CleanString(obj.Name).Replace(" ", "_") + "_" + obj.Header.Handle;
+        }
+        public static string ObjectName(object source, PackageData gameData, bool isGML = false)
+        {
+            string _name = "";
+            string _handle = "";
+
+            ObjectInfo objectInfo = new();
+
+            if (source is ObjectInfo _oi) objectInfo = _oi;
+            else if (source is Action _act) objectInfo = gameData.FrameItems.Items[_act.ObjectInfo];
+            else if (source is Condition _cond) objectInfo = gameData.FrameItems.Items[_cond.ObjectInfo];
+            else if (source is ParameterExpression _exp) objectInfo = gameData.FrameItems.Items[_exp.ObjectInfo];
+
+            _name = objectInfo.Name;
+            _handle = objectInfo.Header.Handle.ToString();
+
+            //return "obj_" + CleanString(_name).Replace(" ", "_") + "_" + _handle;
+            return $"{(isGML ? "object(" : "")}obj_{CleanString(_name).Replace(" ", "_")}_{_handle}{(isGML ? ")" : "")}";
         }
         public static string SoundName(Sound item)
         {

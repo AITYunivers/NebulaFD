@@ -461,7 +461,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                     {
                                         switch (cond.Num)
                                         {
-                                            //case -4: // Pressed button (notAlways) (FIX/REWORK add this)
+                                            //case -4: // Pressed button (OnlyOneActionWhenEventLoops) (FIX/REWORK add this)
                                             default:
                                                 Throw.unimplemented(cond, ref evntIfStatement, gameData, ref missing_code, ExtCodes);
                                                 break;
@@ -729,22 +729,25 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                     }
                                 case 2: // Active/Object -- NOTE: every condition here MUST be accomodated to work with EACH instance of the object individually
                                     {
+                                        string ObjectName = GMS2Writer.ObjectName(cond, gameData, true);
                                         switch (cond.Num)
                                         {
-                                            //case -36: // Compare Alterable String // (FIX/REWORK add this) -- [ParameterShort], [ParameterExpressions]
+                                            case -36: // Compare Alterable String // (FIX/REWORK add this) -- [ParameterShort], [ParameterExpressions]
+                                                {
+                                                    var whichValue = "";
+                                                    if (cond.Parameters[0].Data is ParameterShort prmShrt) whichValue = prmShrt.Value.ToString();
+                                                    else if (cond.Parameters[0].Data is ParameterExpressions prmExp) whichValue = GMS2Expressions.Evaluate(prmExp, evntCount, gameData, ExtCodes, ref missing_code);
+                                                    var expression = cond.Parameters[1].Data as ParameterExpressions;
+                                                    evntIfStatement += $"CompareAltVars({ObjectName}, \"str\", {whichValue}, \"{GetOperator(expression.Comparison)}\", {GMS2Expressions.Evaluate(expression, evntCount, gameData, ExtCodes, ref missing_code)}, {evntCount})";
+                                                    break;
+                                                }
                                             case -34: // Pick one random instance of Object
                                                 {
-                                                    var RandomObject = gameData.FrameItems.Items[cond.ObjectInfo];
-                                                    var ObjectName = GMS2Writer.CleanString(RandomObject.Name).Replace(" ", "_") + "_" + RandomObject.Header.Handle;
-                                                    ObjectName = $"object({GMS2Writer.ObjectName(RandomObject)})";
                                                     evntIfStatement += $"PickOneOf({ObjectName}, {evntCount})";
                                                     break;
                                                 }
                                             case -32: // Number of objects
                                                 {
-                                                    var CountObject = gameData.FrameItems.Items[cond.ObjectInfo];
-                                                    var ObjectName = GMS2Writer.CleanString(CountObject.Name).Replace(" ", "_") + "_" + CountObject.Header.Handle;
-                                                    ObjectName = $"object({GMS2Writer.ObjectName(CountObject)})";
                                                     var expression = cond.Parameters[0].Data as ParameterExpressions;
                                                     evntIfStatement += $"instance_number({ObjectName}) {GetOperator(expression.Comparison)} {GMS2Expressions.Evaluate(expression, evntCount, gameData, ExtCodes, ref missing_code)}";
                                                     break;
@@ -752,22 +755,20 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                             case -30: // Number of (object) in a zone
                                                 {
                                                     ParameterZone zone = cond.Parameters[0].Data as ParameterZone;
-                                                    string ObjectName = $"object({GMS2Writer.ObjectName(gameData.FrameItems.Items[cond.ObjectInfo])})";
                                                     evntIfStatement += $"NumInZone({ObjectName}, {zone.X1}, {zone.Y1}, {zone.X2}, {zone.Y2}, {evntCount})";
                                                     break;
                                                 }
                                             case -29: // Object is visible
                                             case -28: // Object is invisible
-                                                evntIfStatement += GMS2Conditions.IsVisible(cond, evntCount, gameData);
+                                                evntIfStatement += GMS2Conditions.IsVisible(ObjectName, cond, evntCount, gameData);
                                                 break;
                                             case -27: // Compare Alterable Value
                                                 {
-                                                    var whichValue = cond.Parameters[0].Data as ParameterShort;
+                                                    var whichValue = "";
+                                                    if (cond.Parameters[0].Data is ParameterShort prmShrt) whichValue = prmShrt.Value.ToString();
+                                                    else if (cond.Parameters[0].Data is ParameterExpressions prmExp) whichValue = GMS2Expressions.Evaluate(prmExp, evntCount, gameData, ExtCodes, ref missing_code);
                                                     var expression = cond.Parameters[1].Data as ParameterExpressions;
-                                                    var CompareObject = gameData.FrameItems.Items[cond.ObjectInfo];
-                                                    var ObjectName = GMS2Writer.CleanString(CompareObject.Name).Replace(" ", "_") + "_" + CompareObject.Header.Handle;
-                                                    ObjectName = $"object({GMS2Writer.ObjectName(CompareObject)})";
-                                                    evntIfStatement += $"CompareAltValue({ObjectName}, {whichValue.Value}, \"{GetOperator(expression.Comparison)}\", {GMS2Expressions.Evaluate(expression, evntCount, gameData, ExtCodes, ref missing_code)}, {evntCount})";
+                                                    evntIfStatement += $"CompareAltVars({ObjectName}, \"val\", {whichValue}, \"{GetOperator(expression.Comparison)}\", {GMS2Expressions.Evaluate(expression, evntCount, gameData, ExtCodes, ref missing_code)}, {evntCount})";
                                                     break;
                                                 }
                                             case -23: // Is object overlapping a backdrop
@@ -777,10 +778,8 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                                 }
                                             case -22: // Object is getting closer than X pixels from window's edge
                                                 {
-                                                    var objName = GMS2Writer.CleanString(gameData.FrameItems.Items[cond.ObjectInfo].Name).Replace(" ", "_") + "_" + gameData.FrameItems.Items[cond.ObjectInfo].Header.Handle;
-                                                    objName = $"object({GMS2Writer.ObjectName(gameData.FrameItems.Items[cond.ObjectInfo])})";
                                                     var pixels = GMS2Expressions.Evaluate(cond.Parameters[0].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
-                                                    evntIfStatement += $"CloseToWindowEdge({objName}, {pixels}, {evntCount})";
+                                                    evntIfStatement += $"CloseToWindowEdge({ObjectName}, {pixels}, {evntCount})";
                                                     break;
                                                 }
                                             //case -21: // Object has reached the end of its path (FIX/REWORK add this)
@@ -789,14 +788,14 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                             case -17: // Compare XPos
                                             case -16: // Compare YPos
                                                 {
-                                                    evntIfStatement += GMS2Conditions.CompareXorYPos(cond, evntCount, gameData, ExtCodes, ref missing_code);
+                                                    evntIfStatement += GMS2Conditions.CompareXorYPos(ObjectName, cond, evntCount, gameData, ExtCodes, ref missing_code);
                                                     break;
                                                 }
                                             //case -15: // Compare Speed (FIX/REWORK add this)
                                             case -14: // Collides with another object  (OnlyOneActionWhenEventLoops)
                                                 {
                                                     notAlways = true;
-                                                    evntIfStatement += GMS2Conditions.OverlapObject(cond, evntCount, gameData);
+                                                    evntIfStatement += GMS2Conditions.OverlapObject(ObjectName, cond, evntCount, gameData);
                                                     break;
                                                 }
                                             case -13: // Collides with a backdrop (OnlyOneActionWhenEventLoops)
@@ -808,37 +807,30 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                             case -12: // Leaves the play area (OnlyOneActionWhenEventLoops)
                                                 {
                                                     notAlways = true;
-                                                    var objName = GMS2Writer.CleanString(gameData.FrameItems.Items[cond.ObjectInfo].Name).Replace(" ", "_") + "_" + gameData.FrameItems.Items[cond.ObjectInfo].Header.Handle;
-                                                    objName = $"object({GMS2Writer.ObjectName(gameData.FrameItems.Items[cond.ObjectInfo])})";
-                                                    evntIfStatement += $"CloseToWindowEdge({objName}, -1, {evntCount})";
+                                                    evntIfStatement += $"CloseToWindowEdge({ObjectName}, -1, {evntCount})";
                                                     break;
                                                 }
                                             case -8: // Object is facing direction
                                                 {
                                                     string direction = "";
-                                                    string objName = $"object({GMS2Writer.ObjectName(gameData.FrameItems.Items[cond.ObjectInfo])})";
                                                     if (cond.Parameters[0].Data is ParameterExpressions dirExp) direction = GMS2Expressions.Evaluate(dirExp, evntCount, gameData, ExtCodes, ref missing_code);
                                                     else if (cond.Parameters[0].Data is ParameterInt dirInt) direction = dirInt.Value.ToString();
-                                                    evntIfStatement += $"{objName}.direction == ({direction})*11.25";
+                                                    //evntIfStatement += $"{ObjectName}.direction == ({direction})*11.25";
+                                                    evntIfStatement += $"CompareLocalVar({ObjectName}, \"direction\", \"==\", ({direction})*11.25, {evntCount})";
                                                     break;
                                                 }
                                             case -7: // Is movement stopped?
                                                 {
-                                                    var objName = GMS2Writer.CleanString(gameData.FrameItems.Items[cond.ObjectInfo].Name).Replace(" ", "_") + "_" + gameData.FrameItems.Items[cond.ObjectInfo].Header.Handle;
-                                                    objName = $"object({GMS2Writer.ObjectName(gameData.FrameItems.Items[cond.ObjectInfo])})";
-                                                    evntIfStatement += $"IsStopped({objName}, {evntCount})";
+                                                    evntIfStatement += $"IsStopped({ObjectName}, {evntCount})";
                                                     break;
                                                 }
                                             case -4: // Is object overlapping another object (Fix/rework IN GML to target individual obj2 instances)
                                                 {
-                                                    evntIfStatement += GMS2Conditions.OverlapObject(cond, evntCount, gameData);
+                                                    evntIfStatement += GMS2Conditions.OverlapObject(ObjectName, cond, evntCount, gameData);
                                                     break;
                                                 }
                                             case -3: // Is an animation playing?
                                                 {
-                                                    var Object = gameData.FrameItems.Items[cond.ObjectInfo];
-                                                    var ObjectName = GMS2Writer.CleanString(Object.Name).Replace(" ", "_") + "_" + Object.Header.Handle;
-                                                    ObjectName = $"object({GMS2Writer.ObjectName(Object)})";
                                                     var changeAnim = "";
                                                     if (cond.Parameters[0].Data is ParameterExpressions) changeAnim = GMS2Expressions.Evaluate(cond.Parameters[0].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
                                                     else changeAnim = (cond.Parameters[0].Data as ParameterShort).Value.ToString();
@@ -847,9 +839,6 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                                 }
                                             case -2: // Has an animation finished? (FIX/REWORK NOTE: might be buggy at last frame)
                                                 {
-                                                    var Object = gameData.FrameItems.Items[cond.ObjectInfo];
-                                                    var ObjectName = GMS2Writer.CleanString(Object.Name).Replace(" ", "_") + "_" + Object.Header.Handle;
-                                                    ObjectName = $"object({GMS2Writer.ObjectName(Object)})";
                                                     var finAnim = "";
                                                     if (cond.Parameters[0].Data is ParameterExpressions) finAnim = GMS2Expressions.Evaluate(cond.Parameters[0].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
                                                     else finAnim = (cond.Parameters[0].Data as ParameterShort).Value.ToString();
@@ -858,9 +847,6 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                                 }
                                             case -1: // Compare to Animation Frame
                                                 {
-                                                    var Object = gameData.FrameItems.Items[cond.ObjectInfo];
-                                                    var ObjectName = GMS2Writer.CleanString(Object.Name).Replace(" ", "_") + "_" + Object.Header.Handle;
-                                                    ObjectName = $"object({GMS2Writer.ObjectName(Object)})";
                                                     var compareFrame = "";
                                                     if (cond.Parameters[0].Data is ParameterExpressions) compareFrame = GMS2Expressions.Evaluate(cond.Parameters[0].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
                                                     else compareFrame = (cond.Parameters[0].Data as ParameterShort).Value.ToString();
@@ -877,12 +863,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                 case 7: // Counters -- NOTE: every condition here MUST be accomodated to work with EACH instance of the counter individually
                                     {
                                         // set counter name
-                                        string CounterName = "ZEL_UNKNOWN_OBJECT";
-                                        var Counter = gameData.FrameItems.Items[cond.ObjectInfo];
-                                        if (cond.ObjectInfo <= gameData.FrameItems.Items.Count)
-                                            CounterName = GMS2Writer.CleanString(Counter.Name).Replace(" ", "_") + "_" + Counter.Header.Handle;
-                                        CounterName = $"object({GMS2Writer.ObjectName(Counter)})";
-
+                                        string CounterName = CounterName = GMS2Writer.ObjectName(cond, gameData, true);
                                         switch (cond.Num)
                                         {
                                             case -81: // Compare counter to value
@@ -906,19 +887,21 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                 default:
                                     {
                                         #region ExtensionConditions
+                                        string ExtName = GMS2Writer.ObjectName(cond, gameData, true);
                                         if (cond.ObjectType == GMS2Expressions.try_val("AndR", ExtCodes)) // Android object
                                         {
                                             switch (cond.Num)
                                             {
-                                                case -91: // On back button pressed (notAlways)
+                                                case -91: // On back button pressed (OnlyOneActionWhenEventLoops)
                                                     evntIfStatement += "(os_type == os_android && keyboard_check_pressed(vk_backspace))";
+                                                    notAlways = true;
                                                     break;
                                                 default:
                                                     Throw.unimplemented(cond, ref evntIfStatement, gameData, ref missing_code, ExtCodes); ;
                                                     break;
                                             }
                                         }
-                                        if (cond.ObjectType == GMS2Expressions.try_val("2YOJ", ExtCodes)) // Joystick 2 Object
+                                        else if (cond.ObjectType == GMS2Expressions.try_val("2YOJ", ExtCodes)) // Joystick 2 Object
                                         {
                                             switch (cond.Num)
                                             {
@@ -948,7 +931,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                             }
                                             break;
                                         }
-                                        if (cond.ObjectType == GMS2Expressions.try_val("GMS2", ExtCodes)) // GMS2 Object
+                                        else if (cond.ObjectType == GMS2Expressions.try_val("GMS2", ExtCodes)) // GMS2 Object
                                         {
                                             switch (cond.Num)
                                             {
@@ -963,12 +946,9 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                             break;
                                         }
                                         #endregion
-                                        switch (cond.Num)
+                                        else
                                         {
-                                            default:
-                                                Throw.unimplemented(cond, ref evntIfStatement, gameData, ref missing_code, ExtCodes); ;
-                                                break;
-
+                                            Throw.unimplemented(cond, ref evntIfStatement, gameData, ref missing_code, ExtCodes); ;
                                         }
 
                                     }
@@ -1000,11 +980,10 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                 case -6: // Keyboard/Mouse
                                     switch (action.Num)
                                     {
-                                        case 0: // Hide Windows mouse pointer (FIX/REWORK add this)
-                                        case 1: // Show Windows mouse pointer (FIX/REWORK add this)
+                                        case 0: // Hide Windows mouse pointer
+                                        case 1: // Show Windows mouse pointer
                                             {
-                                                string[] cr = { "cr_none", "cr_default" };
-                                                evntIfStatement += $"window_set_cursor({cr[action.Num]});";
+                                                evntIfStatement += $"window_set_cursor({(action.Num == 1 ? "cr_default" : "cr_none")});";
                                                 break;
                                             }
                                         default:
@@ -1082,24 +1061,22 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                             {
                                                 if (action.Parameters[0].Data is ParameterShort prmShrt)
                                                 {
-                                                    int toFrame = prmShrt.Value + 1;
-                                                    int frameId = -1;
-                                                    foreach (Frame f in gameData.Frames)
-                                                    {
-                                                        if (f.Handle == toFrame) frameId = f.Handle; break;
-                                                    }
-                                                    evntIfStatement += $"room_goto(rm{toFrame}_{GMS2Writer.CleanStringFull(gameData.Frames[toFrame].FrameName)}); // Jump to Frame ({toFrame})";
+                                                    int frameId = gameData.FrameHandles[prmShrt.Value];
+                                                    if (frameId < 0) throw new Exception("Couldn't get frame!");
+
+                                                    evntIfStatement += $"room_goto(rm{frameId}_{GMS2Writer.CleanStringFull(gameData.Frames[frameId].FrameName)}); // Jump to Frame ({frameId})";
                                                 }
                                                 else if (action.Parameters[0].Data is ParameterExpressions prmExp)
                                                 {
-                                                    string toFrame = GMS2Expressions.Evaluate(prmExp, evntCount, gameData, ExtCodes, ref missing_code);
-                                                    evntIfStatement += $"JumpToFrame({toFrame}); // Jump to Frame (ParameterExpressions)";
+                                                    string frameId = GMS2Expressions.Evaluate(prmExp, evntCount, gameData, ExtCodes, ref missing_code);
+                                                    evntIfStatement += $"JumpToFrame({frameId}); // Jump to Frame (ParameterExpressions)";
                                                 }
                                                 break;
                                             }
-                                            catch // If frame is missing or errored somehow
+                                            catch (Exception ex) // If frame is missing or errored somehow
                                             {
-                                                evntIfStatement += $"// Jump to frame (missing frame)";
+                                                Logger.LogType(typeof(EventsToGML), $"JUMP TO FRAME ERROR: {ex}");
+                                                evntIfStatement += $"// Jump to frame (missing/errored frame)";
                                                 break;
                                             }
                                         
@@ -1209,13 +1186,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                         break;
                                     }
                                 case 2: // Object -- NOTE: every action here MUST be accomodated to work with EACH instance of the object individually
-                                    //string ObjectName = $"Qualifier {action.ObjectInfo}";
-                                    string ObjectName = "ZEL_UNKNOWN_OBJECT";
-                                    var Object = gameData.FrameItems.Items[action.ObjectInfo];
-                                    if (action.ObjectInfo <= gameData.FrameItems.Items.Count)
-                                        ObjectName = GMS2Writer.CleanString(Object.Name).Replace(" ", "_") + "_" + Object.Header.Handle;
-                                    ObjectName = $"object({GMS2Writer.ObjectName(Object)})";
-
+                                    string ObjectName = GMS2Writer.ObjectName(action, gameData, true);
                                     switch (action.Num)
                                     {
                                         case 1: // Set Position at (X,X)
@@ -1248,6 +1219,8 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                                 evntIfStatement += $"LookAt({ObjectName}, {Object2.X}, {Object2.Y}, {evntCount});";
                                             }
                                             break;
+                                        //case 15: // Stop animation (FIX/REWORK add this)
+                                        //case 16: // Start animation (FIX/REWORK add this)
                                         case 17: // Change animation sequence
                                             string changeAnim = "";
                                             if (action.Parameters[0].Data is ParameterExpressions) changeAnim = GMS2Expressions.Evaluate(action.Parameters[0].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
@@ -1312,11 +1285,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                     break;
                                 case 3: // String -- NOTE: every action here MUST be accomodated to work with EACH instance of the string individually
                                     {
-                                        string StringName = "ZEL_UNKNOWN_OBJECT";
-                                        var String = gameData.FrameItems.Items[action.ObjectInfo];
-                                        if (action.ObjectInfo <= gameData.FrameItems.Items.Count)
-                                            StringName = GMS2Writer.CleanString(String.Name).Replace(" ", "_") + "_" + String.Header.Handle;
-                                        StringName = $"object({GMS2Writer.ObjectName(String)})";
+                                        string StringName = StringName = GMS2Writer.ObjectName(action, gameData, true);
                                         switch (action.Num)
                                         {
                                             case 24: // Destroy
@@ -1353,12 +1322,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                         break;
                                     }
                                 case 7: // Counter -- NOTE: every action here MUST be accomodated to work with EACH instance of the counter individually
-                                    string CounterName = "ZEL_UNKNOWN_OBJECT";
-                                    var Counter = gameData.FrameItems.Items[action.ObjectInfo];
-                                    if (action.ObjectInfo <= gameData.FrameItems.Items.Count)
-                                        CounterName = GMS2Writer.CleanString(Counter.Name).Replace(" ", "_") + "_" + Counter.Header.Handle;
-                                    CounterName = $"object({GMS2Writer.ObjectName(Counter)})";
-
+                                    string CounterName = CounterName = GMS2Writer.ObjectName(action, gameData, true);
                                     switch (action.Num)
                                     {
                                         case 24: // Destroy
@@ -1405,22 +1369,39 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                 default:
                                     {
                                         #region ExtensionActions
+                                        string ExtName = GMS2Writer.ObjectName(action, gameData, true);
+                                        string pref = $"with({ExtName}){{"; // Target specific extension object
                                         if (action.ObjectType == GMS2Expressions.try_val("LTCW", ExtCodes)) // Window Control object
                                         {
                                             switch (action.Num)
                                             {
                                                 case 98:
-                                                    evntIfStatement += $"window_set_caption({GMS2Expressions.Evaluate(action.Parameters[0].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code)});";
+                                                    evntIfStatement += $"{pref}window_set_caption({GMS2Expressions.Evaluate(action.Parameters[0].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code)})";
                                                     break;
                                                 default:
-                                                    Throw.unimplemented(action, ref evntIfStatement, gameData, ref missing_code, ExtCodes); ;
+                                                    Throw.unimplemented(action, ref evntIfStatement, gameData, ref missing_code, ExtCodes);
                                                     break;
                                             }
+                                            evntIfStatement += "};";
                                         }
-                                        if (action.ObjectType == GMS2Expressions.try_val("0I", ExtCodes) || action.ObjectType == GMS2Expressions.try_val("0INI", ExtCodes)) // Ini object
+                                        else if (action.ObjectType == GMS2Expressions.try_val("sFwU", ExtCodes)) // Ultimate Fullscreen object
                                         {
-                                            var ini_name = GMS2Writer.ObjectName(gameData.FrameItems.Items[action.ObjectInfo]);
-                                            string pref = $"with({ini_name}){{"; // Target specific INI object
+                                            switch (action.Num)
+                                            {
+                                                case 80: // Go fullscreen
+                                                case 81: // Go windowed
+                                                    evntIfStatement += $"{pref}window_set_fullscreen({(action.Num == 80 ? "true" : "false")})";
+                                                    break;
+                                                default:
+                                                    Throw.unimplemented(action, ref evntIfStatement, gameData, ref missing_code, ExtCodes);
+                                                    break;
+                                            }
+                                            evntIfStatement += "};";
+                                        }
+                                        else if (action.ObjectType == GMS2Expressions.try_val("0I", ExtCodes) || action.ObjectType == GMS2Expressions.try_val("0INI", ExtCodes)) // Ini object
+                                        {
+                                            //var ini_name = GMS2Writer.ObjectName(action, gameData, true);
+                                            
                                             switch (action.Num)
                                             {
                                                 case 80: // Set current group to "GroupName"
@@ -1516,7 +1497,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                                     }
 
                                                 default:
-                                                    Throw.unimplemented(action, ref evntIfStatement, gameData, ref missing_code, ExtCodes); ;
+                                                    Throw.unimplemented(action, ref evntIfStatement, gameData, ref missing_code, ExtCodes);
                                                     break;
                                             }
                                             evntIfStatement += "};";
@@ -1524,7 +1505,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                         #endregion
                                         else
                                         {
-                                            Throw.unimplemented(action, ref evntIfStatement, gameData, ref missing_code, ExtCodes); ;
+                                            Throw.unimplemented(action, ref evntIfStatement, gameData, ref missing_code, ExtCodes);
                                         }
                                     }
                                     break;

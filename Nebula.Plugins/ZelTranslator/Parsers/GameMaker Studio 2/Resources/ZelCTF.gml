@@ -94,6 +94,117 @@ function object(oname){
 /*
 	CONDITIONS
 */
+function CompareLocalVar(obj, varName, comparison, val, event) {
+	var returnTrue = 0
+	if (obj_inst_count(obj, event) == 0) {
+		if (instance_exists(obj)){
+			for (var i = 0; i < instance_number(obj); i++;){
+				//returnTrue = 0;
+				try {
+					with (instance_find(obj, i)){
+						var localVar = 0;
+						if (variable_instance_exists(id, varName)) localVar = variable_instance_get(id, varName);
+						switch (comparison)
+						{
+							case "==":
+								if localVar == val then {returnTrue = 1;
+									array_push(global.eventInstLists[event], id);}
+							break;
+				
+							case "!=":
+								if localVar != val then {returnTrue = 1;
+									array_push(global.eventInstLists[event], id);}
+							break;
+				
+							case "<=":
+								if localVar <= val then {returnTrue = 1;
+									array_push(global.eventInstLists[event], id);}
+							break;
+				
+							case "<":
+								if localVar < val then {returnTrue = 1;
+									array_push(global.eventInstLists[event], id);}
+							break;
+				
+							case ">=":
+								if localVar >= val then {returnTrue = 1;
+									array_push(global.eventInstLists[event], id);}
+							break;
+				
+							case ">":
+								if localVar > val {returnTrue = 1;
+									array_push(global.eventInstLists[event], id);}
+							break;
+						
+							default:
+								throw ("Invalid comparison operator for CompareAltValue()!");
+							break;
+						}
+			
+						if (returnTrue == 1) {
+							//array_push(global.eventInstLists[event], id);
+						}
+					}
+				} catch(_ex){}
+			}	
+		}
+	}
+	else {
+		if (instance_exists(obj)){
+			for (var i = 0; i < array_length(global.eventInstLists[event]); i++;){
+				if global.eventInstLists[event][i].object_index == obj {
+					try {
+						with (global.eventInstLists[event][i]){
+							var localVar = 0;
+							if (variable_instance_exists(id, varName)) localVar = variable_instance_get(id, varName);
+							switch (comparison)
+							{
+								case "==":
+									if localVar == val then returnTrue = 1;
+									else array_delete(global.eventInstLists[event],i,1);
+								break;
+				
+								case "!=":
+									if localVar != val then returnTrue = 1;
+									else array_delete(global.eventInstLists[event],i,1);
+								break;
+				
+								case "<=":
+									if localVar <= val then returnTrue = 1;
+									else array_delete(global.eventInstLists[event],i,1);
+								break;
+				
+								case "<":
+									if localVar < val then returnTrue = 1;
+									else array_delete(global.eventInstLists[event],i,1);
+								break;
+				
+								case ">=":
+									if localVar >= val then returnTrue = 1;
+									else array_delete(global.eventInstLists[event],i,1);
+								break;
+				
+								case ">":
+									if localVar > val then returnTrue = 1;
+									else array_delete(global.eventInstLists[event],i,1);
+								break;
+							
+								default:
+									throw ("Invalid comparison operator for CompareAltString()!");
+								break;
+							}
+			
+							if (returnTrue == 1) {
+								//array_push(global.eventInstLists[event], id);
+							}
+						}
+					} catch(_ex){}
+				}
+			}
+		}
+	}
+	if (returnTrue == 1) return true;
+}
 function FacingDirection(obj, dir, paramType, val, event) {
 	var returnTrue = 0;
 	var ParameterInt = 0;
@@ -306,7 +417,7 @@ function IsOverlappingBackdrop(obj, event) {
 	}
 	if (returnTrue == 1) return true;
 }
-function CompareAltValue(obj, variable, comparison, val, event) {
+function CompareAltVar(obj, type, variable, comparison, val, event) {
 	var returnTrue = 0
 	if (obj_inst_count(obj, event) == 0) {
 		if (instance_exists(obj)){
@@ -314,35 +425,38 @@ function CompareAltValue(obj, variable, comparison, val, event) {
 				//returnTrue = 0;
 				try {
 					with (instance_find(obj, i)){
+						var AlterableVars = [];
+						if (type == "val") AlterableVars = AlterableValues;
+						if (type == "str") AlterableVars = AlterableStrings;
 						switch (comparison)
 						{
 							case "==":
-								if AlterableValues[variable] == val then {returnTrue = 1;
+								if AlterableVars[variable] == val then {returnTrue = 1;
 									array_push(global.eventInstLists[event], id);}
 							break;
 				
 							case "!=":
-								if AlterableValues[variable] != val then {returnTrue = 1;
+								if AlterableVars[variable] != val then {returnTrue = 1;
 									array_push(global.eventInstLists[event], id);}
 							break;
 				
 							case "<=":
-								if AlterableValues[variable] <= val then {returnTrue = 1;
+								if AlterableVars[variable] <= val then {returnTrue = 1;
 									array_push(global.eventInstLists[event], id);}
 							break;
 				
 							case "<":
-								if AlterableValues[variable] < val then {returnTrue = 1;
+								if AlterableVars[variable] < val then {returnTrue = 1;
 									array_push(global.eventInstLists[event], id);}
 							break;
 				
 							case ">=":
-								if AlterableValues[variable] >= val then {returnTrue = 1;
+								if AlterableVars[variable] >= val then {returnTrue = 1;
 									array_push(global.eventInstLists[event], id);}
 							break;
 				
 							case ">":
-								if AlterableValues[variable] > val {returnTrue = 1;
+								if AlterableVars[variable] > val {returnTrue = 1;
 									array_push(global.eventInstLists[event], id);}
 							break;
 						
@@ -365,40 +479,43 @@ function CompareAltValue(obj, variable, comparison, val, event) {
 				if global.eventInstLists[event][i].object_index == obj {
 					try {
 						with (global.eventInstLists[event][i]){
+							var AlterableVars = [];
+							if (type == "val") AlterableVars = AlterableValues;
+							if (type == "str") AlterableVars = AlterableStrings;
 							switch (comparison)
 							{
 								case "==":
-									if AlterableValues[variable] == val then returnTrue = 1;
+									if AlterableVars[variable] == val then returnTrue = 1;
 									else array_delete(global.eventInstLists[event],i,1);
 								break;
 				
 								case "!=":
-									if AlterableValues[variable] != val then returnTrue = 1;
+									if AlterableVars[variable] != val then returnTrue = 1;
 									else array_delete(global.eventInstLists[event],i,1);
 								break;
 				
 								case "<=":
-									if AlterableValues[variable] <= val then returnTrue = 1;
+									if AlterableVars[variable] <= val then returnTrue = 1;
 									else array_delete(global.eventInstLists[event],i,1);
 								break;
 				
 								case "<":
-									if AlterableValues[variable] < val then returnTrue = 1;
+									if AlterableVars[variable] < val then returnTrue = 1;
 									else array_delete(global.eventInstLists[event],i,1);
 								break;
 				
 								case ">=":
-									if AlterableValues[variable] >= val then returnTrue = 1;
+									if AlterableVars[variable] >= val then returnTrue = 1;
 									else array_delete(global.eventInstLists[event],i,1);
 								break;
 				
 								case ">":
-									if AlterableValues[variable] > val then returnTrue = 1;
+									if AlterableVars[variable] > val then returnTrue = 1;
 									else array_delete(global.eventInstLists[event],i,1);
 								break;
 							
 								default:
-									throw ("Invalid comparison operator for CompareAltValue()!");
+									throw ("Invalid comparison operator for CompareAltString()!");
 								break;
 							}
 			
