@@ -291,6 +291,10 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                 case 6: // Direction (FIX/REWORK to work with multiple instances)
                                     buildString += $"({actobjName}.direction/11.25)";
                                     break;
+                                case 9: // Y Top
+                                case 10: // Y Bottom
+                                    buildString += $"{actobjName}.bbox_{(exp.Num == 9 ? "top" : "bottom")}";
+                                    break;
                                 case 11: // X Position (FIX/REWORK to work with multiple instances)
                                     buildString += $"{actobjName}.x";
                                     break;
@@ -309,10 +313,16 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                 case 17: // SemiTrans (FIX/REWORK to work with multiple instances)
                                     buildString += $"((1 - {actobjName}.image_alpha)*128.0)";
                                     break;
+                                case 18: // NMovement (the current movement index)
+                                    buildString += $"{actobjName}.movement";
+                                    break;
                                 case 19: // Alterable Strings (FIX/REWORK to work with multiple instances)
                                     buildString += $"Alterable({actobjName}, \"str\", {evnt}, {shortExp.Value})";
                                     break;
-                                //case 25 // XActionPoint
+                                case 25: // XActionPoint
+                                case 26: // YActionPoint
+                                    buildString += $"GetGeneralValue({actobjName}, \"{(exp.Num == 25 ? "X" : "Y")}ActionPoint\", \"val\", {evnt})";
+                                    break;
                                 case 27: // BlendCoeff (FIX/REWORK to work with multiple instances)
                                     buildString += $"((1 - {actobjName}.image_alpha)*256.0)";
                                     break;
@@ -328,8 +338,16 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                 case 41: // Height (in pixels) (FIX/REWORK to work with multiple instances)
                                     buildString += $"{actobjName}.sprite_height";
                                     break;
-                                // case 32: // ODistance(obj, x, y) -- Returns distance between object and point (X,Y)
-                                // case 33: // OAngle(obj, x, y) -- Returns angle vector between object and point (X,Y)
+                                case 32: // ODistance(obj, x, y) -- Returns distance between object and point (X,Y)
+                                    buildString += $"point_distance(GetGeneralValue({actobjName}, \"x\", \"val\", {evnt}), GetGeneralValue({actobjName}, \"y\", \"val\", {evnt}), ";
+                                    break;
+                                case 33: // OAngle(obj, x, y) -- Returns angle vector between object and point (X,Y)
+                                    buildString += $"point_direction(GetGeneralValue({actobjName}, \"x\", \"val\", {evnt}), GetGeneralValue({actobjName}, \"y\", \"val\", {evnt}), ";
+                                    break;
+                                case 81: // XScale
+                                case 82: // YScale
+                                    buildString += $"GetGeneralValue({actobjName}, \"image_{(exp.Num == 81 ? "x" : "y")}scale\", \"val\", {evnt})";
+                                    break;
                                 // case 83: // Angle
                                 default:
                                     NoParam(exp, gameData, ref missing_code);

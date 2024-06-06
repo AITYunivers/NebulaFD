@@ -131,7 +131,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
             else if (action.Parameters[0].Data is ParameterExpressions prmExps) setAltValue = GMS2Expressions.Evaluate(prmExps, evnt, gameData, extCodes, ref missing_code);
             var setExpression = action.Parameters[1].Data as ParameterExpressions;
             //var setValue = (setExpression.Items[0].Data as LongExp).Value;
-            string operation = new string[] { "=", "+=", "-=" }[action.Num-31];
+            string operation = action.Num switch { 31 => "=", 32 => "+=", 33 => "-=" };
             return $"SetAltValue({ObjectName}, {setAltValue}, \"{operation}\", {GMS2Expressions.Evaluate(setExpression, evnt, gameData, extCodes, ref missing_code)}, {evnt});";
         }
         public static string SetAltString(Action action, int evnt, PackageData gameData, Dictionary<string, int> extCodes, ref List<string> missing_code)
@@ -146,7 +146,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
         public static string SetFlag(Action action, int evnt, PackageData gameData, Dictionary<string, int> extCodes, ref List<string> missing_code)
         {
             string ObjectName = object_name(action, gameData);
-            string val = new string[] { "true", "false", "\"toggle\"" }[action.Num - 35];
+            string val = action.Num switch { 35 => "true", 36 => "false", 37 => "\"toggle\"" };
             var flagExp = action.Parameters[0].Data as ParameterExpressions;
             return $"SetFlag({ObjectName}, {flagExp}, {val}, {evnt});";
         }
@@ -169,7 +169,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                 else if (action.Parameters[0].Data is ParameterShort shrt) setVal = shrt.Value.ToString();
             }
             
-            string prevNext = new string[] { "", ", \"prev\"", ", \"next\"" }[action.Num-84];
+            string prevNext = action.Num switch { 84 => "", 85 => ", \"prev\"", 86 => ", \"next\"" };
             return $"SetParagraph({ObjectName}, {setVal}, {evnt}{prevNext});";
         }
     }

@@ -1,7 +1,7 @@
 #region ZelCTF
 function ZelCTF(){
 	// List of translated GML functions that are used in Fusion games
-	#macro FNAF_WORLD true
+	#macro FNAF_WORLD false
 }
 
 // Utility

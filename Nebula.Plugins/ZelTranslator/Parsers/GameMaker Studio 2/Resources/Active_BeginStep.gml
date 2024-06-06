@@ -9,7 +9,11 @@ for (var i = 0; i < array_length(animations); i++){
 	}
 }
 var closest = get_closest_angle(direction, animations[playingAnim][0]);
-if (validAnim) sprite_index = animations[playingAnim][0][closest][0];
+if (validAnim) {
+	sprite_index = animations[playingAnim][0][closest][0];
+	XActionPoint = animations[playingAnim][0][closest][2];
+	YActionPoint = animations[playingAnim][0][closest][3];
+}
 if (!validAnim) sprite_index = animations[0][0][0][0];
 if (flash[1] > 0) {
 	flash[0] += delta_time/1000000.0

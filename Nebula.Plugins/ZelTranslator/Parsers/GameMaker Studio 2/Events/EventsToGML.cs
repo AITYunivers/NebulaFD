@@ -15,6 +15,7 @@ using Action = Nebula.Core.Data.Chunks.FrameChunks.Events.Action;
 using Nebula.Core.Data.Chunks.ObjectChunks;
 using System.ComponentModel;
 using Nebula.Core.Data.Chunks.FrameChunks;
+using System.Linq.Expressions;
 
 namespace ZelTranslator_SD.Parsers.GameMakerStudio2
 {
@@ -771,6 +772,13 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                                     evntIfStatement += $"CompareAltVars({ObjectName}, \"val\", {whichValue}, \"{GetOperator(expression.Comparison)}\", {GMS2Expressions.Evaluate(expression, evntCount, gameData, ExtCodes, ref missing_code)}, {evntCount})";
                                                     break;
                                                 }
+                                            case -24: // Flag is off
+                                            case -25: // Flag is on
+                                                {
+                                                    var exp = GMS2Expressions.Evaluate(cond.Parameters[0].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
+                                                    evntIfStatement += $"Flag({ObjectName}, {evntCount}, {exp}) == {(cond.Num == -25 ? "true" : "false")}";
+                                                    break;
+                                                }
                                             case -23: // Is object overlapping a backdrop
                                                 {
                                                     evntIfStatement += GMS2Conditions.OverlapBackdrop(cond, evntCount, gameData);
@@ -1274,6 +1282,11 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                             evntIfStatement += GMS2Actions.SetAlpha(action, evntCount, gameData, ExtCodes, ref missing_code);
                                             break;
                                         //case 80: // Paste into background (not an obstalce) (FIX/REWORK add this and also research it properly for the different backdrop modes)
+                                        case 86: // Set X Scale
+                                        case 87: // Set Y Scale
+                                            string scale = GMS2Expressions.Evaluate(action.Parameters[0].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
+                                            evntIfStatement += $"SetGeneralValue({ObjectName}, image_{(action.Num == 86 ? "x" : "y")}scale, \"=\", {scale}, {evntCount});";
+                                            break;
                                         case 88: // Set Angle to _
                                             string angle = GMS2Expressions.Evaluate(action.Parameters[0].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
                                             evntIfStatement += $"SetAngle({ObjectName}, {angle}, {evntCount})";

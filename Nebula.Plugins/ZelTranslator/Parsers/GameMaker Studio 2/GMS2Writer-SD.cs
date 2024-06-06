@@ -1197,7 +1197,7 @@ if (flash[1] > 0) {
                         beginstepEv.eventNum = 1;
                         beginstepEv.eventType = 3;
 
-                        WriteAnimations(common, newObj.name, createEvFile, beginstepEvFile);
+                        WriteAnimations(common, newObj.name, createEvFile, beginstepEvFile, gameData);
 
                         events.Add(beginstepEv);
                         GMLFiles.Add(beginstepEvFile);
@@ -1675,6 +1675,9 @@ if (flash[1] > 0) {
             // Object name
             createEvFile.code = $"object_name = \"{obj.Name}\";\n";
 
+            createEvFile.code += $"XActionPoint = 0\n";
+            createEvFile.code += $"YActionPoint = 0\n";
+
             // Alterable Values (fix/rework to exclude flags)
             createEvFile.code += $"AlterableValues = [";
             int[] values = common.ObjectAlterableValues.AlterableValues;
@@ -2006,7 +2009,7 @@ nodes : [
                 Logger.LogType(typeof(GMS2Writer), $"Unable to write object movement: {ex}");
             }
         }
-        public static void WriteAnimations(ObjectCommon common, string ObjectName, GMLFile createEvFile, GMLFile beginstepEvFile)
+        public static void WriteAnimations(ObjectCommon common, string ObjectName, GMLFile createEvFile, GMLFile beginstepEvFile, PackageData gameData)
         {
             try
             {
@@ -2033,7 +2036,8 @@ nodes : [
 
                             if (imgs.Length > 0)
                             {
-                                createEvFile.code += $"[spr_{ObjectName.Substring(4)}_{imgs[0]}_{animationID}_{directionID}, {directionID}], ";
+                                var baseimg = gameData.ImageBank.Images[imgs[0]];
+                                createEvFile.code += $"[spr_{ObjectName.Substring(4)}_{imgs[0]}_{animationID}_{directionID}, {directionID}, /*XActionPoint*/{baseimg.ActionPointX}, /*YActionPoint*/{baseimg.ActionPointY}], ";
                             }
                         }
                         createEvFile.code += $"], {animationID}";
@@ -2077,6 +2081,7 @@ nodes : [
                 {
                     beginstepEvFile.code = sr.ReadToEnd();
                 }
+                createEvFile.code += $"\n\n{beginstepEvFile.code.Replace("/// @description Manage animations", "// Run animation code once at creation")}";
             }
             catch (Exception ex)
             {
