@@ -2,6 +2,8 @@
 # 
 **README is a Work In Progress.**
 
+[Discord](https://discord.gg/aY2WFGPBBB)
+
 Just another Clickteam Fusion 2.5 decompiler made by [Yunivers](https://github.com/AITYunivers).
 |Table of Contents| Description |
 |--|--|
