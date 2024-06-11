@@ -49,7 +49,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
             missing_code.Add(errStr);
             throw new Exception(errStr);
         }
-        public static string Evaluate(ParameterExpressions expression, int evnt, PackageData gameData, Dictionary<string, int> extCodes, ref List<string> missing_code)
+        public static string Evaluate(ParameterExpressions? expression, int evnt, PackageData gameData, Dictionary<string, int> extCodes, ref List<string> missing_code)
         {
             string buildString = "";
             int expParamCount = 0;
@@ -348,7 +348,9 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                 case 82: // YScale
                                     buildString += $"GetGeneralValue({actobjName}, \"image_{(exp.Num == 81 ? "x" : "y")}scale\", \"val\", {evnt})";
                                     break;
-                                // case 83: // Angle
+                                case 83: // Angle
+                                    buildString += $"GetGeneralValue({actobjName}, \"image_angle\", \"val\", {evnt})";
+                                    break;
                                 default:
                                     NoParam(exp, gameData, ref missing_code);
                                     break;

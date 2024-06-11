@@ -92,6 +92,21 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
             string ObjectName = object_name(action, gameData);
             return $"SetGeneralValue({ObjectName}, \"depth\", \"=\", layer_get_depth(GetGeneralValue({ObjectName},\"layer\",\"str\",{evnt})), {evnt}); // Bring to front";
         }
+        public static string BringToDepth(Action action, int evnt, PackageData gameData)
+        {
+            // (FIX/REWORK this might not work like how I think it does...)
+            string ObjectName = object_name(action, gameData);
+            string _op = "";
+            if (action.Num == 58) _op = "+1";
+            else if (action.Num == 59)
+            {
+                string Object2 = GMS2Writer.ObjectName(gameData.FrameItems.Items[(action.Parameters[0].Data as ParameterObject).ObjectInfo], gameData, true);
+                return $"SetGeneralValue({ObjectName}, \"depth\", \"=\", GetGeneralValue({Object2},\"depth\",\"str\",{evnt})+1, {evnt});";
+            }
+
+            return $"SetGeneralValue({ObjectName}, \"depth\", \"=\", layer_get_depth(GetGeneralValue({ObjectName},\"layer\",\"str\",{evnt}){_op}), {evnt});";
+        }
+
         public static string SetVisibility(Action action, int evnt, PackageData gameData)
         {
             string ObjectName = object_name(action, gameData);

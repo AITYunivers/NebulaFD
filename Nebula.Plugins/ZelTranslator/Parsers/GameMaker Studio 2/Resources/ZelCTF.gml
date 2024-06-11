@@ -417,7 +417,7 @@ function IsOverlappingBackdrop(obj, event) {
 	}
 	if (returnTrue == 1) return true;
 }
-function CompareAltVar(obj, type, variable, comparison, val, event) {
+function CompareAltVars(obj, type, variable, comparison, val, event) {
 	var returnTrue = 0
 	if (obj_inst_count(obj, event) == 0) {
 		if (instance_exists(obj)){

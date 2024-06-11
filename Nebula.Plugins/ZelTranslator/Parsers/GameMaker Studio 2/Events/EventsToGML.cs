@@ -16,6 +16,8 @@ using Nebula.Core.Data.Chunks.ObjectChunks;
 using System.ComponentModel;
 using Nebula.Core.Data.Chunks.FrameChunks;
 using System.Linq.Expressions;
+using Spectre.Console;
+using Nebula.Core.Memory;
 
 namespace ZelTranslator_SD.Parsers.GameMakerStudio2
 {
@@ -326,7 +328,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                 GMLFile createGML = new GMLFile(); // GMLFile
                 createGML.name = "Create_0";
                 createGML.path = $"objects\\{newObj.name}";
-                createGML.code = $"ZelCTF();\nglobal.eventInstLists = array_create_zel({frame.FrameEvents.Events.Count}+1); // Create event instance lists\nnotAlways = array_notalways({frame.FrameEvents.Events.Count}+1); // Create notAlways and runOnce lists\nrunOnce = notAlways;\ngroups = array_notalways(<GROUPCOUNT>);\nOnlyOneActionWhenEventLoops = true; // Dummy/Aesthetic variable\n";
+                createGML.code = $"ZelCTF();\nglobal.eventInstLists = array_create_zel({frame.FrameEvents.Events.Count}+1); // Create event instance lists\nnotAlways = array_notalways({frame.FrameEvents.Events.Count}+1); // Create notAlways and runOnce lists\nrunOnce = notAlways;\ngroups = array_notalways(<GROUPCOUNT>);\n<INACTIVEGROUPS>\nOnlyOneActionWhenEventLoops = true; // Dummy/Aesthetic variable\n";
                 createGML.code += $"MoveTimer = {frame.FrameMoveTimer}\n";
                 createGML.code += $"VirtualWidth = {frame.FrameRect.right};\nVirtualHeight = {frame.FrameRect.bottom};\n";
                 createGML.code += $"ID = {frameCount + 1};\n";
@@ -425,6 +427,8 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                 var equalsTimers = new List<string[]>();
                 int evntCount = 1;
                 int groupCount = 0;
+                List<short> inactiveGroups = new List<short>();
+                List<short> externalGroups = new List<short>();
                 int indents = 0;
 
                 var notAlwaysEvts = new List<int>();
@@ -453,6 +457,16 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                     {
                         try
                         {
+                            for (var p = 0; p < cond.Parameters.Length; p++)
+                            {
+                                var prm = cond.Parameters[p];
+                                if (prm.Data is ParameterExtension prmExt)
+                                {
+                                    var fileName = $"{GMS2Writer.ObjectName(cond, gameData)}_F-{frameCount}_E-{evntCount}_Cnd-{condCount}_Prm{p}_Data.bin";
+                                    File.WriteAllBytes(Path.Combine("Binary", "ExtensionData", "ParameterExtension", fileName), prmExt.Data);
+                                }
+                            }
+
                             if (condCount > 1)
                                 if (!evntIfStatement.EndsWith(") || (")) evntIfStatement += " && ";
                             if (cond.OtherFlags["Negated"]) evntIfStatement += "!";
@@ -677,6 +691,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                                 //evntIfStatement += "}\n#endregion";
                                                 evntIfStatement = "";
                                                 groupEnd = true;
+                                                externalGroups.RemoveAt(externalGroups.Count - 1);
                                                 indents--;
                                                 break;
                                             case -10: // GROUP START/Group header
@@ -685,7 +700,9 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                                     evntIfStatement = evntIfStatement.Insert(evntIfStatement.IndexOf("/*"), $"#region ").Replace("*/ ", $"*/ {group.Name}\n");
                                                     evntIfStatement += $"groups[{group.ID}]";
                                                     groupStart = true;
+                                                    if (group.GroupFlags["InactiveOnStart"]) inactiveGroups.Add(group.ID);
                                                     groupCount++;
+                                                    externalGroups.Add(group.ID);
                                                     indents++;
                                                     break;
                                                 }
@@ -969,7 +986,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                         catch (Exception ex)
                         {
                             Logger.LogType(typeof(EventsToGML), $"Problem reading condition ({frameCount}-{evntCount}): {ex}");
-                            Throw.unimplemented(cond, ref evntIfStatement, gameData, ref missing_code, ExtCodes); ;
+                            Throw.unimplemented(cond, ref evntIfStatement, gameData, ref missing_code, ExtCodes, true); ;
                             condCount++;
                         }
 
@@ -983,6 +1000,15 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                     {
                         try
                         {
+                            for (var p = 0; p < action.Parameters.Length; p++)
+                            {
+                                var prm = action.Parameters[p];
+                                if (prm.Data is ParameterExtension prmExt)
+                                {
+                                    var fileName = $"{GMS2Writer.ObjectName(action, gameData)}_F-{frameCount}_E-{evntCount}_Act-{condCount}_Prm{p}_Data.bin";
+                                    File.WriteAllBytes(Path.Combine("Binary", "ExtensionData", "ParameterExtension", fileName), prmExt.Data);
+                                }
+                            }
                             switch (action.ObjectType)
                             {
                                 case -6: // Keyboard/Mouse
@@ -1266,11 +1292,18 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                         case 37: // Toggle flag
                                             evntIfStatement += GMS2Actions.SetFlag(action, evntCount, gameData, ExtCodes, ref missing_code);
                                             break;
+                                        case 40: // Force animation frame to _
+                                            var animFrame = GMS2Expressions.Evaluate(action.Parameters[0].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
+                                            evntIfStatement += $"SetGeneralValue({ObjectName}, \"image_index\", \"=\", {animFrame}, {evntCount});";
+                                            break;
+                                        //case 47: // Set gravity to _ (FIX/REWORK add this)
                                         case 49: // Set Alterable String
                                             evntIfStatement += GMS2Actions.SetAltString(action, evntCount, gameData, ExtCodes, ref missing_code);
                                             break;
                                         case 57: // Bring to front
-                                            evntIfStatement += GMS2Actions.BringToFront(action, evntCount, gameData);
+                                        case 58: // Bring to back
+                                        case 59: // Move behind object ___
+                                            evntIfStatement += GMS2Actions.BringToDepth(action, evntCount, gameData);
                                             break;
                                         case 61: // Move to layer _
                                             string layer = GMS2Expressions.Evaluate(action.Parameters[0].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
@@ -1281,11 +1314,14 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                         case 65: // Set alpha-blending Coefficient
                                             evntIfStatement += GMS2Actions.SetAlpha(action, evntCount, gameData, ExtCodes, ref missing_code);
                                             break;
+                                        //case 69: // Set elasticity to _ 
                                         //case 80: // Paste into background (not an obstalce) (FIX/REWORK add this and also research it properly for the different backdrop modes)
+                                        case 85: // Set Scale
                                         case 86: // Set X Scale
                                         case 87: // Set Y Scale
                                             string scale = GMS2Expressions.Evaluate(action.Parameters[0].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
-                                            evntIfStatement += $"SetGeneralValue({ObjectName}, image_{(action.Num == 86 ? "x" : "y")}scale, \"=\", {scale}, {evntCount});";
+                                            evntIfStatement += $"SetGeneralValue({ObjectName}, \"image_{((action.Num == 85 || action.Num == 86) ? "x" : "y")}scale\", \"=\", {scale}, {evntCount});";
+                                            if (action.Num == 85) evntIfStatement += $"\nSetGeneralValue({ObjectName}, \"image_yscale\", \"=\", {scale}, {evntCount});";
                                             break;
                                         case 88: // Set Angle to _
                                             string angle = GMS2Expressions.Evaluate(action.Parameters[0].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
@@ -1405,6 +1441,60 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                                                 case 81: // Go windowed
                                                     evntIfStatement += $"{pref}window_set_fullscreen({(action.Num == 80 ? "true" : "false")})";
                                                     break;
+                                                default:
+                                                    Throw.unimplemented(action, ref evntIfStatement, gameData, ref missing_code, ExtCodes);
+                                                    break;
+                                            }
+                                            evntIfStatement += "};";
+                                        }
+                                        else if (action.ObjectType == GMS2Expressions.try_val("LACS", ExtCodes)) // Object Resizer
+                                        {
+                                            switch (action.Num)
+                                            {
+                                                case 85: // Set Width of Object to _
+                                                case 86: // Set Height of Object to _
+                                                    {
+                                                        string _wh = action.Num == 85 ? "width" : "height";
+                                                        string objName = GMS2Writer.ObjectName(gameData.FrameItems.Items[(action.Parameters[0].Data as ParameterObject).ObjectInfo], gameData, true);
+                                                        string scale = GMS2Expressions.Evaluate(action.Parameters[1].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
+                                                        scale = $"(({scale}) / sprite_get_{_wh}(GetGeneralValue({objName}, \"sprite_index\", \"val\", {evntCount})))";
+                                                        evntIfStatement += $"{pref}SetGeneralValue({objName}, \"image_{(action.Num == 85 ? "x" : "y")}scale\", \"=\", {scale}, {evntCount});";
+                                                        break;
+                                                    }
+                                                default:
+                                                    Throw.unimplemented(action, ref evntIfStatement, gameData, ref missing_code, ExtCodes);
+                                                    break;
+                                            }
+                                            evntIfStatement += "};";
+                                        }
+                                        else if (action.ObjectType == GMS2Expressions.try_val("GnsE", ExtCodes)) // Easing Object
+                                        {
+                                            switch (action.Num)
+                                            {
+                                                case 80: // Move ([Object]-ParameterObject)0 using ([Ease]-ParameterExtension)1 to ([X]-ParameterExpressions,2[Y]-ParameterExpressions)3 over ([Milliseconds/Event loops]-ParameterExtension)4 ([Units]-ParameterExpression)5
+                                                case 90: // Move (ParameterExpressions)
+                                                    {
+                                                        goto default; // (FIX/REWORK UNFINISHED)
+                                                        
+                                                        string objName = GMS2Writer.ObjectName(gameData.FrameItems.Items[(action.Parameters[0].Data as ParameterObject).ObjectInfo], gameData, true);
+                                                        
+                                                        byte[] _easeData = (action.Parameters[1].Data as ParameterExtension).Data;
+                                                        int easingMode = _easeData[1];
+                                                        int functionA = _easeData[2];
+                                                        int functionB = _easeData[3];
+
+                                                        string xpos = GMS2Expressions.Evaluate(action.Parameters[2].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
+                                                        string ypos = GMS2Expressions.Evaluate(action.Parameters[3].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
+
+                                                        int timeMode = (action.Parameters[4].Data as ParameterExtension).Data[0];
+
+                                                        string duration = GMS2Expressions.Evaluate(action.Parameters[5].Data as ParameterExpressions, evntCount, gameData, ExtCodes, ref missing_code);
+                                                        break;
+                                                        
+                                                    }
+                                                //case 81: // Stop Object
+                                                //case 82: // Stop all objects
+                                                //case 83: // Reverse movement of Object
                                                 default:
                                                     Throw.unimplemented(action, ref evntIfStatement, gameData, ref missing_code, ExtCodes);
                                                     break;
@@ -1531,7 +1621,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                         catch (Exception ex)
                         {
                             Logger.LogType(typeof(EventsToGML), $"Problem reading action ({frameCount}-{evntCount}): {ex}");
-                            Throw.unimplemented(action, ref evntIfStatement, gameData, ref missing_code, ExtCodes); ;
+                            Throw.unimplemented(action, ref evntIfStatement, gameData, ref missing_code, ExtCodes, true); ;
 
                             if (!(action.ObjectType == -1 && action.Num > 1)) evntIfStatement += "\n\t";
                             if (notAlways) evntIfStatement += "\t";
@@ -1544,26 +1634,36 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                     if (!groupStart) evntIfStatement += "\n}";
                     if (!groupEnd) evntIfStatement += "\n";
                     if (notAlways) evntIfStatement += $"else {{\n\tnotAlways[{evntCount}] = true;\n}}";
-                    evntIfStatement = evntIfStatement.Replace("\n", "\n" + string.Concat(Enumerable.Repeat("\t", indents)));
+                    string indentString = string.Concat(Enumerable.Repeat("\t", indents));
+                    evntIfStatement = evntIfStatement.Replace("\n", "\n" + indentString);
                     if (groupEnd) evntIfStatement += $"#endregion /*ev{evntCount}*/\n";
 
                     evntIfStatement += "\n";
 
                     // Append GML
+                    string _extGroups = "(";
+                    for (var ii = 0; ii < externalGroups.Count; ii++)
+                    {
+                        var ID = externalGroups[ii];
+                        _extGroups += $"groups[{ID}]";
+                        if (ii < externalGroups.Count - 1) _extGroups += " && ";
+                    }
+                    _extGroups += ") && ";
+
                     if (startOfFrame)
                     {
-                        roomStartGML.code += evntIfStatement;
-                        stepGML.code += $"/*ev{evntCount}*/ // Start of Frame... in Room Start Event\n\n";
+                        roomStartGML.code += evntIfStatement.Replace("*/ if (", "*/ if (" + _extGroups);
+                        stepGML.code += $"{indentString}/*ev{evntCount}*/ // Start of Frame... in Room Start Event\n\n";
                     }
                     else if (endOfFrame)
                     {
-                        roomendGML.code += evntIfStatement;
-                        stepGML.code += $"/*ev{evntCount}*/ // End of Frame... in Room End Event\n\n";
+                        roomendGML.code += evntIfStatement.Replace("*/ if (", "*/ if (" + _extGroups);
+                        stepGML.code += $"{indentString}/*ev{evntCount}*/ // End of Frame... in Room End Event\n\n";
                     }
                     else if (endOfApp)
                     {
-                        gameendGML.code += evntIfStatement;
-                        stepGML.code += $"/*ev{evntCount}*/ // End of Application... in Game End Event\n\n";
+                        gameendGML.code += evntIfStatement.Replace("*/ if (", "*/ if (" + _extGroups);
+                        stepGML.code += $"{indentString}/*ev{evntCount}*/ // End of Application... in Game End Event\n\n";
                     }
                     else
                     {
@@ -1573,6 +1673,13 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                 }
                 // Create Variables in Create GML
                 createGML.code = createGML.code.Replace("<GROUPCOUNT>", groupCount.ToString());
+
+                // Inactive groups
+                inactiveGroups = inactiveGroups.Distinct().ToList();
+                string _groups = "";
+                foreach (var ID in inactiveGroups) { _groups += $"groups[{ID}] = false;\n"; }
+                createGML.code = createGML.code.Replace("<INACTIVEGROUPS>", _groups);
+
                 foreach (var item in everyTimers)
                 {
                     createVariables.Add($"{item[0]} = [{item[1]}, {item[2]}];");
@@ -1786,24 +1893,26 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
             }
             */
 
-            public static void unimplemented(Condition cond, ref string evntIfStatement, PackageData gameData, ref List<string> missing_code, Dictionary<string, int> extCodes)
+            public static void unimplemented(Condition cond, ref string evntIfStatement, PackageData gameData, ref List<string> missing_code, Dictionary<string, int> extCodes, bool isError = false)
             {
 
                 var ItemsList = cond.Parameters;
                 var ID = getID(cond.ObjectInfo, cond.ObjectType, gameData);
                 string errStr = Throw.missingCond(cond.ObjectType, cond.Num, ID) + "/* ";
+                if (!isError) errStr = errStr.Replace("UNIMPLEMENTED", "ERRORED");
                 //Logger.Log(typeof(EventsToGML), "69420 UNIMPLEMENTED CONDITION");
                 writeitems(ItemsList, ref errStr, gameData, ref missing_code, extCodes);
                 missing_code.Add(errStr);
                 evntIfStatement += errStr;
                 evntIfStatement += "*/";
             }
-            public static void unimplemented(Action action, ref string evntIfStatement, PackageData gameData, ref List<string> missing_code, Dictionary<string, int> extCodes)
+            public static void unimplemented(Action action, ref string evntIfStatement, PackageData gameData, ref List<string> missing_code, Dictionary<string, int> extCodes, bool isError = false)
             {
 
                 var ItemsList = action.Parameters;
                 var ID = getID(action.ObjectInfo, action.ObjectType, gameData);
-                string errStr = Throw.missingAction(action.ObjectType, action.Num, ID) + " ";
+                string errStr = Throw.missingAction(action.ObjectType, action.Num, ID).Replace("UNIMPLEMENTED", "ERRORED") + " ";
+                if (!isError) errStr = errStr.Replace("UNIMPLEMENTED", "ERRORED");
                 //Logger.Log(typeof(EventsToGML), "1337 UNIMPLEMENTED ACTION");
                 writeitems(ItemsList, ref errStr, gameData, ref missing_code, extCodes);
                 missing_code.Add(errStr);

@@ -61,7 +61,7 @@ namespace ZelTranslator_SD.Parsers
         {
             return "obj_" + CleanString(obj.Name).Replace(" ", "_") + "_" + obj.Header.Handle;
         }
-        public static string ObjectName(object source, PackageData gameData, bool isGML = false)
+        public static string ObjectName(object source, PackageData ?gameData, bool isGML = false)
         {
             string _name = "";
             string _handle = "";
@@ -69,6 +69,7 @@ namespace ZelTranslator_SD.Parsers
             ObjectInfo objectInfo = new();
 
             if (source is ObjectInfo _oi) objectInfo = _oi;
+            else if (source is ushort _id) objectInfo = gameData.FrameItems.Items[_id];
             else if (source is Action _act) objectInfo = gameData.FrameItems.Items[_act.ObjectInfo];
             else if (source is Condition _cond) objectInfo = gameData.FrameItems.Items[_cond.ObjectInfo];
             else if (source is ParameterExpression _exp) objectInfo = gameData.FrameItems.Items[_exp.ObjectInfo];
