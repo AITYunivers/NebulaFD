@@ -40,19 +40,34 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             Size = reader.ReadInt();
-            Width = reader.ReadInt();
-            Height = reader.ReadInt();
+
+            if (NebulaCore.Fusion == 1.5f)
+            {
+                Width = reader.ReadShort();
+                Height = reader.ReadShort();
+            }
+            else
+            {
+                Width = reader.ReadInt();
+                Height = reader.ReadInt();
+            }
+
             Player = reader.ReadShort();
             DisplayType = reader.ReadUShort();
-            ushort digitCounts = reader.ReadUShort();
-            IntDigitCount = (byte)(digitCounts & 0xF);
-            FloatWholeCount = (byte)(((digitCounts & 0xF0) >> 4) + 1);
-            FloatDecimalCount = (byte)((digitCounts & 0xF000) >> 12);
-            IntDigitPadding = IntDigitCount > 0;
-            FloatWholePadding = (digitCounts & 0x200) != 0;
-            FloatDecimalPadding = (digitCounts & 0x400) != 0;
-            FloatPadding = (digitCounts & 0x800) != 0;
-            BarDirection = (digitCounts & 0x100) != 0;
+
+            if (NebulaCore.Fusion > 1.5f)
+            {
+                ushort digitCounts = reader.ReadUShort();
+                IntDigitCount = (byte)(digitCounts & 0xF);
+                FloatWholeCount = (byte)(((digitCounts & 0xF0) >> 4) + 1);
+                FloatDecimalCount = (byte)((digitCounts & 0xF000) >> 12);
+                IntDigitPadding = IntDigitCount > 0;
+                FloatWholePadding = (digitCounts & 0x200) != 0;
+                FloatDecimalPadding = (digitCounts & 0x400) != 0;
+                FloatPadding = (digitCounts & 0x800) != 0;
+                BarDirection = (digitCounts & 0x100) != 0;
+            }
+
             Font = reader.ReadUShort();
 
             switch (DisplayType)

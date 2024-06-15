@@ -7,7 +7,7 @@ namespace Nebula
 {
     public static class NebulaCore
     {
-        public const string BuildDate = "5/27/24";
+        public const string BuildDate = "6/6/24";
         public static Color[] ColorRules = new Color[]
         {
             Color.DarkViolet_1,    // Header
@@ -31,6 +31,9 @@ namespace Nebula
         {
             get
             {
+                if (Fusion == 1.5)
+                    return 0;
+
                 if (PackageData.AppHeader.OtherFlags["Direct3D9or11"] && PackageData.AppHeader.OtherFlags["Direct3D8or11"])
                     return 11;
                 else if (PackageData.AppHeader.OtherFlags["Direct3D9or11"])

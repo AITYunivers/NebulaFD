@@ -7,7 +7,7 @@ using Nebula.Core.Memory;
 using Nebula.Core.Data;
 using static Nebula.Core.Utilities.Enums;
 
-namespace MappingTool
+namespace Nebula.Tools.MappingTool
 {
     public class ReadMap : INebulaTool
     {

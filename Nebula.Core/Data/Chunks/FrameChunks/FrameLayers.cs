@@ -42,6 +42,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            if (Layers.Length == 0)
+                Layers = new FrameLayer[1] { new FrameLayer() };
+
             writer.WriteInt(Layers.Length);
             foreach (FrameLayer layer in Layers)
             {

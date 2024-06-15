@@ -27,6 +27,9 @@ namespace Nebula.Core.Utilities
         public bool dump_unk_chunks = false;
         public string comment_allchunks = "Whether or not to dump all chunks to a 'Chunks' folder";
         public bool dump_all_chunks = false;
+        public string comment_gpu = "Whether or not to use the GPU to translate images (EXPERIMENTAL)";
+        public string comment_gpuUpdate = "DO NOT USE!!! Broke it when rewriting the Image Translator, WILL CRASH!";
+        public bool gpu_acceleration = false;
         public string comment_frames = "An array of frame ids to ignore reading, index starts at 0";
         public int[] ignore_frames = new int[0];
 
@@ -52,6 +55,7 @@ namespace Nebula.Core.Utilities
         public static bool DontUseHeader => Inst.ignore_header;
         public static bool DumpUnknownChunks => Inst.dump_unk_chunks;
         public static bool DumpAllChunks => Inst.dump_all_chunks;
+        public static bool GPUAcceleration => Inst.gpu_acceleration;
         public static int[] DontIncludeFrames => Inst.ignore_frames;
     }
 }

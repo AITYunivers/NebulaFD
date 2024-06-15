@@ -9,7 +9,7 @@ using Spectre.Console;
 using Action = Nebula.Core.Data.Chunks.FrameChunks.Events.Action;
 using Color = System.Drawing.Color;
 
-namespace Nebula.Plugins.EncKeyDumper
+namespace Nebula.Tools.EncKeyDumper
 {
     public class KeyDumper : INebulaTool
     {

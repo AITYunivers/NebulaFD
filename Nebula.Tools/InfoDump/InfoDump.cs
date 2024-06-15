@@ -6,7 +6,7 @@ using Nebula.Core.Utilities;
 using Spectre.Console;
 using System.Reflection;
 
-namespace Nebula.Plugins.GameDumper
+namespace Nebula.Tools.GameDumper
 {
     public class InfoDump : INebulaTool
     {

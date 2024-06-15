@@ -33,11 +33,13 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             ShaderParameters = new ShaderParameter[reader.ReadInt()];
             int paramOffset = reader.ReadInt();
 
+            if (ShaderHandle >= 0)
+                Shader = NebulaCore.PackageData.ShaderBank.Shaders[ShaderHandle];
+
             long returnOffset = reader.Tell();
             if (paramOffset != 0)
             {
                 reader.Seek(startOffset + paramOffset);
-                Shader = NebulaCore.PackageData.ShaderBank.Shaders[ShaderHandle];
                 for (int i = 0; i < Shader.Parameters.Length; i++)
                 {
                     ShaderParameters[i] = new ShaderParameter();
@@ -98,8 +100,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             writer.WriteByte(RGBCoeff.G);
             writer.WriteByte(RGBCoeff.R);
             writer.WriteByte((byte)(255 - BlendCoeff));
-            writer.WriteInt(Shader.Handle > 0 ? 1 : 0);
-            if (Shader.Handle > 0)
+            writer.WriteInt(Shader.Handle >= 0 ? 1 : 0);
+            if (Shader.Handle >= 0)
             {
                 Shader.Parameters = ShaderParameters;
                 Shader.WriteMFA(writer);

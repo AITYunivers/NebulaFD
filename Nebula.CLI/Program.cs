@@ -110,6 +110,10 @@ namespace Nebula
                     break;
                 case ".exe":
                     NebulaCore.CurrentReader = new EXEFileReader();
+                /* if (((EXEFileReader)NebulaCore.CurrentReader).CheckInstaller(fileReader!))
+                        NebulaCore.CurrentReader = new INSTFileReader();
+                    else if (((EXEFileReader)NebulaCore.CurrentReader).CheckChowdren(fileReader!))
+                        NebulaCore.CurrentReader = new ChowdrenFileReader(); */
                     break;
                 case ".mfa":
                     NebulaCore.CurrentReader = new MFAFileReader();

@@ -2,7 +2,7 @@
 using Nebula.Core.Data.Chunks.ObjectChunks;
 using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using Nebula.Core.Utilities;
-using Nebula.Plugins.GameDumper;
+using Nebula.Tools.GameDumper;
 using Spectre.Console;
 using System.Drawing;
 using Image = Nebula.Core.Data.Chunks.BankChunks.Images.Image;

@@ -23,8 +23,23 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             long Debut = reader.Tell();
-            ObjectType = reader.ReadShort();
-            Num = reader.ReadShort();
+            if (NebulaCore.Fusion == 1.5f)
+            {
+                ObjectType = reader.ReadSByte();
+                Num = reader.ReadSByte();
+
+                if (ObjectType > 1 && Num >= 48)
+                {
+                    // MMF1.5 EXTBASE = 48
+                    // MMF2   EXTBASE = 80
+                    Num += 80 - 48;
+                }
+            }
+            else
+            {
+                ObjectType = reader.ReadShort();
+                Num = reader.ReadShort();
+            }
 
             if (ObjectType == 0 && Num == 0)
                 return;
@@ -52,8 +67,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             else if (ObjectType == 0)
                 Expression = new ExpressionExtension();
 
-            Debug.Assert(Size >= 6);
-            Expression.ReadCCN(reader, Size - 6);
+            Debug.Assert(Size >= 6 - (NebulaCore.Fusion == 1.5f ? 2 : 0));
+            Expression.ReadCCN(reader, Size - 6 + (NebulaCore.Fusion == 1.5f ? 2 : 0));
             reader.Seek(Debut + Size);
         }
 
@@ -205,15 +220,19 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
                                 switch (Num)
                                 {
                                     default: return $"[ERROR] Could not find ObjectType {ObjectType}, Num {Num}";
-                                    case 27:
-                                        return $"AlphaCoef(\"{GetObjectName()}\")";
                                 }
                             switch (ObjectType)
                             {
                                 default:
-                                    string output = $"{GetObjectName()}: Expression ID {Num}";
+                                    string output = $"{GetObjectName()}: Expression ID {Num}(";
                                     return output;
                             }
+                        case 1:
+                            return $"Y(\"{GetObjectName()}\")";
+                        case 11:
+                            return $"X(\"{GetObjectName()}\")";
+                        case 27:
+                            return $"AlphaCoef(\"{GetObjectName()}\")";
                     }
             }
         }

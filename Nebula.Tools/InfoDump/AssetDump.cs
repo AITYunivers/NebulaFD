@@ -1,27 +1,9 @@
-﻿using Nebula.Core.Data.Chunks.BankChunks.Images;
+﻿using GameDumper.AssetDumpers;
 using Nebula.Core.Data.PackageReaders;
 using Nebula.Core.Utilities;
 using Spectre.Console;
-using System.Drawing.Imaging;
-using System.Drawing;
-using System.Runtime.InteropServices;
-using Image = Nebula.Core.Data.Chunks.BankChunks.Images.Image;
-using System.Diagnostics;
-using Nebula.Core.Data.Chunks.BankChunks.Sounds;
-using System.Reflection;
-using Nebula.Core.Data.Chunks.ObjectChunks;
-using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
-using Nebula.Core.Data.Chunks.BankChunks.Music;
-using Nebula.Core.Data.Chunks.AppChunks;
-using Nebula.Core.FileReaders;
-using Nebula.Core.Data.Chunks.BankChunks.Shaders;
-using System.Text;
-using System.Xml;
-using System.Text.RegularExpressions;
-using GameDumper.AssetDumpers;
-#pragma warning disable CA1416
 
-namespace Nebula.Plugins.GameDumper
+namespace Nebula.Tools.GameDumper
 {
     public class AssetDump : INebulaTool
     {
@@ -112,8 +94,7 @@ namespace Nebula.Plugins.GameDumper
                 foreach (Task task in runningTasks)
                     task.Start();
 
-                foreach (Task task in runningTasks)
-                    task.Wait();
+                Task.WaitAll(runningTasks.ToArray());
             });
         }
     }

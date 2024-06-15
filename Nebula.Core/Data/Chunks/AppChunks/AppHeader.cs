@@ -186,6 +186,13 @@ namespace Nebula.Core.Data.Chunks.AppChunks
                 GraphicFlags["Direct3D11"] = OtherFlags == AppHeaderOtherFlags.Direct3D9or11 && OtherFlags == AppHeaderOtherFlags.Direct3D8or11;
                 GraphicFlags["PremultipliedAlpha"] = ext.Flags["PremultipliedAlpha"];
                 GraphicFlags["DontOptimizeEvents"] = !FrameEvents.OptimizedEvents;
+
+                if (NebulaCore.Fusion < 2.0f)
+                {
+                    GraphicFlags["Direct3D8"] = false;
+                    GraphicFlags["Direct3D9"] = false;
+                    GraphicFlags["Direct3D11"] = false;
+                }
             }
             else
             {

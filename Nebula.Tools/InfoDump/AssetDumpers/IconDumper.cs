@@ -2,7 +2,7 @@
 using Nebula.Core.Data.Chunks.BankChunks.Images;
 using Nebula.Core.Data.PackageReaders;
 using Nebula.Core.Utilities;
-using Nebula.Plugins.GameDumper;
+using Nebula.Tools.GameDumper;
 using Spectre.Console;
 
 namespace GameDumper.AssetDumpers

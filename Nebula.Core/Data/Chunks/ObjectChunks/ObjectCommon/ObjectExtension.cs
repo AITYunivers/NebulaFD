@@ -16,12 +16,25 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            int DataSize = reader.ReadInt() - 20;
-            reader.Skip(4);
-            ExtensionVersion = reader.ReadInt();
-            ExtensionID = reader.ReadInt();
-            ExtensionPrivate = reader.ReadInt();
-            ExtensionData = reader.ReadBytes(DataSize);
+            int dataSize;
+            if (NebulaCore.Fusion == 1.5f)
+            {
+                dataSize = reader.ReadInt() - 12;
+                reader.Skip(2);
+                ExtensionVersion = reader.ReadShort();
+                ExtensionID = reader.ReadShort();
+                ExtensionPrivate = reader.ReadShort();
+                ExtensionData = reader.ReadBytes(dataSize);
+            }
+            else
+            {
+                dataSize = reader.ReadInt() - 20;
+                reader.Skip(4);
+                ExtensionVersion = reader.ReadInt();
+                ExtensionID = reader.ReadInt();
+                ExtensionPrivate = reader.ReadInt();
+                ExtensionData = reader.ReadBytes(dataSize);
+            }
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

@@ -4,18 +4,17 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 {
     public class FrameLayer : Chunk
     {
-        public BitDict LayerFlags = new BitDict( // Layer Flags
-            "XCoefficient",                       // 
-            "YCoefficient",                       // 
-            "DontSaveBackground", "", "",         // Save Background Disabled
-            "WrapHorizontally",                   // Wrap Horizontally
-            "WrapVertically",                     // Wrap Vertically
-            "PrevEffect", "", "", "",             // Same effect as previous layer
-            "", "", "", "", "", "",               //
-            "HiddenAtStart"                       // Visible at start Disabled
+        public BitDict LayerFlags = new BitDict(16, // Layer Flags
+            "", "",
+            "DontSaveBackground", "", "", // Save Background Disabled
+            "WrapHorizontally",           // Wrap Horizontally
+            "WrapVertically",             // Wrap Vertically
+            "PrevEffect", "", "", "",     // Same effect as previous layer
+            "", "", "", "", "", "",
+            "HiddenAtStart"               // Visible at start Disabled
         );
 
-        public BitDict MFALayerFlags = new BitDict( // Layer Flags
+        public BitDict MFALayerFlags = new BitDict(1, // Layer Flags
             "Visible",            // Visible
             "Locked", "",         // Locked
             "HiddenAtStart",      // Visible at start Disabled
@@ -25,8 +24,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             "PrevEffect"          // Same effect as previous layer
         );
 
-        public float XCoefficient;
-        public float YCoefficient;
+        public float XCoefficient = 1.0f;
+        public float YCoefficient = 1.0f;
         public int BackdropCount;
         public int BackdropIndex;
         public string Name = string.Empty;
@@ -78,7 +77,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         {
             if (!fromMFA)
             {
-                MFALayerFlags.Value = 1; // Default Value
                 MFALayerFlags["HiddenAtStart"] = LayerFlags["HiddenAtStart"];
                 MFALayerFlags["DontSaveBackground"] = LayerFlags["DontSaveBackground"];
                 MFALayerFlags["WrapHorizontally"] = LayerFlags["WrapHorizontally"];
@@ -87,7 +85,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             }
             else
             {
-                LayerFlags.Value = 16; // Default Value
                 LayerFlags["DontSaveBackground"] = MFALayerFlags["DontSaveBackground"];
                 LayerFlags["WrapHorizontally"] = MFALayerFlags["WrapHorizontally"];
                 LayerFlags["WrapVertically"] = MFALayerFlags["WrapVertically"];

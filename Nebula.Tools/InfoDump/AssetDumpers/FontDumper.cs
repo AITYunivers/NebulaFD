@@ -2,7 +2,7 @@
 using Nebula.Core.Data.Chunks.BankChunks.Music;
 using Nebula.Core.Data.Chunks.BankChunks.TrueTypeFonts;
 using Nebula.Core.Utilities;
-using Nebula.Plugins.GameDumper;
+using Nebula.Tools.GameDumper;
 using Spectre.Console;
 
 namespace GameDumper.AssetDumpers

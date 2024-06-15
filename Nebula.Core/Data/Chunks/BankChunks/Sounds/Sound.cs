@@ -162,5 +162,21 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             Array.Copy(data, 16, output, 44, data.Length - 16);
             return output;
         }
+
+        public string GetSoundType()
+        {
+            string header = Encoding.ASCII.GetString(Data[0..3]);
+            switch (header)
+            {
+                case "RIFF":
+                    return "WAV";
+                case "AIFF":
+                    return "AIFF";
+                case "OggS":
+                    return "OGG";
+                default:
+                    return "MOD";
+            }
+        }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using Nebula;
 using Nebula.Core.Data.Chunks.BankChunks.Images;
 using Nebula.Core.Utilities;
-using Nebula.Plugins.GameDumper;
+using Nebula.Tools.GameDumper;
 using Spectre.Console;
+using System.Drawing;
+using Image = Nebula.Core.Data.Chunks.BankChunks.Images.Image;
 
 namespace GameDumper.AssetDumpers
 {
@@ -16,12 +18,21 @@ namespace GameDumper.AssetDumpers
             Directory.CreateDirectory(path);
 
             Image[] images = NebulaCore.PackageData.ImageBank.Images.Values.ToArray();
-            for (int i = 0; i < images.Length; i++)
+            List<Task> imgTasks = new List<Task>();
+            if (Parameters.GPUAcceleration)
+                ImageTranslatorGPU.GetAccelerator();
+            foreach (Image image in images)
             {
-                images[i].GetBitmap().Save(path + images[i].Handle + ".png");
-                images[i].DisposeBmp();
-                task.Value++;
+                Task imgTask = Task.Factory.StartNew(() =>
+                {
+                    Bitmap bmp = image.GetBitmap();
+                    bmp.Save(path + image.Handle + ".png");
+                    image.DisposeBmp();
+                    task.Value++;
+                });
+                imgTasks.Add(imgTask);
             }
+            Task.WaitAll(imgTasks.ToArray());
             task.StopTask();
         }
     }

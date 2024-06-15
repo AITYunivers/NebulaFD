@@ -23,7 +23,8 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                 AlterableValues[i] = reader.ReadInt();
             }
 
-            AlterableFlags.Value = reader.ReadUInt();
+            if (NebulaCore.Fusion > 1.5f)
+                AlterableFlags.Value = reader.ReadUInt();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

@@ -105,7 +105,7 @@ namespace Nebula.Core.Data.Chunks
             { 0x3349, typeof(FrameEffects)        },
             //0x334A         FrameRuntimeOptions
             //0x334B         FrameWuaOptions
-            //0x334C
+            { 0x334C, typeof(FrameHandle)         },
             { 0x4444, typeof(ObjectInfoHeader)    },
             { 0x4445, typeof(ObjectInfoName)      },
             { 0x4446, typeof(ObjectCommon)        },

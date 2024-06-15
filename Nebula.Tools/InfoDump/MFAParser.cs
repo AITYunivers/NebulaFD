@@ -17,7 +17,7 @@ using Image = Nebula.Core.Data.Chunks.BankChunks.Images.Image;
 using Size = System.Drawing.Size;
 
 #pragma warning disable CA1416 // Validate platform compatibility
-namespace GameDumper
+namespace Nebula.Tools.GameDumper
 {
     public class MFAParser : INebulaTool
     {
@@ -44,13 +44,13 @@ namespace GameDumper
             }
 
             this.Log("Converting images to MFA format");
-            Stopwatch sw    = Stopwatch.StartNew();
+            Stopwatch sw = Stopwatch.StartNew();
             List<Task> imgLoading = new List<Task>();
             foreach (Image img in dat.ImageBank.Images.Values)
                 imgLoading.Add(Task.Factory.StartNew(img.PrepareForMfa));
             Task.WaitAll(imgLoading.ToArray());
             GC.Collect();
-            this.Log($"Done! ({sw.Elapsed.Seconds} seconds)");
+            this.Log($"Done! ({sw.Elapsed.TotalSeconds} seconds)");
 
             this.Log("Generating Application, Object, and Frame icons");
             sw.Restart();
@@ -178,32 +178,44 @@ namespace GameDumper
             }
             GC.Collect();
             IconBank.ImageCount = IconBank.Images.Count;
-            this.Log($"Done! ({sw.Elapsed.Seconds} seconds)");
+            this.Log($"Done! ({sw.Elapsed.TotalSeconds} seconds)");
 
             writer.WriteAscii("MFU2");
             writer.WriteShort(6);
             writer.WriteShort(dat.RuntimeSubversion);
-            writer.WriteInt(dat.ProductVersion);
-            writer.WriteInt(dat.ProductBuild);
+            writer.WriteInt(NebulaCore.Fusion > 1.5f ? dat.ProductVersion : 0);
+            writer.WriteInt(NebulaCore.Fusion > 1.5f ? dat.ProductBuild : 280);
             writer.WriteInt(0);
             writer.WriteAutoYunicode(dat.AppName);
             writer.WriteAutoYunicode("");
             writer.WriteAutoYunicode(dat.EditorFilename);
             writer.WriteInt(0);
 
-            this.Log("Writing Asset Banks");
+            this.Log("Writing Font Bank");
             sw.Restart();
             writer.WriteAscii("ATNF"); // Font Bank
             dat.FontBank.WriteMFA(writer);
+            this.Log($"Done! ({sw.Elapsed.TotalSeconds} seconds)");
+            this.Log("Writing Sound Bank");
+            sw.Restart();
             writer.WriteAscii("APMS"); // Sound Bank
             dat.SoundBank.WriteMFA(writer);
+            this.Log($"Done! ({sw.Elapsed.TotalSeconds} seconds)");
+            this.Log("Writing Music Bank");
+            sw.Restart();
             writer.WriteAscii("ASUM"); // Music Bank
             dat.MusicBank.WriteMFA(writer);
+            this.Log($"Done! ({sw.Elapsed.TotalSeconds} seconds)");
+            this.Log("Writing Icon Bank");
+            sw.Restart();
             writer.WriteAscii("AGMI"); // Icon Bank
             IconBank.WriteMFA(writer);
+            this.Log($"Done! ({sw.Elapsed.TotalSeconds} seconds)");
+            this.Log("Writing Image Bank");
+            sw.Restart();
             writer.WriteAscii("AGMI"); // Image Bank
             dat.ImageBank.WriteMFA(writer);
-            this.Log($"Done! ({sw.Elapsed.Seconds} seconds)");
+            this.Log($"Done! ({sw.Elapsed.TotalSeconds} seconds)");
 
             writer.WriteAutoYunicode(dat.AppName);
             writer.WriteAutoYunicode(dat.Author);
@@ -263,12 +275,12 @@ namespace GameDumper
             {
                 writer.WriteUInt((uint)(offsetEnd + frameWriter.Tell()));
                 Frame frm = dat.Frames[i];
-                if (!NebulaCore.MFA && NebulaCore.Fusion >= 1.0f)
+                if (!NebulaCore.MFA && NebulaCore.Fusion >= 1.0f && frm.Handle == -1)
                     frm.Handle = dat.FrameHandles.IndexOf((short)i);
                 this.Log("Writing frame '" + frm.FrameName + "'");
                 sw.Restart();
                 frm.WriteMFA(frameWriter);
-                this.Log($"Done! ({sw.Elapsed.Seconds} seconds)");
+                this.Log($"Done! ({sw.Elapsed.TotalSeconds} seconds)");
             }
 
             writer.WriteUInt((uint)(offsetEnd + frameWriter.Tell()));

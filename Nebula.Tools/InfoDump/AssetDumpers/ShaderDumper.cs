@@ -2,7 +2,7 @@
 using Nebula.Core.Data.Chunks.BankChunks.Shaders;
 using Nebula.Core.Data.Chunks.ObjectChunks;
 using Nebula.Core.Utilities;
-using Nebula.Plugins.GameDumper;
+using Nebula.Tools.GameDumper;
 using Spectre.Console;
 using System.Text;
 using System.Text.RegularExpressions;

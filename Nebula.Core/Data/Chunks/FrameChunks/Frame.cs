@@ -20,7 +20,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
     public class Frame : Chunk
     {
         public static int RealFrameCount = 0;
-        public int Handle = 0;
         public FrameHeader FrameHeader = new();               // 0x3334
         public string FrameName = string.Empty;               // 0x3335
         public string FramePassword = string.Empty;           // 0x3336
@@ -35,6 +34,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         public FrameLayerEffects FrameLayerEffects = new();   // 0x3345
         public int FrameMoveTimer;                            // 0x3347
         public FrameEffects FrameEffects = new();             // 0x3349
+        public int Handle = -1;                               // 0x334C
 
         public MFAFrameInfo MFAFrameInfo = new();
         public Bitmap? BitmapCache = null;
@@ -62,7 +62,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                 newChunk.ChunkData = null;
             }
 
-            log = $"Frame '{FrameName}' found.";
+            log = $"Frame {(Handle >= 0 ? "$[{Handle}] " : "")}'{FrameName}' found.";
 
             if (FrameHeader.FrameFlags["DontInclude"])
                 log += " (Not Included)";
@@ -158,6 +158,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             if (!string.IsNullOrEmpty(FrameTransitionOut.FileName))
                 FrameTransitionOut.WriteMFA(writer);
 
+            int backdropId = 1;
             Dictionary<uint, MFAObjectInfo> objectInfos = new Dictionary<uint, MFAObjectInfo>();
             foreach (FrameInstance instance in FrameInstances.Instances)
                 if (!objectInfos.ContainsKey(instance.ObjectInfo) && NebulaCore.PackageData.FrameItems.Items.ContainsKey((int)instance.ObjectInfo))
@@ -216,6 +217,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                             newOQB.Image = oldOQB.Shape.Image;
 
                             newOI.ObjectLoader = newOQB;
+
+                            if (NebulaCore.Fusion == 1.5f)
+                                newOI.Name = "Quick Backdrop " + backdropId++;
                             break;
                         case 1:
                             MFABackdrop newOBD = new MFABackdrop();
@@ -225,6 +229,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                             newOBD.Image = oldOBD.Image;
 
                             newOI.ObjectLoader = newOBD;
+
+                            if (NebulaCore.Fusion == 1.5f)
+                                newOI.Name = "Backdrop " + backdropId++;
                             break;
                         default:
                             MFAObjectLoader newOC = oI.Header.Type switch
@@ -507,7 +514,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
             FrameLayerEffects.WriteMFA(writer, this);
             FrameEffects.WriteMFA(writer, this);
-            FrameRect.WriteMFA(writer, this);
+            if (NebulaCore.Fusion > 1.5f)
+                FrameRect.WriteMFA(writer, this);
             writer.WriteByte(0); // Last Chunk
         }
     }

@@ -22,11 +22,21 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            // First two bytes in MMF 1.5 is a size
             FontHandle = reader.ReadUShort();
             if (!NebulaCore.Android && NebulaCore.Fusion >= 2.5)
                 FontHandle++;
-            ParagraphFlags.Value = reader.ReadUShort();
+
+            if (NebulaCore.Fusion == 1.5f)
+                FontHandle = reader.ReadUShort();
+            else
+                ParagraphFlags.Value = reader.ReadUShort();
+
             Color = reader.ReadColor();
+
+            if (NebulaCore.Fusion == 1.5)
+                reader.Skip(2);
+
             Value = reader.ReadYuniversal();
         }
 

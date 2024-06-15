@@ -114,13 +114,21 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
             GetOffset(reader, 4);
             GetOffset(reader, 5, check);
             
-            ObjectFlags.Value = reader.ReadUInt();
+            if (NebulaCore.Fusion == 1.5f)
+            {
+                reader.Skip(2);
+                ObjectFlags.Value = reader.ReadUShort();
+            }
+            else
+                ObjectFlags.Value = reader.ReadUInt();
+
             for (int i = 0; i < 8; i++)
                 Qualifiers[i] = reader.ReadShort();
 
             GetOffset(reader, 6);
             GetOffset(reader, 7);
-            GetOffset(reader, 8);
+            if (NebulaCore.Fusion > 1.5f)
+                GetOffset(reader, 8);
             NewObjectFlags.Value = reader.ReadUShort();
             GetOffset(reader, 9);
             Identifier = reader.ReadAscii(4);
@@ -345,6 +353,33 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                         break;
                     case 9:
                         ExtensionOffset = Offset;
+                        break;
+                }
+            }
+            else if (NebulaCore.Fusion == 1.5f)
+            {
+                switch (index)
+                {
+                    case 0:
+                        MovementsOffset = Offset;
+                        break;
+                    case 1:
+                        AnimationOffset = Offset;
+                        break;
+                    case 3:
+                        ValueOffset = Offset;
+                        break;
+                    case 4:
+                        DataOffset = Offset;
+                        break;
+                    case 6:
+                        ExtensionOffset = Offset;
+                        break;
+                    case 7:
+                        AlterableValuesOffset = Offset;
+                        break;
+                    case 9:
+                        PreferenceFlags.Value = (ushort)Offset;
                         break;
                 }
             }

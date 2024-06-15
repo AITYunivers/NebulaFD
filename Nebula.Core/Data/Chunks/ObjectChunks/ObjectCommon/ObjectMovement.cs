@@ -23,11 +23,16 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             long StartOffset = (long)extraInfo[0];
-            int NameOffset = reader.ReadInt();
-            ID = reader.ReadInt();
-            int DataOffset = reader.ReadInt();
-            int DataSize = reader.ReadInt();
-            reader.Seek(StartOffset + DataOffset);
+            int NameOffset, DataOffset, DataSize;
+            NameOffset = DataOffset = DataSize = 0;
+            if (NebulaCore.Fusion > 1.5f)
+            {
+                NameOffset = reader.ReadInt();
+                ID = reader.ReadInt();
+                DataOffset = reader.ReadInt();
+                DataSize = reader.ReadInt();
+                reader.Seek(StartOffset + DataOffset);
+            }
 
             if (string.IsNullOrEmpty(Name))
                 Name = "Movement #" + ID;
@@ -145,12 +150,12 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
             {
                 ObjectMovementExtension ExtensionDefinition = (ObjectMovementExtension)MovementDefinition;
                 writer.WriteAutoYunicode(ExtensionDefinition.FileName);
-                writer.WriteInt(ID);
+                writer.WriteInt(Type);
             }
             else
             {
                 writer.WriteAutoYunicode("");
-                writer.WriteInt(ID);
+                writer.WriteInt(Type);
                 mvntWriter.WriteShort(Player);
                 mvntWriter.WriteShort(Type);
                 mvntWriter.WriteByte(Move);

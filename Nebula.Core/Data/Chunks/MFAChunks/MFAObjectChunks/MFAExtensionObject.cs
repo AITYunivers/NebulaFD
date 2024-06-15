@@ -56,12 +56,18 @@ namespace Nebula.Core.Data.Chunks.MFAChunks.MFAObjectChunks
                 writer.WriteAutoYunicode(SubType);
             }
 
-            writer.WriteInt(Data.Length + 20);
-            writer.WriteInt(Data.Length + 20);
+            int offset = 20 + (NebulaCore.Fusion == 1.5f ? 4 : 0);
+
+            writer.WriteInt(Data.Length + offset);
+            writer.WriteInt(Data.Length + offset);
             writer.WriteInt(-1);
             writer.WriteInt(Version);
             writer.WriteInt(ID);
             writer.WriteInt(Private);
+
+            if (NebulaCore.Fusion == 1.5f)
+                writer.Skip(4);
+
             writer.WriteBytes(Data);
         }
     }

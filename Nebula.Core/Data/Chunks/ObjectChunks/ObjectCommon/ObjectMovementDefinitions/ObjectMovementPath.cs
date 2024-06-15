@@ -32,11 +32,19 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDefini
             PathNodes = new ObjectMovementPathNode[NodeCount];
             for (int i = 0; i < NodeCount; i++)
             {
-                long NodeOffset = reader.Tell();
                 PathNodes[i] = new ObjectMovementPathNode();
-                reader.Skip(1);
-                byte NodeSize = reader.ReadByte();
+
+                long NodeOffset = reader.Tell();
+                byte NodeSize = 14;
+
+                if (NebulaCore.Fusion > 1.5f)
+                {
+                    reader.Skip(1);
+                    NodeSize = reader.ReadByte();
+                }
+
                 PathNodes[i].ReadCCN(reader);
+
                 reader.Seek(NodeOffset + NodeSize);
             }
         }

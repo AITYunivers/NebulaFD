@@ -27,13 +27,24 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         {
             Handle = reader.ReadUShort();
             ObjectInfo = reader.ReadUShort();
-            PositionX = reader.ReadInt();
-            PositionY = reader.ReadInt();
+            if (NebulaCore.Fusion == 1.5f)
+            {
+                PositionX = reader.ReadShort();
+                PositionY = reader.ReadShort();
+            }
+            else
+            {
+                PositionX = reader.ReadInt();
+                PositionY = reader.ReadInt();
+            }
             ParentType = reader.ReadUShort();
             InstanceFlags["CreateOnly"] = ParentType != 0;
-            if (NebulaCore.Fusion < 3)
-                InstanceValue = reader.ReadShort();
-            Layer = reader.ReadUShort();
+            if (NebulaCore.Fusion > 1.5f)
+            {
+                if (NebulaCore.Fusion < 3)
+                    InstanceValue = reader.ReadShort();
+                Layer = reader.ReadUShort();
+            }
             if (NebulaCore.Fusion < 3)
                 ParentHandle = reader.ReadUShort();
         }

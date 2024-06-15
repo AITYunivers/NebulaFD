@@ -78,6 +78,25 @@ namespace Nebula.Core.Memory
 #endif
         }
 
+        public static byte[] DeflateBlock(byte[] data)
+        {
+#if Ionic
+            return ZlibStream.UncompressBuffer(data);
+#else
+            using (var inputStream = new MemoryStream(data))
+            {
+                using (var deflateStream = new System.IO.Compression.DeflateStream(inputStream, CompressionMode.Decompress))
+                {
+                    using (var outputStream = new MemoryStream())
+                    {
+                        deflateStream.CopyTo(outputStream);
+                        return outputStream.ToArray();
+                    }
+                }
+            }
+#endif
+        }
+
         public static byte[] CompressBlock(byte[] data)
         {
 #if Joveler

@@ -15,10 +15,11 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
         {
             long StartOffset = reader.Tell();
 
-            if (NebulaCore.Fusion < 2.0f || NebulaCore.Fusion == 3)
-                return;
+            if (NebulaCore.Fusion == 1.5f)
+                Movements = new ObjectMovement[1];
+            else
+                Movements = new ObjectMovement[reader.ReadInt()];
 
-            Movements = new ObjectMovement[reader.ReadInt()];
             for (int i = 0; i < Movements.Length; i++)
             {
                 long MovementOffset = reader.Tell();

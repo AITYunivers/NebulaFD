@@ -48,7 +48,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             EventFlags.Value = reader.ReadUShort();
             Parent = (FrameEvents)extraInfo[0];
 
-            if (NebulaCore.Build >= 284 && !(NebulaCore.MFA || NebulaCore.Android && NebulaCore.Build == 287))
+            if (NebulaCore.Build >= 284 && !(NebulaCore.Fusion == 1.5f || NebulaCore.MFA || NebulaCore.Android && NebulaCore.Build == 287))
             {
                 reader.Skip(2);
                 Restricted = reader.ReadInt();

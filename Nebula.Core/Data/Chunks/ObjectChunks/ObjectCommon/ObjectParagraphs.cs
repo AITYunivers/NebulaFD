@@ -17,13 +17,28 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
         {
             long StartOffset = reader.Tell();
             reader.Skip(4);
-            Width = reader.ReadInt();
-            Height = reader.ReadInt();
-            int Count = reader.ReadInt();
+            int Count;
+            int[] Offsets;
+            if (NebulaCore.Fusion == 1.5f)
+            {
+                Width = reader.ReadShort();
+                Height = reader.ReadShort();
+                Count = reader.ReadShort();
 
-            int[] Offsets = new int[Count];
-            for (int i = 0; i < Count; i++)
-                Offsets[i] = reader.ReadInt();
+                Offsets = new int[Count];
+                for (int i = 0; i < Count; i++)
+                    Offsets[i] = reader.ReadShort();
+            }
+            else
+            {
+                Width = reader.ReadInt();
+                Height = reader.ReadInt();
+                Count = reader.ReadInt();
+
+                Offsets = new int[Count];
+                for (int i = 0; i < Count; i++)
+                    Offsets[i] = reader.ReadInt();
+            }
 
             Paragraphs = new ObjectParagraph[Count];
             for (int i = 0; i < Count; i++)

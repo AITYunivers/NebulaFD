@@ -29,7 +29,8 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectMovementDefini
             Sin = reader.ReadShort();
             Length = reader.ReadShort();
             Pause = reader.ReadShort();
-            Name = reader.ReadYunicode();
+            if (NebulaCore.Fusion > 1.5f)
+                Name = reader.ReadYunicode();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

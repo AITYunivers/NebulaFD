@@ -50,13 +50,26 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             reader.Skip(4);
-            Width = reader.ReadInt();
-            Height = reader.ReadInt();
+            if (NebulaCore.Fusion == 1.5f)
+            {
+                Width = reader.ReadUShort();
+                Height = reader.ReadUShort();
+            }
+            else
+            {
+                Width = reader.ReadInt();
+                Height = reader.ReadInt();
+            }
             Version = reader.ReadShort();
             StartFrame = reader.ReadShort();
             SubAppFlags.Value = reader.ReadUInt();
-            reader.Skip(8);
-            Name = reader.ReadYuniversal();
+            if (NebulaCore.Fusion == 1.5f)
+                Name = reader.ReadAscii();
+            else
+            {
+                reader.Skip(8);
+                Name = reader.ReadYuniversal();
+            }
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

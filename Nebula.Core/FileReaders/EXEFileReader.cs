@@ -42,6 +42,37 @@ namespace Nebula.Core.FileReaders
             Package.Read(fileReader);
         }
 
+        public bool CheckInstaller(ByteReader fileReader)
+        {
+            calculateEntryPoint(fileReader);
+            string header = string.Empty;
+            if (fileReader.HasMemory(4))
+                header = fileReader.ReadAscii(4);
+            fileReader.Seek(0);
+            return header == "wwgT";
+        }
+
+        public bool CheckChowdren(ByteReader fileReader)
+        {
+            fileReader.Seek(60);
+            var hdrOffset = fileReader.ReadUShort();
+            fileReader.Seek(hdrOffset + 6);
+            var numOfSections = fileReader.ReadUShort();
+            fileReader.Skip(240);
+
+            bool isChowdren = false;
+            for (var i = 0; i < numOfSections; i++)
+            {
+                string header = fileReader.ReadAsciiStop(16);
+                fileReader.Skip(24);
+
+                if (isChowdren = header == ".gfids")
+                    break;
+            }
+            fileReader.Seek(0);
+            return isChowdren && File.Exists(Path.Combine(Path.GetDirectoryName(NebulaCore.FilePath)!, "Assets.dat"));
+        }
+
         private void loadIcons(string gamePath)
         {
             var icoExt = new IconExtractor(gamePath);

@@ -2,7 +2,7 @@
 using Nebula.Core.Utilities;
 using Spectre.Console;
 
-namespace Nebula.Plugins.GameDumper
+namespace Nebula.Tools.GameDumper
 {
     public class FrameDump : INebulaTool
     {

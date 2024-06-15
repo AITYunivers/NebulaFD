@@ -101,8 +101,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             chunkWriter.WriteByte(RGBCoeff.G);
             chunkWriter.WriteByte(RGBCoeff.R);
             chunkWriter.WriteByte((byte)(255 - BlendCoeff));
-            chunkWriter.WriteInt(Shader.Handle > 0 ? 1 : 0);
-            if (Shader.Handle > 0)
+            chunkWriter.WriteInt(Shader.Handle >= 0 ? 1 : 0);
+            if (Shader.Handle >= 0)
             {
                 Shader.Parameters = ShaderParameters;
                 Shader.WriteMFA(chunkWriter);

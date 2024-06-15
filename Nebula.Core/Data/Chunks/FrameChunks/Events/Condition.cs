@@ -50,8 +50,16 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
         {
             long endPosition = reader.Tell() + Math.Abs(reader.ReadUShort());
 
-            ObjectType = reader.ReadShort();
-            Num = reader.ReadShort();
+            if (NebulaCore.Fusion == 1.5f)
+            {
+                ObjectType = reader.ReadSByte();
+                Num = reader.ReadSByte();
+            }
+            else
+            {
+                ObjectType = reader.ReadShort();
+                Num = reader.ReadShort();
+            }
             ObjectInfo = reader.ReadUShort();
             ObjectInfoList = reader.ReadShort();
             EventFlags.Value = reader.ReadByte();
@@ -133,6 +141,15 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
         {
             short oldNum = Num;
             bool ignoreOptimization = false;
+
+            if (NebulaCore.Fusion == 1.5f && ObjectType > 1 && Num <= -48)
+            {
+                // MMF1.5 EXTBASE = 48
+                // MMF2   EXTBASE = 80
+                Num -= 80 - 48;
+                ignoreOptimization = true;
+            }
+
             switch (ObjectType)
             {
                 case -1:
@@ -392,6 +409,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                             return $"On timer event {Parameters[0]}";
                         case -5:
                             return $"User has left the computer for {Parameters[0]}";
+                        case -4:
+                            return $"Every {Parameters[0]}";
                         case -2:
                             return $"Timer is less than {Parameters[0]}";
                         case -1:

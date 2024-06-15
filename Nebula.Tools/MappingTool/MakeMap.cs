@@ -3,7 +3,7 @@ using Nebula.Core.Utilities;
 using Spectre.Console;
 using Newtonsoft.Json;
 
-namespace MappingTool
+namespace Nebula.Tools.MappingTool
 {
     // I'll probably have every map have to be created manually
 

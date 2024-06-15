@@ -3,7 +3,7 @@ using Nebula.Core.Data.Chunks.FrameChunks.Events;
 using Nebula.Core.Utilities;
 using Spectre.Console;
 
-namespace Nebula.Plugins.GameDumper
+namespace Nebula.Tools.GameDumper
 {
     public class EventDump : INebulaTool
     {

@@ -18,7 +18,7 @@ using ZelTranslator_SD.Parsers;
 using Spectre.Console;
 
 
-namespace ZelTranslator_SD
+namespace Nebula.Tools.ZelTranslator_SD
 {
     public class GameMakerStudio2 : INebulaTool
     {

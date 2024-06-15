@@ -2,6 +2,7 @@
 using Nebula.Core.Data.Chunks.ChunkTypes;
 using Nebula.Core.Data.Chunks.MFAChunks;
 using Nebula.Core.Data.Chunks.MFAChunks.MFAFrameChunks;
+using Nebula.Core.FileReaders;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 
@@ -23,6 +24,8 @@ namespace Nebula.Core.Data.Chunks
             short id = byteReader.ReadShort();
             short flag = byteReader.ReadShort();
             int size = byteReader.ReadInt();
+            //if (NebulaCore.CurrentReader is INSTFileReader)
+            //    size += 4;
             var rawData = byteReader.ReadBytes(size);
             var dataReader = new ByteReader(rawData);
             byte[] newData = new byte[0];

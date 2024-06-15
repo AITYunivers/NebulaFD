@@ -48,8 +48,16 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
         {
             long endPosition = reader.Tell() + reader.ReadUShort();
 
-            ObjectType = reader.ReadShort();
-            Num = reader.ReadShort();
+            if (NebulaCore.Fusion == 1.5f)
+            {
+                ObjectType = reader.ReadSByte();
+                Num = reader.ReadSByte();
+            }
+            else
+            {
+                ObjectType = reader.ReadShort();
+                Num = reader.ReadShort();
+            }
             ObjectInfo = reader.ReadUShort();
             ObjectInfoList = reader.ReadShort();
             EventFlags.Value = reader.ReadByte();
@@ -128,6 +136,15 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
         {
             short oldNum = Num;
             bool ignoreOptimization = false;
+
+            if (NebulaCore.Fusion == 1.5f && ObjectType > 1 && Num >= 48)
+            {
+                // MMF1.5 EXTBASE = 48
+                // MMF2   EXTBASE = 80
+                Num += 80 - 48;
+                ignoreOptimization = true;
+            }
+
             switch (ObjectType)
             {
                 case -1:
@@ -524,6 +541,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                                             return Header + "Restart application";
                                         return Header + $"Paste into background{GetDirectionSettings(((ParameterShort)Parameters[0].Data).Value)}";
                                     case 81:
+                                        if (ObjectType == 2)
+                                            return Header + "Bring to front";
                                         if (ObjectType == 7)
                                             return Header + $"Add {Parameters[0]} to Counter";
                                         if (ObjectType == 8)

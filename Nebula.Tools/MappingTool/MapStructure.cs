@@ -1,4 +1,4 @@
-﻿namespace MappingTool
+﻿namespace Nebula.Tools.MappingTool
 {
     public class MapStructure
     {

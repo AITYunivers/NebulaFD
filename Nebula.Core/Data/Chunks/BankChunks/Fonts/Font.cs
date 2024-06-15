@@ -49,15 +49,32 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Fonts
             }
             else if (Compressed) dataReader = Decompressor.DecompressAsReader(reader, out var decompSize);
             else dataReader = reader;
-            Checksum = dataReader.ReadInt();
-            References = dataReader.ReadInt();
-            var size = dataReader.ReadInt();
 
-            Height = dataReader.ReadInt();
-            Width = dataReader.ReadInt();
-            Escapement = dataReader.ReadInt();
-            Orientation = dataReader.ReadInt();
-            Weight = dataReader.ReadInt();
+            if (NebulaCore.Fusion > 1.5f)
+            {
+                Checksum = dataReader.ReadInt();
+                References = dataReader.ReadInt();
+                var size = dataReader.ReadInt();
+
+                Height = dataReader.ReadInt();
+                Width = dataReader.ReadInt();
+                Escapement = dataReader.ReadInt();
+                Orientation = dataReader.ReadInt();
+                Weight = dataReader.ReadInt();
+            }
+            else
+            {
+                Checksum = dataReader.ReadShort();
+                References = dataReader.ReadShort();
+                dataReader.Skip(10);
+
+                Height = dataReader.ReadShort();
+                Width = dataReader.ReadShort();
+                Escapement = dataReader.ReadShort();
+                Orientation = dataReader.ReadShort();
+                Weight = dataReader.ReadShort();
+            }
+
             Italic = dataReader.ReadByte();
             Underline = dataReader.ReadByte();
             StrikeOut = dataReader.ReadByte();
@@ -66,7 +83,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Fonts
             ClipPrecision = dataReader.ReadByte();
             Quality = dataReader.ReadByte();
             PitchAndFamily = dataReader.ReadByte();
-            Name = dataReader.ReadYuniversal(32);
+            Name = dataReader.ReadYuniversal();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

@@ -365,3 +365,7 @@ FodyWeavers.xsd
 /Nebula.Plugins/InfoDump/ExtensionDumper.cs
 /.resources/ExtensionDumper.mfx
 /Nebula.Plugins/MappingTool/
+/Nebula.Core/Data/PackageReaders/ChowdrenPackageData.cs
+/Nebula.Core/Data/PackageReaders/INSTPackageData.cs
+/Nebula.Core/FileReaders/ChowdrenFileReader.cs
+/Nebula.Core/FileReaders/INSTFileReader.cs

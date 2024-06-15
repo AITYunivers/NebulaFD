@@ -76,6 +76,59 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
             return new Image25();
         }
 
+        public byte[] GetData()
+        {
+            if (GraphicMode == 3 && NebulaCore.Fusion == 0)
+                Width = (short)(Math.Ceiling(Width / 2.0f) * 2);
+
+            byte[] colorArray = null;
+            switch (GraphicMode)
+            {
+                case 0:
+                    colorArray = ImageTranslatorCPU.AndroidMode0ToRGBA(this);
+                    break;
+                case 1:
+                    colorArray = ImageTranslatorCPU.AndroidMode1ToRGBA(this);
+                    break;
+                case 2:
+                    colorArray = ImageTranslatorCPU.AndroidMode2ToRGBA(this);
+                    break;
+                case 3:
+                    if (NebulaCore.Android)
+                        colorArray = ImageTranslatorCPU.AndroidMode3ToRGBA(this);
+                    else
+                        colorArray = ImageTranslatorCPU.ColorPaletteToRGBA(this, NebulaCore.PackageData.Frames.First().FramePalette.Palette);
+                    break;
+                case 4:
+                    if (NebulaCore.Android && !IsMasked)
+                        colorArray = ImageTranslatorCPU.AndroidMode4ToRGBA(this);
+                    else// if (NebulaCore.CurrentReader is not ChowdrenFileReader)
+                        colorArray = ImageTranslatorCPU.Normal24BitMaskedToRGBA(this);
+                    //else
+                    //    colorArray = ImageData;
+                    break;
+                case 5:
+                    colorArray = ImageTranslatorCPU.AndroidMode5ToRGBA(this);
+                    break;
+                case 6:
+                    colorArray = ImageTranslatorCPU.Normal15BitToRGBA(this);
+                    break;
+                case 7:
+                    colorArray = ImageTranslatorCPU.Normal16BitToRGBA(this);
+                    break;
+                case 8:
+                    if (!Parameters.GPUAcceleration)
+                        colorArray = ImageTranslatorCPU.TwoFivePlusToRGBA(this);
+                    else
+                        colorArray = ImageTranslatorGPU.TwoFivePlusToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], NebulaCore.Seeded);
+                    break;
+                case 9:
+                    colorArray = ImageTranslatorCPU.FlashToRGBA(this);
+                    break;
+            }
+            return colorArray;
+        }
+
         public Bitmap GetBitmap()
         {
             if (BitmapCache == null)
@@ -83,58 +136,21 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                 if (ImageData.Length == 0)
                     return new Bitmap(1, 1);
 
-                if (GraphicMode == 3 && NebulaCore.Fusion == 0)
-                    Width = (short)(Math.Ceiling(Width / 2.0f) * 2);
-
                 BitmapCache = new Bitmap(Width, Height);
                 var bmpData = BitmapCache.LockBits(new Rectangle(0, 0, Width, Height),
                                                     ImageLockMode.WriteOnly,
                                                     PixelFormat.Format32bppArgb);
 
-                byte[] colorArray = null;
-                switch (GraphicMode)
-                {
-                    case 0:
-                        colorArray = ImageTranslator.AndroidMode0ToRGBA(ImageData, Width, Height);
-                        break;
-                    case 1:
-                        colorArray = ImageTranslator.AndroidMode1ToRGBA(ImageData, Width, Height);
-                        break;
-                    case 2:
-                        colorArray = ImageTranslator.AndroidMode2ToRGBA(ImageData, Width, Height);
-                        break;
-                    case 3:
-                        if (NebulaCore.Android)
-                            colorArray = ImageTranslator.AndroidMode3ToRGBA(ImageData, Width, Height);
-                        else
-                            colorArray = ImageTranslator.ColorPaletteToRGBA(ImageData, Width, Height, NebulaCore.PackageData.Frames.First().FramePalette.Palette, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
-                        break;
-                    case 4:
-                        if (NebulaCore.Android && !IsMasked)
-                            colorArray = ImageTranslator.AndroidMode4ToRGBA(ImageData, Width, Height);
-                        else
-                            colorArray = ImageTranslator.Normal24BitMaskedToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"], NebulaCore.Seeded);
-                        break;
-                    case 5:
-                        colorArray = ImageTranslator.AndroidMode5ToRGBA(ImageData, Width, Height, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
-                        break;
-                    case 6:
-                        colorArray = ImageTranslator.Normal15BitToRGBA(ImageData, Width, Height, false, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
-                        break;
-                    case 7:
-                        colorArray = ImageTranslator.Normal16BitToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
-                        break;
-                    case 8:
-                        colorArray = ImageTranslator.TwoFivePlusToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], NebulaCore.Seeded);
-                        break;
-                    case 9:
-                        colorArray = ImageTranslator.FlashToRGBA(ImageData, Width, Height);
-                        break;
-                }
+                byte[] colorArray = GetData();
 
                 if (!IsMasked && colorArray != null)
                 {
-                    ImageData = ImageTranslator.RGBAToRGBMasked(colorArray, Width, Height, Flags["Alpha"], Flags["RGBA"]);
+                    ImageData = colorArray;
+                    if (!Parameters.GPUAcceleration)
+                        ImageData = ImageTranslatorCPU.RGBAToRGBMasked(this);
+                    else
+                        ImageData = ImageTranslatorGPU.RGBAToRGBMasked(colorArray, Width, Height, Flags["Alpha"], Flags["RGBA"]);
+
                     GraphicMode = 4;
                     IsMasked = true;
                 }
@@ -261,52 +277,54 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
             switch (GraphicMode)
             {
                 case 0:
-                    ImageData = ImageTranslator.AndroidMode0ToRGBA(ImageData, Width, Height);
-                    ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
+                    ImageData = ImageTranslatorCPU.AndroidMode0ToRGBA(this);
                     break;
                 case 1:
-                    ImageData = ImageTranslator.AndroidMode1ToRGBA(ImageData, Width, Height);
-                    ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
+                    ImageData = ImageTranslatorCPU.AndroidMode1ToRGBA(this);
                     break;
                 case 2:
-                    ImageData = ImageTranslator.AndroidMode2ToRGBA(ImageData, Width, Height);
-                    ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
+                    ImageData = ImageTranslatorCPU.AndroidMode2ToRGBA(this);
                     break;
                 case 3:
                     if (NebulaCore.Android)
-                        ImageData = ImageTranslator.AndroidMode3ToRGBA(ImageData, Width, Height);
+                        ImageData = ImageTranslatorCPU.AndroidMode3ToRGBA(this);
                     else
-                        ImageData = ImageTranslator.ColorPaletteToRGBA(ImageData, Width, Height, NebulaCore.PackageData.Frames.First().FramePalette.Palette, TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
-                    ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
+                        ImageData = ImageTranslatorCPU.ColorPaletteToRGBA(this, NebulaCore.PackageData.Frames.First().FramePalette.Palette);
                     break;
                 case 4:
                     if (IsMasked)
                         break;
                     if (NebulaCore.Android)
-                    {
-                        ImageData = ImageTranslator.AndroidMode4ToRGBA(ImageData, Width, Height);
-                        ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
-                    }
+                        ImageData = ImageTranslatorCPU.AndroidMode4ToRGBA(this);
                     else if (NebulaCore.Fusion > 2.5f)
-                    {
-                        ImageData = ImageTranslator.Normal24BitMaskedToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"], true);
-                        ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
-                    }
+                        ImageData = ImageTranslatorCPU.Normal24BitMaskedToRGBA(this);
                     break;
                 case 5:
-                    ImageData = ImageTranslator.AndroidMode5ToRGBA(ImageData, Width, Height, Flags["RLE"] || Flags["RLEW"] || Flags["RLET"]);
-                    ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"]);
+                    ImageData = ImageTranslatorCPU.AndroidMode5ToRGBA(this);
+                    break;
+                case 6:
+                    ImageData = ImageTranslatorCPU.Normal15BitToRGBA(this);
+                    break;
+                case 7:
+                    ImageData = ImageTranslatorCPU.Normal16BitToRGBA(this);
                     break;
                 case 8:
-                    ImageData = ImageTranslator.TwoFivePlusToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], NebulaCore.Fusion > 2.5f);
-                    ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"]);
+                    if (!Parameters.GPUAcceleration)
+                        ImageData = ImageTranslatorCPU.TwoFivePlusToRGBA(this);
+                    else
+                    {
+                        ImageData = ImageTranslatorGPU.TwoFivePlusToRGBA(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"], NebulaCore.Fusion > 2.5f);
+                        ImageData = ImageTranslatorGPU.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"]);
+                    }
                     break;
                 case 9:
-                    ImageData = ImageTranslator.FlashToRGBA(ImageData, Width, Height);
-                    ImageData = ImageTranslator.RGBAToRGBMasked(ImageData, Width, Height, Flags["Alpha"], TransparentColor, Flags["RGBA"]);
+                    ImageData = ImageTranslatorCPU.FlashToRGBA(this);
                     break;
             }
             GraphicMode = 4;
+            Flags["RLE"] = Flags["RLEW"] = Flags["RLET"] = false;
+            if (!IsMasked)
+                ImageData = ImageTranslatorCPU.RGBAToRGBMasked(this);
             IsMasked = true;
         }
 

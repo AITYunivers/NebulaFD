@@ -33,7 +33,7 @@ namespace Nebula.Core.Data.PackageReaders
             {
                 if (NebulaCore.Build < 280)
                     NebulaCore.Fusion = 2f + (ProductVersion == 1 ? 0.1f : 0);
-                this.Log("Fusion Build: " + ProductBuild + "(Fusion " + NebulaCore.Fusion + ")");
+                this.Log("Fusion Build: " + ProductBuild + " (Fusion " + NebulaCore.Fusion + ")");
             }
             else
             {

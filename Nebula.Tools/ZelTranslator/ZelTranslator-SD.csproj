@@ -42,7 +42,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Nebula.Core\Nebula.Core.csproj" />
   </ItemGroup>
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="robocopy &quot;..\..\.resources\ObjectIcons&quot; &quot;..\..\build\Tools\ObjectIcons&quot; /E&#xD;&#xA;copy &quot;..\..\.resources\MenuBar&quot; &quot;..\..\build&quot;&#xD;&#xA;if ErrorLevel 8 (exit /B 1) else (exit /B 0)" />
-  </Target>
 </Project>

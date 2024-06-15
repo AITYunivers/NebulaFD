@@ -5,7 +5,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
 {
     public class Shader : Chunk
     {
-        public int Handle;
+        public int Handle = -1;
         public string Name = string.Empty;
         public bool Compiled = false;
         public byte[] FXData = new byte[0];

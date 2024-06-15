@@ -21,8 +21,16 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
             Size = reader.ReadInt();
             ObstacleType = reader.ReadUShort();
             CollisionType = reader.ReadUShort();
-            Width = reader.ReadInt();
-            Height = reader.ReadInt();
+            if (NebulaCore.Fusion > 1.5f)
+            {
+                Width = reader.ReadInt();
+                Height = reader.ReadInt();
+            }
+            else
+            {
+                Width = reader.ReadUShort();
+                Height = reader.ReadUShort();
+            }
             Shape.ReadCCN(reader);
 
             ((ObjectInfo)extraInfo[0]).Properties = this;
