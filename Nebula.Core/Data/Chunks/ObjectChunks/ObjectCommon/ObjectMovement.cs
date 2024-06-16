@@ -150,7 +150,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
             {
                 ObjectMovementExtension ExtensionDefinition = (ObjectMovementExtension)MovementDefinition;
                 writer.WriteAutoYunicode(ExtensionDefinition.FileName);
-                writer.WriteInt(Type);
+                writer.WriteInt(ID);
             }
             else
             {

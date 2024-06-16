@@ -298,6 +298,8 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                         ImageData = ImageTranslatorCPU.AndroidMode4ToRGBA(this);
                     else if (NebulaCore.Fusion > 2.5f)
                         ImageData = ImageTranslatorCPU.Normal24BitMaskedToRGBA(this);
+                    else
+                        IsMasked = true;
                     break;
                 case 5:
                     ImageData = ImageTranslatorCPU.AndroidMode5ToRGBA(this);
