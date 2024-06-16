@@ -26,9 +26,25 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Music
             Handle = reader.ReadUInt();
             if (NebulaCore.Fusion >= 2.5f)
                 Handle--;
-            int decompressedSize = reader.ReadInt();
-            int size = reader.ReadInt();
-            musicData = new ByteReader(Decompressor.DecompressBlock(reader, size));
+
+            int decompressedSize;
+            if (NebulaCore.Fusion == 1.5f)
+            {
+                List<int> offsets = NebulaCore.PackageData.MusicOffsets.SortedOffsets;
+                int startingOffset = (int)reader.Tell();
+                int compressedSize = 3;
+                if (offsets.IndexOf(startingOffset) != offsets.Count - 1)
+                    compressedSize = offsets[offsets.IndexOf(startingOffset) + 1] - startingOffset - 4;
+                decompressedSize = reader.ReadInt();
+                var compressedBuffer = reader.ReadBytes(compressedSize - 4);
+                musicData = new ByteReader(Decompressor.DecompressOPFBlock(compressedBuffer));
+            }
+            else
+            {
+                decompressedSize = reader.ReadInt();
+                int size = reader.ReadInt();
+                musicData = new ByteReader(Decompressor.DecompressBlock(reader, size));
+            }
             Checksum = musicData.ReadInt();
             References = musicData.ReadUInt();
             int dataSize = musicData.ReadInt();
