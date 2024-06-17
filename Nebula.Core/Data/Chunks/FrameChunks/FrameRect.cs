@@ -4,10 +4,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 {
     public class FrameRect : Chunk
     {
-        public int left;
-        public int top;
-        public int right;
-        public int bottom;
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
 
         public FrameRect()
         {
@@ -17,20 +17,20 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            left = reader.ReadInt();
-            top = reader.ReadInt();
-            right = reader.ReadInt();
-            bottom = reader.ReadInt();
+            Left = reader.ReadInt();
+            Top = reader.ReadInt();
+            Right = reader.ReadInt();
+            Bottom = reader.ReadInt();
 
             ((Frame)extraInfo[0]).FrameRect = this;
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            left = reader.ReadInt();
-            top = reader.ReadInt();
-            right = reader.ReadInt();
-            bottom = reader.ReadInt();
+            Left = reader.ReadInt();
+            Top = reader.ReadInt();
+            Right = reader.ReadInt();
+            Bottom = reader.ReadInt();
 
             ((Frame)extraInfo[0]).FrameRect = this;
         }
@@ -44,10 +44,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         {
             writer.WriteByte(0x21);
             writer.WriteInt(16);
-            writer.WriteInt(left);
-            writer.WriteInt(top);
-            writer.WriteInt(right);
-            writer.WriteInt(bottom);
+            writer.WriteInt(Left);
+            writer.WriteInt(Top);
+            writer.WriteInt(Right);
+            writer.WriteInt(Bottom);
         }
     }
 }

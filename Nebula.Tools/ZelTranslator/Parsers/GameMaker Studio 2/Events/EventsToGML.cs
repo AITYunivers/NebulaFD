@@ -330,7 +330,7 @@ namespace ZelTranslator_SD.Parsers.GameMakerStudio2
                 createGML.path = $"objects\\{newObj.name}";
                 createGML.code = $"ZelCTF();\nglobal.eventInstLists = array_create_zel({frame.FrameEvents.Events.Count}+1); // Create event instance lists\nnotAlways = array_notalways({frame.FrameEvents.Events.Count}+1); // Create notAlways and runOnce lists\nrunOnce = notAlways;\ngroups = array_notalways(<GROUPCOUNT>);\n<INACTIVEGROUPS>\nOnlyOneActionWhenEventLoops = true; // Dummy/Aesthetic variable\n";
                 createGML.code += $"MoveTimer = {frame.FrameMoveTimer}\n";
-                createGML.code += $"VirtualWidth = {frame.FrameRect.right};\nVirtualHeight = {frame.FrameRect.bottom};\n";
+                createGML.code += $"VirtualWidth = {frame.FrameRect.Right};\nVirtualHeight = {frame.FrameRect.Bottom};\n";
                 createGML.code += $"ID = {frameCount + 1};\n";
                 // Step
                 ObjectYY.Event stepEvent = new ObjectYY.Event(); // Event

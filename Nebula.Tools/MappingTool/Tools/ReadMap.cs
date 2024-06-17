@@ -1,20 +1,16 @@
-﻿using Nebula;
-using Nebula.Core.Utilities;
-using Spectre.Console;
+﻿using Nebula.Core.Data;
+using Nebula.Tools.MappingTool.Structure;
 using Newtonsoft.Json;
-using Nebula.Core.FileReaders;
-using Nebula.Core.Memory;
-using Nebula.Core.Data;
+using Spectre.Console;
 using static Nebula.Core.Utilities.Enums;
 
-namespace Nebula.Tools.MappingTool
+namespace Nebula.Tools.MappingTool.Tools
 {
-    public class ReadMap : INebulaTool
+    public class ReadMap
     {
-        public string Name => "Read Map File (Don't Use!!!)";
-        public MapStructure.Project? Project;
+        public static MapStructure.Project? Project;
 
-        public void Execute()
+        public static void Execute()
         {
             AnsiConsole.Clear();
             AnsiConsole.Write(NebulaCore.ConsoleFiglet);
@@ -25,7 +21,7 @@ namespace Nebula.Tools.MappingTool
             while (true)
             {
                 string path = Console.ReadLine()!.Trim().Trim('"');
-                if (File.Exists(path) && Path.GetExtension(path) == ".map")
+                if (File.Exists(path) && Path.GetExtension(path) == ".nmp")
                 {
                     NebulaCore.FilePath = path;
                     try

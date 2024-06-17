@@ -106,6 +106,12 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             InitScore = reader.ReadInt();
             InitLives = reader.ReadInt();
 
+            if (NebulaCore.Fusion == 1.5f)
+            {
+                InitScore = (InitScore + 1) * -1;
+                InitLives = (InitLives + 1) * -1;
+            }
+
             for (int i = 0; i < 4; i++)
                 ControlType[i] = reader.ReadShort();
 

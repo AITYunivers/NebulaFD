@@ -1,4 +1,7 @@
-﻿namespace Nebula.Tools.MappingTool
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace Nebula.Tools.MappingTool.Structure
 {
     public class MapStructure
     {
@@ -17,10 +20,13 @@
 
         public class Settings
         {
+            [JsonConverter(typeof(StringEnumConverter))]
             public GraphicMode GraphicMode = GraphicMode.C16Mil;
+            [JsonConverter(typeof(StringEnumConverter))]
             public BuildType BuildType = BuildType.WindowsEXE;
             public string BuildFilename = string.Empty;
             public bool ShowDeprecatedBuildTypes = false;
+            [JsonConverter(typeof(StringEnumConverter))]
             public CompressionLevel CompressionLevel = CompressionLevel.Normal;
             public bool CompressSounds = false;
             public bool DisplayBuildWarningMessages = true;
@@ -125,6 +131,7 @@
             public bool RunWhileResizing = false;
             public bool DoNotStopScreenSaverWhenInputEvent = false;
             public bool DoNotShareDataIfRunAsSubApplication = false;
+            [JsonConverter(typeof(StringEnumConverter))]
             public DisplayMode DisplayMode = DisplayMode.Direct3D11;
             public bool VSync = false;
             public int NumberOfBackBuffers = 2;
@@ -133,7 +140,9 @@
             public bool MultiSamples = true;
             public bool PlaySoundsOverFrames = false;
             public bool DoNotMuteSamplesOnLoseFocus = false;
+            [JsonConverter(typeof(StringEnumConverter))]
             public CharacterInputEncoding Input = CharacterInputEncoding.ANSI;
+            [JsonConverter(typeof(StringEnumConverter))]
             public CharacterOutputEncoding Output = CharacterOutputEncoding.Unicode;
             public int InitialScore = 0;
             public int InitialLives = 3;
@@ -172,6 +181,7 @@
         {
             public bool AllowGlobalEventsWithGhostObjects = true;
             public int BaseFrame = 1;
+            [JsonConverter(typeof(StringEnumConverter))]
             public EventOrder EventOrder = EventOrder.FrameGlobalBehaviors;
             public string[] Qualifiers = new string[100]
             {
@@ -285,6 +295,7 @@
             public int[] Icons = new int[11] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
             public string Filename = string.Empty;
             public string HelpFile = string.Empty;
+            [JsonConverter(typeof(StringEnumConverter))]
             public Language Language = Language.EnglishUnitedStates;
             public string Author = string.Empty;
             public string Copyright = string.Empty;
@@ -303,6 +314,7 @@
             public string ModulesSubDirectory = "Modules";
             public bool IncludeExternalFiles = false;
             public InstallSettings InstallSettings = new InstallSettings();
+            [JsonConverter(typeof(StringEnumConverter))]
             public ExecutionLevel ExecutionLevel = ExecutionLevel.AsInvoker;
         }
 
@@ -508,7 +520,9 @@
 
         public class InstallFileViewRun
         {
+            [JsonConverter(typeof(StringEnumConverter))]
             public View View = View.No;
+            [JsonConverter(typeof(StringEnumConverter))]
             public Run Run = Run.No;
             public string CommandLineOptions = string.Empty;
             public bool WaitForEndBeforeContinuing = false;
@@ -517,6 +531,7 @@
 
         public class InstallFileWindows
         {
+            [JsonConverter(typeof(StringEnumConverter))]
             public InstallDirectory InstallDirectory = InstallDirectory.DestinationDirectory;
             public string OtherDirectory = string.Empty;
             public bool SetAsScreensaver = false;
@@ -574,7 +589,7 @@
         public class Effect
         {
             public int InkEffect = 0;
-            public int InkEffectParams = 0;
+            public uint InkEffectParams = 0;
             public Shader? Shader = null;
         }
 
@@ -586,6 +601,7 @@
             public bool DisplayFrameTitleInWindowCaption = false;
             public bool ResizeToScreenSizeAtStart = false;
             public bool Direct3DDontEraseBackground = false;
+            [JsonConverter(typeof(StringEnumConverter))]
             public ForceLoadOnCall ForceLoadOnCall = ForceLoadOnCall.No;
             public bool ScreenSaverSetupFrame = false;
             public bool IncludeGlobalEvents = true;
@@ -711,7 +727,9 @@
             public bool Underline = false;
             public bool Strikeout = false;
             public int[] Color = new int[3] { 0, 0, 0 };
+            [JsonConverter(typeof(StringEnumConverter))]
             public HorizontalAllignment HorizontalAllignment = HorizontalAllignment.Left;
+            [JsonConverter(typeof(StringEnumConverter))]
             public VerticalAllignment VerticalAllignment = VerticalAllignment.Top;
             public bool RightToLeftReading = false;
         }
@@ -728,12 +746,15 @@
             public bool CreateBeforeFrameTransition = false;
             public bool FollowTheFrame = true;
             public bool DestroyObjectIfTooFar = true;
+            [JsonConverter(typeof(StringEnumConverter))]
             public InactivateIfTooFar InactivateIfTooFar = InactivateIfTooFar.Automatic;
             public bool UseFineDetection = true;
+            [JsonConverter(typeof(StringEnumConverter))]
             public ObstacleType ObstacleType = ObstacleType.None;
             public bool CollisionWithBox = false;
             public bool LoadOnCall = false;
             public bool GlobalObject = false;
+            [JsonConverter(typeof(StringEnumConverter))]
             public EditorSynchronization EditorSynchronization = EditorSynchronization.SameNameAndType;
             public bool AutomaticRotations = false;
             public bool DoNotResetFrameDuration = false;
@@ -780,10 +801,12 @@
 
         public class QuickBackdropData
         {
+            [JsonConverter(typeof(StringEnumConverter))]
             public BackdropShape Shape = BackdropShape.Rectangle;
             public int[] BorderColor = new int[3] { 0, 0, 0 };
             public int BorderWidth = 0;
 
+            [JsonConverter(typeof(StringEnumConverter))]
             public BackdropFillType FillType = BackdropFillType.SolidColor;
             public int[] FillColor1 = new int[3] { 128, 128, 128 };
             public int[] FillColor2 = new int[3] { 255, 255, 255 };
@@ -855,6 +878,7 @@
         public class ScoreData
         {
             public int Player = 1;
+            [JsonConverter(typeof(StringEnumConverter))]
             public ScoreType Type = ScoreType.Numbers;
             public bool UseFixedDigitCount = false;
             public int FixedNumberOfDigits = 9;
@@ -864,6 +888,7 @@
         public class LivesData
         {
             public int Player = 1;
+            [JsonConverter(typeof(StringEnumConverter))]
             public LivesType Type = LivesType.Image;
             public bool UseFixedDigitCount = false;
             public int FixedNumberOfDigits = 2;
@@ -885,10 +910,13 @@
             public int NumberOfDigitsAfterDecimalPoint = 2;
             public bool AddZerosToTheLeft = false;
 
+            [JsonConverter(typeof(StringEnumConverter))]
             public CounterType Type = CounterType.Numbers;
             public int[] Images = new int[14];
 
+            [JsonConverter(typeof(StringEnumConverter))]
             public CounterCount Count = CounterCount.UpLeft;
+            [JsonConverter(typeof(StringEnumConverter))]
             public CounterFillType FillType = CounterFillType.Gradient;
             public int[] FillColor1 = new int[3] { 128, 128, 128 };
             public int[] FillColor2 = new int[3] { 255, 255, 255 };
@@ -903,6 +931,7 @@
 
         public class SubAppData
         {
+            [JsonConverter(typeof(StringEnumConverter))]
             public SubAppSource Source = SubAppSource.FrameFromThisApplication;
             public string Filename = string.Empty;
             public int FrameNumber = 0;
@@ -946,10 +975,10 @@
 
         public enum GraphicMode
         {
-            C256,
-            C32768,
-            C65536,
-            C16Mil
+            C256 = 3,
+            C32768 = 6,
+            C65536 = 7,
+            C16Mil = 4
         }
 
         public enum BuildType
@@ -962,14 +991,16 @@
             JavaInternetApplet,
             JavaWebStart,
             JavaForMobileDevices,
-            JavaMacApplication = 9,
+            JavaBluRay,
+            JavaMacApplication,
             AdobeFlash,
             JavaForBlackberry,
             AndroidOUYAApplication,
             iOSApplication,
             iOSXCodeProject,
             FinaliOSXCodeProject,
-            MacApplication = 17,
+            XNAXboxApp,
+            MacApplication,
             XNAWindowsProject,
             XNAXboxProject,
             XNAPhoneProject,
@@ -1169,7 +1200,7 @@
             UzbekLatin,
             Vietnamese
         }
-        
+
         public enum View
         {
             No,
