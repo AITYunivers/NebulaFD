@@ -199,6 +199,15 @@ namespace Nebula
                     }
             }
 
+            // Force MFA Parser to the top, dunno why it used to be at the top
+            // but now it's not so I need this.
+            string mfaParserToolName = $"[{NebulaCore.ColorRules[3]}]MFA Parser[/]";
+            if (toolNames.Contains(mfaParserToolName))
+            {
+                toolNames.Remove(mfaParserToolName);
+                toolNames.Insert(1, mfaParserToolName);
+            }
+
             List<string> selectedTasks = AnsiConsole.Prompt(
                 new MultiSelectionPrompt<string>()
                     .Title($"[{NebulaCore.ColorRules[1]}]Select a task.[/]")

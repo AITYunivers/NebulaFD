@@ -216,6 +216,7 @@ namespace Nebula.Core.Utilities
 
             return colorArray;
         }
+
         public static byte[] Normal15BitToRGBA(Image img)
         {
             byte[] colorArray = new byte[img.Width * img.Height * 4];
@@ -297,12 +298,7 @@ namespace Nebula.Core.Utilities
             return colorArray;
 
         }
-        public static byte[] Normal8BitToRGBA(Image img)
-        {
-            var newImg = new Data.Chunks.BankChunks.Images.Image();
-            //newImg.FromBitmap((Bitmap)Bitmap.FromStream(new MemoryStream(img.ImageData)));
-            return newImg.ImageData;
-        }
+
         public static byte[] AndroidMode0ToRGBA(Image img)
         {
             var colorArray = new byte[img.Width * img.Height * 4];
