@@ -62,7 +62,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                 newChunk.ChunkData = null;
             }
 
-            log = $"Frame {(Handle >= 0 ? "$[{Handle}] " : "")}'{FrameName}' found.";
+            log = $"Frame {(Handle >= 0 ? $"[{Handle}] " : "")}'{FrameName}' found.";
 
             if (FrameHeader.FrameFlags["DontInclude"])
                 log += " (Not Included)";

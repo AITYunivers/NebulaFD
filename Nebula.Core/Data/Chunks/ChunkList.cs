@@ -62,7 +62,7 @@ namespace Nebula.Core.Data.Chunks
             //0x224C         VirtualKeysToChar
             //0x224D         CharEncoding
             //0x224E         PreloaderTouchMsg
-            //0x224F         EngineVer
+            { 0x224F, typeof(EngineVer)           },
             //0x2250
             //0x2251         AppLanguage
             //0x2252         WUAOptions

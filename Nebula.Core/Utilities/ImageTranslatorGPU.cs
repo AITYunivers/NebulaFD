@@ -101,14 +101,14 @@ namespace Nebula.Core.Utilities
 
                     if (flipRGB == 1)
                     {
-                        r = b;
-                        b = data[position];
+                        r = data[position + 2];
+                        b = data[position + 0];
                     }
 
                     int newPos = (y * (width * 4)) + (x * 4);
-                    output[newPos + 2] = r;
+                    output[newPos + 0] = r;
                     output[newPos + 1] = g;
-                    output[newPos + 0] = b;
+                    output[newPos + 2] = b;
                     output[newPos + 3] = 255;
                     if (alpha != 1)
                     {
@@ -472,32 +472,28 @@ namespace Nebula.Core.Utilities
                 ArrayView<byte> output) =>
                 {
                     int x = i % width;
-                    int y = (int)i / width % height;
-                    if (i < width * height)
+                    int y = (int)i / width;
+                    int position = (x * 3) + (y * width * 3) + (y * (pad * 3));
+
+                    int pos = (y * (width * 4)) + (x * 4);
+                    output[position + 0] = data[pos + 0];
+                    output[position + 1] = data[pos + 1];
+                    output[position + 2] = data[pos + 2];
+                    output[position + 3] = data[pos + 3];
+
+                    if (alpha == 0 && RGBA == 1 && data[pos + 3] != 255)
                     {
-                        int position = (x * 3) + (y * width * 4) + (y * (pad * 3));
-
-                        int pos = (y * (width * 4)) + (x * 4);
-                        output[position + 0] = data[pos + 0];
-                        output[position + 1] = data[pos + 1];
-                        output[position + 2] = data[pos + 2];
-                        output[position + 3] = data[pos + 3];
-
-                        if (alpha == 0 && RGBA == 1 && data[pos + 3] != 255)
-                        {
-                            output[position + 2] = (byte)((transparent >> 16) & 0xFF);
-                            output[position + 1] = (byte)((transparent >> 8) & 0xFF);
-                            output[position + 0] = (byte)(transparent & 0xFF);
-                        }
+                        output[position + 2] = (byte)((transparent >> 16) & 0xFF);
+                        output[position + 1] = (byte)((transparent >> 8) & 0xFF);
+                        output[position + 0] = (byte)(transparent & 0xFF);
                     }
-                    else if (alpha == 1)
+                    
+                    if (alpha == 1)
                     {
-                        int position = (width * height) + x + (y * width) + (y * alphaPad);
-                        int pos = (y * (width * 4)) + (x * 4);
+                        position = (width * height * 3) + x + (y * width) + (y * alphaPad);
                         if (position >= output.Length || pos + 3 >= data.Length)
                             return;
                         output[position] = data[pos + 3];
-                        position += 1;
                     }
                 });
             }
@@ -508,11 +504,11 @@ namespace Nebula.Core.Utilities
         {
             Accelerator accelerator = GetAccelerator();
             var deviceData = accelerator.Allocate1D(img.ImageData);
-            var deviceOutput = accelerator.Allocate1D(new byte[img.Width * img.Height * 8]);
+            var deviceOutput = accelerator.Allocate1D(new byte[img.Width * img.Height * 4]);
             var loadedKernel = GetRGBAToRGBMaskedKernel(accelerator);
 
             loadedKernel(
-                img.Width * img.Height * 2,
+                img.Width * img.Height,
                 deviceData.View,
                 img.Width,
                 img.Height,
@@ -525,7 +521,7 @@ namespace Nebula.Core.Utilities
 
             accelerator.Synchronize();
 
-            byte[] output = new byte[img.Width * img.Height * 8];
+            byte[] output = new byte[img.Width * img.Height * 4];
             deviceOutput.CopyToCPU(output);
             deviceData.Dispose();
             deviceOutput.Dispose();
