@@ -36,7 +36,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             if (tS.Minutes > 0)
                 output += tS.Minutes.ToString("D2") + "'";
             output += tS.Seconds.ToString("D2") + "''";
-            output += "-" + tS.Milliseconds.ToString("D2").Substring(0, 2);
+            int centiseconds = tS.Milliseconds / 10;
+            output += "-" + centiseconds.ToString("D2");
             return output;
         }
     }
