@@ -742,11 +742,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 30:
                             return Header + $"Launch {Parameters[0]} toward {Parameters[1].ToString().ReplaceLast(" layer 1", "")}";
                         case 31:
-                            return Header + $"Set {GetObjectAlterableValueName(((ParameterShort)Parameters[0].Data).Value)} to {Parameters[1]}";
+                            return Header + $"Set {GetObjectAlterableValueName(Parameters[0].Data)} to {Parameters[1]}";
                         case 32:
-                            return Header + $"Add {Parameters[1]} to {GetObjectAlterableValueName(((ParameterShort)Parameters[0].Data).Value)}";
+                            return Header + $"Add {Parameters[1]} to {GetObjectAlterableValueName(Parameters[0].Data)}";
                         case 33:
-                            return Header + $"Subtract {Parameters[1]} from {GetObjectAlterableValueName(((ParameterShort)Parameters[0].Data).Value)}";
+                            return Header + $"Subtract {Parameters[1]} from {GetObjectAlterableValueName(Parameters[0].Data)}";
                         case 35:
                             return Header + $"Set Flag {Parameters[0]} on";
                         case 36:
@@ -776,7 +776,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 48:
                             return Header + $"Goto node {Parameters[0]}";
                         case 49:
-                            return Header + $"Set {GetObjectAlterableStringName(((ParameterShort)Parameters[0].Data).Value)} to {Parameters[1]}";
+                            return Header + $"Set {GetObjectAlterableStringName(Parameters[0].Data)} to {Parameters[1]}";
                         case 50:
                             return Header + $"Set font name to {Parameters[0]}";
                         case 51:
