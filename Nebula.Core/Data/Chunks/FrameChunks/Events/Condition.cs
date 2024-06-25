@@ -1,4 +1,5 @@
-﻿using Nebula.Core.Data.Chunks.AppChunks;
+﻿using ILGPU.IR.Values;
+using Nebula.Core.Data.Chunks.AppChunks;
 using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
 using Nebula.Core.Data.Chunks.ObjectChunks;
 using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
@@ -381,7 +382,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case -21:
                             return $"Pick objects with Flag {Parameters[0]} on";
                         case -20:
-                            return $"Pick objects which {GetAlterableValueName(((ParameterInt)Parameters[0].Data).Value)} {GetComparison(((ParameterExpressions)Parameters[1].Data).Comparison)} {Parameters[1]}";
+                            return $"Pick objects which {GetAlterableValueName(Parameters[0].Data)} {GetComparison(((ParameterExpressions)Parameters[1].Data).Comparison)} {Parameters[1]}";
                         case -19:
                             return $"Pick objects with fixed value {GetComparison(((ParameterExpressions)Parameters[0].Data).Comparison)} {Parameters[0]}";
                         case -18:
@@ -598,7 +599,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case -37:
                             return $"{GetObjectName()}: font is bold";
                         case -36:
-                            return $"{GetObjectAlterableStringName(((ParameterShort)Parameters[0].Data).Value)} of {GetObjectName()} {GetComparison(((ParameterExpressions)Parameters[1].Data).Comparison)} {Parameters[1]}";
+                            return $"{GetObjectAlterableStringName(Parameters[0].Data)} of {GetObjectName()} {GetComparison(((ParameterExpressions)Parameters[1].Data).Comparison)} {Parameters[1]}";
                         case -35:
                             return $"Path movement of {GetObjectName()} has reached node {Parameters[1]}";
                         case -34:
@@ -616,7 +617,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case -28:
                             return $"{GetObjectName()} is invisible";
                         case -27:
-                            return $"{GetObjectAlterableValueName(((ParameterShort)Parameters[0].Data).Value)} of {GetObjectName()} {GetComparison(((ParameterExpressions)Parameters[1].Data).Comparison)} {Parameters[1]}";
+                            return $"{GetObjectAlterableValueName(Parameters[0].Data)} of {GetObjectName()} {GetComparison(((ParameterExpressions)Parameters[1].Data).Comparison)} {Parameters[1]}";
                         case -26:
                             return $"Fixed value of {GetObjectName()} {GetComparison(((ParameterExpressions)Parameters[0].Data).Comparison)} {Parameters[0]}";
                         case -25:
@@ -714,50 +715,70 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             else return $"Global String({param})";
         }
 
-        public string GetAlterableValueName(int id)
+        public string GetAlterableValueName(ParameterChunk parameter)
         {
-            string output = "Alterable Value ";
-            if (id > 26)
-                output += (char)('A' + Math.Floor(id / 27d));
-            output += (char)('A' + id % 27);
-            return output;
-        }
-
-        public string GetAlterableStringName(int id)
-        {
-            string output = "Alterable String ";
-            if (id > 26)
-                output += (char)('A' + Math.Floor(id / 27d));
-            output += (char)('A' + id % 27);
-            return output;
-        }
-
-        public string GetObjectAlterableValueName(int id)
-        {
-            ObjectCommon oC = (ObjectCommon)GetObject().Properties;
-            if (oC.ObjectAlterableValues.Names.Length <= id || string.IsNullOrEmpty(oC.ObjectAlterableValues.Names[id]))
+            if (parameter is ParameterInt idData)
             {
+                int id = idData.Value;
                 string output = "Alterable Value ";
                 if (id > 26)
                     output += (char)('A' + Math.Floor(id / 27d));
                 output += (char)('A' + id % 27);
                 return output;
             }
-            else return oC.ObjectAlterableValues.Names[id];
+            else return "Alterable Value(" + parameter.ToString() + ")";
         }
 
-        public string GetObjectAlterableStringName(int id)
+        public string GetAlterableStringName(ParameterChunk parameter)
         {
-            ObjectCommon oC = (ObjectCommon)GetObject().Properties;
-            if (oC.ObjectAlterableStrings.Names.Length <= id || string.IsNullOrEmpty(oC.ObjectAlterableStrings.Names[id]))
+            if (parameter is ParameterInt idData)
             {
+                int id = idData.Value;
                 string output = "Alterable String ";
                 if (id > 26)
                     output += (char)('A' + Math.Floor(id / 27d));
                 output += (char)('A' + id % 27);
                 return output;
             }
-            else return oC.ObjectAlterableStrings.Names[id];
+            else return "Alterable String(" + parameter.ToString() + ")";
+        }
+
+        public string GetObjectAlterableValueName(ParameterChunk parameter)
+        {
+            if (parameter is ParameterShort idData)
+            {
+                short id = idData.Value;
+                ObjectCommon oC = (ObjectCommon)GetObject().Properties;
+                if (oC.ObjectAlterableValues.Names.Length <= id || string.IsNullOrEmpty(oC.ObjectAlterableValues.Names[id]))
+                {
+                    string output = "Alterable Value ";
+                    if (id > 26)
+                        output += (char)('A' + Math.Floor(id / 27d));
+                    output += (char)('A' + id % 27);
+                    return output;
+                }
+                else return oC.ObjectAlterableValues.Names[id];
+            }
+            else return "Alterable Value(" + parameter.ToString() + ")";
+        }
+
+        public string GetObjectAlterableStringName(ParameterChunk parameter)
+        {
+            if (parameter is ParameterShort idData)
+            {
+                short id = idData.Value;
+                ObjectCommon oC = (ObjectCommon)GetObject().Properties;
+                if (oC.ObjectAlterableStrings.Names.Length <= id || string.IsNullOrEmpty(oC.ObjectAlterableStrings.Names[id]))
+                {
+                    string output = "Alterable String ";
+                    if (id > 26)
+                        output += (char)('A' + Math.Floor(id / 27d));
+                    output += (char)('A' + id % 27);
+                    return output;
+                }
+                else return oC.ObjectAlterableStrings.Names[id];
+            }
+            else return "Alterable String(" + parameter.ToString() + ")";
         }
 
         public string GetComparison(int id) => id switch

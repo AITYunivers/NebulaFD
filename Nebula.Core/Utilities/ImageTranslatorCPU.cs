@@ -10,6 +10,7 @@ namespace Nebula.Core.Utilities
             int colorModeSize = 3;
             switch (img.GraphicMode)
             {
+                case 0:
                 case 1:
                 case 8:
                     colorModeSize = 4;

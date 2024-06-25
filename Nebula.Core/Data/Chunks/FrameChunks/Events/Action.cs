@@ -884,32 +884,42 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             else return $"Global String({param})";
         }
 
-        public string GetObjectAlterableValueName(int id)
+        public string GetObjectAlterableValueName(ParameterChunk parameter)
         {
-            ObjectCommon oC = (ObjectCommon)GetObject().Properties;
-            if (oC.ObjectAlterableValues.Names.Length <= id || string.IsNullOrEmpty(oC.ObjectAlterableValues.Names[id]))
+            if (parameter is ParameterShort idData)
             {
-                string output = "Alterable Value ";
-                if (id > 26)
-                    output += (char)('A' + Math.Floor(id / 27d));
-                output += (char)('A' + id % 27);
-                return output;
+                short id = idData.Value;
+                ObjectCommon oC = (ObjectCommon)GetObject().Properties;
+                if (oC.ObjectAlterableValues.Names.Length <= id || string.IsNullOrEmpty(oC.ObjectAlterableValues.Names[id]))
+                {
+                    string output = "Alterable Value ";
+                    if (id > 26)
+                        output += (char)('A' + Math.Floor(id / 27d));
+                    output += (char)('A' + id % 27);
+                    return output;
+                }
+                else return oC.ObjectAlterableValues.Names[id];
             }
-            else return oC.ObjectAlterableValues.Names[id];
+            else return "Alterable Value(" + parameter.ToString() + ")";
         }
 
-        public string GetObjectAlterableStringName(int id)
+        public string GetObjectAlterableStringName(ParameterChunk parameter)
         {
-            ObjectCommon oC = (ObjectCommon)GetObject().Properties;
-            if (oC.ObjectAlterableStrings.Names.Length <= id || string.IsNullOrEmpty(oC.ObjectAlterableStrings.Names[id]))
+            if (parameter is ParameterShort idData)
             {
-                string output = "Alterable String ";
-                if (id > 26)
-                    output += (char)('A' + Math.Floor(id / 27d));
-                output += (char)('A' + id % 27);
-                return output;
+                short id = idData.Value;
+                ObjectCommon oC = (ObjectCommon)GetObject().Properties;
+                if (oC.ObjectAlterableStrings.Names.Length <= id || string.IsNullOrEmpty(oC.ObjectAlterableStrings.Names[id]))
+                {
+                    string output = "Alterable String ";
+                    if (id > 26)
+                        output += (char)('A' + Math.Floor(id / 27d));
+                    output += (char)('A' + id % 27);
+                    return output;
+                }
+                else return oC.ObjectAlterableStrings.Names[id];
             }
-            else return oC.ObjectAlterableStrings.Names[id];
+            else return "Alterable String(" + parameter.ToString() + ")";
         }
 
         public string GetMenuItemName(int id)
