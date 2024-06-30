@@ -166,7 +166,7 @@ namespace Nebula.Core.Utilities
                             case 0: // Quick Backdrop
                                 if (((ObjectQuickBackdrop)oi.Properties).Shape.FillType == 3)
                                 {
-                                    img = NebulaCore.PackageData.ImageBank.Images[((ObjectQuickBackdrop)oi.Properties).Shape.Image];
+                                    img = NebulaCore.PackageData.ImageBank[((ObjectQuickBackdrop)oi.Properties).Shape.Image];
                                     destRect = new Rectangle(inst.PositionX, inst.PositionY,
                                                              ((ObjectQuickBackdrop)oi.Properties).Width,
                                                              ((ObjectQuickBackdrop)oi.Properties).Height);
@@ -174,7 +174,7 @@ namespace Nebula.Core.Utilities
                                 }
                                 break;
                             case 1: // Backdrop
-                                img = NebulaCore.PackageData.ImageBank.Images[((ObjectBackdrop)oi.Properties).Image];
+                                img = NebulaCore.PackageData.ImageBank[((ObjectBackdrop)oi.Properties).Image];
                                 destRect = new Rectangle(inst.PositionX, inst.PositionY,
                                                          img.Width, img.Height);
                                 doDraw(graphics, img.GetBitmap(), destRect, alpha);
@@ -186,7 +186,7 @@ namespace Nebula.Core.Utilities
                                 switch (oi.Header.Type)
                                 {
                                     case 2: // Active
-                                        img = NebulaCore.PackageData.ImageBank.Images[oc.ObjectAnimations.GetFirst().Directions.First().Frames.First()];
+                                        img = NebulaCore.PackageData.ImageBank[oc.ObjectAnimations.GetFirst().Directions.First().Frames.First()];
                                         destRect = new Rectangle(inst.PositionX - img.HotspotX,
                                                                  inst.PositionY - img.HotspotY,
                                                                  img.Width, img.Height);
@@ -297,7 +297,7 @@ namespace Nebula.Core.Utilities
                 foreach (char c in value)
                 {
                     uint id = counterID[c];
-                    Data.Chunks.BankChunks.Images.Image img = NebulaCore.PackageData.ImageBank.Images[cntr.Frames[id]];
+                    Data.Chunks.BankChunks.Images.Image img = NebulaCore.PackageData.ImageBank[cntr.Frames[id]];
                     width += img.Width;
                     height = Math.Max(height, img.Height);
                 }
@@ -307,7 +307,7 @@ namespace Nebula.Core.Utilities
                 foreach (char c in value.Reverse())
                 {
                     uint id = counterID[c];
-                    Data.Chunks.BankChunks.Images.Image img = NebulaCore.PackageData.ImageBank.Images[cntr.Frames[id]];
+                    Data.Chunks.BankChunks.Images.Image img = NebulaCore.PackageData.ImageBank[cntr.Frames[id]];
                     int xToDraw = width - img.Width;
                     if (prevX != null)
                         xToDraw = (int)prevX - img.Width;
@@ -318,7 +318,7 @@ namespace Nebula.Core.Utilities
             else if (cntr.DisplayType == 4)
             {
                 double ratio = (double)(val.Initial - val.Minimum) / (val.Maximum - val.Minimum);
-                Data.Chunks.BankChunks.Images.Image img = NebulaCore.PackageData.ImageBank.Images[cntr.Frames[(int)((cntr.Frames.Length - 1) * ratio)]];
+                Data.Chunks.BankChunks.Images.Image img = NebulaCore.PackageData.ImageBank[cntr.Frames[(int)((cntr.Frames.Length - 1) * ratio)]];
                 bmp = new Bitmap(img.Width, img.Height);
                 g = Graphics.FromImage(bmp);
                 g.DrawImageUnscaled(img.GetBitmap(), 0, 0);

@@ -34,7 +34,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             int paramOffset = reader.ReadInt();
 
             if (ShaderHandle >= 0)
-                Shader = NebulaCore.PackageData.ShaderBank.Shaders[ShaderHandle];
+                Shader = NebulaCore.PackageData.ShaderBank[ShaderHandle];
 
             long returnOffset = reader.Tell();
             if (paramOffset != 0)

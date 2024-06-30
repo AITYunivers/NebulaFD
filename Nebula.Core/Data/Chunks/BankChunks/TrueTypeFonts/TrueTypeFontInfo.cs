@@ -33,7 +33,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.TrueTypeFonts
                 {
                     if (bank.Fonts.Count < ii)
                         bank.Fonts.Add(new TrueTypeFont());
-                    bank.Fonts[ii++].Name = name;
+                    bank[ii++].Name = name;
                     names.Add(name);
                 }
             }

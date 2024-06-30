@@ -1,4 +1,5 @@
-﻿using Nebula.Core.Memory;
+﻿using Nebula.Core.Data.Chunks.BankChunks.Sounds;
+using Nebula.Core.Memory;
 
 namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
 {
@@ -49,6 +50,30 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
+        }
+
+        public Shader this[int key]
+        {
+            get => (Shaders.ContainsKey(key) ? Shaders[key] : NebulaCore.PackageData.DX9ShaderBank[key]);
+            set
+            {
+                if ((!Shaders.ContainsKey(key) || Shaders[key] == null) && NebulaCore.PackageData.DX9ShaderBank.Shaders.ContainsKey(key))
+                    NebulaCore.PackageData.DX9ShaderBank[key] = value;
+                else
+                    Shaders[key] = value;
+            }
+        }
+
+        public Shader this[uint key]
+        {
+            get => (Shaders.ContainsKey((int)key) ? Shaders[(int)key] : NebulaCore.PackageData.DX9ShaderBank[key]);
+            set
+            {
+                if ((!Shaders.ContainsKey((int)key) || Shaders[(int)key] == null) && NebulaCore.PackageData.DX9ShaderBank.Shaders.ContainsKey((int)key))
+                    NebulaCore.PackageData.DX9ShaderBank[key] = value;
+                else
+                    Shaders[(int)key] = value;
+            }
         }
     }
 }

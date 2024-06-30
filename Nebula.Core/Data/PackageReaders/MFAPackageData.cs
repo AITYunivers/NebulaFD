@@ -113,9 +113,9 @@ namespace Nebula.Core.Data.PackageReaders
                 long end = reader.Tell() + cnt * 4;
                 if (cnt >= 3)
                 {
-                    NebulaCore.CurrentReader.Icons.Add(64, IconBank.Images[reader.ReadUInt()].GetBitmap());
-                    NebulaCore.CurrentReader.Icons.Add(32, IconBank.Images[reader.ReadUInt()].GetBitmap());
-                    NebulaCore.CurrentReader.Icons.Add(16, IconBank.Images[reader.ReadUInt()].GetBitmap());
+                    NebulaCore.CurrentReader.Icons.Add(64, IconBank[reader.ReadUInt()].GetBitmap());
+                    NebulaCore.CurrentReader.Icons.Add(32, IconBank[reader.ReadUInt()].GetBitmap());
+                    NebulaCore.CurrentReader.Icons.Add(16, IconBank[reader.ReadUInt()].GetBitmap());
                 }
                 reader.Seek(end);
             }

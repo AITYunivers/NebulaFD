@@ -183,7 +183,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                         newOI.ObjectEffects.HasShader = oI.Shader.ShaderHandle != null;
                         if (newOI.ObjectEffects.HasShader)
                         {
-                            newOI.ObjectEffects.Shader = NebulaCore.PackageData.ShaderBank.Shaders[(int)oI.Shader.ShaderHandle!];
+                            newOI.ObjectEffects.Shader = NebulaCore.PackageData.ShaderBank[(int)oI.Shader.ShaderHandle!];
                             newOI.ObjectEffects.ShaderParameters = new ShaderParameter[oI.Shader.ShaderParameters.Length];
                             for (int i = 0; i < newOI.ObjectEffects.ShaderParameters.Length; i++)
                             {

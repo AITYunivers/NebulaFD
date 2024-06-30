@@ -40,7 +40,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Fonts
                     if (Offsets.Length > 0)
                         bnkReader.Seek(Offsets[i] - 4);
                     fnt.ReadCCN(bnkReader);
-                    bnk.Fonts[fnt.Handle] = fnt;
+                    bnk[fnt.Handle] = fnt;
                 }
             }
         }

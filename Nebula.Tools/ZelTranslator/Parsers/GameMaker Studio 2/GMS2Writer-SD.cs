@@ -284,8 +284,8 @@ namespace ZelTranslator_SD.Parsers
                                 {
                                     try
                                     {
-                                        newInstance.scaleX = (float)Decimal.Divide(quickbackdrop.Width, gameData.ImageBank.Images[quickbackdrop.Shape.Image].Width);
-                                        newInstance.scaleY = (float)Decimal.Divide(quickbackdrop.Height, gameData.ImageBank.Images[quickbackdrop.Shape.Image].Height);
+                                        newInstance.scaleX = (float)Decimal.Divide(quickbackdrop.Width, gameData.ImageBank[quickbackdrop.Shape.Image].Width);
+                                        newInstance.scaleY = (float)Decimal.Divide(quickbackdrop.Height, gameData.ImageBank[quickbackdrop.Shape.Image].Height);
                                     }
                                     catch
                                     {
@@ -385,7 +385,7 @@ namespace ZelTranslator_SD.Parsers
                         var newSprite = new SpriteYY.RootObject();
                         uint[] imgs = { 0 };
                         if (counter.Frames.Length > 0) imgs = counter.Frames;
-                        var baseimg = gameData.ImageBank.Images[imgs[0]];
+                        var baseimg = gameData.ImageBank[imgs[0]];
                         newSprite.name = $"CounterSprite_{imgs[0]}";
 
                         newSprite.bbox_right = baseimg.Width - 1;
@@ -456,7 +456,7 @@ namespace ZelTranslator_SD.Parsers
                                 if (direction.Frames.Length == 0) continue;
                                 var newSprite = new SpriteYY.RootObject();
                                 var imgs = direction.Frames;
-                                var baseimg = gameData.ImageBank.Images[imgs[0]];
+                                var baseimg = gameData.ImageBank[imgs[0]];
                                 var objName = CleanString(obj.Name).Replace(" ", "_") + "_" + obj.Header.Handle;
                                 newSprite.name = $"spr_{objName}_{imgs[0]}_{ad}_{dd}";
 
@@ -481,8 +481,8 @@ namespace ZelTranslator_SD.Parsers
                                 newSequence.length = imgs.Length;
                                 newSequence.backdropWidth = gameData.AppHeader.AppWidth;
                                 newSequence.backdropHeight = gameData.AppHeader.AppHeight;
-                                newSequence.xorigin = gameData.ImageBank.Images[imgs[0]].HotspotX;
-                                newSequence.yorigin = gameData.ImageBank.Images[imgs[0]].HotspotY;
+                                newSequence.xorigin = gameData.ImageBank[imgs[0]].HotspotX;
+                                newSequence.yorigin = gameData.ImageBank[imgs[0]].HotspotY;
 
                                 var seqFrames = new List<SpriteYY.KeyFrame>();
                                 int fi = 0;
@@ -521,7 +521,7 @@ namespace ZelTranslator_SD.Parsers
                     {
                         var newSprite = new SpriteYY.RootObject();
                         var imgs = new List<int>() { (int)backdrop.Image };
-                        var baseimg = gameData.ImageBank.Images[(uint)imgs[0]];
+                        var baseimg = gameData.ImageBank[(uint)imgs[0]];
                         newSprite.name = $"Backdrop_{imgs[0]}";
 
                         newSprite.bbox_right = baseimg.Width - 1;
@@ -585,7 +585,7 @@ namespace ZelTranslator_SD.Parsers
                         {
                             var newSprite = new SpriteYY.RootObject();
                             var imgs = new List<int>() { (int)quickbackdrop.Shape.Image };
-                            var baseimg = gameData.ImageBank.Images[(uint)imgs[0]];
+                            var baseimg = gameData.ImageBank[(uint)imgs[0]];
 
                             newSprite.name = $"QuickBackdrop_{imgs[0]}";
                             newSprite.bbox_right = baseimg.Width - 1;
@@ -646,7 +646,7 @@ namespace ZelTranslator_SD.Parsers
                         {
                             var newSprite = new SpriteYY.RootObject();
                             var imgs = new List<int>() { (int)quickbackdrop.Shape.Image };
-                            var baseimg = gameData.ImageBank.Images[(uint)imgs[0]];
+                            var baseimg = gameData.ImageBank[(uint)imgs[0]];
 
                             newSprite.name = $"QuickBackdrop_{imgs[0]}";
                             newSprite.bbox_right = baseimg.Width - 1;
@@ -1530,8 +1530,8 @@ if (flash[1] > 0) {
                     {
                         string layerFramePath = $"{outPath}\\sprites\\{spr.name}\\layers\\{frame.name}\\{spr.layers[0].name}.png";
                         string framePath = $"{outPath}\\sprites\\{spr.name}\\{frame.name}.png";
-                        if (!File.Exists(layerFramePath)) gameData.ImageBank.Images[(uint)frame.ctfhandle].GetBitmap().Save(layerFramePath);
-                        if (!File.Exists(framePath)) gameData.ImageBank.Images[(uint)frame.ctfhandle].GetBitmap().Save(framePath);
+                        if (!File.Exists(layerFramePath)) gameData.ImageBank[(uint)frame.ctfhandle].GetBitmap().Save(layerFramePath);
+                        if (!File.Exists(framePath)) gameData.ImageBank[(uint)frame.ctfhandle].GetBitmap().Save(framePath);
 
                     }
                     catch (Exception ex)
@@ -2037,7 +2037,7 @@ nodes : [
 
                             if (imgs.Length > 0)
                             {
-                                var baseimg = gameData.ImageBank.Images[imgs[0]];
+                                var baseimg = gameData.ImageBank[imgs[0]];
                                 createEvFile.code += $"[spr_{ObjectName.Substring(4)}_{imgs[0]}_{animationID}_{directionID}, {directionID}, /*XActionPoint*/{baseimg.ActionPointX}, /*YActionPoint*/{baseimg.ActionPointY}], ";
                             }
                         }

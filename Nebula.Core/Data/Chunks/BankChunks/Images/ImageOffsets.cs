@@ -39,7 +39,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                     if (Offsets.Length > 0)
                         bnkReader.Seek(Offsets[i] - 4);
                     img.ReadCCN(bnkReader);
-                    bnk.Images[img.Handle] = img;
+                    bnk[img.Handle] = img;
                 }
 
                 foreach (Task task in ImageBank.TaskManager)

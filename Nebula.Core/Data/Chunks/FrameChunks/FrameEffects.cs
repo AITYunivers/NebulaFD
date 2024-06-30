@@ -34,7 +34,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
             if (ShaderParameters.Length > 0)
             {
-                Shader = NebulaCore.PackageData.ShaderBank.Shaders[ShaderHandle];
+                Shader = NebulaCore.PackageData.ShaderBank[ShaderHandle];
                 for (int i = 0; i < ShaderParameters.Length; i++)
                     ShaderParameters[i] = new ShaderParameter();
                 for (int i = 0; i < Shader.Parameters.Length; i++)

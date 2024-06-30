@@ -4,10 +4,6 @@ using Nebula.Core.Data.Chunks.ObjectChunks;
 using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
-using System;
-using System.Diagnostics;
-using System.Drawing;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 {

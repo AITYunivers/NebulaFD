@@ -54,5 +54,17 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Fonts
             foreach (Font fnt in Fonts.Values)
                 fnt.WriteMFA(writer);
         }
+
+        public Font this[int key]
+        {
+            get => Fonts[(uint)key];
+            set => Fonts[(uint)key] = value;
+        }
+
+        public Font this[uint key]
+        {
+            get => Fonts[key];
+            set => Fonts[key] = value;
+        }
     }
 }

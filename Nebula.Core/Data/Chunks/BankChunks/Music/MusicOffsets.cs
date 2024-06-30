@@ -40,7 +40,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Music
                     if (Offsets.Length > 0)
                         bnkReader.Seek(Offsets[i] - 4);
                     msc.ReadCCN(bnkReader);
-                    bnk.Music[msc.Handle] = msc;
+                    bnk[msc.Handle] = msc;
                 }
             }
         }

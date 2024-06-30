@@ -3,7 +3,6 @@ using Nebula.Core.Data.Chunks.BankChunks.Images;
 using Nebula.Core.Data.Chunks.BankChunks.Sounds;
 using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
 using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
-using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
@@ -20,30 +19,24 @@ namespace Nebula.Tools.ZelTranslator_SD.GDevelop
                 return ((char)('A' + index)).ToString();
         }
 
-        public static Dictionary<string, int> extnames = new()
-        {
-            { "Every", 0 }
-        };
-
-        public List<int> extensions = new();
+        public static HashSet<string> extensions = new();
 
         public string Name => "GDevelop Translator";
 
         public void Execute()
         {
             PackageData gameData = NebulaCore.PackageData;
-            var outPath = gameData.AppName ?? "Unknown Game";
-            Regex rgx = new Regex("[^a-zA-Z0-9 -]");
-            outPath = rgx.Replace(outPath, "").Trim(' ');
-            outPath = $"Dumps\\{outPath}\\GDevelop";
-            Directory.CreateDirectory(outPath);
+
+            string path = "Dumps\\" + Utilities.ClearName(NebulaCore.PackageData.AppName) + "\\GDevelop\\";
+            Directory.CreateDirectory(path);
+
             extensions = new();
 
             var JSONtoWrite = new GDJSON.Rootobject();
             JSONtoWrite.firstLayout = gameData.Frames[0].FrameName;
 
             var Properties = new GDJSON.Properties();
-            Properties.packageName = $"com.CTFAK.{rgx.Replace(gameData.AppName, "").Replace(" ", "")}";
+            Properties.packageName = $"com.Nebula.{Utilities.ClearName(gameData.AppName).Replace(" ", "")}";
             Properties.name = gameData.AppName;
             Properties.author = gameData.Author;
             Properties.windowWidth = gameData.AppHeader.AppWidth;
@@ -64,7 +57,7 @@ namespace Nebula.Tools.ZelTranslator_SD.GDevelop
                     var newTask = new Task(() =>
                     {
                         var bmp = img.GetBitmap();
-                        bmp.Save($"{outPath}\\img{img.Handle}.png");
+                        bmp.Save($"{path}\\img{img.Handle}.png");
 
                         var res = new GDJSON.Resource();
                         res.alwaysLoaded = false;
@@ -94,7 +87,7 @@ namespace Nebula.Tools.ZelTranslator_SD.GDevelop
                         var sndext = ".wav";
                         if (snddata[0] == 0xff || snddata[0] == 0x49)
                             sndext = ".mp3";
-                        File.WriteAllBytes($"{outPath}\\{sound.Name}{sndext}", snddata);
+                        File.WriteAllBytes($"{path}\\{sound.Name}{sndext}", snddata);
 
                         var res = new GDJSON.Resource();
                         res.file = sound.Name + sndext;
@@ -123,7 +116,7 @@ namespace Nebula.Tools.ZelTranslator_SD.GDevelop
             {
                 var newScene = new GDJSON.Layout();
                 if (frame.FrameName == "" || frame.FrameName == null) continue;
-                newScene.mangledName = rgx.Replace(frame.FrameName, "").Replace(" ", "");
+                newScene.mangledName = Utilities.ClearName(frame.FrameName).Replace(" ", "");
                 newScene.name = frame.FrameName;
                 var sceneLayers = new List<GDJSON.Layer>();
                 // Base Layer
@@ -191,8 +184,8 @@ namespace Nebula.Tools.ZelTranslator_SD.GDevelop
                                             var newImg = new GDJSON.Sprite();
                                             newImg.image = $"img{img}.png";
                                             var newHotspot = new GDJSON.Originpoint();
-                                            newHotspot.x = gameData.ImageBank.Images[img].HotspotX;
-                                            newHotspot.y = gameData.ImageBank.Images[img].HotspotY;
+                                            newHotspot.x = gameData.ImageBank[img].HotspotX;
+                                            newHotspot.y = gameData.ImageBank[img].HotspotY;
                                             newImg.originPoint = newHotspot;
                                             Images.Add(newImg);
                                         }
@@ -455,8 +448,7 @@ namespace Nebula.Tools.ZelTranslator_SD.GDevelop
                                 {
                                     case -8: //Every Timer
                                         newCond = GDConditions.EveryTimer(cond, gameData, Events.Count);
-                                        if (!extensions.Contains(extnames["Every"]))
-                                            extensions.Add(extnames["Every"]);
+                                        extensions.Add("Every");
                                         break;
                                 }
                                 break;
@@ -647,16 +639,16 @@ namespace Nebula.Tools.ZelTranslator_SD.GDevelop
             var JSON = JsonConvert.SerializeObject(JSONtoWrite, Formatting.Indented, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
 
             string exts = "\"eventsFunctionsExtensions\": [";
-            foreach (int ext in extensions)
+            foreach (string ext in extensions)
             {
-                if (exts[exts.Length - 1] == '}')
+                if (exts[^1] == '}')
                     exts += ",";
-                exts += GDExtensions.extensions[ext];
+                exts += GDExtensions.Get[ext];
             }
             exts += "],";
 
             JSON = JSON.Replace(":null", ":[]").Replace("\"eventsFunctionsExtensions\":[],", exts);
-            File.WriteAllText($"{outPath}\\game.json", JSON);
+            File.WriteAllText($"{path}\\game.json", JSON);
         }
     }
 }

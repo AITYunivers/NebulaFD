@@ -89,5 +89,17 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
             foreach (Image img in Images.Values)
                 img.WriteMFA(writer);
         }
+
+        public Image this[int key]
+        {
+            get => Images[(uint)key];
+            set => Images[(uint)key] = value;
+        }
+
+        public Image this[uint key]
+        {
+            get => Images[key];
+            set => Images[key] = value;
+        }
     }
 }

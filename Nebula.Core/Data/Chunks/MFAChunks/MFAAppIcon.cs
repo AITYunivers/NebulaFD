@@ -28,13 +28,13 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
             {
                 try
                 {
-                    NebulaCore.CurrentReader.Icons.Add(256, ((MFAPackageData)NebulaCore.PackageData).IconBank.Images[IconHandles[1]].GetBitmap());
-                    NebulaCore.CurrentReader.Icons.Add(128, ((MFAPackageData)NebulaCore.PackageData).IconBank.Images[IconHandles[0]].GetBitmap());
+                    NebulaCore.CurrentReader.Icons.Add(256, ((MFAPackageData)NebulaCore.PackageData).IconBank[IconHandles[1]].GetBitmap());
+                    NebulaCore.CurrentReader.Icons.Add(128, ((MFAPackageData)NebulaCore.PackageData).IconBank[IconHandles[0]].GetBitmap());
                 }
                 catch
                 {
-                    NebulaCore.CurrentReader.Icons.Add(256, ((MFAPackageData)NebulaCore.PackageData).IconBank.Images[IconHandles[1] + 1].GetBitmap());
-                    NebulaCore.CurrentReader.Icons.Add(128, ((MFAPackageData)NebulaCore.PackageData).IconBank.Images[IconHandles[0] + 1].GetBitmap());
+                    NebulaCore.CurrentReader.Icons.Add(256, ((MFAPackageData)NebulaCore.PackageData).IconBank[IconHandles[1] + 1].GetBitmap());
+                    NebulaCore.CurrentReader.Icons.Add(128, ((MFAPackageData)NebulaCore.PackageData).IconBank[IconHandles[0] + 1].GetBitmap());
                 }
             }
         }

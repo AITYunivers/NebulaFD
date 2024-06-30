@@ -43,7 +43,7 @@ namespace GameDumper.AssetDumpers
                                 Bitmap qBDOutput = new Bitmap(qBD.Width, qBD.Height);
                                 using (Graphics qBDGraphics = Graphics.FromImage(qBDOutput))
                                 {
-                                    Image qBDImg = NebulaCore.PackageData.ImageBank.Images[qBD.Shape.Image];
+                                    Image qBDImg = NebulaCore.PackageData.ImageBank[qBD.Shape.Image];
                                     Rectangle qBDRect = new Rectangle(0, 0, qBD.Width, qBD.Height);
                                     Utilities.doDraw(qBDGraphics, qBDImg.GetBitmap(), qBDRect, 1.0f);
                                     qBDImg.DisposeBmp();
@@ -52,7 +52,7 @@ namespace GameDumper.AssetDumpers
                                 break;
                             case 1: // Backdrop
                                 ObjectBackdrop bD = (ObjectBackdrop)oI.Properties;
-                                Image bDImg = NebulaCore.PackageData.ImageBank.Images[bD.Image];
+                                Image bDImg = NebulaCore.PackageData.ImageBank[bD.Image];
                                 bDImg.GetBitmap().Save($"{path}\\[{i}] {oI.Name}.png");
                                 bDImg.DisposeBmp();
                                 break;
@@ -69,7 +69,7 @@ namespace GameDumper.AssetDumpers
                                                 int aWidth, aHeight;
                                                 foreach (uint aFrm in aDir.Frames)
                                                 {
-                                                    Image aImg = NebulaCore.PackageData.ImageBank.Images[aFrm];
+                                                    Image aImg = NebulaCore.PackageData.ImageBank[aFrm];
                                                     int aImgWidth = aImg.Width;
                                                 }
                                             }

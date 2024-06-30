@@ -1,4 +1,5 @@
-﻿using Nebula.Core.Memory;
+﻿using Nebula.Core.Data.Chunks.BankChunks.Sounds;
+using Nebula.Core.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,6 +45,18 @@ namespace Nebula.Core.Data.Chunks.BankChunks.TrueTypeFonts
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
+        }
+
+        public TrueTypeFont this[int key]
+        {
+            get => Fonts[key];
+            set => Fonts[key] = value;
+        }
+
+        public TrueTypeFont this[uint key]
+        {
+            get => Fonts[(int)key];
+            set => Fonts[(int)key] = value;
         }
     }
 }

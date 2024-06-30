@@ -306,7 +306,7 @@ namespace Nebula.Tools.GameDumper
             switch (objectInfo.Header.Type)
             {
                 case 0:
-                    Image bmp0 = imgBnk.Images[((ObjectQuickBackdrop)objectInfo.Properties).Shape.Image];
+                    Image bmp0 = imgBnk[((ObjectQuickBackdrop)objectInfo.Properties).Shape.Image];
                     if (MakeIcon(bmp0.GetBitmap(), out Bitmap bmp00))
                     {
                         bmp0.DisposeBmp();
@@ -315,7 +315,7 @@ namespace Nebula.Tools.GameDumper
                     bmp0?.DisposeBmp();
                     return "Tools\\ObjectIcons\\MMFQuickBackdrop.png";
                 case 1:
-                    Image bmp1 = imgBnk.Images[((ObjectBackdrop)objectInfo.Properties).Image];
+                    Image bmp1 = imgBnk[((ObjectBackdrop)objectInfo.Properties).Image];
                     if (MakeIcon(bmp1.GetBitmap(), out Bitmap bmp01))
                     {
                         bmp1.DisposeBmp();
@@ -324,7 +324,7 @@ namespace Nebula.Tools.GameDumper
                     bmp1?.DisposeBmp();
                     return "Tools\\ObjectIcons\\MMFBackdrop.png";
                 case 2:
-                    Image bmp2 = imgBnk.Images[((ObjectCommon)objectInfo.Properties).ObjectAnimations.Animations[0].Directions[0].Frames[0]];
+                    Image bmp2 = imgBnk[((ObjectCommon)objectInfo.Properties).ObjectAnimations.Animations[0].Directions[0].Frames[0]];
                     if (MakeIcon(bmp2.GetBitmap(), out Bitmap bmp02))
                     {
                         bmp2.DisposeBmp();
@@ -440,7 +440,7 @@ namespace Nebula.Tools.GameDumper
                             case 0: // Quick Backdrop
                                 if (((ObjectQuickBackdrop)oi.Properties).Shape.FillType == 0)
                                 {
-                                    img = NebulaCore.PackageData.ImageBank.Images[((ObjectQuickBackdrop)oi.Properties).Shape.Image];
+                                    img = NebulaCore.PackageData.ImageBank[((ObjectQuickBackdrop)oi.Properties).Shape.Image];
                                     destRect = new Rectangle(inst.PositionX, inst.PositionY,
                                                              ((ObjectQuickBackdrop)oi.Properties).Width,
                                                              ((ObjectQuickBackdrop)oi.Properties).Height);
@@ -449,14 +449,14 @@ namespace Nebula.Tools.GameDumper
                                 }
                                 break;
                             case 1: // Backdrop
-                                img = NebulaCore.PackageData.ImageBank.Images[((ObjectBackdrop)oi.Properties).Image];
+                                img = NebulaCore.PackageData.ImageBank[((ObjectBackdrop)oi.Properties).Image];
                                 destRect = new Rectangle(inst.PositionX, inst.PositionY,
                                                          img.Width, img.Height);
                                 doDraw(graphics, img.GetBitmap(), destRect, alpha);
                                 img.DisposeBmp();
                                 break;
                             case 2: // Active
-                                img = NebulaCore.PackageData.ImageBank.Images[((ObjectCommon)oi.Properties).ObjectAnimations.Animations.First().Value.Directions.First().Frames.First()];
+                                img = NebulaCore.PackageData.ImageBank[((ObjectCommon)oi.Properties).ObjectAnimations.Animations.First().Value.Directions.First().Frames.First()];
                                 destRect = new Rectangle(inst.PositionX - img.HotspotX,
                                                          inst.PositionY - img.HotspotY,
                                                          img.Width, img.Height);
@@ -540,7 +540,7 @@ namespace Nebula.Tools.GameDumper
                 foreach (char c in val.Initial.ToString())
                 {
                     uint id = counterID[c];
-                    Image img = NebulaCore.PackageData.ImageBank.Images[cntr.Frames[id]];
+                    Image img = NebulaCore.PackageData.ImageBank[cntr.Frames[id]];
                     width += img.Width;
                     height = Math.Max(height, img.Height);
                 }
@@ -550,7 +550,7 @@ namespace Nebula.Tools.GameDumper
                 foreach (char c in val.Initial.ToString().Reverse())
                 {
                     uint id = counterID[c];
-                    Image img = NebulaCore.PackageData.ImageBank.Images[cntr.Frames[id]];
+                    Image img = NebulaCore.PackageData.ImageBank[cntr.Frames[id]];
                     int xToDraw = width - img.Width;
                     if (prevX != null)
                         xToDraw = (int)prevX - img.Width;
@@ -562,7 +562,7 @@ namespace Nebula.Tools.GameDumper
             else if (cntr.DisplayType == 4)
             {
                 double ratio = (double)(val.Initial - val.Minimum) / (val.Maximum - val.Minimum);
-                Image img = NebulaCore.PackageData.ImageBank.Images[cntr.Frames[(int)((cntr.Frames.Length - 1) * ratio)]];
+                Image img = NebulaCore.PackageData.ImageBank[cntr.Frames[(int)((cntr.Frames.Length - 1) * ratio)]];
                 bmp = new Bitmap(img.Width, img.Height);
                 g = Graphics.FromImage(bmp);
                 g.DrawImageUnscaled(img.GetBitmap(), 0, 0);

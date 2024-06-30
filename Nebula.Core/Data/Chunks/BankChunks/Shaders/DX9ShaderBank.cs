@@ -49,5 +49,17 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
         {
 
         }
+
+        public Shader this[int key]
+        {
+            get => Shaders[key];
+            set => Shaders[key] = value;
+        }
+
+        public Shader this[uint key]
+        {
+            get => Shaders[(int)key];
+            set => Shaders[(int)key] = value;
+        }
     }
 }

@@ -40,7 +40,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
                     if (Offsets.Length > 0)
                         bnkReader.Seek(Offsets[i] - 4);
                     snd.ReadCCN(bnkReader);
-                    bnk.Sounds[snd.Handle] = snd;
+                    bnk[snd.Handle] = snd;
                 }
             }
         }

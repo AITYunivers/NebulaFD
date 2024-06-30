@@ -16,7 +16,7 @@ namespace Nebula.Tools.ZelTranslator_SD.GDevelop
             int bmpHeight = 0;
             foreach (uint imgId in objCommon.ObjectCounter.Frames)
             {
-                Image img = gameData.ImageBank.Images[imgId];
+                Image img = gameData.ImageBank[imgId];
                 bmpWidth += img.Width;
                 bmpHeight = Math.Max(bmpHeight, img.Height);
             }
@@ -31,7 +31,7 @@ namespace Nebula.Tools.ZelTranslator_SD.GDevelop
                 for (int imgId = 0; imgId < objCommon.ObjectCounter.Frames.Length; imgId++)
                 {
                     // Source Image
-                    Bitmap img = gameData.ImageBank.Images[objCommon.ObjectCounter.Frames[imgId]].GetBitmap();
+                    Bitmap img = gameData.ImageBank[objCommon.ObjectCounter.Frames[imgId]].GetBitmap();
                     Rectangle rect = new Rectangle(bmpPosition, 0, img.Width, img.Height);
                     g.DrawImage(img, rect);
                     bmpPosition += img.Width;

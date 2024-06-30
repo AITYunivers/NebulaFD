@@ -61,5 +61,17 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             foreach (Sound snd in Sounds.Values)
                 snd.WriteMFA(writer);
         }
+
+        public Sound this[int key]
+        {
+            get => Sounds[(uint)key];
+            set => Sounds[(uint)key] = value;
+        }
+
+        public Sound this[uint key]
+        {
+            get => Sounds[key];
+            set => Sounds[key] = value;
+        }
     }
 }

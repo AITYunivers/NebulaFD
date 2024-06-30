@@ -29,9 +29,9 @@ namespace GameDumper.AssetDumpers
                 File.WriteAllBytes(filePath, shdrs[i].FXData);
                 filePath = path + Path.GetFileNameWithoutExtension(shdrs[i].Name) + ".xml";
 
-                string fxData = shdBnk.Shaders[keys[i]].GetFXData();
+                string fxData = shdBnk[keys[i]].GetFXData();
                 if (dx9ShdBnk.Shaders.ContainsKey(keys[i]))
-                    fxData = dx9ShdBnk.Shaders[keys[i]].GetFXData();
+                    fxData = dx9ShdBnk[keys[i]].GetFXData();
                 File.WriteAllText(filePath, GenerateXML(shdrs[i], fxData));
 
                 task.Value++;

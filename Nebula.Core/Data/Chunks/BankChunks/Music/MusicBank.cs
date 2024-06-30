@@ -59,5 +59,17 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Music
             foreach (Music msc in Music.Values)
                 msc.WriteMFA(writer);
         }
+
+        public Music this[int key]
+        {
+            get => Music[(uint)key];
+            set => Music[(uint)key] = value;
+        }
+
+        public Music this[uint key]
+        {
+            get => Music[key];
+            set => Music[key] = value;
+        }
     }
 }
