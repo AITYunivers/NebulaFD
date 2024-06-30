@@ -28,6 +28,8 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
                 for (int i = 0; i < paramN; i++)
                     ShaderParameters[i] = reader.ReadInt();
             }
+            else
+                ShaderHandle = null;
 
             ((ObjectInfo)extraInfo[0]).Shader = this;
         }
