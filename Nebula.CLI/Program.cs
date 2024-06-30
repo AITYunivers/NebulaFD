@@ -159,9 +159,7 @@ namespace Nebula
             }
             catch (Exception ex)
             {
-                Logger.Log(NebulaCore.CurrentReader.GetType(), ex.Message);
-                Logger.Log(NebulaCore.CurrentReader.GetType(), ex.InnerException);
-                Logger.Log(NebulaCore.CurrentReader.GetType(), ex.StackTrace);
+                Logger.Log(NebulaCore.CurrentReader.GetType(), "ERROR: \n" + ex.Message + '\n' + ex.StackTrace);
                 Logger.Save();
                 throw;
             }
@@ -233,9 +231,7 @@ namespace Nebula
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log(tool.GetType(), ex.Message);
-                        Logger.Log(tool.GetType(), ex.InnerException);
-                        Logger.Log(tool.GetType(), ex.StackTrace);
+                        Logger.Log(tool.GetType(), "ERROR: \n" + ex.Message + '\n' + ex.StackTrace);
                         Logger.Save();
                         throw;
                     }
