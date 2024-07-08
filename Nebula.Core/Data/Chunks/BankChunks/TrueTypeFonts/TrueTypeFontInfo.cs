@@ -1,10 +1,4 @@
 ﻿using Nebula.Core.Memory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Nebula.Core.Data.Chunks.BankChunks.TrueTypeFonts
 {
@@ -21,21 +15,14 @@ namespace Nebula.Core.Data.Chunks.BankChunks.TrueTypeFonts
             TrueTypeFontBank bank = NebulaCore.PackageData.TrueTypeFontBank;
 
             int count = (int)reader.Size() / 96;
-            List<string> names = new List<string>();
-            int ii = 0;
             for (int i = 0; i < count; i++)
             {
                 reader.Skip(28);
                 string name = reader.ReadYunicodeStop(32);
-                reader.Skip(4);
+                uint offset = reader.ReadUInt();
 
-                if (!names.Contains(name))
-                {
-                    if (bank.Fonts.Count < ii)
-                        bank.Fonts.Add(new TrueTypeFont());
-                    bank[ii++].Name = name;
-                    names.Add(name);
-                }
+                if (bank.OffsetToIndex.ContainsKey(offset))
+                    bank[bank.OffsetToIndex[offset]].Name = name;
             }
         }
 

@@ -1,16 +1,11 @@
-﻿using Nebula.Core.Data.Chunks.BankChunks.Sounds;
-using Nebula.Core.Memory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Nebula.Core.Memory;
 
 namespace Nebula.Core.Data.Chunks.BankChunks.TrueTypeFonts
 {
     public class TrueTypeFontBank : Chunk
     {
         public List<TrueTypeFont> Fonts = new();
+        public Dictionary<uint, int> OffsetToIndex = new();
 
         public TrueTypeFontBank()
         {
@@ -20,13 +15,12 @@ namespace Nebula.Core.Data.Chunks.BankChunks.TrueTypeFonts
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            int i = 0;
             while (reader.HasMemory(8))
             {
-                if (Fonts.Count <= i)
-                    Fonts.Add(new TrueTypeFont());
-                Fonts[i].ReadCCN(reader, false);
-                Fonts[i].Name = i++.ToString();
+                OffsetToIndex.Add((uint)reader.Tell(), Fonts.Count);
+                TrueTypeFont ttf = new TrueTypeFont();
+                ttf.ReadCCN(reader, false);
+                Fonts.Add(ttf);
             }
 
             NebulaCore.PackageData.TrueTypeFontBank = this;

@@ -7,34 +7,9 @@ using Nebula.Core.Utilities;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 {
-    public class Condition : Chunk
+    public class Condition : ACEventBase
     {
-        public BitDict EventFlags = new BitDict( // Flags
-            "Repeat",         // Repeat
-            "Done",           // Done
-            "Default",        // Default
-            "DoneBeforeFade", // Done Before Fade In
-            "NotDoneInStart", // Not Done In Start
-            "Always",         // Always
-            "Bad",            // Bad
-            "BadObject"       // Bad Object
-        );
-
-        public BitDict OtherFlags = new BitDict( // Other Flags
-            "Negated", "", "", "", "", // Not
-            "NoInterdependence"        // No Object Interdependence
-        );
-
-        public short ObjectType;
-        public short Num;
-        public ushort ObjectInfo;
-        public short ObjectInfoList;
-        public Parameter[] Parameters = new Parameter[0];
-        public byte DefType;
         public short Identifier;
-
-        public Event? Parent = null;
-        public bool DoAdd = true;
 
         public Condition()
         {
