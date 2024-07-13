@@ -180,7 +180,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                         newOI.ObjectEffects = new MFAObjectEffects();
                         newOI.ObjectEffects.RGBCoeff = oI.Header.RGBCoeff;
                         newOI.ObjectEffects.BlendCoeff = oI.Header.BlendCoeff;
-                        newOI.ObjectEffects.HasShader = oI.Shader.ShaderHandle != null;
+                        newOI.ObjectEffects.HasShader = oI.Shader.ShaderHandle != -1;
                         if (newOI.ObjectEffects.HasShader)
                         {
                             newOI.ObjectEffects.Shader = NebulaCore.PackageData.ShaderBank[(int)oI.Shader.ShaderHandle!];

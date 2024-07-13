@@ -32,7 +32,7 @@ namespace Nebula.Core.Utilities
                     break;
             }
 
-            if (!img.Flags["RLET"] || NebulaCore.Plus || NebulaCore.Fusion >= 2.0f)
+            if (!img.Flags["RLET"] || NebulaCore.Plus || NebulaCore.Fusion < 2.0f)
                 return img.Width * colorModeSize % 2;
             else if (NebulaCore.Android)
                 return img.Width * colorModeSize;

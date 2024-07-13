@@ -25,8 +25,16 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
             reader.Skip(4); // Unknown
             FTFlags.Value = reader.ReadUInt();
             Color = reader.ReadColor();
-            Width = reader.ReadInt();
-            Height = reader.ReadInt();
+            if (NebulaCore.Fusion > 1.5f)
+            {
+                Width = reader.ReadInt();
+                Height = reader.ReadInt();
+            }
+            else
+            {
+                Width = reader.ReadUShort();
+                Height = reader.ReadUShort();
+            }
             reader.Skip(4); // Unknown
             Data = reader.ReadAscii(reader.ReadInt());
         }

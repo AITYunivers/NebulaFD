@@ -540,7 +540,12 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                                         return Header + $"Add backdrop{GetDirectionSettings(((ParameterShort)Parameters[0].Data).Value)}";
                                     case 84:
                                         if (ObjectType == 3)
-                                            return Header + $"Display paragraph {((ParameterShort)Parameters[1].Data).Value + 1}";
+                                        {
+                                            if (Parameters.Length > 1 && Parameters[1].Data is ParameterShort)
+                                                return Header + $"Display paragraph {((ParameterShort)Parameters[1].Data).Value + 1}";
+                                            else
+                                                return Header + $"Display paragraph {Parameters[0].Data}";
+                                        }
                                         if (ObjectType == 7)
                                             return Header + $"Set maximum value to {Parameters[0]}";
                                         if (ObjectType == 8)
@@ -827,7 +832,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 {
                     string output = "Global Value ";
                     if (id > 26)
-                        output += (char)('A' + Math.Floor(id / 27d));
+                        output += (char)('A' + Math.Floor(id / 27.0));
                     output += (char)('A' + id % 27);
                     return output;
                 }
@@ -845,7 +850,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 {
                     string output = "Global String ";
                     if (id > 26)
-                        output += (char)('A' + Math.Floor(id / 27d));
+                        output += (char)('A' + Math.Floor(id / 27.0));
                     output += (char)('A' + id % 27);
                     return output;
                 }
@@ -864,7 +869,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 {
                     string output = "Alterable Value ";
                     if (id > 26)
-                        output += (char)('A' + Math.Floor(id / 27d));
+                        output += (char)('A' + Math.Floor(id / 27.0));
                     output += (char)('A' + id % 27);
                     return output;
                 }
@@ -883,7 +888,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 {
                     string output = "Alterable String ";
                     if (id > 26)
-                        output += (char)('A' + Math.Floor(id / 27d));
+                        output += (char)('A' + Math.Floor(id / 27.0));
                     output += (char)('A' + id % 27);
                     return output;
                 }
@@ -1091,7 +1096,14 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public string GetFrameName(short id)
         {
-            return $"\"{NebulaCore.PackageData.Frames[NebulaCore.PackageData.FrameHandles[id]].FrameName}\" ({NebulaCore.PackageData.FrameHandles[id] + 1})";
+            try
+            {
+                return $"\"{NebulaCore.PackageData.Frames[NebulaCore.PackageData.FrameHandles[id]].FrameName}\" ({NebulaCore.PackageData.FrameHandles[id] + 1})";
+            }
+            catch
+            {
+                return "(ERROR: UNKNOWN FRAME)";
+            }
         }
 
         public string GetDirectionSettings(short id)

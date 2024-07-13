@@ -45,7 +45,10 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Music
                 int size = reader.ReadInt();
                 musicData = new ByteReader(Decompressor.DecompressBlock(reader, size));
             }
-            Checksum = musicData.ReadInt();
+            if (NebulaCore.Fusion == 1.5f)
+                Checksum = musicData.ReadShort();
+            else
+                Checksum = musicData.ReadInt();
             References = musicData.ReadUInt();
             int dataSize = musicData.ReadInt();
             Flags = musicData.ReadUInt();

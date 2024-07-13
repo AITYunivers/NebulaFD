@@ -6,7 +6,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
 {
     public class ObjectInfoShader : Chunk
     {
-        public int? ShaderHandle;
+        public int ShaderHandle = -1;
         public int[] ShaderParameters = new int[0];
 
         public ObjectInfoShader()
@@ -29,7 +29,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
                     ShaderParameters[i] = reader.ReadInt();
             }
             else
-                ShaderHandle = null;
+                ShaderHandle = -1;
 
             ((ObjectInfo)extraInfo[0]).Shader = this;
         }
