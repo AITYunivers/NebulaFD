@@ -30,11 +30,11 @@ namespace GameDumper.AssetDumpers
             int searchCnt = 1;
             string search = pathSplit[^1];
             while (NebulaCore.PackageData.BinaryFiles.Items.Select(x => x.FileName).Where(x => x.EndsWith(search)).Count() > 1 && searchCnt < pathSplit.Length)
-                search = pathSplit[^++searchCnt] + Path.PathSeparator + search;
+                search = pathSplit[^++searchCnt] + Path.DirectorySeparatorChar + search;
 
             string outPath = Path.Combine(basePath, search);
             string outDir = Path.GetDirectoryName(outPath)!;
-            if (!Directory.Exists(outPath))
+            if (!Directory.Exists(outDir))
                 Directory.CreateDirectory(outDir);
             return outPath;
         }
