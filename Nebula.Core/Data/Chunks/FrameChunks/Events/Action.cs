@@ -35,11 +35,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             Parameters = new Parameter[reader.ReadByte()];
             DefType = reader.ReadByte();
 
-            long startPosition = reader.Tell();
             for (int i = 0; i < Parameters.Length; i++)
             {
                 Parameters[i] = new Parameter();
-                Parameters[i].ReadCCN(reader, startPosition);
+                Parameters[i].ReadCCN(reader);
                 Parameters[i].FrameEvents = ((Event)extraInfo[1]).Parent;
             }
 
@@ -439,6 +438,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                             return Header + $"Subtract {Parameters[1]} from {GetGlobalValueName(Parameters[0].Data)}";
                         case 5:
                             return Header + $"Add {Parameters[1]} to {GetGlobalValueName(Parameters[0].Data)}";
+                        case 6:
+                            return Header + $"Activate Group \"TO BE IMPLEMENTED\"";
+                        case 7:
+                            return Header + $"Deactivate Group \"TO BE IMPLEMENTED\"";
                         case 8:
                             return Header + $"Enable menu option {GetMenuItemName(((ParameterInt)Parameters[0].Data).Value)}";
                         case 9:
@@ -689,7 +692,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 16:
                             return Header + "Start animation";
                         case 17:
-                            return Header + $"Change animation sequence to {GetObjectAnimation(((ParameterShort)Parameters[0].Data).Value)}";
+                            if (Parameters[0].Data is ParameterShort animS)
+                                return Header + $"Change animation sequence to {GetObjectAnimation(animS.Value)}";
+                            else
+                                return Header + $"Change animation sequence to {Parameters[0].Data}";
                         case 18:
                             return Header + $"Change animation direction to {GetDirection(Parameters[0].Data)}";
                         case 19:
@@ -1072,6 +1078,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
         public string GetObjectAnimation(short id)
         {
             ObjectCommon oC = (ObjectCommon)GetObject().Properties;
+            if (!oC.ObjectAnimations.Animations.ContainsKey(id))
+                return "Deleted Animation " + id;
             if (string.IsNullOrEmpty(oC.ObjectAnimations.Animations[id].Name))
             {
                 return id switch

@@ -38,11 +38,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             DefType = reader.ReadByte();
             Identifier = reader.ReadShort();
 
-            long startPosition = reader.Tell();
             for (int i = 0; i < Parameters.Length; i++)
             {
                 Parameters[i] = new Parameter();
-                Parameters[i].ReadCCN(reader, startPosition);
+                Parameters[i].ReadCCN(reader);
                 Parameters[i].FrameEvents = ((Event)extraInfo[1]).Parent;
             }
 
@@ -656,9 +655,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 if (NebulaCore.PackageData.GlobalValueNames.Names.Length <= id || string.IsNullOrEmpty(NebulaCore.PackageData.GlobalValueNames.Names[id]))
                 {
                     string output = "Global Value ";
-                    if (id > 26)
-                        output += (char)('A' + Math.Floor(id / 27d));
-                    output += (char)('A' + id % 27);
+                    if (id > 25)
+                        output += (char)('A' + Math.Floor(id / 26d));
+                    output += (char)('A' + id % 26);
                     return output;
                 }
                 else return NebulaCore.PackageData.GlobalValueNames.Names[id];
@@ -674,9 +673,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 if (NebulaCore.PackageData.GlobalStringNames.Names.Length <= id || string.IsNullOrEmpty(NebulaCore.PackageData.GlobalStringNames.Names[id]))
                 {
                     string output = "Global String ";
-                    if (id > 26)
-                        output += (char)('A' + Math.Floor(id / 27d));
-                    output += (char)('A' + id % 27);
+                    if (id > 25)
+                        output += (char)('A' + Math.Floor(id / 26d));
+                    output += (char)('A' + id % 26);
                     return output;
                 }
                 else return NebulaCore.PackageData.GlobalStringNames.Names[id];
@@ -690,9 +689,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             {
                 int id = idData.Value;
                 string output = "Alterable Value ";
-                if (id > 26)
-                    output += (char)('A' + Math.Floor(id / 27d));
-                output += (char)('A' + id % 27);
+                if (id > 25)
+                    output += (char)('A' + Math.Floor(id / 26d));
+                output += (char)('A' + id % 26);
                 return output;
             }
             else return "Alterable Value(" + parameter.ToString() + ")";
@@ -704,9 +703,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             {
                 int id = idData.Value;
                 string output = "Alterable String ";
-                if (id > 26)
-                    output += (char)('A' + Math.Floor(id / 27d));
-                output += (char)('A' + id % 27);
+                if (id > 25)
+                    output += (char)('A' + Math.Floor(id / 26d));
+                output += (char)('A' + id % 26);
                 return output;
             }
             else return "Alterable String(" + parameter.ToString() + ")";
@@ -721,9 +720,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 if (oC.ObjectAlterableValues.Names.Length <= id || string.IsNullOrEmpty(oC.ObjectAlterableValues.Names[id]))
                 {
                     string output = "Alterable Value ";
-                    if (id > 26)
-                        output += (char)('A' + Math.Floor(id / 27d));
-                    output += (char)('A' + id % 27);
+                    if (id > 25)
+                        output += (char)('A' + Math.Floor(id / 26d));
+                    output += (char)('A' + id % 26);
                     return output;
                 }
                 else return oC.ObjectAlterableValues.Names[id];
@@ -740,9 +739,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 if (oC.ObjectAlterableStrings.Names.Length <= id || string.IsNullOrEmpty(oC.ObjectAlterableStrings.Names[id]))
                 {
                     string output = "Alterable String ";
-                    if (id > 26)
-                        output += (char)('A' + Math.Floor(id / 27d));
-                    output += (char)('A' + id % 27);
+                    if (id > 25)
+                        output += (char)('A' + Math.Floor(id / 26d));
+                    output += (char)('A' + id % 26);
                     return output;
                 }
                 else return oC.ObjectAlterableStrings.Names[id];

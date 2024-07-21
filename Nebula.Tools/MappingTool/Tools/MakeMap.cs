@@ -1,5 +1,4 @@
 ﻿using Nebula.Core.Data;
-using Nebula.Core.Data.Chunks.AppChunks;
 using Nebula.Core.Data.Chunks.FrameChunks;
 using Nebula.Core.Utilities;
 using Nebula.Tools.MappingTool.Structure;
@@ -10,13 +9,19 @@ using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using static Nebula.Tools.MappingTool.Structure.MapStructure;
-using About = Nebula.Tools.MappingTool.Structure.MapStructure.About;
-using Frame = Nebula.Tools.MappingTool.Structure.MapStructure.Frame;
+//using About = Nebula.Tools.MappingTool.Structure.MapStructure.About;
+//using Frame = Nebula.Tools.MappingTool.Structure.MapStructure.Frame;
 using NFrame = Nebula.Core.Data.Chunks.FrameChunks.Frame;
 using NLayer = Nebula.Core.Data.Chunks.FrameChunks.FrameLayer;
 using NTransition = Nebula.Core.Data.Chunks.ChunkTypes.TransitionChunk;
 using NShader = Nebula.Core.Data.Chunks.BankChunks.Shaders.Shader;
 using NShaderParameter = Nebula.Core.Data.Chunks.BankChunks.Shaders.ShaderParameter;
+using NObjectInfo = Nebula.Core.Data.Chunks.ObjectChunks.ObjectInfo;
+using NObjectCommon = Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectCommon;
+using NObjectAnimations = Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectAnimations;
+using NObjectAnimation = Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectAnimation;
+using NObjectExtension = Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectExtension;
+using System.Dynamic;
 
 namespace Nebula.Tools.MappingTool.Tools
 {
@@ -33,21 +38,22 @@ namespace Nebula.Tools.MappingTool.Tools
 
             PackageData data = NebulaCore.PackageData;
             Project proj = new();
-            MakeSettings(proj.Settings, data);
-            MakeWindow(proj.Window, data);
-            MakeRuntimeOptions(proj.RuntimeOptions, data);
-            MakeValues(proj.Values, data);
-            MakeEvents(proj.Events, data);
-            MakeAbout(proj.About, data);
-            MakeWindows(proj.Windows, data);
-            MakeFrames(proj, data);
+            //MakeSettings(proj.Settings, data);
+            //MakeWindow(proj.Window, data);
+            //MakeRuntimeOptions(proj.RuntimeOptions, data);
+            MakeValues(proj, data);
+            //MakeEvents(proj.Events, data);
+            //MakeAbout(proj.About, data);
+            //MakeWindows(proj.Windows, data);
+            //MakeFrames(proj, data);
+            MakeObjects(proj, data);
 
             string path = "Dumps\\" + Utilities.ClearName(NebulaCore.PackageData.AppName) + "\\Mapping.nmf";
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             File.WriteAllText(path, JsonConvert.SerializeObject(proj, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
         }
 
-        public static void MakeSettings(Settings proj, PackageData data)
+        /*public static void MakeSettings(Settings proj, PackageData data)
         {
             proj.GraphicMode = (GraphicMode)data.AppHeader.GraphicMode;
             proj.BuildType = (BuildType)data.ExtendedHeader.BuildType;
@@ -138,30 +144,37 @@ namespace Nebula.Tools.MappingTool.Tools
             //proj.Player2 = data.AppHeader.ControlKeys[1];
             //proj.Player3 = data.AppHeader.ControlKeys[2];
             //proj.Player4 = data.AppHeader.ControlKeys[3];
-        }
+        }*/
 
-        public static void MakeValues(Values proj, PackageData data)
+        public static void MakeValues(MapStructure.Project proj, PackageData data)
         {
-            proj.GlobalValues = new GlobalValue[data.GlobalValues.Values.Length];
-            for (int i = 0; i < proj.GlobalValues.Length; i++)
+            if (data.GlobalValues.Values.Length +
+                data.GlobalValueNames.Names.Length +
+                data.GlobalStrings.Strings.Length +
+                data.GlobalStringNames.Names.Length == 0)
+                return;
+            proj.Values = new Values();
+
+            proj.Values.GlobalValues = new GlobalValue[data.GlobalValues.Values.Length];
+            for (int i = 0; i < proj.Values.GlobalValues.Length; i++)
             {
-                proj.GlobalValues[i] = new GlobalValue();
-                proj.GlobalValues[i].Value = data.GlobalValues.Values[i];
+                proj.Values.GlobalValues[i] = new GlobalValue();
+                //proj.Values.GlobalValues[i].Value = data.GlobalValues.Values[i];
                 if (data.GlobalValueNames.Names.Length > 0)
-                    proj.GlobalValues[i].Name = data.GlobalValueNames.Names[i];
+                    proj.Values.GlobalValues[i].Name = data.GlobalValueNames.Names[i];
             } 
 
-            proj.GlobalStrings = new GlobalString[data.GlobalStrings.Strings.Length];
-            for (int i = 0; i < proj.GlobalStrings.Length; i++)
+            proj.Values.GlobalStrings = new GlobalString[data.GlobalStrings.Strings.Length];
+            for (int i = 0; i < proj.Values.GlobalStrings.Length; i++)
             {
-                proj.GlobalStrings[i] = new GlobalString();
-                proj.GlobalStrings[i].Value = data.GlobalStrings.Strings[i];
+                proj.Values.GlobalStrings[i] = new GlobalString();
+                //proj.Values.GlobalStrings[i].Value = data.GlobalStrings.Strings[i];
                 if (data.GlobalStringNames.Names.Length > 0)
-                    proj.GlobalStrings[i].Name = data.GlobalStringNames.Names[i];
-            }    
+                    proj.Values.GlobalStrings[i].Name = data.GlobalStringNames.Names[i];
+            }
         }
 
-        public static void MakeEvents(Events proj, PackageData data)
+        /*public static void MakeEvents(Events proj, PackageData data)
         {
             //proj.AllowGlobalEventsWithGhostObjects = true;
             //proj.BaseFrame = 1;
@@ -392,6 +405,85 @@ namespace Nebula.Tools.MappingTool.Tools
                 proj.Shader = new Shader();
                 MakeShader(proj.Shader, data.Effect.Shader);
             }
+        }*/
+
+        public static void MakeObjects(MapStructure.Project proj, PackageData data)
+        {
+            foreach (NObjectInfo objInfo in data.FrameItems.Items.Values)
+            {
+                ObjectInfo newInfo = new ObjectInfo();
+                if (objInfo.Properties is NObjectCommon common)
+                {
+                    newInfo.Values = new ObjectValues();
+                    MakeObjectValues(newInfo, common);
+                    if (objInfo.Header.Type < 2)
+                        continue;
+                    else if (objInfo.Header.Type == 2)
+                        MakeObjectActiveData(newInfo, common.ObjectAnimations);
+
+                    if (newInfo.Values.AlterableValues.Length +
+                        newInfo.Values.AlterableStrings.Length +
+                        newInfo.Values.AlterableFlags.Length == 0 &&
+                        (newInfo.ActiveData == null ||
+                        newInfo.ActiveData.Animations.Count == 0))
+                        continue;
+                }
+                else continue;
+                if (proj.ObjectInfos == null)
+                    proj.ObjectInfos = new Dictionary<uint, ObjectInfo>();
+                proj.ObjectInfos.Add((uint)objInfo.Header.Handle, newInfo);
+            }
+        }
+
+        public static void MakeObjectValues(ObjectInfo proj, NObjectCommon data)
+        {
+            if (data.ObjectAlterableValues.AlterableValues.Length +
+                data.ObjectAlterableValues.Names.Length +
+                data.ObjectAlterableStrings.AlterableStrings.Length +
+                data.ObjectAlterableStrings.Names.Length == 0)
+                return;
+            proj.Values = new ObjectValues();
+
+            proj.Values.AlterableValues = new AlterableValue[data.ObjectAlterableValues.AlterableValues.Length];
+            for (int i = 0; i < proj.Values.AlterableValues.Length; i++)
+            {
+                proj.Values.AlterableValues[i] = new AlterableValue();
+                proj.Values.AlterableValues[i].Name = data.ObjectAlterableValues.Names[i];
+            }
+
+            proj.Values.AlterableStrings = new AlterableString[data.ObjectAlterableStrings.AlterableStrings.Length];
+            for (int i = 0; i < proj.Values.AlterableStrings.Length; i++)
+            {
+                proj.Values.AlterableStrings[i] = new AlterableString();
+                proj.Values.AlterableStrings[i].Name = data.ObjectAlterableStrings.Names[i];
+            }
+
+            int flagCount;
+            for (flagCount = 31; flagCount > 0; flagCount--)
+                if (data.ObjectAlterableValues.AlterableFlags == flagCount - 1)
+                    break;
+
+            proj.Values.AlterableFlags = new AlterableFlag[flagCount];
+            for (int i = 0; i < proj.Values.AlterableFlags.Length; i++)
+            {
+                proj.Values.AlterableFlags[i] = new AlterableFlag();
+                proj.Values.AlterableFlags[i].Name = data.ObjectAlterableValues.FlagNames[i];
+            }
+        }
+
+        public static void MakeObjectActiveData(ObjectInfo proj, NObjectAnimations data)
+        {
+            proj.ActiveData = new ActiveData();
+            foreach (KeyValuePair<int, NObjectAnimation> animData in data.Animations)
+            {
+                Animation anim = new Animation();
+                anim.Name = animData.Value.Name;
+                if (!string.IsNullOrEmpty(anim.Name))
+                    proj.ActiveData.Animations.Add((uint)animData.Key, anim);
+            }
+
+            if (proj.ActiveData.Animations.Count == 0)
+                proj.ActiveData = null;
         }
     }
 }

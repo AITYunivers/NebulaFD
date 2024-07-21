@@ -7,6 +7,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public int[] AlterableValues = new int[0];
         public string[] Names = new string[0];
         public BitDict AlterableFlags = new BitDict();
+        public string[] FlagNames = new string[32];
 
         public ObjectAlterableValues()
         {

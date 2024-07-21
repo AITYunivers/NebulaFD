@@ -1,24 +1,21 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
-namespace Nebula.Tools.MappingTool.Structure
+﻿namespace Nebula.Tools.MappingTool.Structure
 {
     public class MapStructure
     {
         public class Project
         {
-            public Settings Settings = new Settings();
-            public Window Window = new Window();
-            public RuntimeOptions RuntimeOptions = new RuntimeOptions();
-            public Values Values = new Values();
-            public Events Events = new Events();
-            public About About = new About();
-            public Windows Windows = new Windows();
-            public Frame[] Frames = new Frame[0];
-            public ObjectInfo[] ObjectInfos = new ObjectInfo[0];
+            //public Settings Settings = new Settings();
+            //public Window Window = new Window();
+            //public RuntimeOptions RuntimeOptions = new RuntimeOptions();
+            public Values? Values = null;
+            //public Events Events = new Events();
+            //public About About = new About();
+            //public Windows Windows = new Windows();
+            //public Frame[] Frames = new Frame[0];
+            public Dictionary<uint, ObjectInfo>? ObjectInfos;
         }
 
-        public class Settings
+        /*public class Settings
         {
             [JsonConverter(typeof(StringEnumConverter))]
             public GraphicMode GraphicMode = GraphicMode.C16Mil;
@@ -157,7 +154,7 @@ namespace Nebula.Tools.MappingTool.Structure
             public int[] Player2 = new int[9] { 5, 38, 40, 37, 39, 16, 17, 32, 13 };
             public int[] Player3 = new int[9] { 5, 38, 40, 37, 39, 16, 17, 32, 13 };
             public int[] Player4 = new int[9] { 5, 38, 40, 37, 39, 16, 17, 32, 13 };
-        }
+        }*/
 
         public class Values
         {
@@ -168,16 +165,16 @@ namespace Nebula.Tools.MappingTool.Structure
         public class GlobalValue
         {
             public string Name = "Global Value A";
-            public int Value = 0;
+            //public int Value = 0;
         }
 
         public class GlobalString
         {
             public string Name = "Global String A";
-            public string Value = string.Empty;
+            //public string Value = string.Empty;
         }
 
-        public class Events
+        /*public class Events
         {
             public bool AllowGlobalEventsWithGhostObjects = true;
             public int BaseFrame = 1;
@@ -671,33 +668,33 @@ namespace Nebula.Tools.MappingTool.Structure
         public class InstanceValues
         {
             public int InstanceValue = 0;
-        }
+        }*/
 
         public class ObjectInfo
         {
-            public ObjectDisplayOptions DisplayOptions = new ObjectDisplayOptions();
-            public ObjectSize Size = new ObjectSize();
-            public ObjectTextOptions TextOptions = new ObjectTextOptions();
-            public ObjectMovement Movements = new ObjectMovement();
-            public ObjectRuntimeOptions RuntimeOptions = new ObjectRuntimeOptions();
-            public ObjectValues Values = new ObjectValues();
-            public ObjectEvents Events = new ObjectEvents();
-            public ObjectAbout About = new ObjectAbout();
+            //public ObjectDisplayOptions DisplayOptions = new ObjectDisplayOptions();
+            //public ObjectSize Size = new ObjectSize();
+            //public ObjectTextOptions TextOptions = new ObjectTextOptions();
+            //public ObjectMovement Movements = new ObjectMovement();
+            //public ObjectRuntimeOptions RuntimeOptions = new ObjectRuntimeOptions();
+            public ObjectValues? Values = null;
+            //public ObjectEvents Events = new ObjectEvents();
+            //public ObjectAbout About = new ObjectAbout();
 
-            public QuickBackdropData? QuickBackdropData = null;
-            public BackdropData? BackdropData = null;
+            //public QuickBackdropData? QuickBackdropData = null;
+            //public BackdropData? BackdropData = null;
             public ActiveData? ActiveData = null;
-            public StringData? StringData = null;
-            public QNAData? QuestionAndAnswerData = null;
-            public ScoreData? ScoreData = null;
-            public LivesData? LivesData = null;
-            public CounterData? CounterData = null;
-            public FormattedTextData? FormattedTextData = null;
-            public SubAppData? SubApplicationData = null;
-            public ExtensionData? ExtensionData = null;
+            //public StringData? StringData = null;
+            //public QNAData? QuestionAndAnswerData = null;
+            //public ScoreData? ScoreData = null;
+            //public LivesData? LivesData = null;
+            //public CounterData? CounterData = null;
+            //public FormattedTextData? FormattedTextData = null;
+            //public SubAppData? SubApplicationData = null;
+            //public ExtensionData? ExtensionData = null;
         }
 
-        public class ObjectDisplayOptions
+        /*public class ObjectDisplayOptions
         {
             public bool VisibleAtStart = true;
             public bool DisplayAsBackground = false;
@@ -758,7 +755,7 @@ namespace Nebula.Tools.MappingTool.Structure
             public EditorSynchronization EditorSynchronization = EditorSynchronization.SameNameAndType;
             public bool AutomaticRotations = false;
             public bool DoNotResetFrameDuration = false;
-        }
+        }*/
 
         public class ObjectValues
         {
@@ -770,36 +767,36 @@ namespace Nebula.Tools.MappingTool.Structure
         public class AlterableValue
         {
             public string Name = "Alterable Value A";
-            public int Value = 0;
+            //public int Value = 0;
         }
 
         public class AlterableString
         {
             public string Name = "Alterable String A";
-            public string Value = string.Empty;
+            //public string Value = string.Empty;
         }
 
         public class AlterableFlag
         {
             public string Name = "Flag 0";
-            public bool Value = false;
+            //public bool Value = false;
         }
 
-        public class ObjectEvents
+        /*public class ObjectEvents
         {
             public int[] Qualifiers = new int[8]
             {
                 -1, -1, -1, -1, -1, -1, -1, -1
             };
-        }
+        }*/
 
         public class ObjectAbout
         {
             public string Name = "Active";
-            public bool AutoUpdate = true;
+            //public bool AutoUpdate = true;
         }
 
-        public class QuickBackdropData
+        /*public class QuickBackdropData
         {
             [JsonConverter(typeof(StringEnumConverter))]
             public BackdropShape Shape = BackdropShape.Rectangle;
@@ -819,20 +816,20 @@ namespace Nebula.Tools.MappingTool.Structure
         public class BackdropData
         {
             public int Image = 0;
-        }
+        }*/
 
         public class ActiveData
         {
-            public Animation[] Animations = new Animation[0];
+            public Dictionary<uint, Animation> Animations = new Dictionary<uint, Animation>();
         }
 
         public class Animation
         {
             public string Name = "Stopped";
-            public Direction[] Directions = new Direction[0];
+            //public Direction[] Directions = new Direction[0];
         }
 
-        public class Direction
+        /*public class Direction
         {
             public int Index = 0;
             public int MinimumSpeed = 50;
@@ -840,9 +837,9 @@ namespace Nebula.Tools.MappingTool.Structure
             public int Repeat = 1;
             public int RepeatFrame = 0;
             public int[] Frames = new int[0];
-        }
+        }*/
 
-        public class StringData
+        /*public class StringData
         {
             public string[] Paragraphs = new string[0];
         }
@@ -958,19 +955,19 @@ namespace Nebula.Tools.MappingTool.Structure
             public bool DisableClose = false;
             public bool HiddenOnClose = false;
             public bool Modal = false;
-        }
+        }*/
 
         public class ExtensionData
         {
-            public int Type = 0;
-            public string Name = string.Empty;
+            //public int Type = 0;
+            //public string Name = string.Empty;
             public string FileName = string.Empty;
-            public int Magic = 0;
-            public string SubType = string.Empty;
-            public int Version = 0;
-            public int ID = 0;
-            public int Private = 0;
-            public int[] Data = new int[0];
+            //public int Magic = 0;
+            //public string SubType = string.Empty;
+            //public int Version = 0;
+            //public int ID = 0;
+            //public int Private = 0;
+            //public int[] Data = new int[0];
         }
 
         public enum GraphicMode

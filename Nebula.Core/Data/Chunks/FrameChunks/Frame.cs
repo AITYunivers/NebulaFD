@@ -269,6 +269,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                                 for (int i = 0; i < count; i++)
                                 {
                                     MFAAltFlag altFlag = new MFAAltFlag();
+                                    altFlag.Name = newOC.AlterableValues.FlagNames[i] ?? "";
                                     altFlag.Value = newOC.AlterableValues.AlterableFlags == i;
                                     newOI.AltFlags.AlterableFlags[i] = altFlag;
                                 }
@@ -502,11 +503,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     if (param.Data is ParameterGroupPointer point)
                     {
                         if (groupLookupTable.ContainsKey(point.CCNPointer))
-                        {
                             point.ID = groupLookupTable[point.CCNPointer].ID;
-                            point.parentGroup = groupLookupTable[point.CCNPointer];
-                            point.parentGroup.childrenPointers.Add(point);
-                        }
                     }
             }
 

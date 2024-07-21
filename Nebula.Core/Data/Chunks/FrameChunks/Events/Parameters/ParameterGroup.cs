@@ -11,11 +11,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         );
 
         public long CCNPointer;
-        public long? MFAPointer;
         public short ID;
         public string Name = string.Empty;
-
-        public List<ParameterGroupPointer> childrenPointers = new();
 
         public ParameterGroup()
         {
@@ -23,9 +20,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
-        {/*
-            CCNPointer = (long)extraInfo[0];*/
-            CCNPointer = reader.Tell() - 32;
+        {
+            CCNPointer = reader.Tell() - 36;
             GroupFlags.Value = reader.ReadUShort();
             ID = reader.ReadShort();
             Name = reader.ReadYuniversalStop(79);
@@ -39,7 +35,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
-            //MFAPointer = (long)extraInfo[0];
             writer.WriteUShort((ushort)GroupFlags.Value);
             writer.WriteShort(ID);
             writer.WriteYunicode(Name, 79);
@@ -51,17 +46,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             }
             writer.WriteUInt(Checksum(Name));
             writer.WriteShort(0);
-
-            long returnPointer = writer.Tell();
-            foreach (ParameterGroupPointer child in childrenPointers)
-            {
-                if (child.MFAPointer != null)
-                {
-                    writer.Seek((long)child.MFAPointer);
-                    writer.WriteInt((int)(child.MFAPointer - MFAPointer));
-                }
-            }
-            writer.Seek(returnPointer);
         }
 
         private uint Checksum(string name)
