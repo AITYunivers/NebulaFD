@@ -94,13 +94,13 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                     colorArray = ImageTranslatorCPU.AndroidMode2ToRGBA(this);
                     break;
                 case 3:
-                    if (NebulaCore.Android)
+                    if (NebulaCore.Android || NebulaCore.iOS)
                         colorArray = ImageTranslatorCPU.AndroidMode3ToRGBA(this);
                     else
                         colorArray = ImageTranslatorCPU.ColorPaletteToRGBA(this, NebulaCore.PackageData.Frames.First().FramePalette.Palette);
                     break;
                 case 4:
-                    if (NebulaCore.Android && !IsMasked)
+                    if ((NebulaCore.Android || NebulaCore.iOS) && !IsMasked)
                         colorArray = ImageTranslatorCPU.AndroidMode4ToRGBA(this);
                     else// if (NebulaCore.CurrentReader is not ChowdrenFileReader)
                     {
@@ -294,7 +294,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                     ImageData = ImageTranslatorCPU.AndroidMode2ToRGBA(this);
                     break;
                 case 3:
-                    if (NebulaCore.Android)
+                    if (NebulaCore.Android || NebulaCore.iOS)
                         ImageData = ImageTranslatorCPU.AndroidMode3ToRGBA(this);
                     else
                         ImageData = ImageTranslatorCPU.ColorPaletteToRGBA(this, NebulaCore.PackageData.Frames.First().FramePalette.Palette);
@@ -302,7 +302,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                 case 4:
                     if (IsMasked)
                         break;
-                    if (NebulaCore.Android)
+                    if (NebulaCore.Android || NebulaCore.iOS)
                         ImageData = ImageTranslatorCPU.AndroidMode4ToRGBA(this);
                     else if (NebulaCore.Fusion > 2.5f)
                     {

@@ -34,7 +34,7 @@ namespace Nebula.Core.Utilities
 
             if (!img.Flags["RLET"] || NebulaCore.Plus || NebulaCore.Fusion < 2.0f)
                 return img.Width * colorModeSize % 2;
-            else if (NebulaCore.Android)
+            else if (NebulaCore.Android || NebulaCore.iOS)
                 return img.Width * colorModeSize;
             else if (NebulaCore.Build < 280)
                 return img.Width * colorModeSize % 2 * colorModeSize;
@@ -44,7 +44,7 @@ namespace Nebula.Core.Utilities
 
         public static int GetAlphaPadding(Image img)
         {
-            if (NebulaCore.Android)
+            if (NebulaCore.Android || NebulaCore.iOS)
                 return 0;
             else
                 return (4 - (img.Width % 4)) % 4;

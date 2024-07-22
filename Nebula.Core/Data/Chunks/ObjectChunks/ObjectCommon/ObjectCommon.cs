@@ -287,13 +287,13 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                 switch (index)
                 {
                     case 0:
-                        if (NebulaCore.Build >= 288)
+                        if (NebulaCore.Build >= 284)
                             ExtensionOffset = Offset;
                         else
                             MovementsOffset = Offset;
                         break;
                     case 1:
-                        if (NebulaCore.Build >= 288)
+                        if (NebulaCore.Build >= 284)
                             MovementsOffset = Offset;
                         else
                             AnimationOffset = Offset;
@@ -302,18 +302,18 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                         ValueOffset = Offset;
                         break;
                     case 4:
-                        if (NebulaCore.Build >= 288)
+                        if (NebulaCore.Build >= 284)
                             AnimationOffset = Offset;
                         else
                             DataOffset = Offset;
                         break;
                     case 5:
-                        if (NebulaCore.Build >= 288)
+                        if (NebulaCore.Build >= 284)
                             DataOffset = Offset;
                         else return;
                         break;
                     case 6:
-                        if (NebulaCore.Build >= 288)
+                        if (NebulaCore.Build >= 284)
                             return;
                         else
                             ExtensionOffset = Offset;

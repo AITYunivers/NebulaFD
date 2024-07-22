@@ -418,6 +418,7 @@ namespace Nebula.Tools.GameDumper
         {
             Bitmap output = new Bitmap(NebulaCore.PackageData.AppHeader.AppWidth, NebulaCore.PackageData.AppHeader.AppHeight);
             Rectangle destRect;
+            HashSet<Image> images = new HashSet<Image>();
             using (Graphics graphics = Graphics.FromImage(output))
             {
                 graphics.Clear(Color.FromArgb(255, frm.FrameHeader.Background));
@@ -440,28 +441,34 @@ namespace Nebula.Tools.GameDumper
                             case 0: // Quick Backdrop
                                 if (((ObjectQuickBackdrop)oi.Properties).Shape.FillType == 0)
                                 {
-                                    img = NebulaCore.PackageData.ImageBank[((ObjectQuickBackdrop)oi.Properties).Shape.Image];
                                     destRect = new Rectangle(inst.PositionX, inst.PositionY,
                                                              ((ObjectQuickBackdrop)oi.Properties).Width,
                                                              ((ObjectQuickBackdrop)oi.Properties).Height);
+                                    if (destRect.Right < 0 || destRect.Left > output.Width)
+                                        break;
+                                    img = NebulaCore.PackageData.ImageBank[((ObjectQuickBackdrop)oi.Properties).Shape.Image];
                                     doDraw(graphics, img.GetBitmap(), destRect, alpha);
-                                    img.DisposeBmp();
+                                    images.Add(img);
                                 }
                                 break;
                             case 1: // Backdrop
                                 img = NebulaCore.PackageData.ImageBank[((ObjectBackdrop)oi.Properties).Image];
                                 destRect = new Rectangle(inst.PositionX, inst.PositionY,
                                                          img.Width, img.Height);
+                                if (destRect.Right < 0 || destRect.Left > output.Width)
+                                    break;
                                 doDraw(graphics, img.GetBitmap(), destRect, alpha);
-                                img.DisposeBmp();
+                                images.Add(img);
                                 break;
                             case 2: // Active
                                 img = NebulaCore.PackageData.ImageBank[((ObjectCommon)oi.Properties).ObjectAnimations.Animations.First().Value.Directions.First().Frames.First()];
                                 destRect = new Rectangle(inst.PositionX - img.HotspotX,
                                                          inst.PositionY - img.HotspotY,
                                                          img.Width, img.Height);
+                                if (destRect.Right < 0 || destRect.Left > output.Width)
+                                    break;
                                 doDraw(graphics, img.GetBitmap(), destRect, alpha);
-                                img.DisposeBmp();
+                                images.Add(img);
                                 break;
                             case 7: // Counter
                                 ObjectCounter cntr = ((ObjectCommon)oi.Properties).ObjectCounter;
@@ -472,12 +479,16 @@ namespace Nebula.Tools.GameDumper
                                     destRect = new Rectangle(inst.PositionX - cntrImg.Width,
                                                              inst.PositionY - cntrImg.Height,
                                                              cntrImg.Width, cntrImg.Height);
+                                    if (destRect.Right < 0 || destRect.Left > output.Width)
+                                        break;
                                     doDraw(graphics, cntrImg, destRect, alpha);
                                 }
                                 else if (cntr.DisplayType == 4)
                                 {
                                     destRect = new Rectangle(inst.PositionX, inst.PositionY,
                                                              cntrImg.Width, cntrImg.Height);
+                                    if (destRect.Right < 0 || destRect.Left > output.Width)
+                                        break;
                                     doDraw(graphics, cntrImg, destRect, alpha);
                                 }
                                 cntrImg?.Dispose();
@@ -489,6 +500,8 @@ namespace Nebula.Tools.GameDumper
             }
             Bitmap resizedOutput = output.ResizeImage(64, 48);
             output.Dispose();
+            foreach (Image img in images)
+                img.DisposeBmp();
             return resizedOutput;
         }
 
