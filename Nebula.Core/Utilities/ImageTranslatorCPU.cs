@@ -79,7 +79,7 @@ namespace Nebula.Core.Utilities
                     }
 
                     int newPos = (y * stride) + (x * 4);
-                    if (NebulaCore.Seeded)
+                    if (NebulaCore.Fusion == 3.0f && !NebulaCore.Seeded)
                     {
                         colorArray[newPos + 0] = b;
                         colorArray[newPos + 1] = g;
@@ -470,7 +470,7 @@ namespace Nebula.Core.Utilities
                 for (int x = 0; x < img.Width; x++)
                 {
                     int newPos = (y * stride) + (x * 4);
-                    if (NebulaCore.Seeded)
+                    if (NebulaCore.Fusion == 3.0f && !NebulaCore.Seeded)
                     {
                         colorArray[newPos + 0] = img.ImageData[position + 2];
                         colorArray[newPos + 1] = img.ImageData[position + 1];

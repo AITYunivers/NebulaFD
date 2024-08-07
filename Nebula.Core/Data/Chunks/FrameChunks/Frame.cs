@@ -478,7 +478,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     if (evtObj.Value.ObjectType == 3)
                         FrameEvents.QualifierJumptable.Add(Tuple.Create((ushort)evtObj.Key, (short)evtObj.Value.ObjectType), (ushort)evtObj.Key);
 
-            if (!NebulaCore.MFA)
+            if (NebulaCore.Windows)
             {
                 Dictionary<long, ParameterGroup> groupLookupTable = new();
                 List<Parameter> checkParams = new List<Parameter>();
@@ -492,8 +492,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                 foreach (Parameter param in checkParams.Where(x => x.Code == 38))
                     if (param.Data is ParameterGroup group)
                     {
-                        if (!groupLookupTable.ContainsKey(group.CCNPointer))
-                            groupLookupTable.Add(group.CCNPointer, group);
+                        groupLookupTable.TryAdd(group.CCNPointer, group);
                         group.ID = (short)groupLookupTable.Keys.ToList().IndexOf(group.CCNPointer);
 
                         if (NebulaCore.Plus)
@@ -502,8 +501,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                 foreach (Parameter param in checkParams.Where(x => x.Code == 39))
                     if (param.Data is ParameterGroupPointer point)
                     {
-                        if (groupLookupTable.ContainsKey(point.CCNPointer))
-                            point.ID = groupLookupTable[point.CCNPointer].ID;
+                        Debug.Assert(groupLookupTable.ContainsKey(point.CCNPointer),
+                            "CCN Pointer is offset incorrectly for build " + NebulaCore.Build);
+                        point.ID = groupLookupTable[point.CCNPointer].ID;
                     }
             }
 

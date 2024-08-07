@@ -20,7 +20,6 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            return;
             reader.Skip(4);
             int menuOffset = reader.ReadInt();
             int menuSize = reader.ReadInt();

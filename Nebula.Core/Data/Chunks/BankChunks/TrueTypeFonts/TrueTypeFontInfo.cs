@@ -18,7 +18,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.TrueTypeFonts
             for (int i = 0; i < count; i++)
             {
                 reader.Skip(28);
-                string name = reader.ReadYunicodeStop(32);
+                string name = reader.ReadYuniversalStop(32);
                 uint offset = reader.ReadUInt();
 
                 if (bank.OffsetToIndex.ContainsKey(offset))

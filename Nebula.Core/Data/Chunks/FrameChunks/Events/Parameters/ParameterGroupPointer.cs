@@ -18,7 +18,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             Pointer = reader.ReadInt();
             ID = reader.ReadInt();
 
-            CCNPointer = reader.Tell() - 14 + Pointer;
+            CCNPointer = reader.Tell() - 12 + Pointer;
+            // Probably 284 knowing the runtime
+            // But I'd need samples to confirm
+            if (NebulaCore.Build < 285)
+                CCNPointer -= 2;
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)

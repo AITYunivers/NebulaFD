@@ -22,6 +22,7 @@ namespace Nebula
         public static float Fusion = 2.5f;
         public static bool Plus;
         public static bool Seeded;
+        public static bool Windows;
         public static bool Android;
         public static bool iOS;
         public static bool MFA;

@@ -29,6 +29,8 @@ namespace Nebula.Core.Utilities
         public bool dump_all_chunks = false;
         public string comment_gpu = "Whether or not to use the GPU to translate images (EXPERIMENTAL)";
         public bool gpu_acceleration = false;
+        public string comment_evtlog = "Whether or not to silently log events to the log file";
+        public bool silent_log_events = false;
         public string comment_frames = "An array of frame ids to ignore reading, index starts at 0";
         public int[] ignore_frames = new int[0];
 
@@ -55,6 +57,7 @@ namespace Nebula.Core.Utilities
         public static bool DumpUnknownChunks => Inst.dump_unk_chunks;
         public static bool DumpAllChunks => Inst.dump_all_chunks;
         public static bool GPUAcceleration => Inst.gpu_acceleration;
+        public static bool SilentLogEvents => Inst.silent_log_events;
         public static int[] DontIncludeFrames => Inst.ignore_frames;
     }
 }

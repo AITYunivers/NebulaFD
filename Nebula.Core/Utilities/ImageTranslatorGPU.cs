@@ -148,7 +148,7 @@ namespace Nebula.Core.Utilities
                 img.Height,
                 GetPadding(img),
                 GetAlphaPadding(img),
-                NebulaCore.Seeded ? 1 : 0,
+                NebulaCore.Fusion == 3.0f && !NebulaCore.Seeded ? 1 : 0,
                 img.Flags["Alpha"] ? 1 : 0,
                 (img.TransparentColor.R << 16) | (img.TransparentColor.G << 8) | img.TransparentColor.B,
                 deviceOutput.View);
@@ -434,7 +434,7 @@ namespace Nebula.Core.Utilities
                 img.Height, 
                 GetPadding(img),
                 GetAlphaPadding(img),
-                NebulaCore.Seeded ? 1 : 0,
+                NebulaCore.Fusion == 3.0f && !NebulaCore.Seeded ? 1 : 0,
                 (img.Flags["Alpha"] || img.Flags["RGBA"]) ? 1 : 0,
                 img.Flags["RGBA"] ? 1 : 0,
                 NebulaCore.PackageData.ExtendedHeader.Flags["PremultipliedAlpha"] ? 1 : 0,

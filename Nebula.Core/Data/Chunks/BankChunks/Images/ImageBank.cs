@@ -36,7 +36,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
 
             if (NebulaCore.Android || NebulaCore.iOS|| NebulaCore.Flash || NebulaCore.HTML)
             {
-                reader.Skip(2);
+                reader.Skip(2); // Handles
                 ImageCount = reader.ReadShort();
             }
             else
