@@ -48,9 +48,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 57 => new ParameterMovement(),
                 _ => new ParameterChunk(Code)
             };
+            Data.Parent = this;
             Data.ReadCCN(reader, extraInfo);
-            if (Data is ParameterExpressions)
-                ((ParameterExpressions)Data).FrameEvents = FrameEvents;
 
             reader.Seek(endPosition);
         }

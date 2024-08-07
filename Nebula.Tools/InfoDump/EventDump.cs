@@ -1,5 +1,6 @@
 ﻿using Nebula.Core.Data.Chunks.FrameChunks;
 using Nebula.Core.Data.Chunks.FrameChunks.Events;
+using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
 using Nebula.Core.Utilities;
 using Spectre.Console;
 
@@ -22,8 +23,6 @@ namespace Nebula.Tools.GameDumper
                 int progress = 0;
                 int max = 0;
                 string path = "Dumps\\" + Utilities.ClearName(NebulaCore.PackageData.AppName) + "\\Events";
-                foreach (Frame frm in NebulaCore.PackageData.Frames)
-                    max += frm.FrameEvents.Events.Count;
 
                 while (!task.IsFinished)
                 {
@@ -36,7 +35,7 @@ namespace Nebula.Tools.GameDumper
                             task.StartTask();
 
                         task.Value = progress;
-                        task.MaxValue = max;
+                        task.MaxValue = NebulaCore.PackageData.Frames.Count;
 
                         Directory.CreateDirectory(path);
                         foreach (Frame frm in NebulaCore.PackageData.Frames)
@@ -66,13 +65,36 @@ namespace Nebula.Tools.GameDumper
                     header += "\t";
 
                 Event evt = frm.FrameEvents.Events[e];
+                List<string> tEvtStrs = new();
                 for (int c = 0; c < evt.Conditions.Count; c++)
-                    evtStrs.Add(header + (c == 0 ? "* " : "+ ") + evt.Conditions[c].ToString());
+                    tEvtStrs.Add(header + (c == 0 ? "* " : "+ ") + evt.Conditions[c].ToString());
                 for (int a = 0; a < evt.Actions.Count; a++)
-                    evtStrs.Add(header + "\t" + evt.Actions[a].ToString());
+                    tEvtStrs.Add(header + "\t" + evt.Actions[a].ToString());
 
                 if (e + 1 < frm.FrameEvents.Events.Count)
-                    evtStrs.Add("");
+                    tEvtStrs.Add("");
+
+                if (evt.Conditions.Count > 0)
+                {
+                    switch (evt.Conditions[0].ObjectType)
+                    {
+                        case -1:
+                            switch (evt.Conditions[0].Num)
+                            {
+                                case -10:
+                                    evtStrs.Add(header + $"[ {((ParameterGroup)evt.Conditions[0].Parameters[0].Data).Name} ]");
+                                    evtStrs.Add("");
+                                    indent++;
+                                    continue;
+                                case -11:
+                                    indent--;
+                                    continue;
+                            }
+                            break;
+                    }
+                }
+
+                evtStrs.AddRange(tEvtStrs);
             }
             return evtStrs;
         }

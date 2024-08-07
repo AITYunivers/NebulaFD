@@ -38,6 +38,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
         public MFAFrameInfo MFAFrameInfo = new();
         public Bitmap? BitmapCache = null;
+        public Dictionary<short, ParameterGroup> GroupLookupTable = new();
 
         public Frame()
         {
@@ -61,6 +62,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                 newChunk.ReadCCN(chunkReader, this);
                 newChunk.ChunkData = null;
             }
+            
+            Fix();
 
             log = $"Frame {(Handle >= 0 ? $"[{Handle}] " : "")}'{FrameName}' found.";
 
@@ -110,6 +113,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             MFAFrameInfo.Folders.ReadMFA(reader);
             FrameInstances.ReadMFA(reader);
             FrameEvents.ReadMFA(reader);
+            FrameEvents.Parent = this;
 
             while (true)
             {
@@ -122,6 +126,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                 if (newChunk is Last)
                     break;
             }
+
+            Fix();
 
             this.Log($"Frame '{FrameName}' found.", color: ConsoleColor.Green);
         }
@@ -414,21 +420,31 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             }
             MFAFrameInfo.Folders.WriteMFA(writer);
             FrameInstances.WriteMFA(writer);
+            FrameEvents.WriteMFA(writer);
 
+            FrameLayerEffects.WriteMFA(writer, this);
+            FrameEffects.WriteMFA(writer, this);
+            if (NebulaCore.Fusion > 1.5f)
+                FrameRect.WriteMFA(writer, this);
+            writer.WriteByte(0); // Last Chunk
+        }
+
+        public void Fix()
+        {
             FrameEvents.QualifierJumptable = new();
             if (!NebulaCore.MFA)
             {
                 Dictionary<int, EventObject> evtObjs = new();
                 List<short> quals = new();
-                foreach (MFAObjectInfo oI in objectInfos.Values)
+                foreach (ObjectInfo oI in GetObjectInfos())
                 {
-                    if (oI.ObjectType < 2) continue;
+                    if (oI.Header.Type < 2) continue;
                     EventObject evtObj = new();
-                    evtObj.Handle = NebulaCore.MFA ? evtObjs.Count : oI.Handle;
+                    evtObj.Handle = oI.Header.Handle;
                     evtObj.ObjectType = 1;
-                    evtObj.ItemType = (ushort)oI.ObjectType;
+                    evtObj.ItemType = (ushort)oI.Header.Type;
                     evtObj.Name = oI.Name;
-                    evtObj.TypeName = oI.ObjectType switch
+                    evtObj.TypeName = oI.Header.Type switch
                     {
                         2 => "Sprite",
                         3 => "Text",
@@ -438,7 +454,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                         7 => "Counter",
                         _ => string.Empty
                     };
-                    evtObj.ItemHandle = (uint)oI.Handle;
+                    evtObj.ItemHandle = (uint)oI.Header.Handle;
                     evtObj.InstanceHandle = -1;
                     evtObjs.Add(evtObj.Handle, evtObj);
                 }
@@ -494,6 +510,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     {
                         groupLookupTable.TryAdd(group.CCNPointer, group);
                         group.ID = (short)groupLookupTable.Keys.ToList().IndexOf(group.CCNPointer);
+                        GroupLookupTable.TryAdd(group.ID, group);
 
                         if (NebulaCore.Plus)
                             group.Name = "Group " + group.ID;
@@ -506,14 +523,22 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                         point.ID = groupLookupTable[point.CCNPointer].ID;
                     }
             }
+            else
+            {
+                foreach (Event evnt in FrameEvents.Events)
+                    foreach (Condition cond in evnt.Conditions)
+                        foreach (Parameter param in cond.Parameters.Where(x => x.Code == 38))
+                            if (param.Data is ParameterGroup group)
+                                GroupLookupTable.TryAdd(group.ID, group);
+            }
+        }
 
-            FrameEvents.WriteMFA(writer);
-
-            FrameLayerEffects.WriteMFA(writer, this);
-            FrameEffects.WriteMFA(writer, this);
-            if (NebulaCore.Fusion > 1.5f)
-                FrameRect.WriteMFA(writer, this);
-            writer.WriteByte(0); // Last Chunk
+        public ObjectInfo[] GetObjectInfos()
+        {
+            HashSet<ObjectInfo> objectInfos = new();
+            foreach (FrameInstance inst in FrameInstances.Instances)
+                objectInfos.Add(NebulaCore.PackageData.FrameItems.Items[(int)inst.ObjectInfo]);
+            return objectInfos.ToArray();
         }
     }
 }

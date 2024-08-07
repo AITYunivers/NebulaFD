@@ -46,7 +46,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             byte cndCnt = reader.ReadByte();
             byte actCnt = reader.ReadByte();
             EventFlags.Value = reader.ReadUShort();
-            Parent = (FrameEvents)extraInfo[0];
 
             if (NebulaCore.Build >= 284 && !(NebulaCore.Fusion == 1.5f || NebulaCore.MFA || NebulaCore.Android && NebulaCore.Build == 287))
             {
@@ -65,7 +64,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             for (int i = 0; i < cndCnt; i++)
             {
                 Condition cnd = new Condition();
-                cnd.ReadCCN(reader, Conditions, this);
+                cnd.Parent = this;
+                cnd.ReadCCN(reader, Conditions);
                 if (cnd.DoAdd)
                 {
                     Conditions.Add(cnd);
@@ -77,7 +77,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             for (int i = 0; i < actCnt; i++)
             {
                 Action act = new Action();
-                act.ReadCCN(reader, Actions, this);
+                act.Parent = this;
+                act.ReadCCN(reader, Actions);
                 if (act.DoAdd)
                 {
                     Actions.Add(act);
@@ -116,7 +117,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             for (int i = 0; i < cndCnt; i++)
             {
                 Condition cnd = new Condition();
-                cnd.ReadMFA(reader, Conditions, this);
+                cnd.Parent = this;
+                cnd.ReadMFA(reader, Conditions);
                 Conditions.Add(cnd);
                 if (Utilities.Parameters.SilentLogEvents)
                     this.SilentLog($"[COND] Type: {cnd.ObjectType}, Num: {cnd.Num}, Params: {cnd.Parameters.Length}");
@@ -125,14 +127,14 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             for (int i = 0; i < actCnt; i++)
             {
                 Action act = new Action();
-                act.ReadMFA(reader, Actions, this);
+                act.Parent = this;
+                act.ReadMFA(reader, Actions);
                 Actions.Add(act);
                 if (Utilities.Parameters.SilentLogEvents)
                     this.SilentLog($"[ACT] Type: {act.ObjectType}, Num: {act.Num}, Params: {act.Parameters.Length}");
             }
 
             reader.Seek(endPosition);
-            Parent = (FrameEvents)extraInfo[0];
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

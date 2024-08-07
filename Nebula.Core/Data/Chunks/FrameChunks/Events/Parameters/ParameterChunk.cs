@@ -5,6 +5,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
     public class ParameterChunk : Chunk
     {
         public int? Code = null;
+        public Parameter? Parent;
 
         public ParameterChunk(int? code = null)
         {

@@ -26,7 +26,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
                 if (newExpression.ObjectType == 0 && newExpression.Num == 0)
                     break;
                 
-                newExpression.FrameEvents = FrameEvents;
+                newExpression.Parent = Parent;
                 Expressions.Add(newExpression);
             }
         }

@@ -44,6 +44,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         public uint EventLineY;
         public uint EventLineType;
 
+        public Frame? Parent = null;
+
         /// <summary>
         /// Key is [ObjectInfo, Type]
         /// </summary>
@@ -93,8 +95,13 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     while (reader.Tell() < endPosition)
                     {
                         Event newEvent = new Event();
-                        newEvent.ReadCCN(reader, this);
-                        Events.Add(newEvent);
+                        newEvent.Parent = this;
+                        newEvent.ReadCCN(reader);
+                        if (newEvent.Conditions.Count > 0 &&
+                            !(newEvent.Conditions[0].ObjectType == -1 &&
+                              newEvent.Conditions[0].Num == 0 &&
+                              newEvent.Actions.Count == 0))
+                            Events.Add(newEvent);
                     }
                 }
                 else if (identifier == "ERop")
@@ -103,7 +110,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     break;
             }
 
-            ((Frame)extraInfo[0]).FrameEvents = this;
+            (Parent = (Frame)extraInfo[0]).FrameEvents = this;
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -131,8 +138,13 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     while (reader.Tell() < endPosition)
                     {
                         Event newEvent = new Event();
-                        newEvent.ReadMFA(reader, this);
-                        Events.Add(newEvent);
+                        newEvent.Parent = this;
+                        newEvent.ReadMFA(reader);
+                        if (newEvent.Conditions.Count > 0 &&
+                            !(newEvent.Conditions[0].ObjectType == -1 &&
+                              newEvent.Conditions[0].Num == 0 &&
+                              newEvent.Actions.Count == 0))
+                            Events.Add(newEvent);
                     }
                 }
                 else if (identifier == "Rems" || identifier == "SMER")

@@ -1,4 +1,5 @@
 ﻿using Nebula.Core.Memory;
+using System.Drawing;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 {
@@ -33,7 +34,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override string ToString()
         {
-            return "Group Pointer " + Pointer + ", " + ID;
+            string? name = Parent?.FrameEvents?.Parent?.GroupLookupTable[(short)ID].Name;
+            return name == null ? "Unknown Group" : name;
         }
     }
 }
