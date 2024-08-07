@@ -127,7 +127,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                             break;
                         case 0: // Skip
                         case 44: // Skip
-                            DoAdd = false;
+                            // DoAdd = false;
                             break;
                         case 27: // Set Global Integer
                         case 28: // Set Global

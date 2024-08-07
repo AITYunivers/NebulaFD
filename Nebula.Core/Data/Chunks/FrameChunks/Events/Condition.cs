@@ -141,7 +141,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                             Num = -8; // Compare Global
                             ignoreOptimization = true;
                             break;
-                        case -42: // Idk, just deleting it
                         case -43: // Start Child Event
                             DoAdd = false;
                             ignoreOptimization = true;

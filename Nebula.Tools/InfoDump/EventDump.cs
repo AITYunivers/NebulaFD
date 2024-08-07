@@ -81,6 +81,10 @@ namespace Nebula.Tools.GameDumper
                         case -1:
                             switch (evt.Conditions[0].Num)
                             {
+                                case 2:
+                                    if (evt.Actions.Count == 0)
+                                        continue;
+                                    break;
                                 case -10:
                                     evtStrs.Add(header + $"[ {((ParameterGroup)evt.Conditions[0].Parameters[0].Data).Name} ]");
                                     evtStrs.Add("");
@@ -88,6 +92,22 @@ namespace Nebula.Tools.GameDumper
                                     continue;
                                 case -11:
                                     indent--;
+                                    continue;
+                                case -42:
+                                    continue;
+                            }
+                            break;
+                    }
+                }
+                else continue;
+                if (evt.Actions.Count > 0)
+                {
+                    switch (evt.Actions[0].ObjectType)
+                    {
+                        case -1:
+                            switch (evt.Actions[0].Num)
+                            {
+                                case 0:
                                     continue;
                             }
                             break;

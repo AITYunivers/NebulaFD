@@ -97,11 +97,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                         Event newEvent = new Event();
                         newEvent.Parent = this;
                         newEvent.ReadCCN(reader);
-                        if (newEvent.Conditions.Count > 0 &&
-                            !(newEvent.Conditions[0].ObjectType == -1 &&
-                              newEvent.Conditions[0].Num == 0 &&
-                              newEvent.Actions.Count == 0))
-                            Events.Add(newEvent);
+                        Events.Add(newEvent);
                     }
                 }
                 else if (identifier == "ERop")
@@ -140,11 +136,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                         Event newEvent = new Event();
                         newEvent.Parent = this;
                         newEvent.ReadMFA(reader);
-                        if (newEvent.Conditions.Count > 0 &&
-                            !(newEvent.Conditions[0].ObjectType == -1 &&
-                              newEvent.Conditions[0].Num == 0 &&
-                              newEvent.Actions.Count == 0))
-                            Events.Add(newEvent);
+                        Events.Add(newEvent);
                     }
                 }
                 else if (identifier == "Rems" || identifier == "SMER")
