@@ -591,7 +591,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                                     case 89:
                                         if (ObjectType == 8)
                                             return Header + $"Select Paragraph num {Parameters[0]}";
-                                        return Header + $"Load {Parameters[0]} into Animation {GetObjectAnimation(((ParameterShort)Parameters[1].Data).Value)}, Direction {GetDirection(Parameters[2].Data)}, Frame #{Parameters[3]}, HotSpot({Parameters[4]},{Parameters[5]}, Action Point({Parameters[6]},{Parameters[7]}), Transparent Color {Parameters[8]}";
+                                        if (Parameters[1].Data is ParameterShort)
+                                            return Header + $"Load {Parameters[0]} into Animation {GetObjectAnimation(((ParameterShort)Parameters[1].Data).Value)}, Direction {GetDirection(Parameters[2].Data)}, Frame #{Parameters[3]}, HotSpot({Parameters[4]},{Parameters[5]}, Action Point({Parameters[6]},{Parameters[7]}), Transparent Color {Parameters[8]}";
+                                        return Header + $"Load {Parameters[0]} into Animation {Parameters[1]}, Direction {GetDirection(Parameters[2].Data)}, Frame #{Parameters[3]}, HotSpot({Parameters[4]},{Parameters[5]}, Action Point({Parameters[6]},{Parameters[7]}), Transparent Color {Parameters[8]}";
                                     case 90:
                                         if (ObjectType == 9)
                                             return Header + $"Set global string {Parameters[0]} to {Parameters[1]}";
