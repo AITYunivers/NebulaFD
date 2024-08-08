@@ -577,7 +577,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public string GetGlobalStringName()
         {
-            int id = ((ExpressionCommon)Expression).Value;
+            short id = (short)((uint)((ExpressionCommon)Expression).Value << 16);
             if (NebulaCore.PackageData.GlobalStringNames.Names.Length <= id || string.IsNullOrEmpty(NebulaCore.PackageData.GlobalStringNames.Names[id]))
             {
                 string output = "Global String ";

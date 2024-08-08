@@ -7,6 +7,7 @@ using Spectre.Console;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace GameDumper.AssetDumpers
 {
@@ -38,10 +39,16 @@ namespace GameDumper.AssetDumpers
             }
 
             shdrs = dx9ShdBnk.Shaders.Values.ToArray();
+            keys = dx9ShdBnk.Shaders.Keys.ToArray();
             for (int i = 0; i < shdrs.Length; i++)
             {
                 string filePath = path + "\\" + shdrs[i].Name;
                 File.WriteAllBytes(filePath, shdrs[i].FXData);
+                filePath = path + Path.GetFileNameWithoutExtension(shdrs[i].Name) + ".xml";
+
+                string fxData = dx9ShdBnk[keys[i]].GetFXData();
+                File.WriteAllText(filePath, GenerateXML(shdrs[i], fxData));
+
                 task.Value++;
             }
             task.StopTask();

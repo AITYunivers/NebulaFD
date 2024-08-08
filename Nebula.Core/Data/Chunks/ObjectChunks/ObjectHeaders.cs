@@ -26,7 +26,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
                 oI.Header.ObjectFlags.Value = reader.ReadUShort();
                 reader.Skip(2);
                 oI.Header.InkEffect = reader.ReadShort();
-                reader.Skip(2);
+                oI.Header.InkEffectFlags.Value = reader.ReadUShort();
                 if (oI.Header.InkEffect != 1)
                 {
                     if (NebulaCore.D3D == 0)

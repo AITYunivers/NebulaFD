@@ -31,6 +31,8 @@ namespace Nebula.Core.Utilities
         public bool gpu_acceleration = false;
         public string comment_evtlog = "Whether or not to silently log events to the log file";
         public bool silent_log_events = false;
+        public string comment_invmask = "Whether or not to invert the ignore_frames selection";
+        public bool invert_ignore_frames = false;
         public string comment_frames = "An array of frame ids to ignore reading, index starts at 0";
         public int[] ignore_frames = new int[0];
 
@@ -58,6 +60,7 @@ namespace Nebula.Core.Utilities
         public static bool DumpAllChunks => Inst.dump_all_chunks;
         public static bool GPUAcceleration => Inst.gpu_acceleration;
         public static bool SilentLogEvents => Inst.silent_log_events;
+        public static bool InvertFrameMask => Inst.invert_ignore_frames;
         public static int[] DontIncludeFrames => Inst.ignore_frames;
     }
 }

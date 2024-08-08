@@ -49,7 +49,13 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
             if (Parameters.DontIncludeFrames.Contains(RealFrameCount++))
+            {
+                if (!Parameters.InvertFrameMask)
+                    return;
+            }
+            else if (Parameters.InvertFrameMask)
                 return;
+
             string log = string.Empty;
 
             while (reader.HasMemory(8))
@@ -175,7 +181,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     newOI.InkEffect = oI.Header.InkEffect;
                     newOI.InkEffectParameter = oI.Header.InkEffectParam;
                     newOI.Name = oI.Name;
-                    newOI.Transparent = true;
+                    newOI.Transparent = oI.Header.InkEffectFlags["NotTransparent"];
+                    newOI.AntiAliasing = oI.Header.InkEffectFlags["AntiAliasing"];
                     newOI.IconHandle = oI.IconHandle;
                     newOI.IconType = 1;
 

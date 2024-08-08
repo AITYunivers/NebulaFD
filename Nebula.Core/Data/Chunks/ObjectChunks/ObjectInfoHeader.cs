@@ -11,6 +11,14 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
             "DontCreateAtStart"         // Create at start Disabled
         );
 
+        public BitDict InkEffectFlags = new BitDict( // Ink Effect Flags
+            "", "", "", "",   //
+            "", "", "", "",   //
+            "", "", "", "",   //
+            "NotTransparent", // Transparent Disabled
+            "AntiAliasing"    // Anti-aliasing
+        );
+
         public int Handle;
         public int Type;
         public int InkEffect;
@@ -31,7 +39,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
             ObjectFlags.Value = reader.ReadUShort();
             reader.Skip(2);
             InkEffect = reader.ReadShort();
-            reader.Skip(2);
+            InkEffectFlags.Value = reader.ReadUShort();
             if (InkEffect != 1)
             {
                 if (NebulaCore.D3D == 0)

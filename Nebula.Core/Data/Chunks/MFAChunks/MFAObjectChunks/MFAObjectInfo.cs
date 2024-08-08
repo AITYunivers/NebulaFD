@@ -26,7 +26,7 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
         public bool Transparent;
         public int InkEffect;
         public uint InkEffectParameter;
-        public int AntiAliasing;
+        public bool AntiAliasing;
         public int IconType;
         public uint IconHandle;
         public MFAObjectLoader ObjectLoader = new();
@@ -55,7 +55,7 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
             Transparent = reader.ReadInt() == 1;
             InkEffect = reader.ReadInt();
             InkEffectParameter = reader.ReadUInt();
-            AntiAliasing = reader.ReadInt();
+            AntiAliasing = reader.ReadInt() == 1;
             ObjectFlags.Value = reader.ReadUInt();
             IconType = reader.ReadInt();
             IconHandle = reader.ReadUInt();
@@ -122,7 +122,7 @@ namespace Nebula.Core.Data.Chunks.MFAChunks
             writer.WriteInt(Transparent ? 1 : 0);
             writer.WriteInt(ObjectType == 9 ? 0 : InkEffect);
             writer.WriteUInt(ObjectType == 9 ? 0 : InkEffectParameter);
-            writer.WriteInt(AntiAliasing);
+            writer.WriteInt(AntiAliasing ? 1 : 0);
             writer.WriteUInt(ObjectFlags.Value);
             writer.WriteInt(IconType);
             writer.WriteUInt(IconHandle);

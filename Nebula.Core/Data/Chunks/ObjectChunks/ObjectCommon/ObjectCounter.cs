@@ -80,7 +80,11 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                     break;
                 case 2: // Vertical Bar
                 case 3: // Horizontal Bar
+                    Shape.ReadCCN(reader);
+                    break;
                 case 5: // Text
+                    if (NebulaCore.Fusion >= 2)
+                        Font++;
                     Shape.ReadCCN(reader);
                     break;
             }

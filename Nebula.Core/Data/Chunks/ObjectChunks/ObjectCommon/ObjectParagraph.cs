@@ -24,7 +24,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
         {
             // First two bytes in MMF 1.5 is a size
             FontHandle = reader.ReadUShort();
-            if (!NebulaCore.Android && NebulaCore.Fusion >= 2.5)
+            if (!NebulaCore.Android && NebulaCore.Fusion >= 2)
                 FontHandle++;
 
             if (NebulaCore.Fusion == 1.5f)
