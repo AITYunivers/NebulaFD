@@ -175,7 +175,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                             }
                             break;
                         case 13: // Set Movement
-                            if (Parameters[0].Data is ParameterMovement)
+                            if (Parameters[0].Data is ParameterMovement && (ObjectInfo & 0x7FFF) == ObjectInfo)
                             {
                                 ParameterMovement param = (ParameterMovement)Parameters[0].Data;
                                 ObjectCommon oC = (ObjectCommon)NebulaCore.PackageData.FrameItems.Items[ObjectInfo].Properties;

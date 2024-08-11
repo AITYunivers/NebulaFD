@@ -1,4 +1,5 @@
 ﻿using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 
 namespace Nebula.Core.Data.Chunks.AppChunks
 {
@@ -24,6 +25,12 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             EngineVersion = reader.ReadInt();
             EngineSubversion = reader.ReadInt();
             EngineInfo.Value = reader.ReadUInt();
+
+            if (NebulaCore.Build != EngineVersion)
+            {
+                this.Log($"Build was modified from {EngineVersion}.{EngineSubversion} to {NebulaCore.Build}, reverting", Spectre.Console.Color.Yellow3_1);
+                NebulaCore.Build = EngineVersion;
+            }
 
             NebulaCore.PackageData.EngineVer = this;
         }

@@ -7,7 +7,6 @@
         public static byte[] KeyString(string str)
         {
             var result = new List<byte>();
-            result.Capacity = str.Length * 2;
             foreach (char code in str)
             {
                 if ((code & 0xFF) != 0)
@@ -22,20 +21,21 @@
         public static byte[] MakeKeyCombined(byte[] data)
         {
             int dataLen = data.Length;
-            Array.Resize(ref data, 128);
-            Array.Resize(ref data, 256);
 
             byte lastKeyByte = 0;
             byte v34 = 0;
 
-            for (int i = 0; i <= dataLen; i++)
+            for (int i = 0; i < dataLen; i++)
             {
                 v34 = (byte)((v34 << 7) + (v34 >> 1));
                 data[i] ^= v34;
                 lastKeyByte += (byte)(data[i] * ((v34 & 1) + 2));
             }
 
-            data[dataLen + 1] = lastKeyByte;
+            Array.Resize(ref data, 128);
+            Array.Resize(ref data, 256);
+            if (dataLen < 255)
+                data[dataLen + 1] = lastKeyByte;
             return data;
         }
 

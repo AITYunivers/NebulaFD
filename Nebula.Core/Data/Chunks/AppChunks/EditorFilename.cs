@@ -18,7 +18,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             var pkgData = NebulaCore.PackageData;
             pkgData.EditorFilename = Value;
 
-            if (NebulaCore.Build > 285)
+            if (NebulaCore.Build > 285 || NebulaCore.Unpacked)
                 Decryption.MakeKey(pkgData.AppName, pkgData.Copyright, Value);
             else
                 Decryption.MakeKey(Value, pkgData.AppName, pkgData.Copyright);

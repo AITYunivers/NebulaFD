@@ -207,7 +207,6 @@ namespace Nebula
                 toolNames.Remove(mfaParserToolName);
                 toolNames.Insert(1, mfaParserToolName);
             }
-
             List<string> selectedTasks = AnsiConsole.Prompt(
                 new MultiSelectionPrompt<string>()
                     .Title($"[{NebulaCore.ColorRules[1]}]Select a task.[/]")

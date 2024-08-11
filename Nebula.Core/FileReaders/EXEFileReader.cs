@@ -36,6 +36,7 @@ namespace Nebula.Core.FileReaders
                         break;
                     }
                 fileReader = new ByteReader(Path.ChangeExtension(filePath, "dat"), FileMode.Open);
+                NebulaCore.Unpacked = true;
             }
 
             Package.PackData.Read(fileReader);
