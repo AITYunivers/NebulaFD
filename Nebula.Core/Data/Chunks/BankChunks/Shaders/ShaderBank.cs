@@ -52,6 +52,16 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
 
         }
 
+        public bool ContainsKey(int key)
+        {
+            return Shaders.ContainsKey(key) || NebulaCore.PackageData.DX9ShaderBank.Shaders.ContainsKey(key);
+        }
+
+        public bool ContainsKey(uint key)
+        {
+            return Shaders.ContainsKey((int)key) || NebulaCore.PackageData.DX9ShaderBank.Shaders.ContainsKey((int)key);
+        }
+
         public Shader this[int key]
         {
             get => (Shaders.ContainsKey(key) ? Shaders[key] : NebulaCore.PackageData.DX9ShaderBank[key]);

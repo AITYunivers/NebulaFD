@@ -19,12 +19,13 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
         {
             ShaderHandle = reader.ReadInt();
             int fakeN = reader.ReadInt();
-            Shader shdr = NebulaCore.PackageData.ShaderBank[(int)ShaderHandle!];
-            if (ShaderHandle >= 0 && shdr.Parameters.Length == fakeN)
+            if (ShaderHandle >= 0 && NebulaCore.PackageData.ShaderBank.ContainsKey(ShaderHandle))
             {
-                ShaderParameters = new int[fakeN];
+                Shader shdr = NebulaCore.PackageData.ShaderBank[(int)ShaderHandle!];
+                int parameterCount = Math.Min(fakeN, shdr.Parameters.Length);
+                ShaderParameters = new int[parameterCount];
 
-                for (int i = 0; i < fakeN; i++)
+                for (int i = 0; i < parameterCount; i++)
                     ShaderParameters[i] = reader.ReadInt();
             }
             else
