@@ -27,14 +27,18 @@ namespace Nebula.Core.FileReaders
 
             if (!fileReader.HasMemory(1)) // Check for Unpacked
             {
-                PortableExecutable portableExecutable = new PortableExecutable(filePath);
-                IReadOnlyList<ResourceIdentifier> resourceIdentifiers = portableExecutable.GetResourceIdentifiers();
-                foreach (ResourceIdentifier identifier in resourceIdentifiers)
-                    if (identifier.Type.Code == 6 && identifier.Name.Code == 11)
-                    {
-                        Package.ModulesDir = Utilities.Utilities.ClearName(Encoding.Unicode.GetString(portableExecutable.GetResource(identifier).Data), '\\');
-                        break;
-                    }
+                try
+                {
+                    PortableExecutable portableExecutable = new PortableExecutable(filePath);
+                    IReadOnlyList<ResourceIdentifier> resourceIdentifiers = portableExecutable.GetResourceIdentifiers();
+                    foreach (ResourceIdentifier identifier in resourceIdentifiers)
+                        if (identifier.Type.Code == 6 && identifier.Name.Code == 11)
+                        {
+                            Package.ModulesDir = Utilities.Utilities.ClearName(Encoding.Unicode.GetString(portableExecutable.GetResource(identifier).Data), '\\');
+                            break;
+                        }
+                }
+                catch {}
                 fileReader = new ByteReader(Path.ChangeExtension(filePath, "dat"), FileMode.Open);
                 NebulaCore.Unpacked = true;
             }
