@@ -107,7 +107,7 @@ namespace GameDumper.AssetDumpers
             foreach (ObjectInfo obj in NebulaCore.PackageData.FrameItems.Items.Values)
                 if (obj.Shader.ShaderHandle == shdr.Handle)
                 {
-                    shdrParams = obj.Shader.ShaderParameters;
+                    Array.Copy(obj.Shader.ShaderParameters, shdrParams, Math.Min(obj.Shader.ShaderParameters.Length, shdrParams.Length));
                     break;
                 }
 

@@ -5,6 +5,7 @@ using Spectre.Console;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Runtime;
 using System.Text;
 
 namespace Nebula
@@ -155,6 +156,7 @@ namespace Nebula
             {
 #endif
                 NebulaCore.CurrentReader.LoadGame(fileReader!, NebulaCore.FilePath);
+                fileReader!.Dispose();
 #if !DEBUG
             }
             catch (Exception ex)
@@ -165,7 +167,9 @@ namespace Nebula
             }
 #endif
             Logger.Save();
+            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.Collect();
+            GC.WaitForPendingFinalizers();
             readStopwatch.Stop();
         }
 
