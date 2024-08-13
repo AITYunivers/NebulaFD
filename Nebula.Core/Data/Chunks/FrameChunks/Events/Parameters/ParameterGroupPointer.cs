@@ -20,9 +20,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             ID = reader.ReadInt();
 
             CCNPointer = reader.Tell() - 12 + Pointer;
-            // Probably 284 knowing the runtime
-            // But I'd need samples to confirm
-            if (NebulaCore.Build < 285)
+
+            if (NebulaCore.Build < 284)
                 CCNPointer -= 2;
         }
 
