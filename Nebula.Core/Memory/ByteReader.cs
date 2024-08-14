@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using Nebula.Core.Utilities;
+using System.Drawing;
 using System.Text;
 
 namespace Nebula.Core.Memory
@@ -151,6 +152,14 @@ namespace Nebula.Core.Memory
         {
             short len = ReadShort();
             Skip(2);
+
+            if (NebulaCore._yunicode == null && len > 1)
+            {
+                Skip(1);
+                NebulaCore._yunicode = ReadByte() == 0;
+                Skip(-2);
+            }
+
             if (NebulaCore.Yunicode)
                 return ReadYunicode(len);
             else
@@ -159,7 +168,7 @@ namespace Nebula.Core.Memory
 
         public string ReadYuniversal(int len = -1)
         {
-            if (NebulaCore._yunicode == null)
+            if (NebulaCore._yunicode == null && (Size() > 1 || len > 1))
             {
                 Skip(1);
                 NebulaCore._yunicode = ReadByte() == 0;
@@ -174,15 +183,17 @@ namespace Nebula.Core.Memory
 
         public string ReadYuniversalStop(int len = -1)
         {
-            if (NebulaCore._yunicode == null)
+            if (NebulaCore._yunicode == null && (Size() > 2 || len > 2))
             {
                 Skip(1);
-                NebulaCore._yunicode = ReadByte() == 0;
+                NebulaCore._yunicode = ReadByte() == 0 && ReadByte() != 0;
                 Skip(-2);
             }
 
             if (NebulaCore.Yunicode)
                 return ReadYunicodeStop(len); 
+            else if (NebulaCore._yunicode == null)
+                return ReadAsciiStop(len).Replace("\0", "");
             else
                 return ReadAsciiStop(len);
         }

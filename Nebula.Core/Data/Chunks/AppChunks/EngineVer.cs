@@ -28,7 +28,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
             if (NebulaCore.Build != EngineVersion)
             {
-                this.Log($"Build was modified from {EngineVersion}.{EngineSubversion} to {NebulaCore.Build}, reverting", Spectre.Console.Color.Yellow3_1);
+                this.Log($"Build was modified from {EngineVersion}.{EngineSubversion} to {NebulaCore.Build}, reverting.", Spectre.Console.Color.Yellow3_1);
                 NebulaCore.Build = EngineVersion;
             }
 

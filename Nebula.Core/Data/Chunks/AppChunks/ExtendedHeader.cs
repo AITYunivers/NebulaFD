@@ -1,4 +1,5 @@
 ﻿using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 using System.Diagnostics;
 
 namespace Nebula.Core.Data.Chunks.AppChunks
@@ -92,7 +93,11 @@ namespace Nebula.Core.Data.Chunks.AppChunks
                 case 74: // Nintendo Switch
                 case 75: // Xbox One
                 case 78: // Playstation 4
-                    NebulaCore.Fusion = 3.0f;
+                    if (NebulaCore.Fusion != 3.0f)
+                    {
+                        this.Log($"Fusion 3 detected, correcting.", Spectre.Console.Color.Yellow3_1);
+                        NebulaCore.Fusion = 3.0f;
+                    }
                     break;
             }
             reader.Skip(3);
