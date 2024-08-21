@@ -35,6 +35,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                     ImageData = Decompressor.DecompressBlock(decompressedReader, (int)(decompressedReader.Size() - decompressedReader.Tell()));
                 }
                 else ImageData = decompressedReader.ReadBytes(dataSize);
+                decompressedReader.Dispose();
 
                 ImageBank.LoadedImageCount++;
             });

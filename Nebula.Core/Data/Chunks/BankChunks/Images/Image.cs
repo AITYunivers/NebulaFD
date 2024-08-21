@@ -139,32 +139,35 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
 
         public Bitmap GetBitmap()
         {
-            if (BitmapCache == null)
+            lock (ImageData)
             {
-                if (ImageData.Length == 0)
-                    return new Bitmap(1, 1);
-
-                BitmapCache = new Bitmap(Width, Height);
-                var bmpData = BitmapCache.LockBits(new Rectangle(0, 0, Width, Height),
-                                                    ImageLockMode.WriteOnly,
-                                                    PixelFormat.Format32bppArgb);
-
-                byte[] colorArray = GetData();
-
-                if (!IsMasked && colorArray != null)
+                if (BitmapCache == null)
                 {
-                    ImageData = colorArray;
-                    if (!Parameters.GPUAcceleration)
-                        ImageData = ImageTranslatorCPU.RGBAToRGBMasked(this);
-                    else
-                        ImageData = ImageTranslatorGPU.RGBAToRGBMasked(this);
+                    if (ImageData.Length == 0)
+                        return new Bitmap(1, 1);
 
-                    GraphicMode = 4;
-                    IsMasked = true;
+                    BitmapCache = new Bitmap(Width, Height);
+                    var bmpData = BitmapCache.LockBits(new Rectangle(0, 0, Width, Height),
+                                                        ImageLockMode.WriteOnly,
+                                                        PixelFormat.Format32bppArgb);
+
+                    byte[] colorArray = GetData();
+
+                    if (!IsMasked && colorArray != null)
+                    {
+                        ImageData = colorArray;
+                        if (!Parameters.GPUAcceleration)
+                            ImageData = ImageTranslatorCPU.RGBAToRGBMasked(this);
+                        else
+                            ImageData = ImageTranslatorGPU.RGBAToRGBMasked(this);
+
+                        GraphicMode = 4;
+                        IsMasked = true;
+                    }
+
+                    Marshal.Copy(colorArray, 0, bmpData.Scan0, colorArray.Length);
+                    BitmapCache.UnlockBits(bmpData);
                 }
-
-                Marshal.Copy(colorArray, 0, bmpData.Scan0, colorArray.Length);
-                BitmapCache.UnlockBits(bmpData);
             }
 
             return BitmapCache;
@@ -262,26 +265,37 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
             Flags["LZX"] = true;
             byte[] compressedImg = Decompressor.CompressBlock(ImageData);
 
-            writer.WriteUInt(Handle);
-            writer.WriteInt(Checksum);
-            writer.WriteInt(References);
-            writer.WriteInt(compressedImg.Length + 4);
-            writer.WriteShort(Width);
-            writer.WriteShort(Height);
-            writer.WriteByte(GraphicMode);
-            writer.WriteByte((byte)Flags.Value);
-            writer.WriteShort(0);
-            writer.WriteShort(HotspotX);
-            writer.WriteShort(HotspotY);
-            writer.WriteShort(ActionPointX);
-            writer.WriteShort(ActionPointY);
-            writer.WriteColor(TransparentColor);
-            writer.WriteInt(ImageData.Length);
-            writer.WriteBytes(compressedImg);
+            // For multi-threading, works single-threaded too ofc
+            ByteWriter tempWriter = new ByteWriter(new MemoryStream());
+            tempWriter.WriteUInt(Handle);
+            tempWriter.WriteInt(Checksum);
+            tempWriter.WriteInt(References);
+            tempWriter.WriteInt(compressedImg.Length + 4);
+            tempWriter.WriteShort(Width);
+            tempWriter.WriteShort(Height);
+            tempWriter.WriteByte(GraphicMode);
+            tempWriter.WriteByte((byte)Flags.Value);
+            tempWriter.WriteShort(0);
+            tempWriter.WriteShort(HotspotX);
+            tempWriter.WriteShort(HotspotY);
+            tempWriter.WriteShort(ActionPointX);
+            tempWriter.WriteShort(ActionPointY);
+            tempWriter.WriteColor(TransparentColor);
+            tempWriter.WriteInt(ImageData.Length);
+            tempWriter.WriteBytes(compressedImg);
+            lock (writer)
+                writer.WriteWriter(tempWriter);
         }
 
         public void PrepareForMfa()
         {
+            if (IsMasked)
+            {
+                GraphicMode = 4;
+                Flags["RLE"] = Flags["RLEW"] = Flags["RLET"] = false;
+                return;
+            }
+
             switch (GraphicMode)
             {
                 case 0:
@@ -300,8 +314,6 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                         ImageData = ImageTranslatorCPU.ColorPaletteToRGBA(this, NebulaCore.PackageData.Frames.First().FramePalette.Palette);
                     break;
                 case 4:
-                    if (IsMasked)
-                        break;
                     if (NebulaCore.Android || NebulaCore.iOS)
                         ImageData = ImageTranslatorCPU.AndroidMode4ToRGBA(this);
                     else if (NebulaCore.Fusion > 2.5f)
@@ -336,15 +348,14 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                     ImageData = ImageTranslatorCPU.FlashToRGBA(this);
                     break;
             }
+
             GraphicMode = 4;
             Flags["RLE"] = Flags["RLEW"] = Flags["RLET"] = false;
-            if (!IsMasked)
-            {
-                if (!Parameters.GPUAcceleration)
-                    ImageData = ImageTranslatorCPU.RGBAToRGBMasked(this);
-                else
-                    ImageData = ImageTranslatorGPU.RGBAToRGBMasked(this);
-            }
+
+            if (!Parameters.GPUAcceleration)
+                ImageData = ImageTranslatorCPU.RGBAToRGBMasked(this);
+            else
+                ImageData = ImageTranslatorGPU.RGBAToRGBMasked(this);
             IsMasked = true;
         }
 

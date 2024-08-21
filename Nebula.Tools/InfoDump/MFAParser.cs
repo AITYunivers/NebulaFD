@@ -118,42 +118,88 @@ namespace Nebula.Tools.GameDumper
             }
 
             Dictionary<object, Bitmap> IconBmps = new();
+            List<Task> iconTasks = new List<Task>();
             foreach (ObjectInfo objectInfo in dat.FrameItems.Items.Values)
             {
-                object iconBmpo = "Tools\\ObjectIcons\\MMFActive.png";
-                try
+                Task task = Task.Factory.StartNew(() =>
                 {
-                    iconBmpo = GenerateObjectIcon(objectInfo);
-                }
-                catch {}
+                    object iconBmpo = "Tools\\ObjectIcons\\MMFActive.png";
+                    try
+                    {
+                        iconBmpo = GenerateObjectIcon(objectInfo);
+                    }
+                    catch { }
 
-                var newIconImage = new Image();
-                newIconImage.Handle = (uint)IconBank.Images.Count;
-                if (iconBmpo is string iconPath)
-                {
-                    if (!IconBmps.ContainsKey(iconPath))
-                        IconBmps.Add(iconPath, new Bitmap(Bitmap.FromFile(iconPath)));
-                    newIconImage.FromBitmap(IconBmps[iconPath]);
-                }
-                else if (iconBmpo is Bitmap iconBmp)
-                {
-                    if (!IconBmps.ContainsKey(iconBmp))
-                        IconBmps.Add(iconBmp, null!);
-                    newIconImage.FromBitmap(iconBmp);
-                }
-                else
-                {
-                    string activeIconPath = "Tools\\ObjectIcons\\MMFActive.png";
-                    if (!IconBmps.ContainsKey(activeIconPath))
-                        IconBmps.Add(activeIconPath, new Bitmap(Bitmap.FromFile(activeIconPath)));
-                    newIconImage.FromBitmap(IconBmps[activeIconPath]);
-                }
-                newIconImage.Flags["Alpha"] = true;
-                newIconImage.Flags["RGBA"] = true;
-                IconBank.Images.Add(newIconImage.Handle, newIconImage);
-                objectInfo.IconHandle = newIconImage.Handle;
+                    var newIconImage = new Image();
+                    if (iconBmpo is string iconPath)
+                    {
+                        lock (IconBmps)
+                        {
+                            if (!IconBmps.ContainsKey(iconPath))
+                                IconBmps.Add(iconPath, new Bitmap(Bitmap.FromFile(iconPath)));
+                        }
+                        lock (IconBmps[iconPath])
+                            newIconImage.FromBitmap(IconBmps[iconPath]);
+                    }
+                    else if (iconBmpo is Bitmap iconBmp)
+                    {
+                        lock (IconBmps)
+                        {
+                            if (!IconBmps.ContainsKey(iconBmp))
+                                IconBmps.Add(iconBmp, null!);
+                        }
+                        lock (iconBmp)
+                            newIconImage.FromBitmap(iconBmp);
+                    }
+                    else
+                    {
+                        string activeIconPath = "Tools\\ObjectIcons\\MMFActive.png";
+                        lock (IconBmps)
+                        {
+                            if (!IconBmps.ContainsKey(activeIconPath))
+                                IconBmps.Add(activeIconPath, new Bitmap(Bitmap.FromFile(activeIconPath)));
+                        }
+                        lock (IconBmps[activeIconPath])
+                            newIconImage.FromBitmap(IconBmps[activeIconPath]);
+                    }
+                    newIconImage.Flags["Alpha"] = true;
+                    newIconImage.Flags["RGBA"] = true;
+                    lock (IconBank)
+                    {
+                        newIconImage.Handle = (uint)IconBank.Images.Count;
+                        IconBank.Images.Add(newIconImage.Handle, newIconImage);
+                    }
+                    objectInfo.IconHandle = newIconImage.Handle;
+                });
+                iconTasks.Add(task);
             }
             GC.Collect();
+
+            foreach (Frame frm in dat.Frames)
+            {
+                Task task = Task.Factory.StartNew(() =>
+                {
+                    Image frmImg = new Image();
+                    if (!Parameters.DontIncludeImages)
+                    {
+                        Bitmap frmIcon = MakeFrameIcon(frm);
+                        frmImg.FromBitmap(frmIcon);
+                        frmIcon.Dispose();
+                    }
+                    frmImg.Flags["Alpha"] = true;
+                    frmImg.Flags["RGBA"] = true;
+                    lock (IconBank)
+                    {
+                        frmImg.Handle = (uint)IconBank.Images.Count;
+                        IconBank.Images.Add(frmImg.Handle, frmImg);
+                    }
+                    frm.MFAFrameInfo.IconHandle = (int)frmImg.Handle;
+                });
+                iconTasks.Add(task);
+            }
+            GC.Collect();
+
+            Task.WaitAll(iconTasks.ToArray());
 
             foreach (KeyValuePair<object, Bitmap> bmp in IconBmps)
                 if (bmp.Key is Bitmap keyBmp)
@@ -161,22 +207,6 @@ namespace Nebula.Tools.GameDumper
                 else if (bmp.Value != null)
                     bmp.Value.Dispose();
 
-            foreach (Frame frm in dat.Frames)
-            {
-                Image frmImg = new Image();
-                frmImg.Handle = (uint)IconBank.Images.Count;
-                if (!Parameters.DontIncludeImages)
-                {
-                    Bitmap frmIcon = MakeFrameIcon(frm);
-                    frmImg.FromBitmap(frmIcon);
-                    frmIcon.Dispose();
-                }
-                frmImg.Flags["Alpha"] = true;
-                frmImg.Flags["RGBA"] = true;
-                IconBank.Images.Add(frmImg.Handle, frmImg);
-                frm.MFAFrameInfo.IconHandle = (int)frmImg.Handle;
-            }
-            GC.Collect();
             IconBank.ImageCount = IconBank.Images.Count;
             this.Log($"Done! ({sw.Elapsed.TotalSeconds} seconds)");
 
@@ -307,30 +337,39 @@ namespace Nebula.Tools.GameDumper
             {
                 case 0:
                     Image bmp0 = imgBnk[((ObjectQuickBackdrop)objectInfo.Properties).Shape.Image];
-                    if (MakeIcon(bmp0.GetBitmap(), out Bitmap bmp00))
+                    lock (bmp0)
                     {
-                        bmp0.DisposeBmp();
-                        return bmp00;
+                        if (MakeIcon(bmp0.GetBitmap(), out Bitmap bmp00))
+                        {
+                            //bmp0.DisposeBmp();
+                            return bmp00;
+                        }
                     }
-                    bmp0?.DisposeBmp();
+                    //bmp0?.DisposeBmp();
                     return "Tools\\ObjectIcons\\MMFQuickBackdrop.png";
                 case 1:
                     Image bmp1 = imgBnk[((ObjectBackdrop)objectInfo.Properties).Image];
-                    if (MakeIcon(bmp1.GetBitmap(), out Bitmap bmp01))
+                    lock (bmp1)
                     {
-                        bmp1.DisposeBmp();
-                        return bmp01;
+                        if (MakeIcon(bmp1.GetBitmap(), out Bitmap bmp01))
+                        {
+                            //bmp1.DisposeBmp();
+                            return bmp01;
+                        }
                     }
-                    bmp1?.DisposeBmp();
+                    //bmp1?.DisposeBmp();
                     return "Tools\\ObjectIcons\\MMFBackdrop.png";
                 case 2:
                     Image bmp2 = imgBnk[((ObjectCommon)objectInfo.Properties).ObjectAnimations.Animations[0].Directions[0].Frames[0]];
-                    if (MakeIcon(bmp2.GetBitmap(), out Bitmap bmp02))
+                    lock (bmp2)
                     {
-                        bmp2.DisposeBmp();
-                        return bmp02;
+                        if (MakeIcon(bmp2.GetBitmap(), out Bitmap bmp02))
+                        {
+                            //bmp2.DisposeBmp();
+                            return bmp02;
+                        }
                     }
-                    bmp2?.DisposeBmp();
+                    //bmp2?.DisposeBmp();
                     return "Tools\\ObjectIcons\\MMFActive.png";
                 case 3:
                     return "Tools\\ObjectIcons\\MMFString.png";
@@ -447,8 +486,12 @@ namespace Nebula.Tools.GameDumper
                                     if (destRect.Right < 0 || destRect.Left > output.Width)
                                         break;
                                     img = NebulaCore.PackageData.ImageBank[((ObjectQuickBackdrop)oi.Properties).Shape.Image];
-                                    doDraw(graphics, img.GetBitmap(), destRect, alpha);
-                                    images.Add(img);
+
+                                    lock (img)
+                                    {
+                                        doDraw(graphics, img.GetBitmap(), destRect, alpha);
+                                        images.Add(img);
+                                    }
                                 }
                                 break;
                             case 1: // Backdrop
@@ -457,8 +500,11 @@ namespace Nebula.Tools.GameDumper
                                                          img.Width, img.Height);
                                 if (destRect.Right < 0 || destRect.Left > output.Width)
                                     break;
-                                doDraw(graphics, img.GetBitmap(), destRect, alpha);
-                                images.Add(img);
+                                lock (img)
+                                {
+                                    doDraw(graphics, img.GetBitmap(), destRect, alpha);
+                                    images.Add(img);
+                                }
                                 break;
                             case 2: // Active
                                 img = NebulaCore.PackageData.ImageBank[((ObjectCommon)oi.Properties).ObjectAnimations.Animations.First().Value.Directions.First().Frames.First()];
@@ -467,8 +513,11 @@ namespace Nebula.Tools.GameDumper
                                                          img.Width, img.Height);
                                 if (destRect.Right < 0 || destRect.Left > output.Width)
                                     break;
-                                doDraw(graphics, img.GetBitmap(), destRect, alpha);
-                                images.Add(img);
+                                lock (img)
+                                {
+                                    doDraw(graphics, img.GetBitmap(), destRect, alpha);
+                                    images.Add(img);
+                                }
                                 break;
                             case 7: // Counter
                                 ObjectCounter cntr = ((ObjectCommon)oi.Properties).ObjectCounter;
@@ -500,8 +549,8 @@ namespace Nebula.Tools.GameDumper
             }
             Bitmap resizedOutput = output.ResizeImage(64, 48);
             output.Dispose();
-            foreach (Image img in images)
-                img.DisposeBmp();
+            //foreach (Image img in images)
+            //    img.DisposeBmp();
             return resizedOutput;
         }
 
@@ -567,8 +616,9 @@ namespace Nebula.Tools.GameDumper
                     int xToDraw = width - img.Width;
                     if (prevX != null)
                         xToDraw = (int)prevX - img.Width;
-                    g.DrawImageUnscaled(img.GetBitmap(), xToDraw, 0);
-                    img.DisposeBmp();
+                    lock (img)
+                        g.DrawImageUnscaled(img.GetBitmap(), xToDraw, 0);
+                    //img.DisposeBmp();
                     prevX = xToDraw;
                 }
             }
@@ -578,8 +628,11 @@ namespace Nebula.Tools.GameDumper
                 Image img = NebulaCore.PackageData.ImageBank[cntr.Frames[(int)((cntr.Frames.Length - 1) * ratio)]];
                 bmp = new Bitmap(img.Width, img.Height);
                 g = Graphics.FromImage(bmp);
-                g.DrawImageUnscaled(img.GetBitmap(), 0, 0);
-                img.DisposeBmp();
+                lock (img)
+                {
+                    g.DrawImageUnscaled(img.GetBitmap(), 0, 0);
+                    //img.DisposeBmp();
+                }
             }
 
             if (g != null)

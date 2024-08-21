@@ -31,6 +31,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                 ActionPointX = decompressedReader.ReadShort();
                 ActionPointY = decompressedReader.ReadShort();
                 ImageData = decompressedReader.ReadBytes(dataSize);
+                decompressedReader.Dispose();
 
                 ImageBank.LoadedImageCount++;
             });

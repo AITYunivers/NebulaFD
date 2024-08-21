@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using ILGPU.Runtime.Cuda;
+using System.Drawing;
 using Image = Nebula.Core.Data.Chunks.BankChunks.Images.Image;
 
 namespace Nebula.Core.Utilities
@@ -581,7 +582,7 @@ namespace Nebula.Core.Utilities
                     colorArray[position + 0] = img.ImageData[pos + 0];
                     colorArray[position + 1] = img.ImageData[pos + 1];
                     colorArray[position + 2] = img.ImageData[pos + 2];
-                    colorArray[position + 3] = img.ImageData[pos + 3];
+                    colorArray[position + 3] = img.ImageData[pos + 3]; //wtf is this right??
 
                     if (!img.Flags["Alpha"] && img.Flags["RGBA"] && img.ImageData[pos + 3] != 255)
                     {

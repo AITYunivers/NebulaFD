@@ -86,8 +86,10 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                 writer.WriteColor(col);
 
             writer.WriteInt(Images.Count);
+            List<Task> writeTasks = new List<Task>();
             foreach (Image img in Images.Values)
-                img.WriteMFA(writer);
+                writeTasks.Add(Task.Factory.StartNew(() => img.WriteMFA(writer)));
+            Task.WaitAll(writeTasks.ToArray());
         }
 
         public Image this[int key]

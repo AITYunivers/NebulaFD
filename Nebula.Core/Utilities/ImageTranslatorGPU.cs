@@ -480,7 +480,7 @@ namespace Nebula.Core.Utilities
                     output[position + 0] = data[pos + 0];
                     output[position + 1] = data[pos + 1];
                     output[position + 2] = data[pos + 2];
-                    output[position + 3] = data[pos + 3];
+                    //output[position + 3] = data[pos + 3];
 
                     if (alpha == 0 && RGBA == 1 && data[pos + 3] != 255)
                     {
@@ -491,7 +491,7 @@ namespace Nebula.Core.Utilities
                     
                     if (alpha == 1)
                     {
-                        position = (width * height * 3) + x + (y * width) + (y * alphaPad);
+                        position = (width * (height + (height * pad)) * 3) + x + (y * width) + (y * alphaPad);
                         if (position >= output.Length || pos + 3 >= data.Length)
                             return;
                         output[position] = data[pos + 3];
@@ -505,7 +505,7 @@ namespace Nebula.Core.Utilities
         {
             Accelerator accelerator = GetAccelerator();
             var deviceData = accelerator.Allocate1D(img.ImageData);
-            var deviceOutput = accelerator.Allocate1D(new byte[img.Width * img.Height * 4]);
+            var deviceOutput = accelerator.Allocate1D(new byte[img.Width * img.Height * 8]);
             var loadedKernel = GetRGBAToRGBMaskedKernel(accelerator);
 
             loadedKernel(
@@ -522,10 +522,11 @@ namespace Nebula.Core.Utilities
 
             accelerator.Synchronize();
 
-            byte[] output = new byte[img.Width * img.Height * 4];
+            byte[] output = new byte[img.Width * img.Height * 8];
             deviceOutput.CopyToCPU(output);
             deviceData.Dispose();
             deviceOutput.Dispose();
+            //Array.Resize(ref output, (img.Width * (img.Height * GetPadding(img)) * 3) + img.Width + (img.Height * img.Width) + (img.Height * GetAlphaPadding(img)));
             return output;
         }
         public static byte[] ColorPaletteToRGBA(byte[] imageData, int width, int height, List<Color> palette, Color transparent, bool RLE)

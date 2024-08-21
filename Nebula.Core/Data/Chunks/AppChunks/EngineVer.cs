@@ -1,4 +1,5 @@
-﻿using Nebula.Core.Memory;
+﻿using ILGPU.IR;
+using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 
 namespace Nebula.Core.Data.Chunks.AppChunks
@@ -30,6 +31,12 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             {
                 this.Log($"Build was modified from {EngineVersion}.{EngineSubversion} to {NebulaCore.Build}, reverting.", Spectre.Console.Color.Yellow3_1);
                 NebulaCore.Build = EngineVersion;
+
+                if (!NebulaCore.Unpacked)
+                {
+                    PackageData pkgData = NebulaCore.PackageData;
+                    Decryption.MakeKey(pkgData.AppName, pkgData.Copyright, pkgData.EditorFilename);
+                }
             }
 
             NebulaCore.PackageData.EngineVer = this;
