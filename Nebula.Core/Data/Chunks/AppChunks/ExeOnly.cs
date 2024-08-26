@@ -7,14 +7,13 @@ namespace Nebula.Core.Data.Chunks.AppChunks
     {
         public ExeOnly()
         {
-            ChunkName = "AppName";
+            ChunkName = "ExeOnly";
             ChunkID = 0x2224;
         }
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Value = reader.ReadByte() != 0;
-
+            base.ReadCCN(reader, extraInfo);
             NebulaCore.PackageData.ExeOnly = Value;
         }
     }

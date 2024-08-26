@@ -352,6 +352,9 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
             GraphicMode = 4;
             Flags["RLE"] = Flags["RLEW"] = Flags["RLET"] = false;
 
+            if (IsMasked)
+                return;
+
             if (!Parameters.GPUAcceleration)
                 ImageData = ImageTranslatorCPU.RGBAToRGBMasked(this);
             else

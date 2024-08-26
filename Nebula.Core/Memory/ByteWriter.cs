@@ -41,6 +41,7 @@ namespace Nebula.Core.Memory
         public void WriteFloat(float value) => Write(value);
         public void WriteDouble(double value) => Write(value);
         public void WriteString(string value) => Write(value);
+        public void WriteBool(bool value) => Write(value);
 
         /*public void WriteYuniversal(string value, bool addZero = false)
         {

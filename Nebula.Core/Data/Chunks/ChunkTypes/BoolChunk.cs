@@ -8,7 +8,7 @@ namespace Nebula.Core.Data.Chunks.ChunkTypes
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            Value = reader.ReadInt() != 0;
+            Value = reader.ReadBool();
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -18,7 +18,7 @@ namespace Nebula.Core.Data.Chunks.ChunkTypes
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
-            writer.WriteInt(Value ? 1 : 0);
+            writer.WriteBool(Value);
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)

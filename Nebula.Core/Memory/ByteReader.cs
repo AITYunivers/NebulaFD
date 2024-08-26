@@ -69,6 +69,7 @@ namespace Nebula.Core.Memory
         public uint ReadUInt() => ReadUInt32();
         public int ReadInt() => ReadInt32();
         public float ReadFloat() => ReadSingle();
+        public bool ReadBool() => ReadByte() == 1;
 
         public string ReadAscii(int length = -1)
         {
