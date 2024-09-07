@@ -199,8 +199,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                             for (int i = 0; i < newOI.ObjectEffects.ShaderParameters.Length; i++)
                             {
                                 newOI.ObjectEffects.ShaderParameters[i] = new ShaderParameter();
-                                newOI.ObjectEffects.ShaderParameters[i].Name = newOI.ObjectEffects.Shader.Parameters[i].Name;
-                                newOI.ObjectEffects.ShaderParameters[i].Type = newOI.ObjectEffects.Shader.Parameters[i].Type;
+                                if (i < newOI.ObjectEffects.Shader.Parameters.Length)
+                                {
+                                    newOI.ObjectEffects.ShaderParameters[i].Name = newOI.ObjectEffects.Shader.Parameters[i].Name;
+                                    newOI.ObjectEffects.ShaderParameters[i].Type = newOI.ObjectEffects.Shader.Parameters[i].Type;
+                                }
                                 if (newOI.ObjectEffects.ShaderParameters[i].Type == 1)
                                     newOI.ObjectEffects.ShaderParameters[i].FloatValue = BitConverter.ToSingle(BitConverter.GetBytes(oI.Shader.ShaderParameters[i]));
                                 else
