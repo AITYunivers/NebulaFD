@@ -50,6 +50,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     else
                         ShaderParameters[i].Value = reader.ReadInt();
                 }
+                Array.Resize(ref ShaderParameters, Shader.Parameters.Length);
             }
             reader.Seek(returnOffset);
         }
