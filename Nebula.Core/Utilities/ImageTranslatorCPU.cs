@@ -9,45 +9,38 @@ namespace Nebula.Core.Utilities
         public static int GetPadding(Image img)
         {
             int colorModeSize = 3;
+            int modSize = 2;
             switch (img.GraphicMode)
             {
-                case 0:
-                case 1:
-                case 8:
-                    colorModeSize = 4;
-                    break;
-                case 4:
-                case 5:
-                    colorModeSize = 3;
+                case 3:
+                    colorModeSize = 1;
+                    modSize = 4;
                     break;
                 case 6:
                 case 7:
                     colorModeSize = 2;
                     break;
-                case 2:
-                case 3:
-                    colorModeSize = 1;
-                    break;
-                default:
-                    colorModeSize = 3;
+                case 0:
+                case 8:
+                    colorModeSize = 4;
                     break;
             }
 
             if (!img.Flags["RLET"] || NebulaCore.Plus || NebulaCore.Fusion < 2.0f)
-                return img.Width * colorModeSize % 2;
+                return img.Width * colorModeSize % modSize;
             else if (NebulaCore.Android || NebulaCore.iOS)
                 return img.Width * colorModeSize;
             else if (NebulaCore.Build < 280)
-                return img.Width * colorModeSize % 2 * colorModeSize;
+                return img.Width * colorModeSize % modSize * colorModeSize;
             else
-                return img.Width % 2 * colorModeSize;
+                return img.Width % modSize * colorModeSize;
         }
 
         public static int GetAlphaPadding(Image img)
         {
-            if (NebulaCore.Android || NebulaCore.iOS)
-                return 0;
-            else
+            //if (NebulaCore.Android || NebulaCore.iOS)
+            //    return 0;
+            //else
                 return (4 - (img.Width % 4)) % 4;
         }
 

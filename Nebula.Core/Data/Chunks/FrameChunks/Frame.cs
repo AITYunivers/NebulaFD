@@ -337,8 +337,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                                     (newOC as MFACounterAlt).UseText = oldOC.ObjectCounter.Frames.Length == 0;
                                     if ((newOC as MFACounterAlt).UseText)
                                     {
-                                        (newOC as MFACounterAlt).Color = oldOC.ObjectParagraphs.Paragraphs[0].Color;
-                                        (newOC as MFACounterAlt).Font = oldOC.ObjectParagraphs.Paragraphs[0].FontHandle;
+                                        (newOC as MFACounterAlt).Color = oldOC.ObjectCounter.Shape.Color1;
+                                        (newOC as MFACounterAlt).Font = (int)oldOC.ObjectCounter.Font;
                                     }
                                     else
                                     {

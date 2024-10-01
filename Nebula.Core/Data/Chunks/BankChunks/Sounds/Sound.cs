@@ -38,6 +38,11 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
                 Frequency = reader.ReadInt();
                 if (Flags["HasName"])
                     Name = reader.ReadYuniversal(reader.ReadShort());
+                else
+                    Name = "S" + Handle.ToString("D4");
+
+                // Temp until reading from the apk is added
+                Flags["Decompressed"] = false;
                 return;
             }
             else if (NebulaCore.iOS)
