@@ -28,7 +28,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
             reader.Seek(menuOffset);
             reader.Skip(4);
-            if (menuSize > 0 && NebulaCore.Fusion > 2.0f)
+            if (menuSize > 4 && NebulaCore.Fusion > 2.0f)
                 Items = ReadMenuItems(reader);
 
             reader.Seek(accelOffset);
