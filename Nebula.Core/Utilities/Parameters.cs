@@ -25,6 +25,8 @@ namespace Nebula.Core.Utilities
         public bool dump_unk_chunks = false;
         public string comment_allchunks = "Whether or not to dump all chunks to a 'Chunks' folder";
         public bool dump_all_chunks = false;
+        public string comment_unicode = "Whether or not to force reading as unicode";
+        public bool force_unicode = false;
         public string comment_gpu = "Whether or not to use the GPU to translate images (EXPERIMENTAL)";
         public bool gpu_acceleration = false;
         public string comment_evtlog = "Whether or not to silently log events to the log file";
@@ -55,6 +57,7 @@ namespace Nebula.Core.Utilities
         public static bool DontIncludeBinaryFiles => Inst.ignore_binaryfiles;
         public static bool DumpUnknownChunks => Inst.dump_unk_chunks;
         public static bool DumpAllChunks => Inst.dump_all_chunks;
+        public static bool ForceUnicode => Inst.force_unicode;
         public static bool GPUAcceleration => Inst.gpu_acceleration;
         public static bool SilentLogEvents => Inst.silent_log_events;
         public static bool InvertFrameMask => Inst.invert_ignore_frames;
