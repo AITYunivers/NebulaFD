@@ -7,7 +7,7 @@ namespace Nebula.Core.Data.PackageReaders
     {
         public override void Read(ByteReader reader)
         {
-            this.Log($"Running {NebulaCore.BuildDate} build.");
+            this.Log($"Running build '{NebulaCore.GetCommitHash()}'");
             Header = reader.ReadAscii(4);
             this.Log("Header: " + Header);
             NebulaCore.MFA = true;

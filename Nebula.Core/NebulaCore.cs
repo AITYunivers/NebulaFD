@@ -2,12 +2,13 @@
 using Nebula.Core.Data;
 using Nebula.Core.FileReaders;
 using Spectre.Console;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace Nebula
 {
     public static class NebulaCore
     {
-        public const string BuildDate = "7/18/24";
         public static Color[] ColorRules = new Color[]
         {
             Color.DarkViolet_1,    // Header
@@ -97,6 +98,16 @@ namespace Nebula
                 str += " MFA";
 
             return str;
+        }
+
+        public static string GetCommitHash()
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+            string? version = fileVersionInfo.ProductVersion;
+            if (version != null && version.Length > 6)
+                return version.Substring(6, 7);
+            return "Unknown";
         }
     }
 }

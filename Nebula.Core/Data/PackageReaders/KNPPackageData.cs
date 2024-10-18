@@ -18,7 +18,7 @@ namespace Nebula.Core.Data.PackageReaders
 
         public override void Read(ByteReader reader)
         {
-            this.Log($"Running {NebulaCore.BuildDate} build.");
+            this.Log($"Running build '{NebulaCore.GetCommitHash()}'");
             NebulaCore._yunicode = false;
             NebulaCore.Fusion = 0.0f;
             AppName = Path.GetFileNameWithoutExtension(FilePath);
