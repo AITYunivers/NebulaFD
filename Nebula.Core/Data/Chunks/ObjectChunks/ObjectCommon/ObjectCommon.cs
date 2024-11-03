@@ -68,6 +68,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
         private int ValueOffset = 0;
         private int TransitionInOffset = 0;
         private int TransitionOutOffset = 0;
+        private int AlterableNamesOffset = 0;
 
         public ObjectAnimations ObjectAnimations = new();
         public ObjectAlterableValues ObjectAlterableValues = new();
@@ -81,6 +82,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public ObjectValue ObjectValue = new();
         public TransitionChunk ObjectTransitionIn = new();
         public TransitionChunk ObjectTransitionOut = new();
+        public ObjectAlterableNames ObjectAlterableNames = new();
 
         public ObjectCommon()
         {
@@ -101,8 +103,6 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
             }
 
             long startOffset = reader.Tell();
-            //File.WriteAllBytes("bitch.bin", reader.ReadBytes());
-            //reader.Seek(startOffset);
             reader.Skip(6);
             bool check = reader.ReadInt() == 0;
             reader.Skip(-6);
@@ -135,6 +135,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
             BackColor = reader.ReadColor();
             TransitionInOffset = reader.ReadInt();
             TransitionOutOffset = reader.ReadInt();
+            AlterableNamesOffset = reader.ReadUShort();
 
             if (AnimationOffset > 0)
             {
@@ -165,12 +166,12 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                 reader.Seek(startOffset + DataOffset);
                 switch (Identifier.Substring(0, 2))
                 {
-                    //Text
+                    // Text
                     case "TE":
                     case "QS":
                         ObjectParagraphs.ReadCCN(reader);
                         break;
-                    //Counter
+                    // Counter
                     case "CN":
                     case "SC":
                     case "LI":
@@ -180,7 +181,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                     case "RT":
                         ObjectFormattedText.ReadCCN(reader);
                         break;
-                    //Sub-Application
+                    // Sub-Application
                     case "CC":
                         ObjectSubApplication.ReadCCN(reader);
                         break;
@@ -211,6 +212,12 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                 ObjectTransitionOut.ReadCCN(reader);
             }
 
+            if (AlterableNamesOffset > 0)
+            {
+                reader.Seek(startOffset + AlterableNamesOffset);
+                ObjectAlterableNames.ReadCCN(reader, this);
+            }
+
             ((ObjectInfo)extraInfo[0]).Properties = this;
         }
 
@@ -229,11 +236,9 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         }
 
-        List<short> Offsets = new();
         public void GetOffset(ByteReader reader, int index, bool check = false)
         {
-            short Offset = reader.ReadShort();
-            Offsets.Add(Offset);
+            ushort Offset = reader.ReadUShort();
 
             if (NebulaCore.Android)
             {

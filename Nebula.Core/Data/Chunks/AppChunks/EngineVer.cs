@@ -1,5 +1,4 @@
-﻿using ILGPU.IR;
-using Nebula.Core.Memory;
+﻿using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 
 namespace Nebula.Core.Data.Chunks.AppChunks

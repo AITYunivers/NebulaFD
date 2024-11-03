@@ -43,7 +43,7 @@ namespace Nebula.Core.Data
         public GlobalStrings GlobalStrings = new();         // 0x2233
         public Extensions Extensions = new();               // 0x2234
         public AppIcon AppIcon = new();                     // 0x2235
-        public byte[] SerialNumber = new byte[0];           // 0x2237
+        public int SerialNumber;                            // 0x2237
         public BinaryFiles BinaryFiles = new();             // 0x2238
         public string About = string.Empty;                 // 0x223A
         public string Copyright = string.Empty;             // 0x223B

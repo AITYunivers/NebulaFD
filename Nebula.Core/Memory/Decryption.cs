@@ -39,12 +39,11 @@
             return data;
         }
 
-        public static void MakeKey(string data1, string data2, string data3)
+        public static void MakeKey(params string[] data)
         {
             var bytes = new List<byte>();
-            bytes.AddRange(KeyString(data1 ?? ""));
-            bytes.AddRange(KeyString(data2 ?? ""));
-            bytes.AddRange(KeyString(data3 ?? ""));
+            foreach (string s in data)
+                bytes.AddRange(KeyString(s ?? ""));
             DecryptionKey = MakeKeyCombined(bytes.ToArray());
             InitDecryptionTable(DecryptionKey);
         }

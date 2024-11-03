@@ -16,8 +16,14 @@ namespace Nebula.Core.FileReaders
                 reader.Skip(28); // Multimedia Fusion 2 or above
             else if (reader.PeekInt() == 32639 || reader.PeekInt() == 8748)
             {
-                NebulaCore.Fusion = 1.5f; // Multimedia Fusion 1.5
-                NebulaCore._yunicode = false;
+                // Stupid ass "Anti-decompilation" method lmao
+                if (reader.GetAsciiAt(4, SeekOrigin.Current, 4) == "I\u0087G\u0012")
+                    reader.Skip(28); // Multimedia Fusion 2 or above
+                else
+                {
+                    NebulaCore.Fusion = 1.5f; // Multimedia Fusion 1.5
+                    NebulaCore._yunicode = false;
+                }
             }
             else if (reader.PeekShort() == 1)
             {

@@ -7,9 +7,48 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 {
     public class AppHeader : Chunk
     {
-        public BitDict Flags = new BitDict(4294944001, typeof(AppHeaderFlags));
-        public BitDict NewFlags = new BitDict(2048, typeof(AppHeaderNewFlags));
-        public BitDict OtherFlags = new BitDict(4294951041, typeof(AppHeaderOtherFlags));
+        public BitDict Flags = new BitDict(42241,
+            "HeadingWhenMaximized",    // Heading When Maximized
+            "HeadingDisabled",         // Heading is disabled
+            "FitInside",               // Fit inside (black bars)
+            "MachineIndependentSpeed", // Machine-independent speed
+            "ResizeDisplay", "",       // Resize display to fill window size
+            "MenuDisplayedDisabled",   // Menu displayed on boot-up is disabled
+            "MenuBar",                 // Menu Bar
+            "MaximizedOnBoot",         // Maximized on boot-up
+            "MultiSamples",            // Multi-Samples
+            "ChangeResolutionMode",    // Change Resolution Mode
+            "AllowFullscreenSwitch",   // Allow user to switch to/from full screen
+            "", "", "",                //
+            "NotEdrt"                  // Whether or not the ccn is for the editor runtime
+        );
+
+        public BitDict NewFlags = new BitDict(2048,
+            "PlaySoundsOverFrames", "", // Play sounds over frames
+            "DontMuteOnLostFocus",      // Do not mute samples when application loses focus
+            "NoMinimizeBox",            // No Minimize box
+            "NoMaximizeBox",            // No Maximize box
+            "NoThickFrame",             // No Thick frame
+            "DontCenterFrame",          // Do not center frame area in window
+            "DontStopScreenSaver",      // Do not stop screen saver when input event
+            "DisableCloseButton",       // Disable Close button
+            "HiddenAtStart",            // Hidden at start
+            "EnableVisualThemes",       // Enable Visual Themes
+            "VSync",                    // V-Sync
+            "RunWhenMinimized", "",     // Run when minimized
+            "RunWhileResizing"          // Run while resizing
+        );
+
+        public BitDict OtherFlags = new BitDict(49281,
+            "DebuggerShortcuts", "",       // Enable debugger keyboard shortcuts
+            "DontShareSubAppData", "", "", // Do not share data if run as sub-application
+            "IncludeExternalFiles",        // Include external files
+            "ShowDebugger",                // Show Debugger
+            "", "", "", "", "", "",        //
+            "Direct3D9or11",               // Display Mode: Direct 3D 9 / Direct 3D 11
+            "Direct3D8or11"                // Display Mode: Direct 3D 8 / Direct 3D 11
+        );
+
         public BitDict DisplayFlags = new BitDict(240, // Display Flags (MFA Only)
             "MaximizedOnBoot",       // Maximized on boot-up
             "ResizeDisplay",         // Resize display to fill window size
@@ -31,6 +70,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             "RightToLeftLayout", "", // Right-to-left layout
             "FitInside"              // Fit inside (black bars)
         ); // MFA Only
+
         public BitDict GraphicFlags = new BitDict(807471233, // Graphic Flags (MFA Only)
             "MultiSamples",                  // Multi-samples
             "MachineIndependentSpeed",       // Machine-independent speed
@@ -95,10 +135,10 @@ namespace Nebula.Core.Data.Chunks.AppChunks
         {
             if (NebulaCore.Fusion > 1.5f)
                 reader.Skip(4);
-            Flags.Value = (uint)reader.ReadShort();      // Default: 4294944001
-            NewFlags.Value = (uint)reader.ReadShort();   // Default: 2048
+            Flags.Value = reader.ReadUShort();      // Default: 42241
+            NewFlags.Value = reader.ReadUShort();   // Default: 2048
             GraphicMode = reader.ReadShort();
-            OtherFlags.Value = (uint)reader.ReadShort(); // Default: 4294951041
+            OtherFlags.Value = reader.ReadUShort(); // Default: 49281
 
             AppWidth = reader.ReadShort();
             AppHeight = reader.ReadShort();

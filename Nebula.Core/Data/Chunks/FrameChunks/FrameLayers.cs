@@ -17,6 +17,13 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             Layers = new FrameLayer[reader.ReadInt()];
             for (int i = 0; i < Layers.Length; i++)
             {
+                // Need this for debug ccns, dunno why
+                if (reader.Tell() >= reader.Size())
+                {
+                    Array.Resize(ref Layers, i);
+                    break;
+                }
+
                 Layers[i] = new FrameLayer();
                 Layers[i].ReadCCN(reader);
             }

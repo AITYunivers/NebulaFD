@@ -10,7 +10,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         public int Height;
         public Color Background = Color.White;
 
-        public BitDict FrameFlags = new BitDict( // Frame Flags (Runtime Only)
+        public BitDict FrameFlags = new BitDict(32800, // Frame Flags (Runtime Only)
             "DisplayTitle",                    // Display frame title in window caption
             "GrabDesktop",                     // Grab desktop at start
             "KeepDisplay", "", "",             // Keep display from previous frame

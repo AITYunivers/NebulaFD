@@ -24,6 +24,7 @@ namespace Nebula
         public static bool Plus;
         public static bool Seeded;
         public static bool Unpacked;
+        public static bool Debug;
         public static bool Windows;
         public static bool Android;
         public static bool iOS;

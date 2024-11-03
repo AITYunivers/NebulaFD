@@ -67,7 +67,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             {
                 string identifier = reader.ReadAscii(4);
 
-                if (identifier == "ER>>")
+                if (identifier == "ER>>" || identifier == "KR>>")
                 {
                     MaxObjects = reader.ReadShort();
                     MaxObjectInfos = reader.ReadShort();
@@ -111,18 +111,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
         {
-            long endOffset = 0;
-            if (extraInfo.Length == 0)
-            {
-                Version = reader.ReadUShort();
-                FrameType = reader.ReadUShort();
-            }
-            else
-            {
-                endOffset = reader.ReadUInt();
-                if (endOffset == 0) return;
-                else endOffset += reader.Tell();
-            }
+            uint size = reader.ReadUInt();
+            long endOffset = reader.Tell() + size;
+            if (size == 0)
+                return;
 
             while (true)
             {
@@ -225,8 +217,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     break;
             }
 
-            if (extraInfo.Length > 0)
-                reader.Seek(endOffset);
+            reader.Seek(endOffset);
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

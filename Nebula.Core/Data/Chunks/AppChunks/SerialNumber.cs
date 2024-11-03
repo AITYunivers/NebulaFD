@@ -3,7 +3,7 @@ using Nebula.Core.Memory;
 
 namespace Nebula.Core.Data.Chunks.AppChunks
 {
-    public class SerialNumber : DataChunk
+    public class SerialNumber : IntChunk
     {
         public SerialNumber()
         {

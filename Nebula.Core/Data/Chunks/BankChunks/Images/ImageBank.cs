@@ -18,6 +18,9 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
         public static int LoadedImageCount;
         public static List<Task> TaskManager = new();
 
+        // Editor Runtime
+        public string BankFilepath = string.Empty;
+
         public ImageBank()
         {
             ChunkName = "ImageBank";
@@ -30,6 +33,12 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
 
             if (Parameters.DontIncludeImages)
                 return;
+
+            if (!NebulaCore.PackageData.AppHeader.Flags["NotEdrt"])
+            {
+                BankFilepath = reader.ReadYuniversal();
+                return;
+            }
 
             LoadedImageCount = 0;
             TaskManager.Clear();

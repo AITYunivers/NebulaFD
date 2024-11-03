@@ -10,7 +10,6 @@ namespace Nebula.Core.Data.Chunks.AppChunks
         public List<byte> AccelShift = new();
         public List<short> AccelKey = new();
         public List<short> AccelId = new();
-        public byte[] Data = new byte[0];
 
         public MenuBar()
         {
@@ -20,7 +19,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            reader.Skip(4);
+            int headerSize = reader.ReadInt();
             int menuOffset = reader.ReadInt();
             int menuSize = reader.ReadInt();
             int accelOffset = reader.ReadInt();

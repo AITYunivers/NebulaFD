@@ -19,9 +19,9 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             pkgData.EditorFilename = Value;
 
             if (NebulaCore.Build > 285 || NebulaCore.Unpacked)
-                Decryption.MakeKey(pkgData.AppName, pkgData.Copyright, Value);
+                Decryption.MakeKey(pkgData.AppName, pkgData.Copyright, pkgData.EditorFilename);
             else
-                Decryption.MakeKey(Value, pkgData.AppName, pkgData.Copyright);
+                Decryption.MakeKey(pkgData.EditorFilename, pkgData.AppName, pkgData.Copyright);
 
             if (string.IsNullOrEmpty(pkgData.AppName))
                 pkgData.AppName = Path.GetFileNameWithoutExtension(Value);

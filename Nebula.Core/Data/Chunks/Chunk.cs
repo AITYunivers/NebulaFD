@@ -17,6 +17,7 @@ namespace Nebula.Core.Data.Chunks
         private short _chunkID;
         public short ChunkID { get { return _chunkID; } set { _chunkID = value; } }
         public int ChunkSize;
+        public int ChunkFlag;
         public byte[] ChunkData = new byte[0];
 
         public static Chunk InitChunk(ByteReader byteReader)
@@ -55,6 +56,7 @@ namespace Nebula.Core.Data.Chunks
 
             Chunk newChunk = ChunkJumpTable(id);
             newChunk.ChunkSize = size;
+            newChunk.ChunkFlag = flag;
             newChunk.ChunkData = newData;
 
             if (Parameters.DumpAllChunks || Parameters.DumpUnknownChunks && !ChunkList.ChunkJumpTable.ContainsKey(id))

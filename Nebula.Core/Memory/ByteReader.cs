@@ -223,11 +223,20 @@ namespace Nebula.Core.Memory
             return base.ReadBytes(count);
         }
 
-        public byte GetByteAt(long position)
+        public byte GetByteAt(long position, SeekOrigin seekOrigin = SeekOrigin.Begin)
         {
             long orgPos = Tell();
-            Seek(position);
+            Seek(position, seekOrigin);
             byte output = ReadByte();
+            Seek(orgPos);
+            return output;
+        }
+
+        public string GetAsciiAt(long position, SeekOrigin seekOrigin = SeekOrigin.Begin, int length = -1)
+        {
+            long orgPos = Tell();
+            Seek(position, seekOrigin);
+            string output = ReadAscii(length);
             Seek(orgPos);
             return output;
         }
