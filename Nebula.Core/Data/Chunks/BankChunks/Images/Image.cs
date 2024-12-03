@@ -42,8 +42,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
         private Bitmap? BitmapCache = null;
         public bool IsMasked;
 
-        public BitDict Flags = new BitDict(new string[]
-        {
+        public BitDict Flags = new BitDict(
             "RLE",
             "RLEW",
             "RLET",
@@ -52,7 +51,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
             "ACE",
             "Mac",
             "RGBA"
-        });
+        );
 
         public Image()
         {

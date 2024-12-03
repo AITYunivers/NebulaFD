@@ -113,7 +113,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         {
             uint size = reader.ReadUInt();
             long endOffset = reader.Tell() + size;
-            if (size == 0)
+            if (size == 0 && extraInfo.Length > 0)
                 return;
 
             while (true)
@@ -217,7 +217,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     break;
             }
 
-            reader.Seek(endOffset);
+            if (extraInfo.Length > 0)
+                reader.Seek(endOffset);
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)

@@ -1,15 +1,11 @@
 ﻿#define Joveler
-#if Ionic
-using Ionic.Zlib;
-#endif
 #if Joveler
 using Joveler.Compression.ZLib;
-using System.Diagnostics;
+#endif
 
-#endif
-#if !Ionic || !Joveler
 using System.IO.Compression;
-#endif
+using DeflateStream = System.IO.Compression.DeflateStream;
+using ZLibStream = System.IO.Compression.ZLibStream;
 
 namespace Nebula.Core.Memory
 {
@@ -61,40 +57,34 @@ namespace Nebula.Core.Memory
 
         public static byte[] DecompressBlock(byte[] data)
         {
-#if Ionic
-            return ZlibStream.UncompressBuffer(data);
-#else
-            using (var inputStream = new MemoryStream(data, 2, data.Length - 6))
-            {
-                using (var deflateStream = new System.IO.Compression.DeflateStream(inputStream, CompressionMode.Decompress))
-                {
-                    using (var outputStream = new MemoryStream())
-                    {
-                        deflateStream.CopyTo(outputStream);
-                        return outputStream.ToArray();
-                    }
-                }
-            }
-#endif
+            MemoryStream inputStream = new MemoryStream(data);
+            Stream deflateStream = IsZlib(data) 
+                ? new ZLibStream(inputStream, CompressionMode.Decompress)
+                : new DeflateStream(inputStream, CompressionMode.Decompress);
+            MemoryStream outputStream = new MemoryStream();
+            deflateStream.CopyTo(outputStream);
+            byte[] outputData = outputStream.ToArray();
+            outputStream.Dispose();
+            deflateStream.Dispose();
+            inputStream.Dispose();
+            return outputData;
         }
 
-        public static byte[] DeflateBlock(byte[] data)
+        public static bool IsZlib(byte[] check)
         {
-#if Ionic
-            return ZlibStream.UncompressBuffer(data);
-#else
-            using (var inputStream = new MemoryStream(data))
+            if (check.Length < 2)
+                return false;
+
+            bool isZlib = check[0] == 0x78; // Zlib Header
+            if (isZlib)
             {
-                using (var deflateStream = new System.IO.Compression.DeflateStream(inputStream, CompressionMode.Decompress))
-                {
-                    using (var outputStream = new MemoryStream())
-                    {
-                        deflateStream.CopyTo(outputStream);
-                        return outputStream.ToArray();
-                    }
-                }
+                isZlib = false;
+                isZlib |= check[1] == 0x01; // No Compression/Low Compression
+                isZlib |= check[1] == 0x5E; // Fast Compression
+                isZlib |= check[1] == 0x9C; // Default Compression
+                isZlib |= check[1] == 0xDA; // Best Compression
             }
-#endif
+            return isZlib;
         }
 
         public static byte[] CompressBlock(byte[] data)
@@ -104,14 +94,10 @@ namespace Nebula.Core.Memory
             compOpts.Level = ZLibCompLevel.Default;
             var decompressedStream = new MemoryStream(data);
             var compressedStream = new MemoryStream();
-            byte[] compressedData = null;
             var zs = new Joveler.Compression.ZLib.ZLibStream(compressedStream, compOpts);
             decompressedStream.CopyTo(zs);
             zs.Close();
-
-            compressedData = compressedStream.ToArray();
-
-            return compressedData;
+            return compressedStream.ToArray();
 #else
             // Zlib header (2 bytes): 0x78, 0x9C
             byte[] zlibHeader = new byte[] { 0x78, 0x9C };

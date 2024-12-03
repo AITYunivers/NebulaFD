@@ -1,5 +1,4 @@
-﻿using Ionic.Zlib;
-using Nebula.Core.Memory;
+﻿using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 using ObjCommon = Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon.ObjectCommon;
 
@@ -22,7 +21,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
             reader.Skip(4);
             while (reader.Size() > reader.Tell())
             {
-                ByteReader propertyReader = new ByteReader(ZlibStream.UncompressBuffer(reader.ReadBytes(reader.ReadInt())));
+                ByteReader propertyReader = new ByteReader(Decompressor.DecompressBlock(reader.ReadBytes(reader.ReadInt())));
                 new ObjCommon().ReadCCN(propertyReader, listItems.Items[curHandle++]);
                 propertyReader.Close();
                 reader.Skip(4);

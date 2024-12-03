@@ -17,7 +17,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
         {
             Exts = new();
             ushort Count = reader.ReadUShort();
-            reader.Skip(2);
+            ushort MaxHandle = reader.ReadUShort();
 
             for (int i = 0; i < Count; i++)
             {
