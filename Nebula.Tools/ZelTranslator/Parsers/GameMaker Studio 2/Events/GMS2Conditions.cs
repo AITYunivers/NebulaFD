@@ -1,24 +1,7 @@
-using Ionic.BZip2;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Diagnostics;
-using System.Net.Http.Headers;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Drawing;
-using System.Diagnostics.Metrics;
-using System.Diagnostics.Tracing;
-using System.Security.AccessControl;
-using System.Reflection;
-using System.Linq.Expressions;
-using Condition = Nebula.Core.Data.Chunks.FrameChunks.Events.Condition;
 using Nebula.Core.Data;
 using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
 using static ZelTranslator_SD.Parsers.GameMakerStudio2.EventsToGML;
+using Condition = Nebula.Core.Data.Chunks.FrameChunks.Events.Condition;
 
 namespace ZelTranslator_SD.Parsers.GameMakerStudio2
 {
