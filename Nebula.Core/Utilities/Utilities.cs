@@ -17,7 +17,7 @@ namespace Nebula.Core.Utilities
             invalidChars.Add('?');
             foreach (char pardon in pardons)
                 invalidChars.Remove(pardon);
-            var str = string.Join("", ogName.Split(invalidChars.ToArray()));
+            var str = string.Join("", ogName.Split(invalidChars.ToArray())).TrimEnd('.');
             return str;
         }
         public static string ReadYuniversal(this ByteReader reader, int len=-1)

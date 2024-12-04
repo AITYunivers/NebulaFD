@@ -17,7 +17,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            long endPosition = reader.Tell() + reader.ReadUShort();
+            long endPosition = reader.Tell() + Math.Abs(reader.ReadShort());
 
             Code = reader.ReadShort();
             Data = Code switch

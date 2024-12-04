@@ -18,7 +18,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            long endPosition = reader.Tell() + Math.Abs(reader.ReadUShort());
+            long endPosition = reader.Tell() + Math.Abs(reader.ReadShort());
 
             if (NebulaCore.Fusion == 1.5f)
             {

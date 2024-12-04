@@ -87,17 +87,31 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     EventCount = reader.ReadInt();
                 else if (identifier == "ERev")
                 {
-                    long endPosition = reader.Tell() + reader.ReadInt();
+                    // Seperated bc of issues
                     if (NebulaCore.Android || NebulaCore.HTML)
-                        reader.Skip(4);
-                    if (Parameters.DontIncludeEvents)
-                        reader.Seek(endPosition);
-                    while (reader.Tell() < endPosition)
                     {
-                        Event newEvent = new Event();
-                        newEvent.Parent = this;
-                        newEvent.ReadCCN(reader);
-                        Events.Add(newEvent);
+                        reader.Skip(4);
+                        int count = reader.ReadInt();
+                        for (int i = 0; i < count; i++)
+                        {
+                            Event newEvent = new Event();
+                            newEvent.Parent = this;
+                            newEvent.ReadCCN(reader);
+                            Events.Add(newEvent);
+                        }
+                    }
+                    else
+                    {
+                        long endPosition = reader.Tell() + reader.ReadInt();
+                        if (Parameters.DontIncludeEvents)
+                            reader.Seek(endPosition);
+                        while (reader.Tell() < endPosition)
+                        {
+                            Event newEvent = new Event();
+                            newEvent.Parent = this;
+                            newEvent.ReadCCN(reader);
+                            Events.Add(newEvent);
+                        }
                     }
                 }
                 else if (identifier == "ERop")
