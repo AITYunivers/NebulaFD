@@ -78,6 +78,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
                     NebulaCore.Flash = true;
                     break;
                 case 12: // Android / OUYA Application
+                case 20: // XNA Phone App
                 case 34: // Android App Bundle
                     NebulaCore.Android = true;
                     break;

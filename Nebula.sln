@@ -9,13 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nebula.Core", "Nebula.Core\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nebula.Tools", "Nebula.Tools", "{044E6E66-F3B5-4034-B627-B4669EB304C9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameDumper", "Nebula.Tools\InfoDump\GameDumper.csproj", "{6D8F0E12-6E18-4F2F-8066-091CFBCB5B8B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MappingTool", "Nebula.Tools\MappingTool\MappingTool.csproj", "{FA990FDC-66CD-47C8-8E24-5DAE78709F96}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IniEncKeyDumper", "Nebula.Tools\IniEncKeyDumper\IniEncKeyDumper.csproj", "{A39A2C22-C4ED-44B3-81CF-2E9BB43F69E9}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZelTranslator-SD", "Nebula.Tools\ZelTranslator\ZelTranslator-SD.csproj", "{C6F6893E-DAE2-46EA-873F-924FA14F8368}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameDumper", "Nebula.Tools\GameDumper\GameDumper.csproj", "{6D8F0E12-6E18-4F2F-8066-091CFBCB5B8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
