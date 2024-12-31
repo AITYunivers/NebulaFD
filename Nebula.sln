@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35617.110 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nebula.Core", "Nebula.Core\Nebula.Core.csproj", "{023997B8-F0D1-45C4-9B10-D0EC0DEF8426}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{023997B8-F0D1-45C4-9B10-D0EC0DEF8426}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{023997B8-F0D1-45C4-9B10-D0EC0DEF8426}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{023997B8-F0D1-45C4-9B10-D0EC0DEF8426}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{023997B8-F0D1-45C4-9B10-D0EC0DEF8426}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {212E5F30-98B2-4313-B286-42B8A3DBA2F7}
+	EndGlobalSection
+EndGlobal
