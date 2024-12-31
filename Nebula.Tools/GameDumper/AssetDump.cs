@@ -59,9 +59,6 @@ namespace Nebula.Tools.GameDumper
                     case "Dump Icons":
                         runningTasks.Add(new Task(IconDumper.Execute));
                         break;
-                    case "Dump Sprite Sheets":
-                        runningTasks.Add(new Task(SpriteSheetDumper.Execute));
-                        break;
                     case "Dump Sounds":
                         runningTasks.Add(new Task(SoundDumper.Execute));
                         break;
