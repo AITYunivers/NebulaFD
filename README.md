@@ -1,4 +1,4 @@
-![Nebula Logo](https://raw.githubusercontent.com/AITYunivers/NebulaFD/master/.resources/NebulaLogo.png)
+![Nebula Logo](https://raw.githubusercontent.com/AITYunivers/NebulaFD/2025-rewrite/.resources/NebulaLogo.png)
 # 
 **README is a Work In Progress.**
 **Nebula is currently in the middle of a rewrite!**
@@ -9,7 +9,7 @@
 Just another Clickteam Fusion 2.5 decompiler made by [Yunivers](https://github.com/AITYunivers).
 |Table of Contents| Description |
 |--|--|
-| [Credits](https://github.com/AITYunivers/Nebula/tree/master#Credits)|A list of Nebula credits.|
+| [Credits](https://github.com/AITYunivers/Nebula/tree/2025-rewrite#Credits)|A list of Nebula credits.|
 
 ## Credits
 |User| Credit for..|
