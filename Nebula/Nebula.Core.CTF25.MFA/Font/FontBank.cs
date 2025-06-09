@@ -1,0 +1,39 @@
+﻿using Nebula.Core.Data;
+using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
+
+namespace Nebula.Core.CTF25.MFA.Font
+{
+    public class FontBank : IReadable
+    {
+        private FontItem[] _fontItems = [];
+
+        public void Read(ByteReader reader)
+        {
+            string bankHeader = reader.ReadAscii(4);
+            if (bankHeader != "ATNF")
+                throw new InvalidDataException("Invalid font bank header. Expected ATNF, got " + bankHeader);
+
+            int fontCount = reader.ReadInt();
+            this.Log($"Found {fontCount} font(s)", Logger.LogType.Debug);
+            if (fontCount < 0)
+                throw new InvalidDataException("Invalid font count. Expected greater than or equal to 0, got " + fontCount);
+
+            _fontItems = new FontItem[fontCount];
+            for (int i = 0; i < fontCount; i++)
+            {
+                FontItem fontItem = new FontItem();
+                fontItem.Read(reader);
+                _fontItems[i] = fontItem;
+
+                this.Log($"Font {fontItem.Handle}: {fontItem.Name}", Logger.LogType.Debug);
+            }
+        }
+
+        public FontItem this[int index]
+        {
+            get => _fontItems[index];
+            set => _fontItems[index] = value;
+        }
+    }
+}
