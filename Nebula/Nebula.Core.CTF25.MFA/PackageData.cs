@@ -22,7 +22,7 @@ namespace Nebula.Core.CTF25.MFA
             this.Log("Project Header: " + header);
 
             if (header != "MFU2")
-                throw new InvalidDataException("Invalid project header. Expected MMF2, got " + header);
+                throw new InvalidDataException("Invalid project header. Expected MFU2, got " + header);
 
             ushort runtimeVersion = reader.ReadUShort();
             ushort runtimeSubversion = reader.ReadUShort();
