@@ -1,4 +1,6 @@
 ﻿using Nebula.Core.CTF25.MFA.Common;
+using Nebula.Core.CTF25.MFA.Frame.Folder;
+using Nebula.Core.CTF25.MFA.Frame.Instance;
 using Nebula.Core.CTF25.MFA.Layer;
 using Nebula.Core.CTF25.MFA.Object;
 using Nebula.Core.Data;
@@ -53,6 +55,23 @@ namespace Nebula.Core.CTF25.MFA.Frame
 
             ObjectBank objectBank = new ObjectBank();
             objectBank.Read(reader);
+
+            FolderBank folderBank = new FolderBank();
+            folderBank.Read(reader);
+
+            InstanceBank instanceBank = new InstanceBank();
+            instanceBank.Read(reader);
+
+            reader.Skip(reader.ReadInt()); // Events
+
+            while (true)
+            {
+                bool isLast = reader.ReadByte() == 0x00;
+                if (isLast)
+                    break;
+
+                reader.Skip(reader.ReadInt()); // Data
+            }
         }
     }
 }

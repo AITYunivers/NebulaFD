@@ -1,5 +1,6 @@
 ﻿using Nebula.Core.Utilities;
 using System.Drawing;
+using System.Reflection.PortableExecutable;
 using System.Text;
 
 namespace Nebula.Core.Memory
@@ -83,6 +84,13 @@ namespace Nebula.Core.Memory
         public float ReadFloat() => ReadSingle();
         public bool ReadBool() => ReadByte() == 1;
         public bool ReadBool4() => ReadInt() == 1;
+
+        public string PeekHeader(int length = 4)
+        {
+            string header = ReadAscii(length);
+            Skip(-length);
+            return header;
+        }
 
         public string ReadAscii(int length = -1)
         {

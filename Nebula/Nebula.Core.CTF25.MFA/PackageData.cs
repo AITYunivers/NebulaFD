@@ -18,17 +18,17 @@ namespace Nebula.Core.CTF25.MFA
         {
             this.Log($"Running alpha build");
             string header = reader.ReadAscii(4);
-            reader.SetUnicode(header == "MFU2");
+            reader.SetUnicode(true);
             this.Log("Project Header: " + header);
 
-            if (header != "MFU2" && header != "MMF2")
-                throw new InvalidDataException("Invalid project header. Expected MFU2 or MMF2, got " + header);
+            if (header != "MFU2")
+                throw new InvalidDataException("Invalid project header. Expected MMF2, got " + header);
 
             ushort runtimeVersion = reader.ReadUShort();
             ushort runtimeSubversion = reader.ReadUShort();
             int productVersion = reader.ReadInt();
             int productBuild = reader.ReadInt();
-            reader.Skip(4); // Stamp
+            reader.Skip(reader.ReadInt()); // MFA Thumbnail
             this.Log("Fusion Build: " + productBuild);
 
             string appName = reader.ReadAutoYuniversal();
@@ -141,13 +141,20 @@ namespace Nebula.Core.CTF25.MFA
 
             FrameBank frameBank = new FrameBank();
             frameBank.Read(reader);
+
+            while (true)
+            {
+                bool isLast = reader.ReadByte() == 0x00;
+                if (isLast)
+                    break;
+
+                reader.Skip(reader.ReadInt()); // Data
+            }
         }
 
         public bool Check(ByteReader reader)
         {
-            string header = reader.ReadAscii(4);
-            reader.Skip(-4);
-            return header == "MFU2";
+            return reader.PeekHeader() == "MFU2";
         }
     }
 }
