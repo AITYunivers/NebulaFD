@@ -5,14 +5,22 @@ namespace Nebula.Core.CTF25.MFA.Object.Data
 {
     internal class ActiveData : CommonObjectData
     {
+        public AnimationBank? Animations;
+
         public override void ReadUncommonData(ByteReader reader)
         {
             bool hasAnimations = reader.ReadBool();
             if (hasAnimations)
             {
-                AnimationBank animationBank = new AnimationBank();
-                animationBank.Read(reader);
+                Animations = new AnimationBank();
+                Animations.Read(reader);
             }
+        }
+
+        public override void WriteUncommonData(ByteWriter writer)
+        {
+            writer.WriteBool(Animations != null);
+            Animations?.Write(writer);
         }
     }
 }

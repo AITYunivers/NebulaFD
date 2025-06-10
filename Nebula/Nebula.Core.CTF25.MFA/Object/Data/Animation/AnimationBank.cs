@@ -5,7 +5,7 @@ using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.MFA.Object.Data.Animation
 {
-    internal class AnimationBank : IReadable
+    internal class AnimationBank : IReadable, IWritable
     {
         private AnimationItem[] _animationItems = [];
 
@@ -24,6 +24,13 @@ namespace Nebula.Core.CTF25.MFA.Object.Data.Animation
                 _animationItems[i] = animationItem;
                 this.Log($"Animation {i}: {animationItem.Name}", Logger.LogType.Debug);
             }
+        }
+
+        public void Write(ByteWriter writer)
+        {
+            writer.WriteInt(_animationItems.Length);
+            foreach (AnimationItem animationItem in _animationItems)
+                animationItem.Write(writer);
         }
 
         public AnimationItem this[int index]

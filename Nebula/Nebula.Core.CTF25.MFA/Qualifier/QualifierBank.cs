@@ -5,7 +5,7 @@ using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.MFA.Qualifier
 {
-    public class QualifierBank : IReadable
+    public class QualifierBank : IReadable, IWritable
     {
         private QualifierItem[] _qualifierItems = [];
 
@@ -25,6 +25,13 @@ namespace Nebula.Core.CTF25.MFA.Qualifier
 
                 this.Log($"Qualifier {qualifierItem.Handle}: {qualifierItem.Name}", Logger.LogType.Debug);
             }
+        }
+
+        public void Write(ByteWriter writer)
+        {
+            writer.WriteInt(_qualifierItems.Length);
+            foreach (QualifierItem qualifierItem in _qualifierItems)
+                qualifierItem.Write(writer);
         }
 
         public QualifierItem this[int index]

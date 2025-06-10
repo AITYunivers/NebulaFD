@@ -3,7 +3,7 @@ using Nebula.Core.Memory;
 
 namespace Nebula.Core.CTF25.CCN.Chunk
 {
-    public class ChunkDefinition : IReadable
+    public class ChunkDefinition : IReadable, IWritable
     {
         private ushort _id;
         private byte[]? _chunkData = null;
@@ -17,6 +17,12 @@ namespace Nebula.Core.CTF25.CCN.Chunk
             _compressionType = (EChunkCompressionType)reader.ReadUShort();
             _dataSize = reader.ReadInt();
             _dataOffset = reader.Tell();
+        }
+
+        public virtual void Write(ByteWriter writer)
+        {
+            writer.WriteUShort(_id);
+            writer.WriteUShort((ushort)_compressionType);
         }
 
         public virtual byte[] DecompressData(byte[] data)

@@ -6,6 +6,7 @@ namespace Nebula.Core.Memory
 {
     public class ByteWriter : BinaryWriter
     {
+        public ByteWriter() : base(new MemoryStream()){}
         public ByteWriter(Stream input) : base(input){}
         public ByteWriter(Stream input, Encoding encoding) : base(input, encoding){}
         public ByteWriter(byte[] data) : base(new MemoryStream(data)){}
@@ -35,13 +36,12 @@ namespace Nebula.Core.Memory
         public void WriteUInt32(uint value) => Write(value);
         public void WriteULong(ulong value) => Write(value);
         public void WriteUInt64(ulong value) => Write(value);
-
-        public void WriteBytes(byte[] value) => Write(value);
         public void WriteSingle(float value) => Write(value);
         public void WriteFloat(float value) => Write(value);
         public void WriteDouble(double value) => Write(value);
         public void WriteString(string value) => Write(value);
         public void WriteBool(bool value) => Write(value);
+        public void WriteBool4(bool value) => Write(value ? 1 : 0);
 
         /*public void WriteYuniversal(string value, bool addZero = false)
         {
@@ -49,7 +49,12 @@ namespace Nebula.Core.Memory
             else WriteAscii(value);
         }*/
 
-
+        public void WriteBytes(byte[] value, bool prependSize = false)
+        {
+            if (prependSize)
+                WriteInt(value.Length);
+            Write(value);
+        }
         public void WriteAscii(string value, bool appendZero = false)
         {
             WriteBytes(Encoding.ASCII.GetBytes(value));

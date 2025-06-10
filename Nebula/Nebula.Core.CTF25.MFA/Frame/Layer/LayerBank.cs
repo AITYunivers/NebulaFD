@@ -1,11 +1,10 @@
-﻿using Nebula.Core.CTF25.MFA.Frame;
-using Nebula.Core.Data;
+﻿using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.MFA.Layer
 {
-    internal class LayerBank : IReadable
+    internal class LayerBank : IReadable, IWritable
     {
         private LayerItem[] _layerItems = [];
 
@@ -24,6 +23,13 @@ namespace Nebula.Core.CTF25.MFA.Layer
                 _layerItems[i] = layerItem;
                 this.Log($"Layer {i}: {layerItem.Name}", Logger.LogType.Debug);
             }
+        }
+
+        public void Write(ByteWriter writer)
+        {
+            writer.WriteInt(_layerItems.Length);
+            foreach (LayerItem layerItem in _layerItems)
+                layerItem.Write(writer);
         }
 
         public LayerItem this[int index]

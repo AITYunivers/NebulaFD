@@ -4,7 +4,7 @@ using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.MFA.Object.Data.Animation.Direction
 {
-    internal class DirectionBank : IReadable
+    internal class DirectionBank : IReadable, IWritable
     {
         private DirectionItem[] _directionItems = [];
 
@@ -22,6 +22,13 @@ namespace Nebula.Core.CTF25.MFA.Object.Data.Animation.Direction
                 directionItem.Read(reader);
                 _directionItems[i] = directionItem;
             }
+        }
+
+        public void Write(ByteWriter writer)
+        {
+            writer.WriteInt(_directionItems.Length);
+            foreach (DirectionItem directionItem in _directionItems)
+                directionItem.Write(writer);
         }
 
         public DirectionItem this[int index]

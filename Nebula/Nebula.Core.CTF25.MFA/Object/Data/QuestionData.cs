@@ -5,16 +5,25 @@ namespace Nebula.Core.CTF25.MFA.Object.Data
 {
     internal class QuestionData : CommonObjectData
     {
+        public int Width;
+        public int Height;
+        public ParagraphContainer Questions = new ParagraphContainer();
+        public ParagraphContainer Answers = new ParagraphContainer();
+
         public override void ReadUncommonData(ByteReader reader)
         {
-            int width = reader.ReadInt();
-            int height = reader.ReadInt();
+            Width = reader.ReadInt();
+            Height = reader.ReadInt();
+            Questions.Read(reader);
+            Answers.Read(reader);
+        }
 
-            ParagraphContainer questionsContainer = new ParagraphContainer();
-            questionsContainer.Read(reader);
-
-            ParagraphContainer answersContainer = new ParagraphContainer();
-            answersContainer.Read(reader);
+        public override void WriteUncommonData(ByteWriter writer)
+        {
+            writer.WriteInt(Width);
+            writer.WriteInt(Height);
+            Questions.Write(writer);
+            Answers.Write(writer);
         }
     }
 }

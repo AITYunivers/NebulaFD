@@ -4,7 +4,7 @@ using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.MFA.Font
 {
-    public class FontBank : IReadable
+    public class FontBank : IReadable, IWritable
     {
         private FontItem[] _fontItems = [];
 
@@ -28,6 +28,14 @@ namespace Nebula.Core.CTF25.MFA.Font
 
                 this.Log($"Font {fontItem.Handle}: {fontItem.Name}", Logger.LogType.Debug);
             }
+        }
+
+        public void Write(ByteWriter writer)
+        {
+            writer.WriteAscii("ATNF");
+            writer.WriteInt(_fontItems.Length);
+            foreach (FontItem fontItem in _fontItems)
+                fontItem.Write(writer);
         }
 
         public FontItem this[int index]

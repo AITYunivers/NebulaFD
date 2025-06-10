@@ -4,7 +4,7 @@ using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.MFA.Object.Data.Behaviour
 {
-    internal class BehaviourBank : IReadable
+    internal class BehaviourBank : IReadable, IWritable
     {
         private BehaviourItem[] _behaviourItems = [];
 
@@ -23,6 +23,13 @@ namespace Nebula.Core.CTF25.MFA.Object.Data.Behaviour
                 _behaviourItems[i] = behaviourItem;
                 this.Log($"Behaviour {i}: {behaviourItem.Name}", Logger.LogType.Debug);
             }
+        }
+
+        public void Write(ByteWriter writer)
+        {
+            writer.WriteInt(_behaviourItems.Length);
+            foreach (BehaviourItem behaviourItem in _behaviourItems)
+                behaviourItem.Write(writer);
         }
 
         public BehaviourItem this[int index]

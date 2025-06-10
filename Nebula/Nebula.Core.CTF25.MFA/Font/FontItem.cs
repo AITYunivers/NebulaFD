@@ -3,33 +3,69 @@ using Nebula.Core.Memory;
 
 namespace Nebula.Core.CTF25.MFA.Font
 {
-    public class FontItem : IReadable
+    public class FontItem : IReadable, IWritable
     {
-        public string Name = string.Empty;
         public uint Handle;
+        public uint Checksum;
+        public int References;
+        public int Size;
+        public int Height;
+        public int Width;
+        public int Escapement;
+        public int Orientation;
+        public int Weight;
+        public bool Italic;
+        public bool Underline;
+        public bool StrikeOut;
+        public byte CharSet;
+        public byte OutPrecision;
+        public byte ClipPrecision;
+        public byte Quality;
+        public byte PitchAndFamily;
+        public string Name = string.Empty;
 
         public void Read(ByteReader reader)
         {
             Handle = reader.ReadUInt();
-            /*
-            i32 Checksum        | 0x00
-            i32 References      | 0x04
-            i32 Size            | 0x08
-            i32 Height          | 0x0C
-            i32 Width           | 0x10
-            i32 Escapement      | 0x14
-            i32 Orientation     | 0x18
-            i32 Weight          | 0x1C
-            u8  Italic          | 0x20
-            u8  Underline       | 0x21
-            u8  StrikeOut       | 0x22
-            u8  CharSet         | 0x23
-            u8  OutPrecision    | 0x24
-            u8  ClipPrecision   | 0x25
-            u8  Quality         | 0x26
-            u8  PitchAndFamily  | 0x27
-            */  reader.Skip      (0x28);
+            Checksum = reader.ReadUInt();
+            References = reader.ReadInt();
+            Size = reader.ReadInt();
+            Height = reader.ReadInt();
+            Width = reader.ReadInt();
+            Escapement = reader.ReadInt();
+            Orientation = reader.ReadInt();
+            Weight = reader.ReadInt();
+            Italic = reader.ReadBool();
+            Underline = reader.ReadBool();
+            StrikeOut = reader.ReadBool();
+            CharSet = reader.ReadByte();
+            OutPrecision = reader.ReadByte();
+            ClipPrecision = reader.ReadByte();
+            Quality = reader.ReadByte();
+            PitchAndFamily = reader.ReadByte();
             Name = reader.ReadYuniversal(32);
+        }
+
+        public void Write(ByteWriter writer)
+        {
+            writer.WriteUInt(Handle);
+            writer.WriteUInt(Checksum);
+            writer.WriteInt(References);
+            writer.WriteInt(Size);
+            writer.WriteInt(Height);
+            writer.WriteInt(Width);
+            writer.WriteInt(Escapement);
+            writer.WriteInt(Orientation);
+            writer.WriteInt(Weight);
+            writer.WriteBool(Italic);
+            writer.WriteBool(Underline);
+            writer.WriteBool(StrikeOut);
+            writer.WriteByte(CharSet);
+            writer.WriteByte(OutPrecision);
+            writer.WriteByte(ClipPrecision);
+            writer.WriteByte(Quality);
+            writer.WriteByte(PitchAndFamily);
+            writer.WriteYunicode(Name, 32);
         }
     }
 }

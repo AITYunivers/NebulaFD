@@ -4,7 +4,7 @@ using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.MFA.Object.Data.Paragraph
 {
-    internal class ParagraphBank : IReadable
+    internal class ParagraphBank : IReadable, IWritable
     {
         private ParagraphItem[] _paragraphItems = [];
 
@@ -22,6 +22,13 @@ namespace Nebula.Core.CTF25.MFA.Object.Data.Paragraph
                 paragraphItem.Read(reader);
                 _paragraphItems[i] = paragraphItem;
             }
+        }
+
+        public void Write(ByteWriter writer)
+        {
+            writer.WriteInt(_paragraphItems.Length);
+            foreach (ParagraphItem paragraphItem in _paragraphItems)
+                paragraphItem.Write(writer);
         }
 
         public ParagraphItem this[int index]

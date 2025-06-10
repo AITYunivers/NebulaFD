@@ -4,7 +4,7 @@ using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.MFA.Object.Data.Movement
 {
-    internal class MovementBank : IReadable
+    internal class MovementBank : IReadable, IWritable
     {
         private MovementItem[] _movementItems = [];
 
@@ -23,6 +23,13 @@ namespace Nebula.Core.CTF25.MFA.Object.Data.Movement
                 _movementItems[i] = movementItem;
                 this.Log($"Movement {i}: {movementItem.Name}", Logger.LogType.Debug);
             }
+        }
+
+        public void Write(ByteWriter writer)
+        {
+            writer.WriteInt(_movementItems.Length);
+            foreach (MovementItem movementItem in _movementItems)
+                movementItem.Write(writer);
         }
 
         public MovementItem this[int index]

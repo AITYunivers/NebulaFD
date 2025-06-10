@@ -4,7 +4,7 @@ using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.MFA.Frame
 {
-    internal class FrameBank : IReadable
+    internal class FrameBank : IReadable, IWritable
     {
         private FrameItem[] _frameItems = [];
 
@@ -29,6 +29,12 @@ namespace Nebula.Core.CTF25.MFA.Frame
                 _frameItems[i] = frameItem;
                 this.Log($"Frame {i}: {frameItem.Name}", Logger.LogType.Debug);
             }
+        }
+
+        public void Write(ByteWriter writer)
+        {
+            foreach (FrameItem frameItem in _frameItems)
+                frameItem.Write(writer);
         }
 
         public FrameItem this[int index]

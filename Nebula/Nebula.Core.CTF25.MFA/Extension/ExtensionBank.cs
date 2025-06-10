@@ -5,7 +5,7 @@ using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.MFA.Extension
 {
-    internal class ExtensionBank : IReadable
+    internal class ExtensionBank : IReadable, IWritable
     {
         private ExtensionItem[] _extensionItems = [];
 
@@ -25,6 +25,13 @@ namespace Nebula.Core.CTF25.MFA.Extension
 
                 this.Log($"Extension {extensionItem.Handle}: {extensionItem.Name}", Logger.LogType.Debug);
             }
+        }
+
+        public void Write(ByteWriter writer)
+        {
+            writer.WriteInt(_extensionItems.Length);
+            foreach (ExtensionItem extensionItem in _extensionItems)
+                extensionItem.Write(writer);
         }
 
         public ExtensionItem this[int index]

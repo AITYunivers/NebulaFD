@@ -5,13 +5,28 @@ namespace Nebula.Core.CTF25.MFA.Object.Data
 {
     internal class FormattedTextData : CommonObjectData
     {
+        public int Width;
+        public int Height;
+        public uint Flags;
+        public Color Color;
+        public byte[] Data = [];
+
         public override void ReadUncommonData(ByteReader reader)
         {
-            int width = reader.ReadInt();
-            int height = reader.ReadInt();
-            uint flags = reader.ReadUInt();
-            Color color = reader.ReadColor();
-            reader.Skip(reader.ReadInt()); // Data
+            Width = reader.ReadInt();
+            Height = reader.ReadInt();
+            Flags = reader.ReadUInt();
+            Color = reader.ReadColor();
+            Data = reader.ReadBytes(reader.ReadInt());
+        }
+
+        public override void WriteUncommonData(ByteWriter writer)
+        {
+            writer.WriteInt(Width);
+            writer.WriteInt(Height);
+            writer.WriteUInt(Flags);
+            writer.WriteColor(Color);
+            writer.WriteBytes(Data, true);
         }
     }
 }

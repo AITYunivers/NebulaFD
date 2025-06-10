@@ -4,7 +4,7 @@ using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.MFA.Frame.Instance
 {
-    internal class InstanceBank : IReadable
+    internal class InstanceBank : IReadable, IWritable
     {
         private InstanceItem[] _instanceItems = [];
 
@@ -22,6 +22,13 @@ namespace Nebula.Core.CTF25.MFA.Frame.Instance
                 instanceItem.Read(reader);
                 _instanceItems[i] = instanceItem;
             }
+        }
+
+        public void Write(ByteWriter writer)
+        {
+            writer.WriteInt(_instanceItems.Length);
+            foreach (InstanceItem instanceItem in _instanceItems)
+                instanceItem.Write(writer);
         }
 
         public InstanceItem this[int index]

@@ -3,19 +3,33 @@ using Nebula.Core.Memory;
 
 namespace Nebula.Core.CTF25.MFA.Extension
 {
-    internal class ExtensionItem : IReadable
+    internal class ExtensionItem : IReadable, IWritable
     {
+        public uint Handle = 0;
+        public string FileName = string.Empty;
         public string Name = string.Empty;
-        public uint Handle;
+        public uint MagicNumber = 0;
+        public string SubType = string.Empty;
+        public bool IsUnicode = false;
 
         public void Read(ByteReader reader)
         {
             Handle = reader.ReadUInt();
-            reader.SkipAutoYuniversal(); // FileName
+            FileName = reader.ReadAutoYuniversal();
             Name = reader.ReadAutoYuniversal();
-            reader.Skip(4); // MagicNumber
-            reader.SkipAutoYuniversal(); // SubType
-            reader.Skip(4); // IsUnicode
+            MagicNumber = reader.ReadUInt();
+            SubType = reader.ReadAutoYuniversal();
+            IsUnicode = reader.ReadBool4();
+        }
+
+        public void Write(ByteWriter writer)
+        {
+            writer.WriteUInt(Handle);
+            writer.WriteAutoYunicode(FileName);
+            writer.WriteAutoYunicode(Name);
+            writer.WriteUInt(MagicNumber);
+            writer.WriteAutoYunicode(SubType);
+            writer.WriteBool4(IsUnicode);
         }
     }
 }

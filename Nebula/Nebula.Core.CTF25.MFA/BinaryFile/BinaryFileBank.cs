@@ -4,7 +4,7 @@ using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.MFA.BinaryFile
 {
-    public class BinaryFileBank : IReadable
+    public class BinaryFileBank : IReadable, IWritable
     {
         private BinaryFileItem[] _binaryFileItems = [];
 
@@ -24,6 +24,13 @@ namespace Nebula.Core.CTF25.MFA.BinaryFile
 
                 this.Log($"Binary File {i}: {binaryFileItem.Name}", Logger.LogType.Debug);
             }
+        }
+
+        public void Write(ByteWriter writer)
+        {
+            writer.WriteInt(_binaryFileItems.Length);
+            foreach (BinaryFileItem binaryFileItem in _binaryFileItems)
+                binaryFileItem.Write(writer);
         }
 
         public BinaryFileItem this[int index]

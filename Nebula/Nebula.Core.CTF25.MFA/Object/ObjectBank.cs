@@ -4,7 +4,7 @@ using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.MFA.Object
 {
-    internal class ObjectBank : IReadable
+    internal class ObjectBank : IReadable, IWritable
     {
         private ObjectItem[] _objectItems = [];
 
@@ -23,6 +23,13 @@ namespace Nebula.Core.CTF25.MFA.Object
                 _objectItems[i] = objectItem;
                 this.Log($"Object {i}: {objectItem.Name}", Logger.LogType.Debug);
             }
+        }
+
+        public void Write(ByteWriter writer)
+        {
+            writer.WriteInt(_objectItems.Length);
+            foreach (ObjectItem objectItem in _objectItems)
+                objectItem.Write(writer);
         }
 
         public ObjectItem this[int index]

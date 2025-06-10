@@ -1,29 +1,55 @@
 ﻿using Nebula.Core.CTF25.MFA.Object.Data.Animation;
 using Nebula.Core.Memory;
+using System.Reflection.PortableExecutable;
 
 namespace Nebula.Core.CTF25.MFA.Object.Data
 {
     internal class ExtensionData : CommonObjectData
     {
+        public AnimationBank? Animations;
+        public uint Type;
+        public string? Name;
+        public string? FileName;
+        public uint? Magic;
+        public string? SubType;
+        public byte[] Data = [];
+
         public override void ReadUncommonData(ByteReader reader)
         {
             bool hasAnimations = reader.ReadBool();
             if (hasAnimations)
             {
-                AnimationBank animationBank = new AnimationBank();
-                animationBank.Read(reader);
+                Animations = new AnimationBank();
+                Animations.Read(reader);
             }
 
-            uint type = reader.ReadUInt();
-            if (type == uint.MaxValue)
+            Type = reader.ReadUInt();
+            if (Type == uint.MaxValue)
             {
-                string name = reader.ReadAutoYuniversal();
-                string fileName = reader.ReadAutoYuniversal();
-                uint magic = reader.ReadUInt();
-                string subType = reader.ReadAutoYuniversal();
+                Name = reader.ReadAutoYuniversal();
+                FileName = reader.ReadAutoYuniversal();
+                Magic = reader.ReadUInt();
+                SubType = reader.ReadAutoYuniversal();
             }
 
-            reader.Skip(reader.ReadInt()); // Data
+            Data = reader.ReadBytes(reader.ReadInt());
+        }
+
+        public override void WriteUncommonData(ByteWriter writer)
+        {
+            writer.WriteBool(Animations != null);
+            Animations?.Write(writer);
+
+            writer.WriteUInt(Type);
+            if (Type == uint.MaxValue)
+            {
+                writer.WriteAutoYunicode(Name!);
+                writer.WriteAutoYunicode(FileName!);
+                writer.WriteUInt(Magic!.Value);
+                writer.WriteAutoYunicode(SubType!);
+            }
+
+            writer.WriteBytes(Data, true);
         }
     }
 }
