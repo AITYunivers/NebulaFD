@@ -1,5 +1,4 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
-using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 using System.Drawing;
@@ -46,6 +45,8 @@ namespace Nebula.Core.CTF25.CCN.Chunks
             FrameCount = reader.ReadInt();
             FrameRate = reader.ReadInt();
             WindowMenuHandle = reader.ReadUInt();
+
+            this.Log($"({WindowWidth}x{WindowHeight}) FPS: {FrameRate} | Frames: {FrameCount}", Logger.LogType.Debug);
         }
 
         public override void WriteChunkData(ByteWriter writer)

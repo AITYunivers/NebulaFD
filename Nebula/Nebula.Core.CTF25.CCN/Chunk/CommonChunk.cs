@@ -13,6 +13,7 @@ namespace Nebula.Core.CTF25.CCN.Chunk
                 return;
 
             ByteReader chunkReader = ChunkDefinition.MakeReader(reader);
+            chunkReader.SetUnicode(reader.IsUnicode());
             ReadChunkData(chunkReader);
         }
 

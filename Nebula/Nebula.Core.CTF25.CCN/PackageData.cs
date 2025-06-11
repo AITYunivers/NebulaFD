@@ -1,8 +1,8 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
 using Nebula.Core.CTF25.CCN.Chunks;
+using Nebula.Core.CTF25.CCN.Chunks.Extensions;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
-using System.Reflection.PortableExecutable;
 
 namespace Nebula.Core.CTF25.CCN
 {
@@ -42,6 +42,16 @@ namespace Nebula.Core.CTF25.CCN
             CommonChunk? chunk = chunkDefinition.GetChunkType() switch
             {
                 EChunks.APP_HEADER => new AppHeaderChunk(),
+                EChunks.APP_NAME => new AppNameChunk(),
+                EChunks.AUTHOR => new AuthorChunk(),
+                EChunks.EXTENSION_DATA => new ExtensionDataChunk(),
+                EChunks.EDITOR_FILENAME => new EditorFilenameChunk(),
+                EChunks.TARGET_FILENAME => new TargetFilenameChunk(),
+                EChunks.EXTENSIONS => new ExtensionBankChunk(),
+                EChunks.APP_ICON => new AppIconChunk(),
+                EChunks.EXTENDED_HEADER => new ExtendedHeaderChunk(),
+                EChunks.APP_CODE_PAGE => new AppCodePageChunk(),
+                EChunks.ENGINE_VERSION => new EngineVersionChunk(),
                 _ => null
             };
 
