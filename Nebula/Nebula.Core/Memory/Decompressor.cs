@@ -6,13 +6,14 @@ namespace Nebula.Core.Memory
     {
         public static byte[] DecompressZlib(byte[] compressedData)
         {
-            return DecompressZlib(new ByteReader(compressedData), out int _);
+            using ByteReader reader = new ByteReader(compressedData);
+            return DecompressZlib(reader, out int _);
         }
 
         public static byte[] DecompressZlib(ByteReader exeReader, out int decompressed)
         {
-            var decompSize = exeReader.ReadInt();
-            var compSize = exeReader.ReadInt();
+            int decompSize = exeReader.ReadInt();
+            int compSize = exeReader.ReadInt();
             decompressed = decompSize;
             return DecompressZlib(exeReader, compSize);
         }

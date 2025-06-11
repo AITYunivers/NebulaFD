@@ -1,5 +1,6 @@
 ﻿using Nebula.Core.Data;
 using Nebula.Core.Memory;
+using System.Buffers;
 
 namespace Nebula.Core.CTF25.CCN.Chunk
 {
@@ -17,6 +18,7 @@ namespace Nebula.Core.CTF25.CCN.Chunk
             _compressionType = (EChunkCompressionType)reader.ReadUShort();
             _dataSize = reader.ReadInt();
             _dataOffset = reader.Tell();
+            reader.Skip(_dataSize);
         }
 
         public virtual void Write(ByteWriter writer)
@@ -25,31 +27,43 @@ namespace Nebula.Core.CTF25.CCN.Chunk
             writer.WriteUShort((ushort)_compressionType);
         }
 
-        public virtual byte[] DecompressData(byte[] data)
+        public virtual void DecompressData()
         {
+            if (_chunkData == null)
+                return;
+
+            byte[] result;
             switch (_compressionType)
             {
                 case EChunkCompressionType.UNCOMPRESSED:
-                    return data;
+                    return;
                 case EChunkCompressionType.ZLIB:
                     _compressionType = EChunkCompressionType.UNCOMPRESSED;
-                    return Decompressor.DecompressZlib(data);
+                    result = Decompressor.DecompressZlib(_chunkData);
+                    break;
                 case EChunkCompressionType.XOR:
                     _compressionType = EChunkCompressionType.UNCOMPRESSED;
-                    return Decryption.DecryptXor(data);
+                    Decryption.DecryptXor(_chunkData);
+                    return;
                 case EChunkCompressionType.ZLIB | EChunkCompressionType.XOR:
                     _compressionType = EChunkCompressionType.UNCOMPRESSED;
-                    return Decryption.DecompressXor(data, _id);
+                    result = Decryption.DecompressXor(_chunkData, _id);
+                    break;
                 default:
                     throw new InvalidDataException($"Unknown compression type: {(int)_compressionType}");
             }
+
+            ArrayPool<byte>.Shared.Return(_chunkData);
+            _chunkData = ArrayPool<byte>.Shared.Rent(_dataSize = result.Length);
+            Array.Copy(result, _chunkData, _dataSize);
         }
 
         public virtual void InitData(ByteReader reader, bool resetPosition = true)
         {
             long oldPos = reader.Tell();
             reader.Seek(_dataOffset);
-            _chunkData = reader.ReadBytes(_dataSize);
+            _chunkData = ArrayPool<byte>.Shared.Rent(_dataSize);
+            reader.BaseStream.ReadExactly(_chunkData, 0, _dataSize);
             if (resetPosition)
                 reader.Seek(oldPos);
         }
@@ -70,7 +84,7 @@ namespace Nebula.Core.CTF25.CCN.Chunk
                 return [];
 
             if (_compressionType != EChunkCompressionType.UNCOMPRESSED)
-                _chunkData = DecompressData(_chunkData);
+                DecompressData();
             return _chunkData;
         }
 
@@ -82,7 +96,7 @@ namespace Nebula.Core.CTF25.CCN.Chunk
 
         public ByteReader MakeReader()
         {
-            return new ByteReader(GetData());
+            return new ByteReader(GetData(), GetDataSize());
         }
 
         public ushort GetID()
@@ -93,6 +107,15 @@ namespace Nebula.Core.CTF25.CCN.Chunk
         public EChunks GetChunkType()
         {
             return (EChunks)_id;
+        }
+
+        public void UnloadData()
+        {
+            if (_chunkData != null)
+            {
+                ArrayPool<byte>.Shared.Return(_chunkData);
+                _chunkData = null;
+            }
         }
     }
 }

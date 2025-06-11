@@ -69,7 +69,7 @@ namespace Nebula.Core.CTF25.MFA.Object.Data
 
         public void Write(ByteWriter writer)
         {
-            writer.WriteULong(Flags);
+            writer.WriteULong(CommonFlags);
             writer.WriteColor(Background);
 
             for (int i = 0; i < 8; i++)

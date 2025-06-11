@@ -1,4 +1,5 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
+using Nebula.Core.CTF25.CCN.Chunks;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 using System.Reflection.PortableExecutable;
@@ -38,7 +39,17 @@ namespace Nebula.Core.CTF25.CCN
 
         public virtual void ReadChunk(ChunkDefinition chunkDefinition, ByteReader reader)
         {
-            reader.Skip(chunkDefinition.GetDataSize());
+            CommonChunk? chunk = chunkDefinition.GetChunkType() switch
+            {
+                EChunks.APP_HEADER => new AppHeaderChunk(),
+                _ => null
+            };
+
+            if (chunk != null)
+            {
+                chunk.SetChunkDefinition(chunkDefinition);
+                chunk.Read(reader);
+            }
         }
 
         // Later this will be moved

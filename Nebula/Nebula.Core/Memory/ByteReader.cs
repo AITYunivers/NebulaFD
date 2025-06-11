@@ -12,6 +12,7 @@ namespace Nebula.Core.Memory
         public ByteReader(Stream input) : base(input){}
         public ByteReader(Stream input, Encoding encoding) : base(input, encoding){}
         public ByteReader(byte[] data) : base(new MemoryStream(data)){}
+        public ByteReader(byte[] data, int length) : base(new MemoryStream(data, 0, length)){}
         public ByteReader(string path, FileMode fileMode) : base(new FileStream(path, fileMode)){}
         public void Seek(long offset, SeekOrigin seekOrigin = SeekOrigin.Begin) => BaseStream.Seek(offset, seekOrigin);
         public void Skip(long count) => BaseStream.Seek(count, SeekOrigin.Current);
