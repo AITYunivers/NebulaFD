@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <OutputPath>..\..\build\</OutputPath>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
 </Project>

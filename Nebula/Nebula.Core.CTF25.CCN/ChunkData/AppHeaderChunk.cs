@@ -34,12 +34,9 @@ namespace Nebula.Core.CTF25.CCN.Chunks
             DefaultScore = (reader.ReadInt() + 1) * -1;
             DefaultLives = (reader.ReadInt() + 1) * -1;
 
+            ControlTypes = reader.ReadUShorts(4);
             for (int i = 0; i < 4; i++)
-                ControlTypes[i] = reader.ReadUShort();
-
-            for (int i = 0; i < 4; i++)
-                for (int ii = 0; ii < 8; ii++)
-                    ControlKeys[i][ii] = reader.ReadUShort();
+                ControlKeys[i] = reader.ReadUShorts(8);
 
             BorderColor = reader.ReadColor();
             FrameCount = reader.ReadInt();
@@ -58,11 +55,9 @@ namespace Nebula.Core.CTF25.CCN.Chunks
             headerWriter.WriteInt((DefaultScore + 1) * -1);
             headerWriter.WriteInt((DefaultLives + 1) * -1);
 
+            headerWriter.WriteUShorts(ControlTypes);
             for (int i = 0; i < 4; i++)
-                headerWriter.WriteUShort(ControlTypes[i]);
-            for (int i = 0; i < 4; i++)
-                for (int ii = 0; ii < 8; ii++)
-                    headerWriter.WriteUShort(ControlKeys[i][ii]);
+                headerWriter.WriteUShorts(ControlKeys[i]);
 
             headerWriter.WriteColor(BorderColor);
             headerWriter.WriteInt(FrameCount);

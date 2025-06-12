@@ -15,21 +15,16 @@ namespace Nebula.Core.CTF25.MFA.Layer
             if (layerCount < 0)
                 throw new InvalidDataException("Invalid layer count. Expected greater than or equal to 0, got " + layerCount);
 
-            _layerItems = new LayerItem[layerCount];
+            _layerItems = reader.ReadIReadables<LayerItem>(layerCount);
+
             for (int i = 0; i < layerCount; i++)
-            {
-                LayerItem layerItem = new LayerItem();
-                layerItem.Read(reader);
-                _layerItems[i] = layerItem;
-                this.Log($"Layer {i}: {layerItem.Name}", Logger.LogType.Debug);
-            }
+                this.Log($"Layer {i}: {_layerItems[i].Name}", Logger.LogType.Debug);
         }
 
         public void Write(ByteWriter writer)
         {
             writer.WriteInt(_layerItems.Length);
-            foreach (LayerItem layerItem in _layerItems)
-                layerItem.Write(writer);
+            writer.WriteIWritables(_layerItems);
         }
 
         public LayerItem this[int index]

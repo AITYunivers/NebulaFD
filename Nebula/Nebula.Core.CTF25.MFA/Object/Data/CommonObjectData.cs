@@ -24,26 +24,11 @@ namespace Nebula.Core.CTF25.MFA.Object.Data
         {
             CommonFlags = reader.ReadULong();
             Background = reader.ReadColor();
-
-            for (int i = 0; i < 8; i++)
-                Qualifiers[i] = reader.ReadShort();
+            Qualifiers = reader.ReadShorts(8);
             reader.Skip(2); // Extra Qualifier?
 
-            AlterableValues = new CommonValue[reader.ReadInt()];
-            for (int i = 0; i < AlterableValues.Length; i++)
-            {
-                CommonValue alterableValue = new CommonValue();
-                alterableValue.Read(reader);
-                AlterableValues[i] = alterableValue;
-            }
-
-            AlterableStrings = new CommonValue[reader.ReadInt()];
-            for (int i = 0; i < AlterableStrings.Length; i++)
-            {
-                CommonValue alterableString = new CommonValue();
-                alterableString.Read(reader);
-                AlterableStrings[i] = alterableString;
-            }
+            AlterableValues = reader.ReadIReadables<CommonValue>(reader.ReadInt());
+            AlterableStrings = reader.ReadIReadables<CommonValue>(reader.ReadInt());
 
             Movements.Read(reader);
             Behaviours.Read(reader);
@@ -72,17 +57,14 @@ namespace Nebula.Core.CTF25.MFA.Object.Data
             writer.WriteULong(CommonFlags);
             writer.WriteColor(Background);
 
-            for (int i = 0; i < 8; i++)
-                writer.WriteShort(Qualifiers[i]);
+            writer.WriteShorts(Qualifiers);
             writer.WriteShort(-1); // Extra Qualifier?
 
             writer.WriteInt(AlterableValues.Length);
-            foreach (CommonValue alterableValue in AlterableValues)
-                alterableValue.Write(writer);
+            writer.WriteIWritables(AlterableValues);
 
             writer.WriteInt(AlterableStrings.Length);
-            foreach (CommonValue alterableString in AlterableStrings)
-                alterableString.Write(writer);
+            writer.WriteIWritables(AlterableStrings);
 
             Movements.Write(writer);
             Behaviours.Write(writer);

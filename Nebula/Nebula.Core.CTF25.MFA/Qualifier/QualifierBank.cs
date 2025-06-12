@@ -16,22 +16,16 @@ namespace Nebula.Core.CTF25.MFA.Qualifier
             if (qualifierCount < 0)
                 throw new InvalidDataException("Invalid qualifier count. Expected greater than or equal to 0, got " + qualifierCount);
 
-            _qualifierItems = new QualifierItem[qualifierCount];
-            for (int i = 0; i < qualifierCount; i++)
-            {
-                QualifierItem qualifierItem = new QualifierItem();
-                qualifierItem.Read(reader);
-                _qualifierItems[i] = qualifierItem;
+            _qualifierItems = reader.ReadIReadables<QualifierItem>(qualifierCount);
 
+            foreach (QualifierItem qualifierItem in _qualifierItems)
                 this.Log($"Qualifier {qualifierItem.Handle}: {qualifierItem.Name}", Logger.LogType.Debug);
-            }
         }
 
         public void Write(ByteWriter writer)
         {
             writer.WriteInt(_qualifierItems.Length);
-            foreach (QualifierItem qualifierItem in _qualifierItems)
-                qualifierItem.Write(writer);
+            writer.WriteIWritables(_qualifierItems);
         }
 
         public QualifierItem this[int index]

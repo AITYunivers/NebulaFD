@@ -13,11 +13,7 @@ namespace Nebula.Core.CTF25.CCN.Chunks
         public override void ReadChunkData(ByteReader reader)
         {
             reader.Skip(reader.ReadInt() - 4); // Unknown
-
-            Palette = new Color[16 * 16];
-            for (int i = 0; i < Palette.Length; i++)
-                Palette[i] = reader.ReadColor();
-
+            Palette = reader.ReadColors(16 * 16);
             ImageData = reader.ReadBytes(16 * 16 * 2);
 
             this.Log("Yep, the app icon data does indeed exist.", Logger.LogType.Debug);
@@ -26,10 +22,7 @@ namespace Nebula.Core.CTF25.CCN.Chunks
         public override void WriteChunkData(ByteWriter writer)
         {
             writer.WriteInt(4); // Unknown
-
-            foreach (Color color in Palette)
-                writer.WriteColor(color);
-
+            writer.WriteColors(Palette);
             writer.WriteBytes(ImageData);
         }
     }

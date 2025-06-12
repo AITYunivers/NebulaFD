@@ -1,6 +1,9 @@
-﻿using Nebula.Core.Utilities;
+﻿using Nebula.Core.Data;
+using Nebula.Core.Utilities;
 using System.Drawing;
+using System.Numerics;
 using System.Reflection.PortableExecutable;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Nebula.Core.Memory
@@ -246,6 +249,114 @@ namespace Nebula.Core.Memory
             string output = ReadAscii(length);
             Seek(orgPos);
             return output;
+        }
+
+        public Color[] ReadColors(int length)
+        {
+            Color[] result = new Color[length];
+            for (int i = 0; i < length; i++)
+                result[i] = ReadColor();
+            return result;
+        }
+
+        public short[] ReadShorts(int length)
+        {
+            short[] result = new short[length];
+            for (int i = 0; i < length; i++)
+                result[i] = ReadShort();
+            return result;
+        }
+
+        public ushort[] ReadUShorts(int length)
+        {
+            ushort[] result = new ushort[length];
+            for (int i = 0; i < length; i++)
+                result[i] = ReadUShort();
+            return result;
+        }
+
+        public int[] ReadInts(int length)
+        {
+            int[] result = new int[length];
+            for (int i = 0; i < length; i++)
+                result[i] = ReadInt();
+            return result;
+        }
+
+        public uint[] ReadUInts(int length)
+        {
+            uint[] result = new uint[length];
+            for (int i = 0; i < length; i++)
+                result[i] = ReadUInt();
+            return result;
+        }
+
+        public long[] ReadLongs(int length)
+        {
+            long[] result = new long[length];
+            for (int i = 0; i < length; i++)
+                result[i] = ReadLong();
+            return result;
+        }
+
+        public ulong[] ReadULongs(int length)
+        {
+            ulong[] result = new ulong[length];
+            for (int i = 0; i < length; i++)
+                result[i] = ReadULong();
+            return result;
+        }
+
+        public T[] ReadIReadables<T>(int length) where T : IReadable, new()
+        {
+            T[] result = new T[length];
+            for (int i = 0; i < length; i++)
+            {
+                T readable = new T();
+                readable.Read(this);
+                result[i] = readable;
+            }
+            return result;
+        }
+
+        public T1[] ReadIReadables<T1, T2>(int length, T2[] offsets)
+            where T1 : IReadable, new()
+            where T2 : INumber<T2>
+        {
+            T1[] result = new T1[length];
+            for (int i = 0; i < length; i++)
+            {
+                long offset = Convert.ToInt64(offsets[i]);
+                if (offset == 0)
+                    continue;
+
+                Seek(offset);
+                T1 readable = new T1();
+                readable.Read(this);
+                result[i] = readable;
+            }
+            return result;
+        }
+
+        public T1[] ReadIReadables<T1, T2>(int length, int baseOffset = 0)
+            where T1 : IReadable, new()
+            where T2 : unmanaged, INumber<T2>
+        {
+            int offsetsSize = Marshal.SizeOf<T2>() * length;
+            T2[] offsets = MemoryMarshal.Cast<byte, T2>(ReadBytes(offsetsSize)).ToArray();
+            T1[] result = new T1[length];
+            for (int i = 0; i < length; i++)
+            {
+                long offset = Convert.ToInt64(offsets[i]);
+                if (offset == 0)
+                    continue;
+
+                Seek(baseOffset + offset);
+                T1 readable = new T1();
+                readable.Read(this);
+                result[i] = readable;
+            }
+            return result;
         }
     }
 }

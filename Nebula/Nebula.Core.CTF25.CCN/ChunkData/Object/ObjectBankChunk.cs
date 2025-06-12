@@ -1,27 +1,25 @@
-﻿using Nebula.Core.Data;
+﻿using Nebula.Core.CTF25.CCN.Chunk;
+using Nebula.Core.CTF25.CCN.Chunks.Extensions;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 
-namespace Nebula.Core.CTF25.MFA.Object
+namespace Nebula.Core.CTF25.CCN.Chunks.Objects
 {
-    internal class ObjectBank : IReadable, IWritable
+    internal class ObjectBankChunk : CommonChunk
     {
         private ObjectItem[] _objectItems = [];
 
-        public void Read(ByteReader reader)
+        public override void ReadChunkData(ByteReader reader)
         {
             int objectCount = reader.ReadInt();
-            this.Log($"Found {objectCount} object(s)", Logger.LogType.Debug);
+            this.Log($"Found {objectCount} objects(s)", Logger.LogType.Debug);
             if (objectCount < 0)
                 throw new InvalidDataException("Invalid object count. Expected greater than or equal to 0, got " + objectCount);
-            
-            _objectItems = reader.ReadIReadables<ObjectItem>(objectCount);
 
-            for (int i = 0; i < objectCount; i++)
-                this.Log($"Object {i}: {_objectItems[i].Name}", Logger.LogType.Debug);
+            _objectItems = reader.ReadIReadables<ObjectItem>(objectCount);
         }
 
-        public void Write(ByteWriter writer)
+        public override void WriteChunkData(ByteWriter writer)
         {
             writer.WriteInt(_objectItems.Length);
             writer.WriteIWritables(_objectItems);

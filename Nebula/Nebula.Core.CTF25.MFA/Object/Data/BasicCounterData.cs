@@ -16,11 +16,7 @@ namespace Nebula.Core.CTF25.MFA.Object.Data
         public override void ReadUncommonData(ByteReader reader)
         {
             PlayerHandle = reader.ReadUInt();
-
-            ImageHandles = new uint[reader.ReadInt()];
-            for (int i = 0; i < ImageHandles.Length; i++)
-                ImageHandles[i] = reader.ReadUInt();
-
+            ImageHandles = reader.ReadUInts(reader.ReadInt());
             UseText = reader.ReadBool4();
             Color = reader.ReadColor();
             FontHandle = reader.ReadUInt();
@@ -32,11 +28,8 @@ namespace Nebula.Core.CTF25.MFA.Object.Data
         public override void WriteUncommonData(ByteWriter writer)
         {
             writer.WriteUInt(PlayerHandle);
-
             writer.WriteInt(ImageHandles.Length);
-            foreach (uint imageHandle in ImageHandles)
-                writer.WriteUInt(imageHandle);
-
+            writer.WriteUInts(ImageHandles);
             writer.WriteBool4(UseText);
             writer.WriteColor(Color);
             writer.WriteUInt(FontHandle);

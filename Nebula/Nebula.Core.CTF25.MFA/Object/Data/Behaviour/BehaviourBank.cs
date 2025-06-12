@@ -15,21 +15,16 @@ namespace Nebula.Core.CTF25.MFA.Object.Data.Behaviour
             if (behaviourCount < 0)
                 throw new InvalidDataException("Invalid behaviour count. Expected greater than or equal to 0, got " + behaviourCount);
 
-            _behaviourItems = new BehaviourItem[behaviourCount];
+            _behaviourItems = reader.ReadIReadables<BehaviourItem>(behaviourCount);
+
             for (int i = 0; i < behaviourCount; i++)
-            {
-                BehaviourItem behaviourItem = new BehaviourItem();
-                behaviourItem.Read(reader);
-                _behaviourItems[i] = behaviourItem;
-                this.Log($"Behaviour {i}: {behaviourItem.Name}", Logger.LogType.Debug);
-            }
+                this.Log($"Behaviour {i}: {_behaviourItems[i].Name}", Logger.LogType.Debug);
         }
 
         public void Write(ByteWriter writer)
         {
             writer.WriteInt(_behaviourItems.Length);
-            foreach (BehaviourItem behaviourItem in _behaviourItems)
-                behaviourItem.Write(writer);
+            writer.WriteIWritables(_behaviourItems);
         }
 
         public BehaviourItem this[int index]

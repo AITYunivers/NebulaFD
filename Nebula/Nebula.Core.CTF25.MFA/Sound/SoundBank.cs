@@ -19,15 +19,10 @@ namespace Nebula.Core.CTF25.MFA.Sound
             if (soundCount < 0)
                 throw new InvalidDataException("Invalid sound count. Expected greater than or equal to 0, got " + soundCount);
 
-            _soundItems = new SoundItem[soundCount];
-            for (int i = 0; i < soundCount; i++)
-            {
-                SoundItem soundItem = new SoundItem();
-                soundItem.Read(reader);
-                _soundItems[i] = soundItem;
+            _soundItems = reader.ReadIReadables<SoundItem>(soundCount);
 
+            foreach (SoundItem soundItem in _soundItems)
                 this.Log($"Sound {soundItem.Handle}: {soundItem.Name}", Logger.LogType.Debug);
-            }
         }
 
         public SoundItem this[int index]

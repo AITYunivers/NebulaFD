@@ -45,14 +45,9 @@ namespace Nebula.Core.CTF25.MFA.Frame
             reader.Skip(reader.ReadInt()); // Unknown
             EditorX = reader.ReadInt();
             EditorY = reader.ReadInt();
-
-            Palette = new Color[reader.ReadInt()];
-            for (int i = 0; i < Palette.Length; i++)
-                Palette[i] = reader.ReadColor();
-
+            Palette = reader.ReadColors(reader.ReadInt());
             IconHandle = reader.ReadUInt();
             EditorLayerHandle = reader.ReadUInt();
-
             Layers.Read(reader);
 
             bool hasTransitionIn = reader.ReadBool();
@@ -73,6 +68,7 @@ namespace Nebula.Core.CTF25.MFA.Frame
             Folders.Read(reader);
             Instances.Read(reader);
 
+            return; // Event Skipping like this doesn't work, will need to fully implement them
             reader.Skip(reader.ReadInt()); // Events
 
             while (true)
@@ -98,11 +94,8 @@ namespace Nebula.Core.CTF25.MFA.Frame
             writer.WriteInt(0); // Unknown
             writer.WriteInt(EditorX);
             writer.WriteInt(EditorY);
-
             writer.WriteInt(Palette.Length);
-            foreach (Color item in Palette)
-                writer.WriteColor(item);
-
+            writer.WriteColors(Palette);
             writer.WriteUInt(IconHandle);
             writer.WriteUInt(EditorLayerHandle);
 

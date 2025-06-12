@@ -15,21 +15,16 @@ namespace Nebula.Core.CTF25.MFA.Object.Data.Movement
             if (movementCount < 0)
                 throw new InvalidDataException("Invalid movement count. Expected greater than or equal to 0, got " + movementCount);
         
-            _movementItems = new MovementItem[movementCount];
+            _movementItems = reader.ReadIReadables<MovementItem>(movementCount);
+
             for (int i = 0; i < movementCount; i++)
-            {
-                MovementItem movementItem = new MovementItem();
-                movementItem.Read(reader);
-                _movementItems[i] = movementItem;
-                this.Log($"Movement {i}: {movementItem.Name}", Logger.LogType.Debug);
-            }
+                this.Log($"Movement {i}: {_movementItems[i].Name}", Logger.LogType.Debug);
         }
 
         public void Write(ByteWriter writer)
         {
             writer.WriteInt(_movementItems.Length);
-            foreach (MovementItem movementItem in _movementItems)
-                movementItem.Write(writer);
+            writer.WriteIWritables(_movementItems);
         }
 
         public MovementItem this[int index]

@@ -2,7 +2,7 @@
 {
     public static class Decryption
     {
-        public static byte[] DecryptionKey = [];
+        public static byte[]? DecryptionKey;
 
         public static byte[] KeyString(string str)
         {
@@ -50,20 +50,20 @@
 
         public static byte[] DecompressXor(byte[] chunkData, int chunkId)
         {
-            var reader = new ByteReader(chunkData);
-            var decompressedSize = reader.ReadUInt();
+            using ByteReader reader = new ByteReader(chunkData);
+            uint decompressedSize = reader.ReadUInt();
 
-            var rawData = reader.ReadBytes((int)reader.Size());
+            byte[] rawData = reader.ReadBytes((int)reader.Size());
 
             if ((chunkId & 1) == 1)
                 rawData[0] ^= (byte)((byte)(chunkId & 0xFF) ^ (byte)(chunkId >> 0x8));
 
-            DecryptXor(rawData);
+            byte[] xorData = DecryptXor(rawData);
 
-            using (var data = new ByteReader(rawData))
+            using (ByteReader data = new ByteReader(xorData))
             {
-                var compressedSize = data.ReadUInt();
-                return Decompressor.DecompressZlib(data, (int)compressedSize);
+                int compressedSize = data.ReadInt();
+                return Decompressor.DecompressZlib(data, compressedSize);
             }
         }
 
@@ -72,7 +72,7 @@
 
         public static bool InitDecryptionTable(byte[] magic_key)
         {
-            byte[] buffer = [.. Enumerable.Range(0, 256).Select(i => (byte)i)];
+            decodeBuffer = [.. Enumerable.Range(0, 256).Select(i => (byte)i)];
             static byte rotate(byte value) => (byte)((value << 7) | (value >> 1));
 
             byte accum = 0;
@@ -108,6 +108,7 @@
             return true;
         }
 
+        // RC4 Cipher Algorithm with a custom Key-Gen
         public static byte[] DecryptXor(byte[] chunk)
         {
             if (!valid)

@@ -14,25 +14,19 @@ namespace Nebula.Core.CTF25.CCN.Chunks.Extensions
             this.Log($"Found {extensionCount} extension(s)", Logger.LogType.Debug);
             if (extensionCount < 0)
                 throw new InvalidDataException("Invalid extension count. Expected greater than or equal to 0, got " + extensionCount);
-
-            _extensionItems = new ExtensionItem[extensionCount];
             reader.Skip(2); // Max Handle?? Is this the case on Windows too?
-            for (int i = 0; i < _extensionItems.Length; i++)
-            {
-                ExtensionItem extensionItem = new ExtensionItem();
-                extensionItem.Read(reader);
-                _extensionItems[i] = extensionItem;
 
+            _extensionItems = reader.ReadIReadables<ExtensionItem>(extensionCount);
+
+            foreach (ExtensionItem extensionItem in _extensionItems)
                 this.Log($"Extension {extensionItem.Handle}: {extensionItem.FileName}", Logger.LogType.Debug);
-            }
         }
 
         public override void WriteChunkData(ByteWriter writer)
         {
             writer.WriteUShort((ushort)_extensionItems.Length);
             writer.Skip(2); // Max Handle?? Is this the case on Windows too?
-            foreach (ExtensionItem extensionItem in _extensionItems)
-                extensionItem.Write(writer);
+            writer.WriteIWritables(_extensionItems);
         }
 
         public ExtensionItem this[int index]

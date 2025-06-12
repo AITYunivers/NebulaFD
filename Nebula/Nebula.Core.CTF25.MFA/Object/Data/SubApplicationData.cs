@@ -1,5 +1,4 @@
 ﻿using Nebula.Core.Memory;
-using System.Reflection.PortableExecutable;
 
 namespace Nebula.Core.CTF25.MFA.Object.Data
 {

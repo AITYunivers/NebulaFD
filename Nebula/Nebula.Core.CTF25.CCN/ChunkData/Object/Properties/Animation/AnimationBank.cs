@@ -1,9 +1,8 @@
-﻿using Nebula.Core.CTF25.MFA.Object.Data.Behaviour;
-using Nebula.Core.Data;
+﻿using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 
-namespace Nebula.Core.CTF25.MFA.Object.Data.Animation
+namespace Nebula.Core.CTF25.CCN.Object.Data.Animation
 {
     internal class AnimationBank : IReadable, IWritable
     {
@@ -11,21 +10,18 @@ namespace Nebula.Core.CTF25.MFA.Object.Data.Animation
 
         public void Read(ByteReader reader)
         {
-            int animationCount = reader.ReadInt();
+            reader.Skip(2); // Size
+            short animationCount = reader.ReadShort();
             this.Log($"Found {animationCount} animation(s)", Logger.LogType.Debug);
             if (animationCount < 0)
                 throw new InvalidDataException("Invalid animation count. Expected greater than or equal to 0, got " + animationCount);
-
-            _animationItems = reader.ReadIReadables<AnimationItem>(animationCount);
-
-            for (int i = 0; i < animationCount; i++)
-                this.Log($"Animation {i}: {_animationItems[i].Name}", Logger.LogType.Debug);
+            
+            _animationItems = reader.ReadIReadables<AnimationItem, ushort>(animationCount);
         }
 
         public void Write(ByteWriter writer)
         {
-            writer.WriteInt(_animationItems.Length);
-            writer.WriteIWritables(_animationItems);
+            throw new NotImplementedException();
         }
 
         public AnimationItem this[int index]

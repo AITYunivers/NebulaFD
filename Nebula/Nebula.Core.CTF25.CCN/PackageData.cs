@@ -1,13 +1,18 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
 using Nebula.Core.CTF25.CCN.Chunks;
 using Nebula.Core.CTF25.CCN.Chunks.Extensions;
+using Nebula.Core.CTF25.CCN.Chunks.Objects;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
+using System.Text;
 
 namespace Nebula.Core.CTF25.CCN
 {
-    public class PackageData : IPackageData
+    public class PackageData : IPackageData, IChunkReader
     {
+        private List<IChunk> _chunks = [];
+        public int ProductBuild;
+
         public virtual void Read(ByteReader reader)
         {
             SkipEXEHeader(reader);
@@ -24,8 +29,8 @@ namespace Nebula.Core.CTF25.CCN
             ushort runtimeVersion = reader.ReadUShort();
             ushort runtimeSubversion = reader.ReadUShort();
             int productVersion = reader.ReadInt();
-            int productBuild = reader.ReadInt();
-            this.Log("Fusion Build: " + productBuild);
+            ProductBuild = reader.ReadInt();
+            this.Log("Fusion Build: " + ProductBuild);
 
             while (reader.HasMemory(8))
             {
@@ -44,11 +49,14 @@ namespace Nebula.Core.CTF25.CCN
                 EChunks.APP_HEADER => new AppHeaderChunk(),
                 EChunks.APP_NAME => new AppNameChunk(),
                 EChunks.AUTHOR => new AuthorChunk(),
+                EChunks.OBJECT_BANK => new ObjectBankChunk(),
                 EChunks.EXTENSION_DATA => new ExtensionDataChunk(),
                 EChunks.EDITOR_FILENAME => new EditorFilenameChunk(),
                 EChunks.TARGET_FILENAME => new TargetFilenameChunk(),
+                EChunks.TRANSITION_FILENAME => new TransitionFilenameChunk(),
                 EChunks.EXTENSIONS => new ExtensionBankChunk(),
                 EChunks.APP_ICON => new AppIconChunk(),
+                EChunks.COPYRIGHT => new CopyrightChunk(),
                 EChunks.EXTENDED_HEADER => new ExtendedHeaderChunk(),
                 EChunks.APP_CODE_PAGE => new AppCodePageChunk(),
                 EChunks.ENGINE_VERSION => new EngineVersionChunk(),
@@ -59,6 +67,25 @@ namespace Nebula.Core.CTF25.CCN
             {
                 chunk.SetChunkDefinition(chunkDefinition);
                 chunk.Read(reader);
+                _chunks.Add(chunk);
+            }
+
+            if (Decryption.DecryptionKey == null && chunk is EditorFilenameChunk editorFilenameChunk)
+            {
+                string appName = GetFirstChunk<AppNameChunk>()?.Name ?? string.Empty;
+                string copyright = GetFirstChunk<CopyrightChunk>()?.Copyright ?? string.Empty;
+                string editorFilename = editorFilenameChunk.Filename;
+
+                if (ProductBuild > 285)
+                {
+                    Decryption.MakeKey(appName, copyright, editorFilename);
+                    this.Log("Made decryption key: " + appName + copyright + editorFilename, Logger.LogType.Debug);
+                }
+                else
+                {
+                    Decryption.MakeKey(editorFilename, appName, copyright);
+                    this.Log("Made decryption key: " + editorFilename + appName + copyright, Logger.LogType.Debug);
+                }
             }
         }
 
@@ -125,6 +152,21 @@ namespace Nebula.Core.CTF25.CCN
             uint productBuild = reader.ReadUInt();
             reader.Seek(0); // Reset Position
             return header == "PAMU" && runtimeVersion == 770 && productBuild >= 280;
+        }
+
+        public T[] GetChunks<T>()
+        {
+            return [.. _chunks.Where(x => x is T).Select(x => (T)x)];
+        }
+
+        public T? GetFirstChunk<T>()
+        {
+            return GetChunks<T>().FirstOrDefault();
+        }
+
+        public bool HasChunk<T>()
+        {
+            return _chunks.Any(x => x is T);
         }
     }
 }

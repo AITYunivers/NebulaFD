@@ -19,23 +19,17 @@ namespace Nebula.Core.CTF25.MFA.Font
             if (fontCount < 0)
                 throw new InvalidDataException("Invalid font count. Expected greater than or equal to 0, got " + fontCount);
 
-            _fontItems = new FontItem[fontCount];
-            for (int i = 0; i < fontCount; i++)
-            {
-                FontItem fontItem = new FontItem();
-                fontItem.Read(reader);
-                _fontItems[i] = fontItem;
+            _fontItems = reader.ReadIReadables<FontItem>(fontCount);
 
+            foreach (FontItem fontItem in _fontItems)
                 this.Log($"Font {fontItem.Handle}: {fontItem.Name}", Logger.LogType.Debug);
-            }
         }
 
         public void Write(ByteWriter writer)
         {
             writer.WriteAscii("ATNF");
             writer.WriteInt(_fontItems.Length);
-            foreach (FontItem fontItem in _fontItems)
-                fontItem.Write(writer);
+            writer.WriteIWritables(_fontItems);
         }
 
         public FontItem this[int index]

@@ -19,15 +19,10 @@ namespace Nebula.Core.CTF25.MFA.Music
             if (musicCount < 0)
                 throw new InvalidDataException("Invalid music count. Expected greater than or equal to 0, got " + musicCount);
 
-            _musicItems = new MusicItem[musicCount];
-            for (int i = 0; i < musicCount; i++)
-            {
-                MusicItem musicItem = new MusicItem();
-                musicItem.Read(reader);
-                _musicItems[i] = musicItem;
+            _musicItems = reader.ReadIReadables<MusicItem>(musicCount);
 
+            foreach (MusicItem musicItem in _musicItems)
                 this.Log($"Music {musicItem.Handle}: {musicItem.Name}", Logger.LogType.Debug);
-            }
         }
 
         public MusicItem this[int index]

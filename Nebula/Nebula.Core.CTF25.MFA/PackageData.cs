@@ -1,4 +1,5 @@
 ﻿using Nebula.Core.CTF25.MFA.BinaryFile;
+using Nebula.Core.CTF25.MFA.Common;
 using Nebula.Core.CTF25.MFA.Extension;
 using Nebula.Core.CTF25.MFA.Font;
 using Nebula.Core.CTF25.MFA.Frame;
@@ -28,7 +29,7 @@ namespace Nebula.Core.CTF25.MFA
             ushort runtimeSubversion = reader.ReadUShort();
             int productVersion = reader.ReadInt();
             int productBuild = reader.ReadInt();
-            reader.Skip(reader.ReadInt()); // MFA Thumbnail
+            int language = reader.ReadInt();
             this.Log("Fusion Build: " + productBuild);
 
             string appName = reader.ReadAutoYuniversal();
@@ -111,19 +112,8 @@ namespace Nebula.Core.CTF25.MFA
             // Menu Images (Not implemented yet)
             reader.Skip(reader.ReadInt() * 8);
 
-            int globalValueCount = reader.ReadInt();
-            for (int i = 0; i < globalValueCount; i++)
-            {
-                reader.SkipAutoYuniversal();
-                reader.Skip(8);
-            }
-            int globalStringCount = reader.ReadInt();
-            for (int i = 0; i < globalStringCount; i++)
-            {
-                reader.SkipAutoYuniversal();
-                reader.Skip(4);
-                reader.SkipAutoYuniversal();
-            }
+            CommonValue[] globalValues = reader.ReadIReadables<CommonValue>(reader.ReadInt());
+            CommonValue[] globalStrings = reader.ReadIReadables<CommonValue>(reader.ReadInt());
 
             // Global Events
             reader.Skip(reader.ReadInt());

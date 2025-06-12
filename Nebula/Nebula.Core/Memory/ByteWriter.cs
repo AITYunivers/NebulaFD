@@ -1,5 +1,9 @@
-﻿using Nebula.Core.Utilities;
+﻿using Nebula.Core.Data;
+using Nebula.Core.Utilities;
 using System.Drawing;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Nebula.Core.Memory
@@ -91,6 +95,86 @@ namespace Nebula.Core.Memory
             WriteByte(color.G);
             WriteByte(color.B);
             WriteByte(color.A);
+        }
+
+        public void WriteColors(Color[] colors)
+        {
+            foreach (Color c in colors)
+                WriteColor(c);
+        }
+
+        public void WriteShorts(short[] shorts)
+        {
+            foreach (short s in shorts)
+                WriteShort(s);
+        }
+
+        public void WriteUShorts(ushort[] shorts)
+        {
+            foreach (ushort s in shorts)
+                WriteUShort(s);
+        }
+
+        public void WriteInts(int[] ints)
+        {
+            foreach (int i in ints)
+                WriteInt(i);
+        }
+
+        public void WriteUInts(uint[] ints)
+        {
+            foreach (uint i in ints)
+                WriteUInt(i);
+        }
+
+        public void WriteLongs(long[] longs)
+        {
+            foreach (long l in longs)
+                WriteLong(l);
+        }
+
+        public void WriteULongs(ulong[] longs)
+        {
+            foreach (ulong l in longs)
+                WriteULong(l);
+        }
+
+        public void WriteIWritables<T>(T[] values) where T : IWritable
+        {
+            foreach (IWritable value in values)
+                value?.Write(this);
+        }
+
+        public void WriteIWritablesWithOffsets<T1, T2>(T1[] values)
+            where T1 : IWritable
+            where T2 : unmanaged, INumber<T2>
+        {
+            long[] offsets = new long[values.Length];
+            long offsetsSize = Marshal.SizeOf<T2>() * values.Length;
+            using ByteWriter writer = new ByteWriter();
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (values[i] == null)
+                {
+                    offsets[i] = 0;
+                    continue;
+                }
+
+                offsets[i] = writer.Tell() + offsetsSize;
+                values[i].Write(writer);
+            }
+
+            for (int i = 0; i < offsets.Length; i++)
+            {
+                long offset = offsets[i];
+                T2 offsetCast = Unsafe.As<long, T2>(ref offset);
+                int size = Marshal.SizeOf<T2>();
+                byte[] bytes = new byte[size];
+                MemoryMarshal.Write(bytes.AsSpan(), in offsetCast);
+                WriteBytes(bytes);
+            }
+
+            WriteWriter(writer);
         }
 
         public void WriteWriter(ByteWriter toWrite)

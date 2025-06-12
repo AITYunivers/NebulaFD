@@ -35,10 +35,7 @@ namespace Nebula.Core.CTF25.MFA.Object.Data
             Width = reader.ReadInt();
             Height = reader.ReadInt();
 
-            ImageHandles = new uint[reader.ReadInt()];
-            for (int i = 0; i < ImageHandles.Length; i++)
-                ImageHandles[i] = reader.ReadUInt();
-
+            ImageHandles = reader.ReadUInts(reader.ReadInt());
             FontHandle = reader.ReadUInt();
         }
 
@@ -58,9 +55,7 @@ namespace Nebula.Core.CTF25.MFA.Object.Data
             writer.WriteInt(Height);
 
             writer.WriteInt(ImageHandles.Length);
-            foreach (uint imageHandle in ImageHandles)
-                writer.WriteUInt(imageHandle);
-
+            writer.WriteUInts(ImageHandles);
             writer.WriteUInt(FontHandle);
         }
     }

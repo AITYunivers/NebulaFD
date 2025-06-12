@@ -15,22 +15,16 @@ namespace Nebula.Core.CTF25.MFA.BinaryFile
             if (binaryFileCount < 0)
                 throw new InvalidDataException("Invalid binary file count. Expected greater than or equal to 0, got " + binaryFileCount);
 
-            _binaryFileItems = new BinaryFileItem[binaryFileCount];
-            for (int i = 0; i < binaryFileCount; i++)
-            {
-                BinaryFileItem binaryFileItem = new BinaryFileItem();
-                binaryFileItem.Read(reader);
-                _binaryFileItems[i] = binaryFileItem;
+            _binaryFileItems = reader.ReadIReadables<BinaryFileItem>(binaryFileCount);
 
-                this.Log($"Binary File {i}: {binaryFileItem.Name}", Logger.LogType.Debug);
-            }
+            for (int i = 0; i < binaryFileCount; i++)
+                this.Log($"Binary File {i}: {_binaryFileItems[i].Name}", Logger.LogType.Debug);
         }
 
         public void Write(ByteWriter writer)
         {
             writer.WriteInt(_binaryFileItems.Length);
-            foreach (BinaryFileItem binaryFileItem in _binaryFileItems)
-                binaryFileItem.Write(writer);
+            writer.WriteIWritables(_binaryFileItems);
         }
 
         public BinaryFileItem this[int index]

@@ -24,15 +24,10 @@ namespace Nebula.Core.CTF25.MFA.Image
             if (imageCount < 0)
                 throw new InvalidDataException("Invalid image count. Expected greater than or equal to 0, got " + imageCount);
 
-            _imageItems = new ImageItem[imageCount];
-            for (int i = 0; i < imageCount; i++)
-            {
-                ImageItem imageItem = new ImageItem();
-                imageItem.Read(reader);
-                _imageItems[i] = imageItem;
+            _imageItems = reader.ReadIReadables<ImageItem>(imageCount);
 
+            foreach (ImageItem imageItem in _imageItems)
                 this.Log($"Image {imageItem.Handle}: {imageItem.Width}x{imageItem.Height}", Logger.LogType.Debug);
-            }
         }
 
         public ImageItem this[int index]

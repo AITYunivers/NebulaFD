@@ -16,22 +16,16 @@ namespace Nebula.Core.CTF25.MFA.Extension
             if (extensionCount < 0)
                 throw new InvalidDataException("Invalid extension count. Expected greater than or equal to 0, got " + extensionCount);
 
-            _extensionItems = new ExtensionItem[extensionCount];
-            for (int i = 0; i < extensionCount; i++)
-            {
-                ExtensionItem extensionItem = new ExtensionItem();
-                extensionItem.Read(reader);
-                _extensionItems[i] = extensionItem;
+            _extensionItems = reader.ReadIReadables<ExtensionItem>(extensionCount);
 
+            foreach (ExtensionItem extensionItem in _extensionItems)
                 this.Log($"Extension {extensionItem.Handle}: {extensionItem.Name}", Logger.LogType.Debug);
-            }
         }
 
         public void Write(ByteWriter writer)
         {
             writer.WriteInt(_extensionItems.Length);
-            foreach (ExtensionItem extensionItem in _extensionItems)
-                extensionItem.Write(writer);
+            writer.WriteIWritables(_extensionItems);
         }
 
         public ExtensionItem this[int index]

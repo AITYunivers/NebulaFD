@@ -15,20 +15,13 @@ namespace Nebula.Core.CTF25.MFA.Object.Data.Paragraph
             if (paragraphCount < 0)
                 throw new InvalidDataException("Invalid paragraph count. Expected greater than or equal to 0, got " + paragraphCount);
         
-            _paragraphItems = new ParagraphItem[paragraphCount];
-            for (int i = 0; i < paragraphCount; i++)
-            {
-                ParagraphItem paragraphItem = new ParagraphItem();
-                paragraphItem.Read(reader);
-                _paragraphItems[i] = paragraphItem;
-            }
+            _paragraphItems = reader.ReadIReadables<ParagraphItem>(paragraphCount);
         }
 
         public void Write(ByteWriter writer)
         {
             writer.WriteInt(_paragraphItems.Length);
-            foreach (ParagraphItem paragraphItem in _paragraphItems)
-                paragraphItem.Write(writer);
+            writer.WriteIWritables(_paragraphItems);
         }
 
         public ParagraphItem this[int index]

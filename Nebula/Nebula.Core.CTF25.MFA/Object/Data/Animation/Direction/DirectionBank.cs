@@ -15,20 +15,13 @@ namespace Nebula.Core.CTF25.MFA.Object.Data.Animation.Direction
             if (directionCount < 0)
                 throw new InvalidDataException("Invalid direction count. Expected greater than or equal to 0, got " + directionCount);
 
-            _directionItems = new DirectionItem[directionCount];
-            for (int i = 0; i < directionCount; i++)
-            {
-                DirectionItem directionItem = new DirectionItem();
-                directionItem.Read(reader);
-                _directionItems[i] = directionItem;
-            }
+            _directionItems = reader.ReadIReadables<DirectionItem>(directionCount);
         }
 
         public void Write(ByteWriter writer)
         {
             writer.WriteInt(_directionItems.Length);
-            foreach (DirectionItem directionItem in _directionItems)
-                directionItem.Write(writer);
+            writer.WriteIWritables(_directionItems);
         }
 
         public DirectionItem this[int index]
