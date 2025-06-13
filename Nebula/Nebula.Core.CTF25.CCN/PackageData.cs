@@ -4,13 +4,12 @@ using Nebula.Core.CTF25.CCN.Chunks.Extensions;
 using Nebula.Core.CTF25.CCN.Chunks.Objects;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
-using System.Text;
 
 namespace Nebula.Core.CTF25.CCN
 {
     public class PackageData : IPackageData, IChunkReader
     {
-        private List<IChunk> _chunks = [];
+        private readonly List<IChunk> _chunks = [];
         public int ProductBuild;
 
         public virtual void Read(ByteReader reader)
@@ -152,6 +151,11 @@ namespace Nebula.Core.CTF25.CCN
             uint productBuild = reader.ReadUInt();
             reader.Seek(0); // Reset Position
             return header == "PAMU" && runtimeVersion == 770 && productBuild >= 280;
+        }
+
+        public int GetFusionBuild()
+        {
+            return ProductBuild;
         }
 
         public T[] GetChunks<T>()

@@ -2,7 +2,7 @@
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 
-namespace Nebula.Core.CTF25.CCN.Object.Data.Animation
+namespace Nebula.Core.CTF25.CCN.ChunkData.Object.Properties.Animation
 {
     internal class AnimationBank : IReadable, IWritable
     {

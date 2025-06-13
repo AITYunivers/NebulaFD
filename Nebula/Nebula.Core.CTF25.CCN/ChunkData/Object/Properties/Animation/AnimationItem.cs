@@ -1,8 +1,8 @@
-﻿using Nebula.Core.CTF25.CCN.Object.Data.Animation.Direction;
+﻿using Nebula.Core.CTF25.CCN.ChunkData.Object.Properties.Animation.Direction;
 using Nebula.Core.Data;
 using Nebula.Core.Memory;
 
-namespace Nebula.Core.CTF25.CCN.Object.Data.Animation
+namespace Nebula.Core.CTF25.CCN.ChunkData.Object.Properties.Animation
 {
     internal class AnimationItem : IReadable, IWritable
     {

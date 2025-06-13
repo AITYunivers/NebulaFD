@@ -24,10 +24,10 @@ namespace Nebula.Cli
                     if (packageType == typeof(object))
                         continue;
                     Console.WriteLine($"Checking for file type \"{packageType.FullName}\"");
-                    IPackageData? packageData = (IPackageData?)Activator.CreateInstance(packageType);
-                    if (packageData != null && packageData.Check(reader))
+                    NebulaAPI.PackageData = (IPackageData)Activator.CreateInstance(packageType)!;
+                    if (NebulaAPI.PackageData != null && NebulaAPI.PackageData.Check(reader))
                     {
-                        packageData.Read(reader);
+                        NebulaAPI.PackageData.Read(reader);
                         break;
                     }
                 }

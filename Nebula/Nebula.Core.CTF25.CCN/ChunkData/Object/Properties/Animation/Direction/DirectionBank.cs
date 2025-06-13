@@ -2,7 +2,7 @@
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 
-namespace Nebula.Core.CTF25.CCN.Object.Data.Animation.Direction
+namespace Nebula.Core.CTF25.CCN.ChunkData.Object.Properties.Animation.Direction
 {
     internal class DirectionBank : IReadable, IWritable
     {
@@ -10,7 +10,8 @@ namespace Nebula.Core.CTF25.CCN.Object.Data.Animation.Direction
 
         public void Read(ByteReader reader)
         {
-            _directionItems = reader.ReadIReadables<DirectionItem, ushort>(32);
+            long startOffset = reader.Tell();
+            _directionItems = reader.ReadIReadables<DirectionItem, ushort>(32, startOffset);
         }
 
         public void Write(ByteWriter writer)

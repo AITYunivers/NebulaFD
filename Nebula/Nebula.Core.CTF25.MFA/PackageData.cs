@@ -9,12 +9,13 @@ using Nebula.Core.CTF25.MFA.Qualifier;
 using Nebula.Core.CTF25.MFA.Sound;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
-using System.Reflection.PortableExecutable;
 
 namespace Nebula.Core.CTF25.MFA
 {
     public class PackageData : IPackageData
     {
+        public int ProductBuild;
+
         public void Read(ByteReader reader)
         {
             this.Log($"Running alpha build");
@@ -28,10 +29,10 @@ namespace Nebula.Core.CTF25.MFA
             ushort runtimeVersion = reader.ReadUShort();
             ushort runtimeSubversion = reader.ReadUShort();
             int productVersion = reader.ReadInt();
-            int productBuild = reader.ReadInt();
-            int language = reader.ReadInt();
-            this.Log("Fusion Build: " + productBuild);
+            ProductBuild = reader.ReadInt();
+            this.Log("Fusion Build: " + ProductBuild);
 
+            int language = reader.ReadInt();
             string appName = reader.ReadAutoYuniversal();
             this.Log("App Name: " + appName);
             reader.ReadAutoYuniversal();
@@ -145,6 +146,11 @@ namespace Nebula.Core.CTF25.MFA
         public bool Check(ByteReader reader)
         {
             return reader.PeekHeader() == "MFU2";
+        }
+
+        public int GetFusionBuild()
+        {
+            return ProductBuild;
         }
     }
 }

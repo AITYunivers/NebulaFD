@@ -6,5 +6,6 @@ namespace Nebula.Core
     {
         public void Read(ByteReader reader);
         public bool Check(ByteReader reader);
+        public int GetFusionBuild();
     }
 }

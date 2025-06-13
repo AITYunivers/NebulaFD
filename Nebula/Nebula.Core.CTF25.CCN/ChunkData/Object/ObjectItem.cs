@@ -63,8 +63,7 @@ namespace Nebula.Core.CTF25.CCN.Chunks.Objects
                 return null; // Temp
             if (header.ObjectType == CCN.Objects.EObjectTypes.BACKDROP)
                 return null; // Temp
-            //return new ObjectCommonPropertiesChunk();
-            return null; // This shit doesn't work yet
+            return new ObjectCommonPropertiesChunk();
         }
 
         public void Write(ByteWriter writer)

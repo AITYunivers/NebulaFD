@@ -1,5 +1,7 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
-using Nebula.Core.CTF25.CCN.Object.Data.Animation;
+using Nebula.Core.CTF25.CCN.ChunkData.Object.Properties;
+using Nebula.Core.CTF25.CCN.ChunkData.Object.Properties.Animation;
+using Nebula.Core.CTF25.CCN.ChunkData.Object.Properties.Movement;
 using Nebula.Core.Memory;
 using System.Drawing;
 
@@ -15,6 +17,11 @@ namespace Nebula.Core.CTF25.CCN.Chunks.Objects.Properties
         public Color Background = Color.White;
 
         public AnimationBank? Animations;
+        public int[]? AlterableValues;
+        public uint? AlterableFlags;
+        public string[]? AlterableStrings;
+        public MovementBank? Movements;
+        public object? ObjectData;
 
         private int _animationOffset, _alterableValuesOffset, _alterableStringsOffset,
         _movementsOffset, _dataOffset, _extensionOffset, _valueOffset, _transitionInOffset,
@@ -44,29 +51,56 @@ namespace Nebula.Core.CTF25.CCN.Chunks.Objects.Properties
 
             if (_animationOffset > 0)
             {
-                reader.Seek(_animationOffset);
-                Animations = new AnimationBank();
-                Animations.Read(reader);
+                using ByteReader animationReader = reader.Split(_animationOffset);
+                (Animations = new AnimationBank()).Read(animationReader);
             }
 
             if (_alterableValuesOffset > 0)
             {
                 reader.Seek(_alterableValuesOffset);
+                AlterableValues = reader.ReadInts(reader.ReadUShort());
+                AlterableFlags = reader.ReadUInt();
             }
 
             if (_alterableStringsOffset > 0)
             {
                 reader.Seek(_alterableStringsOffset);
+                AlterableStrings = reader.ReadYuniversals(reader.ReadUShort());
             }
 
             if (_movementsOffset > 0)
             {
-                reader.Seek(_movementsOffset);
+                using ByteReader movementReader = reader.Split(_movementsOffset);
+                (Movements = new MovementBank()).Read(movementReader);
             }
 
             if (_dataOffset > 0)
             {
-                reader.Seek(_dataOffset);
+                using ByteReader dataReader = reader.Split(_dataOffset);
+                switch (Identifier[..2])
+                {
+                    // Text
+                    case "TE":
+                    case "QS":
+                        ObjectData = new StringData();
+                        ((StringData)ObjectData).Read(dataReader);
+                        break;
+                    // Counter
+                    case "CN":
+                    case "SC":
+                    case "LI":
+                        ObjectData = new CounterData();
+                        ((CounterData)ObjectData).Read(dataReader);
+                        break;
+                    // Formatted Text
+                    case "RT":
+                        //ObjectFormattedText.ReadCCN(reader);
+                        break;
+                    // Sub-Application
+                    case "CC":
+                        //ObjectSubApplication.ReadCCN(reader);
+                        break;
+                }
             }
 
             if (_extensionOffset > 0)
@@ -98,22 +132,41 @@ namespace Nebula.Core.CTF25.CCN.Chunks.Objects.Properties
         public virtual void GetOffset(ByteReader reader, int index)
         {
             ushort Offset = reader.ReadUShort();
+            bool min284 = NebulaAPI.PackageData.GetFusionBuild() >= 284;
+
             switch (index)
             {
                 case 0:
-                    _movementsOffset = Offset;
+                    if (min284)
+                        _animationOffset = Offset;
+                    else
+                        _movementsOffset = Offset;
                     break;
                 case 1:
-                    _animationOffset = Offset;
+                    if (min284)
+                        _movementsOffset = Offset;
+                    else
+                        _animationOffset = Offset;
                     break;
                 case 3:
-                    _valueOffset = Offset;
+                    if (!min284)
+                        _valueOffset = Offset;
                     break;
                 case 4:
-                    _dataOffset = Offset;
+                    if (min284)
+                        _extensionOffset = Offset;
+                    else
+                        _dataOffset = Offset;
+                    break;
+                case 5:
+                    if (min284)
+                        _valueOffset = Offset;
                     break;
                 case 6:
-                    _extensionOffset = Offset;
+                    if (min284)
+                        _dataOffset = Offset;
+                    else
+                        _extensionOffset = Offset;
                     break;
                 case 7:
                     _alterableValuesOffset = Offset;

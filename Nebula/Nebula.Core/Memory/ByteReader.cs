@@ -251,6 +251,14 @@ namespace Nebula.Core.Memory
             return output;
         }
 
+        public string[] ReadYuniversals(int length)
+        {
+            string[] result = new string[length];
+            for (int i = 0; i < length; i++)
+                result[i] = ReadYuniversal();
+            return result;
+        }
+
         public Color[] ReadColors(int length)
         {
             Color[] result = new Color[length];
@@ -338,7 +346,7 @@ namespace Nebula.Core.Memory
             return result;
         }
 
-        public T1[] ReadIReadables<T1, T2>(int length, int baseOffset = 0)
+        public T1[] ReadIReadables<T1, T2>(int length, long baseOffset = 0)
             where T1 : IReadable, new()
             where T2 : unmanaged, INumber<T2>
         {
@@ -357,6 +365,18 @@ namespace Nebula.Core.Memory
                 result[i] = readable;
             }
             return result;
+        }
+
+        // I don't very much like how this allocates new memory
+        // TODO: Research a more cost effect method to do this
+        public ByteReader Split(int start, int length = -1)
+        {
+            long pos = Tell();
+            Seek(start);
+            ByteReader newReader = new ByteReader(ReadBytes(length));
+            newReader.SetUnicode(_unicode);
+            Seek(pos);
+            return newReader;
         }
     }
 }
