@@ -259,6 +259,23 @@ namespace Nebula.Core.Memory
             return result;
         }
 
+        public string[] ReadYuniversals<T>(int length, long baseOffset = 0) where T : unmanaged, INumber<T>
+        {
+            int offsetsSize = Marshal.SizeOf<T>() * length;
+            T[] offsets = MemoryMarshal.Cast<byte, T>(ReadBytes(offsetsSize)).ToArray();
+            string[] result = new string[length];
+            for (int i = 0; i < length; i++)
+            {
+                long offset = Convert.ToInt64(offsets[i]);
+                if (offset == 0)
+                    continue;
+
+                Seek(baseOffset + offset);
+                result[i] = ReadYuniversal();
+            }
+            return result;
+        }
+
         public Color[] ReadColors(int length)
         {
             Color[] result = new Color[length];

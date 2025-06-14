@@ -5,7 +5,7 @@ using System.Reflection.PortableExecutable;
 
 namespace Nebula.Core.CTF25.CCN.ChunkData.Object.Properties
 {
-    internal class ObjectShape : IReadable, IWritable
+    internal class ShapeData : IReadable, IWritable
     {
         public short BorderSize;
         public Color BorderColor;

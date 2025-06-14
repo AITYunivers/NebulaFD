@@ -1,5 +1,6 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
 using Nebula.Core.CTF25.CCN.Chunks.Objects.Properties;
+using Nebula.Core.CTF25.CCN.Objects;
 using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
@@ -59,11 +60,11 @@ namespace Nebula.Core.CTF25.CCN.Chunks.Objects
             if (header == null)
                 return null;
 
-            if (header.ObjectType == CCN.Objects.EObjectTypes.QUICK_BACKDROP)
-                return null; // Temp
-            if (header.ObjectType == CCN.Objects.EObjectTypes.BACKDROP)
-                return null; // Temp
-            return new ObjectCommonPropertiesChunk();
+            if (header.ObjectType == EObjectTypes.QUICK_BACKDROP)
+                return new QuickBackdropData();
+            if (header.ObjectType == EObjectTypes.BACKDROP)
+                return new BackdropData();
+            return new CommonPropertiesChunk(header.ObjectType);
         }
 
         public void Write(ByteWriter writer)

@@ -1,13 +1,16 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
+using Nebula.Core.CTF25.CCN.ChunkData.Common;
 using Nebula.Core.CTF25.CCN.ChunkData.Object.Properties;
 using Nebula.Core.CTF25.CCN.ChunkData.Object.Properties.Animation;
 using Nebula.Core.CTF25.CCN.ChunkData.Object.Properties.Movement;
+using Nebula.Core.CTF25.CCN.Objects;
+using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using System.Drawing;
 
 namespace Nebula.Core.CTF25.CCN.Chunks.Objects.Properties
 {
-    internal class ObjectCommonPropertiesChunk : CommonChunk
+    internal class CommonPropertiesChunk : CommonChunk
     {
         public uint ObjectFlags;
         public uint NewObjectFlags;
@@ -22,10 +25,34 @@ namespace Nebula.Core.CTF25.CCN.Chunks.Objects.Properties
         public string[]? AlterableStrings;
         public MovementBank? Movements;
         public object? ObjectData;
+        public ExtensionData? ExtensionData;
+        public CounterValueData? CounterValueData;
+        public CommonTransitionData? TransitionInData;
+        public CommonTransitionData? TransitionOutData;
+        public AlterableNameData? AlterableNameData;
 
         private int _animationOffset, _alterableValuesOffset, _alterableStringsOffset,
         _movementsOffset, _dataOffset, _extensionOffset, _valueOffset, _transitionInOffset,
         _transitionOutOffset, _alterableNamesOffset;
+
+        public CommonPropertiesChunk(EObjectTypes objType)
+        {
+            ObjectData = objType switch
+            {
+                EObjectTypes.STRING or
+                EObjectTypes.QUESTION_AND_ANSWER => new StringData(),
+
+                EObjectTypes.SCORE or
+                EObjectTypes.LIVES or
+                EObjectTypes.COUNTER => new CounterData(),
+
+                EObjectTypes.FORMATTED_TEXT => new FormattedTextData(),
+
+                EObjectTypes.SUB_APPLICATION => new SubApplicationData(),
+
+                _ => null
+            };
+        }
 
         public override void ReadChunkData(ByteReader reader)
         {
@@ -76,56 +103,38 @@ namespace Nebula.Core.CTF25.CCN.Chunks.Objects.Properties
 
             if (_dataOffset > 0)
             {
-                using ByteReader dataReader = reader.Split(_dataOffset);
-                switch (Identifier[..2])
-                {
-                    // Text
-                    case "TE":
-                    case "QS":
-                        ObjectData = new StringData();
-                        ((StringData)ObjectData).Read(dataReader);
-                        break;
-                    // Counter
-                    case "CN":
-                    case "SC":
-                    case "LI":
-                        ObjectData = new CounterData();
-                        ((CounterData)ObjectData).Read(dataReader);
-                        break;
-                    // Formatted Text
-                    case "RT":
-                        //ObjectFormattedText.ReadCCN(reader);
-                        break;
-                    // Sub-Application
-                    case "CC":
-                        //ObjectSubApplication.ReadCCN(reader);
-                        break;
-                }
+                reader.Seek(_dataOffset);
+                (ObjectData as IReadable)?.Read(reader);
             }
 
             if (_extensionOffset > 0)
             {
                 reader.Seek(_extensionOffset);
+                (ExtensionData = new ExtensionData()).Read(reader);
             }
 
             if (_valueOffset > 0)
             {
                 reader.Seek(_valueOffset);
+                (CounterValueData = new CounterValueData()).Read(reader);
             }
 
             if (_transitionInOffset > 0)
             {
-                reader.Seek(_transitionInOffset);
+                using ByteReader transitionReader = reader.Split(_transitionInOffset);
+                (TransitionInData = new CommonTransitionData()).Read(transitionReader);
             }
 
             if (_transitionOutOffset > 0)
             {
-                reader.Seek(_transitionOutOffset);
+                using ByteReader transitionReader = reader.Split(_transitionOutOffset);
+                (TransitionOutData = new CommonTransitionData()).Read(transitionReader);
             }
 
             if (_alterableNamesOffset > 0)
             {
-                reader.Seek(_alterableNamesOffset);
+                using ByteReader alterableNameReader = reader.Split(_alterableNamesOffset);
+                (AlterableNameData = new AlterableNameData()).Read(alterableNameReader);
             }
         }
 
