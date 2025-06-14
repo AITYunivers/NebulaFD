@@ -2,13 +2,12 @@
 using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
+using System.Collections.ObjectModel;
 
 namespace Nebula.Core.CTF25.MFA.Object.Data.Animation
 {
-    internal class AnimationBank : IReadable, IWritable
+    internal class AnimationBank : Collection<AnimationItem>, IReadable, IWritable
     {
-        private AnimationItem[] _animationItems = [];
-
         public void Read(ByteReader reader)
         {
             int animationCount = reader.ReadInt();
@@ -16,22 +15,17 @@ namespace Nebula.Core.CTF25.MFA.Object.Data.Animation
             if (animationCount < 0)
                 throw new InvalidDataException("Invalid animation count. Expected greater than or equal to 0, got " + animationCount);
 
-            _animationItems = reader.ReadIReadables<AnimationItem>(animationCount);
+            foreach (AnimationItem animationItem in reader.ReadIReadables<AnimationItem>(animationCount))
+                Add(animationItem);
 
             for (int i = 0; i < animationCount; i++)
-                this.Log($"Animation {i}: {_animationItems[i].Name}", Logger.LogType.Debug);
+                this.Log($"Animation {i}: {this[i].Name}", Logger.LogType.Debug);
         }
 
         public void Write(ByteWriter writer)
         {
-            writer.WriteInt(_animationItems.Length);
-            writer.WriteIWritables(_animationItems);
-        }
-
-        public AnimationItem this[int index]
-        {
-            get => _animationItems[index];
-            set => _animationItems[index] = value;
+            writer.WriteInt(Count);
+            writer.WriteIWritables(this);
         }
     }
 }

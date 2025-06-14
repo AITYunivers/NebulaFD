@@ -1,13 +1,12 @@
 ﻿using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
+using System.Collections.ObjectModel;
 
 namespace Nebula.Core.CTF25.MFA.Image
 {
-    public class ImageBank : IReadable
+    public class ImageBank : Collection<ImageItem>, IReadable
     {
-        private ImageItem[] _imageItems = [];
-
         public void Read(ByteReader reader)
         {
             string bankHeader = reader.ReadAscii(4);
@@ -24,16 +23,11 @@ namespace Nebula.Core.CTF25.MFA.Image
             if (imageCount < 0)
                 throw new InvalidDataException("Invalid image count. Expected greater than or equal to 0, got " + imageCount);
 
-            _imageItems = reader.ReadIReadables<ImageItem>(imageCount);
-
-            foreach (ImageItem imageItem in _imageItems)
+            foreach (ImageItem imageItem in reader.ReadIReadables<ImageItem>(imageCount))
+            {
+                Add(imageItem);
                 this.Log($"Image {imageItem.Handle}: {imageItem.Width}x{imageItem.Height}", Logger.LogType.Debug);
-        }
-
-        public ImageItem this[int index]
-        {
-            get => _imageItems[index];
-            set => _imageItems[index] = value;
+            }
         }
     }
 }

@@ -1,13 +1,12 @@
 ﻿using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
+using System.Collections.ObjectModel;
 
 namespace Nebula.Core.CTF25.CCN.ChunkData.Object.Properties.Animation
 {
-    internal class AnimationBank : IReadable, IWritable
+    internal class AnimationBank : Collection<AnimationItem>, IReadable, IWritable
     {
-        private AnimationItem[] _animationItems = [];
-
         public void Read(ByteReader reader)
         {
             reader.Skip(2); // Size
@@ -16,18 +15,13 @@ namespace Nebula.Core.CTF25.CCN.ChunkData.Object.Properties.Animation
             if (animationCount < 0)
                 throw new InvalidDataException("Invalid animation count. Expected greater than or equal to 0, got " + animationCount);
             
-            _animationItems = reader.ReadIReadables<AnimationItem, ushort>(animationCount);
+            foreach (AnimationItem animationItem in reader.ReadIReadables<AnimationItem, ushort>(animationCount))
+                Add(animationItem);
         }
 
         public void Write(ByteWriter writer)
         {
             throw new NotImplementedException();
-        }
-
-        public AnimationItem this[int index]
-        {
-            get => _animationItems[index];
-            set => _animationItems[index] = value;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Nebula.Core.CTF25.MFA.Object.Data
         public uint BarDirection;
         public int Width;
         public int Height;
-        public uint[] ImageHandles = [];
+        public List<uint> ImageHandles = [];
         public uint FontHandle;
 
         public override void ReadUncommonData(ByteReader reader)
@@ -35,7 +35,7 @@ namespace Nebula.Core.CTF25.MFA.Object.Data
             Width = reader.ReadInt();
             Height = reader.ReadInt();
 
-            ImageHandles = reader.ReadUInts(reader.ReadInt());
+            ImageHandles = [.. reader.ReadUInts(reader.ReadInt())];
             FontHandle = reader.ReadUInt();
         }
 
@@ -54,7 +54,7 @@ namespace Nebula.Core.CTF25.MFA.Object.Data
             writer.WriteInt(Width);
             writer.WriteInt(Height);
 
-            writer.WriteInt(ImageHandles.Length);
+            writer.WriteInt(ImageHandles.Count);
             writer.WriteUInts(ImageHandles);
             writer.WriteUInt(FontHandle);
         }

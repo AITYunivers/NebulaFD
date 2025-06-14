@@ -2,13 +2,12 @@
 using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
+using System.Collections.ObjectModel;
 
 namespace Nebula.Core.CTF25.MFA.Qualifier
 {
-    public class QualifierBank : IReadable, IWritable
+    public class QualifierBank : Collection<QualifierItem>, IReadable, IWritable
     {
-        private QualifierItem[] _qualifierItems = [];
-
         public void Read(ByteReader reader)
         {
             int qualifierCount = reader.ReadInt();
@@ -16,22 +15,17 @@ namespace Nebula.Core.CTF25.MFA.Qualifier
             if (qualifierCount < 0)
                 throw new InvalidDataException("Invalid qualifier count. Expected greater than or equal to 0, got " + qualifierCount);
 
-            _qualifierItems = reader.ReadIReadables<QualifierItem>(qualifierCount);
-
-            foreach (QualifierItem qualifierItem in _qualifierItems)
+            foreach (QualifierItem qualifierItem in reader.ReadIReadables<QualifierItem>(qualifierCount))
+            {
+                Add(qualifierItem);
                 this.Log($"Qualifier {qualifierItem.Handle}: {qualifierItem.Name}", Logger.LogType.Debug);
+            }
         }
 
         public void Write(ByteWriter writer)
         {
-            writer.WriteInt(_qualifierItems.Length);
-            writer.WriteIWritables(_qualifierItems);
-        }
-
-        public QualifierItem this[int index]
-        {
-            get => _qualifierItems[index];
-            set => _qualifierItems[index] = value;
+            writer.WriteInt(Count);
+            writer.WriteIWritables(this);
         }
     }
 }

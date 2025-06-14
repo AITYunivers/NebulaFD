@@ -1,36 +1,30 @@
 ﻿using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
+using System.Collections.ObjectModel;
 
 namespace Nebula.Core.CTF25.MFA.Object
 {
-    internal class ObjectBank : IReadable, IWritable
+    internal class ObjectBank : Collection<ObjectItem>, IReadable, IWritable
     {
-        private ObjectItem[] _objectItems = [];
-
         public void Read(ByteReader reader)
         {
             int objectCount = reader.ReadInt();
             this.Log($"Found {objectCount} object(s)", Logger.LogType.Debug);
             if (objectCount < 0)
                 throw new InvalidDataException("Invalid object count. Expected greater than or equal to 0, got " + objectCount);
-            
-            _objectItems = reader.ReadIReadables<ObjectItem>(objectCount);
+
+            foreach (ObjectItem objectItem in reader.ReadIReadables<ObjectItem>(objectCount))
+                Add(objectItem);
 
             for (int i = 0; i < objectCount; i++)
-                this.Log($"Object {i}: {_objectItems[i].Name}", Logger.LogType.Debug);
+                this.Log($"Object {i}: {this[i].Name}", Logger.LogType.Debug);
         }
 
         public void Write(ByteWriter writer)
         {
-            writer.WriteInt(_objectItems.Length);
-            writer.WriteIWritables(_objectItems);
-        }
-
-        public ObjectItem this[int index]
-        {
-            get => _objectItems[index];
-            set => _objectItems[index] = value;
+            writer.WriteInt(Count);
+            writer.WriteIWritables(this);
         }
     }
 }

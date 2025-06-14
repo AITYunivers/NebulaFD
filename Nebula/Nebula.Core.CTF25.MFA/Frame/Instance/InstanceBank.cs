@@ -1,13 +1,12 @@
 ﻿using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
+using System.Collections.ObjectModel;
 
 namespace Nebula.Core.CTF25.MFA.Frame.Instance
 {
-    internal class InstanceBank : IReadable, IWritable
+    internal class InstanceBank : Collection<InstanceItem>, IReadable, IWritable
     {
-        private InstanceItem[] _instanceItems = [];
-
         public void Read(ByteReader reader)
         {
             int instanceCount = reader.ReadInt();
@@ -15,19 +14,14 @@ namespace Nebula.Core.CTF25.MFA.Frame.Instance
             if (instanceCount < 0)
                 throw new InvalidDataException("Invalid instance count. Expected greater than or equal to 0, got " + instanceCount);
 
-            _instanceItems = reader.ReadIReadables<InstanceItem>(instanceCount);
+            foreach (InstanceItem instanceItem in reader.ReadIReadables<InstanceItem>(instanceCount))
+                instanceItem.Read(reader);
         }
 
         public void Write(ByteWriter writer)
         {
-            writer.WriteInt(_instanceItems.Length);
-            writer.WriteIWritables(_instanceItems);
-        }
-
-        public InstanceItem this[int index]
-        {
-            get => _instanceItems[index];
-            set => _instanceItems[index] = value;
+            writer.WriteInt(Count);
+            writer.WriteIWritables(this);
         }
     }
 }

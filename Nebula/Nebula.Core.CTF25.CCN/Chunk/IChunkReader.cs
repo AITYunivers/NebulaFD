@@ -2,7 +2,7 @@
 
 namespace Nebula.Core.CTF25.CCN.Chunk
 {
-    public interface IChunkReader
+    public interface IChunkReader : ICollection<IChunk>
     {
         public void ReadChunk(ChunkDefinition chunkDefinition, ByteReader reader);
         public T[] GetChunks<T>();

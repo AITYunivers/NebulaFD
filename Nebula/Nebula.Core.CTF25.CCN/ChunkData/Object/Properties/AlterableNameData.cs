@@ -5,9 +5,9 @@ namespace Nebula.Core.CTF25.CCN.ChunkData.Object.Properties
 {
     internal class AlterableNameData : IReadable
     {
-        public string[] AlterableValueNames = [];
-        public string[] AlterableFlagNames = [];
-        public string[] AlterableStringNames = [];
+        public List<string> AlterableValueNames = [];
+        public List<string> AlterableFlagNames = [];
+        public List<string> AlterableStringNames = [];
 
         public void Read(ByteReader reader)
         {
@@ -20,13 +20,13 @@ namespace Nebula.Core.CTF25.CCN.ChunkData.Object.Properties
             reader.Skip(2); // Maybe offset is int? Idk
 
             reader.Seek(valueOffset);
-            AlterableValueNames = reader.ReadYuniversals<ushort>(reader.ReadShort(), valueOffset);
+            AlterableValueNames = [.. reader.ReadYuniversals<ushort>(reader.ReadShort(), valueOffset)];
 
             reader.Seek(flagOffset);
-            AlterableFlagNames = reader.ReadYuniversals<ushort>(reader.ReadShort(), flagOffset);
+            AlterableFlagNames = [.. reader.ReadYuniversals<ushort>(reader.ReadShort(), flagOffset)];
 
             reader.Seek(stringOffset);
-            AlterableStringNames = reader.ReadYuniversals<ushort>(reader.ReadShort(), stringOffset);
+            AlterableStringNames = [.. reader.ReadYuniversals<ushort>(reader.ReadShort(), stringOffset)];
         }
     }
 }

@@ -25,12 +25,12 @@ namespace Nebula.Core.CTF25.MFA.Frame
         public Color[] Palette = [];
         public uint IconHandle;
         public uint EditorLayerHandle;
-        public LayerBank Layers = new LayerBank();
+        public LayerBank Layers = [];
         public Transition? TransitionIn = null;
         public Transition? TransitionOut = null;
-        public ObjectBank Objects = new ObjectBank();
-        public FolderBank Folders = new FolderBank();
-        public InstanceBank Instances = new InstanceBank();
+        public ObjectBank Objects = [];
+        public FolderBank Folders = [];
+        public InstanceBank Instances = [];
 
         public void Read(ByteReader reader)
         {

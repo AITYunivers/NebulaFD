@@ -6,7 +6,7 @@ namespace Nebula.Core.CTF25.CCN.ChunkData.Object.Properties.Animation
 {
     internal class AnimationItem : IReadable, IWritable
     {
-        public DirectionBank Directions = new DirectionBank();
+        public DirectionBank Directions = [];
 
         public void Read(ByteReader reader)
         {

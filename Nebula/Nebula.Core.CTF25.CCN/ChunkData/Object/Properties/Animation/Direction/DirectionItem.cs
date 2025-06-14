@@ -9,7 +9,7 @@ namespace Nebula.Core.CTF25.CCN.ChunkData.Object.Properties.Animation.Direction
         public byte MaxSpeed;
         public short RepeatCount;
         public ushort RepeatFrom;
-        public ushort[] FrameHandles = [];
+        public List<ushort> FrameHandles = [];
 
         public void Read(ByteReader reader)
         {
@@ -17,7 +17,7 @@ namespace Nebula.Core.CTF25.CCN.ChunkData.Object.Properties.Animation.Direction
             MaxSpeed = reader.ReadByte();
             RepeatCount = reader.ReadShort();
             RepeatFrom = reader.ReadUShort();
-            FrameHandles = reader.ReadUShorts(reader.ReadUShort());
+            FrameHandles = [.. reader.ReadUShorts(reader.ReadUShort())];
         }
 
         public void Write(ByteWriter writer)
@@ -26,7 +26,7 @@ namespace Nebula.Core.CTF25.CCN.ChunkData.Object.Properties.Animation.Direction
             writer.WriteByte(MaxSpeed);
             writer.WriteShort(RepeatCount);
             writer.WriteUShort(RepeatFrom);
-            writer.WriteUShort((ushort)FrameHandles.Length);
+            writer.WriteUShort((ushort)FrameHandles.Count);
             writer.WriteUShorts(FrameHandles);
         }
     }

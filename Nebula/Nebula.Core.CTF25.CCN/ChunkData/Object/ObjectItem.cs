@@ -4,12 +4,12 @@ using Nebula.Core.CTF25.CCN.Objects;
 using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
+using System.Collections.ObjectModel;
 
 namespace Nebula.Core.CTF25.CCN.Chunks.Objects
 {
-    internal class ObjectItem : IReadable, IWritable, IChunkReader
+    internal class ObjectItem : Collection<IChunk>, IReadable, IWritable, IChunkReader
     {
-        private List<IChunk> _chunks = [];
         private bool _logged;
 
         public void Read(ByteReader reader)
@@ -41,7 +41,7 @@ namespace Nebula.Core.CTF25.CCN.Chunks.Objects
             {
                 chunk.SetChunkDefinition(chunkDefinition);
                 chunk.Read(reader);
-                _chunks.Add(chunk);
+                Add(chunk);
             }
 
             if (!_logged && HasChunk<ObjectHeaderChunk>() && HasChunk<ObjectNameChunk>())
@@ -72,19 +72,8 @@ namespace Nebula.Core.CTF25.CCN.Chunks.Objects
             throw new NotImplementedException();
         }
 
-        public T[] GetChunks<T>()
-        {
-            return [.. _chunks.Where(x => x is T).Select(x => (T)x)];
-        }
-
-        public T? GetFirstChunk<T>()
-        {
-            return GetChunks<T>().FirstOrDefault();
-        }
-
-        public bool HasChunk<T>()
-        {
-            return _chunks.Any(x => x is T);
-        }
+        public T[] GetChunks<T>() => [.. this.Where(x => x is T).Select(x => (T)x)];
+        public T? GetFirstChunk<T>() => GetChunks<T>().FirstOrDefault();
+        public bool HasChunk<T>() => this.Any(x => x is T);
     }
 }

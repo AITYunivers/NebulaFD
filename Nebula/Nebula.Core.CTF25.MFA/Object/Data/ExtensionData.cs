@@ -18,10 +18,7 @@ namespace Nebula.Core.CTF25.MFA.Object.Data
         {
             bool hasAnimations = reader.ReadBool();
             if (hasAnimations)
-            {
-                Animations = new AnimationBank();
-                Animations.Read(reader);
-            }
+                (Animations = []).Read(reader);
 
             Type = reader.ReadUInt();
             if (Type == uint.MaxValue)

@@ -1,13 +1,12 @@
 ﻿using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
+using System.Collections.ObjectModel;
 
 namespace Nebula.Core.CTF25.MFA.Layer
 {
-    internal class LayerBank : IReadable, IWritable
+    internal class LayerBank : Collection<LayerItem>, IReadable, IWritable
     {
-        private LayerItem[] _layerItems = [];
-
         public void Read(ByteReader reader)
         {
             int layerCount = reader.ReadInt();
@@ -15,22 +14,17 @@ namespace Nebula.Core.CTF25.MFA.Layer
             if (layerCount < 0)
                 throw new InvalidDataException("Invalid layer count. Expected greater than or equal to 0, got " + layerCount);
 
-            _layerItems = reader.ReadIReadables<LayerItem>(layerCount);
+            foreach (LayerItem layerItem in reader.ReadIReadables<LayerItem>(layerCount))
+                layerItem.Read(reader);
 
             for (int i = 0; i < layerCount; i++)
-                this.Log($"Layer {i}: {_layerItems[i].Name}", Logger.LogType.Debug);
+                this.Log($"Layer {i}: {this[i].Name}", Logger.LogType.Debug);
         }
 
         public void Write(ByteWriter writer)
         {
-            writer.WriteInt(_layerItems.Length);
-            writer.WriteIWritables(_layerItems);
-        }
-
-        public LayerItem this[int index]
-        {
-            get => _layerItems[index];
-            set => _layerItems[index] = value;
+            writer.WriteInt(Count);
+            writer.WriteIWritables(this);
         }
     }
 }

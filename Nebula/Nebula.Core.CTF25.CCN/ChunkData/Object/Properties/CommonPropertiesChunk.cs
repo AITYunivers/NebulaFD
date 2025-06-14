@@ -98,7 +98,7 @@ namespace Nebula.Core.CTF25.CCN.Chunks.Objects.Properties
             if (_movementsOffset > 0)
             {
                 using ByteReader movementReader = reader.Split(_movementsOffset);
-                (Movements = new MovementBank()).Read(movementReader);
+                (Movements = []).Read(movementReader);
             }
 
             if (_dataOffset > 0)

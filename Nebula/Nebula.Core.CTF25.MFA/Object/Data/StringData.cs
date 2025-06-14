@@ -7,7 +7,7 @@ namespace Nebula.Core.CTF25.MFA.Object.Data
     {
         public int Width;
         public int Height;
-        public ParagraphContainer Paragraphs = new ParagraphContainer();
+        public ParagraphContainer Paragraphs = [];
 
         public override void ReadUncommonData(ByteReader reader)
         {

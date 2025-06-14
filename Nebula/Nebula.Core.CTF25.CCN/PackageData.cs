@@ -4,12 +4,12 @@ using Nebula.Core.CTF25.CCN.Chunks.Extensions;
 using Nebula.Core.CTF25.CCN.Chunks.Objects;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
+using System.Collections.ObjectModel;
 
 namespace Nebula.Core.CTF25.CCN
 {
-    public class PackageData : IPackageData, IChunkReader
+    public class PackageData : Collection<IChunk>, IPackageData, IChunkReader
     {
-        private readonly List<IChunk> _chunks = [];
         public int ProductBuild;
 
         public virtual void Read(ByteReader reader)
@@ -66,7 +66,7 @@ namespace Nebula.Core.CTF25.CCN
             {
                 chunk.SetChunkDefinition(chunkDefinition);
                 chunk.Read(reader);
-                _chunks.Add(chunk);
+                Add(chunk);
             }
 
             if (Decryption.DecryptionKey == null && chunk is EditorFilenameChunk editorFilenameChunk)
@@ -158,19 +158,8 @@ namespace Nebula.Core.CTF25.CCN
             return ProductBuild;
         }
 
-        public T[] GetChunks<T>()
-        {
-            return [.. _chunks.Where(x => x is T).Select(x => (T)x)];
-        }
-
-        public T? GetFirstChunk<T>()
-        {
-            return GetChunks<T>().FirstOrDefault();
-        }
-
-        public bool HasChunk<T>()
-        {
-            return _chunks.Any(x => x is T);
-        }
+        public T[] GetChunks<T>() => [.. this.Where(x => x is T).Select(x => (T)x)];
+        public T? GetFirstChunk<T>() => GetChunks<T>().FirstOrDefault();
+        public bool HasChunk<T>() => this.Any(x => x is T);
     }
 }

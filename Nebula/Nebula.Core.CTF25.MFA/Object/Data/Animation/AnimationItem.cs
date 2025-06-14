@@ -7,7 +7,7 @@ namespace Nebula.Core.CTF25.MFA.Object.Data.Animation
     internal class AnimationItem : IReadable, IWritable
     {
         public string Name = string.Empty;
-        public DirectionBank Directions = new DirectionBank();
+        public DirectionBank Directions = [];
 
         public void Read(ByteReader reader)
         {

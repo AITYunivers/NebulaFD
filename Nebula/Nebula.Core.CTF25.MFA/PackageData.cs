@@ -42,19 +42,19 @@ namespace Nebula.Core.CTF25.MFA
             int stampLength = reader.ReadInt();
             byte[] stamp = reader.ReadBytes(stampLength);
 
-            FontBank fontBank = new FontBank();
+            FontBank fontBank = [];
             fontBank.Read(reader);
 
-            SoundBank soundBank = new SoundBank();
+            SoundBank soundBank = [];
             soundBank.Read(reader);
 
-            MusicBank musicBank = new MusicBank();
+            MusicBank musicBank = [];
             musicBank.Read(reader);
 
-            ImageBank iconBank = new ImageBank();
+            ImageBank iconBank = [];
             iconBank.Read(reader);
 
-            ImageBank imageBank = new ImageBank();
+            ImageBank imageBank = [];
             imageBank.Read(reader);
 
             /*
@@ -96,7 +96,7 @@ namespace Nebula.Core.CTF25.MFA
 
             reader.Skip(4);
 
-            BinaryFileBank binaryFileBank = new BinaryFileBank();
+            BinaryFileBank binaryFileBank = [];
             binaryFileBank.Read(reader);
 
             int controlCount = reader.ReadInt();
@@ -124,13 +124,13 @@ namespace Nebula.Core.CTF25.MFA
             // Icons
             reader.Skip(reader.ReadInt() * 4);
 
-            QualifierBank qualifierBank = new QualifierBank();
+            QualifierBank qualifierBank = [];
             qualifierBank.Read(reader);
 
-            ExtensionBank extensionBank = new ExtensionBank();
+            ExtensionBank extensionBank = [];
             extensionBank.Read(reader);
 
-            FrameBank frameBank = new FrameBank();
+            FrameBank frameBank = [];
             frameBank.Read(reader);
 
             while (true)

@@ -1,13 +1,12 @@
 ﻿using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
+using System.Collections.ObjectModel;
 
 namespace Nebula.Core.CTF25.MFA.Music
 {
-    public class MusicBank : IReadable
+    public class MusicBank : Collection<MusicItem>, IReadable
     {
-        private MusicItem[] _musicItems = [];
-
         public void Read(ByteReader reader)
         {
             string bankHeader = reader.ReadAscii(4);
@@ -19,16 +18,11 @@ namespace Nebula.Core.CTF25.MFA.Music
             if (musicCount < 0)
                 throw new InvalidDataException("Invalid music count. Expected greater than or equal to 0, got " + musicCount);
 
-            _musicItems = reader.ReadIReadables<MusicItem>(musicCount);
-
-            foreach (MusicItem musicItem in _musicItems)
+            foreach (MusicItem musicItem in reader.ReadIReadables<MusicItem>(musicCount))
+            {
+                Add(musicItem);
                 this.Log($"Music {musicItem.Handle}: {musicItem.Name}", Logger.LogType.Debug);
-        }
-
-        public MusicItem this[int index]
-        {
-            get => _musicItems[index];
-            set => _musicItems[index] = value;
+            }
         }
     }
 }

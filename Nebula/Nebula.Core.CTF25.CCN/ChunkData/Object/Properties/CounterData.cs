@@ -11,7 +11,7 @@ namespace Nebula.Core.CTF25.CCN.ChunkData.Object.Properties
         public ushort DisplayType;
         public ushort Flags;
         public ushort FontHandle;
-        public ushort[]? FrameHandles;
+        public List<ushort>? FrameHandles;
         public ShapeData? Shape;
 
         public void Read(ByteReader reader)
@@ -28,7 +28,7 @@ namespace Nebula.Core.CTF25.CCN.ChunkData.Object.Properties
             {
                 case 1: // Numbers
                 case 4: // Animation
-                    FrameHandles = reader.ReadUShorts(reader.ReadUShort());
+                    FrameHandles = [.. reader.ReadUShorts(reader.ReadUShort())];
                     break;
                 case 2: // Vertical Bar
                 case 3: // Horizontal Bar

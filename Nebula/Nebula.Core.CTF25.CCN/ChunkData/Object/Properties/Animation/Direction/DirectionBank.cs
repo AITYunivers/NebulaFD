@@ -1,28 +1,20 @@
 ﻿using Nebula.Core.Data;
 using Nebula.Core.Memory;
-using Nebula.Core.Utilities;
+using System.Collections.ObjectModel;
 
 namespace Nebula.Core.CTF25.CCN.ChunkData.Object.Properties.Animation.Direction
 {
-    internal class DirectionBank : IReadable, IWritable
+    internal class DirectionBank : Collection<DirectionItem>, IReadable, IWritable
     {
-        private DirectionItem[] _directionItems = [];
-
         public void Read(ByteReader reader)
         {
-            long startOffset = reader.Tell();
-            _directionItems = reader.ReadIReadables<DirectionItem, ushort>(32, startOffset);
+            foreach (DirectionItem directionItem in reader.ReadIReadables<DirectionItem, ushort>(32, reader.Tell()))
+                Add(directionItem);
         }
 
         public void Write(ByteWriter writer)
         {
-            writer.WriteIWritablesWithOffsets<DirectionItem, ushort>(_directionItems);
-        }
-
-        public DirectionItem this[int index]
-        {
-            get => _directionItems[index];
-            set => _directionItems[index] = value;
+            writer.WriteIWritablesWithOffsets<DirectionItem, ushort>(this);
         }
     }
 }

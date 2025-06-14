@@ -10,7 +10,7 @@ namespace Nebula.Core.CTF25.MFA.Object.Data.Animation.Direction
         public int MaxSpeed;
         public int RepeatCount;
         public int RepeatFrom;
-        public uint[] FrameHandles = [];
+        public List<uint> FrameHandles = [];
 
         public void Read(ByteReader reader)
         {
@@ -19,7 +19,7 @@ namespace Nebula.Core.CTF25.MFA.Object.Data.Animation.Direction
             MaxSpeed = reader.ReadInt();
             RepeatCount = reader.ReadInt();
             RepeatFrom = reader.ReadInt();
-            FrameHandles = reader.ReadUInts(reader.ReadInt());
+            FrameHandles = [.. reader.ReadUInts(reader.ReadInt())];
         }
 
         public void Write(ByteWriter writer)
@@ -29,7 +29,7 @@ namespace Nebula.Core.CTF25.MFA.Object.Data.Animation.Direction
             writer.WriteInt(MaxSpeed);
             writer.WriteInt(RepeatCount);
             writer.WriteInt(RepeatFrom);
-            writer.WriteInt(FrameHandles.Length);
+            writer.WriteInt(FrameHandles.Count);
             writer.WriteUInts(FrameHandles);
         }
     }

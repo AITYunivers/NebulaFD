@@ -2,13 +2,12 @@
 using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
+using System.Collections.ObjectModel;
 
 namespace Nebula.Core.CTF25.MFA.Extension
 {
-    internal class ExtensionBank : IReadable, IWritable
+    internal class ExtensionBank : Collection<ExtensionItem>, IReadable, IWritable
     {
-        private ExtensionItem[] _extensionItems = [];
-
         public void Read(ByteReader reader)
         {
             int extensionCount = reader.ReadInt();
@@ -16,22 +15,17 @@ namespace Nebula.Core.CTF25.MFA.Extension
             if (extensionCount < 0)
                 throw new InvalidDataException("Invalid extension count. Expected greater than or equal to 0, got " + extensionCount);
 
-            _extensionItems = reader.ReadIReadables<ExtensionItem>(extensionCount);
-
-            foreach (ExtensionItem extensionItem in _extensionItems)
+            foreach (ExtensionItem extensionItem in reader.ReadIReadables<ExtensionItem>(extensionCount))
+            {
+                Add(extensionItem);
                 this.Log($"Extension {extensionItem.Handle}: {extensionItem.Name}", Logger.LogType.Debug);
+            }
         }
 
         public void Write(ByteWriter writer)
         {
-            writer.WriteInt(_extensionItems.Length);
-            writer.WriteIWritables(_extensionItems);
-        }
-
-        public ExtensionItem this[int index]
-        {
-            get => _extensionItems[index];
-            set => _extensionItems[index] = value;
+            writer.WriteInt(Count);
+            writer.WriteIWritables(this);
         }
     }
 }
