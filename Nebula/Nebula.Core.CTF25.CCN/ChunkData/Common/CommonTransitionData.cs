@@ -1,5 +1,6 @@
 ﻿using Nebula.Core.Data;
 using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 using System.Drawing;
 
 namespace Nebula.Core.CTF25.CCN.ChunkData.Common
@@ -32,6 +33,8 @@ namespace Nebula.Core.CTF25.CCN.ChunkData.Common
 
             reader.Seek(DataOffset);
             ParameterData = reader.ReadBytes(DataSize);
+
+            this.Log("Transition Filename: " + FileName, Logger.LogType.Debug);
         }
 
         public void Write(ByteWriter writer)

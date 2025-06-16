@@ -1,10 +1,10 @@
-﻿using Nebula.Core.Memory;
+﻿using Nebula.Core.Data;
+using Nebula.Core.Memory;
 
 namespace Nebula.Core
 {
-    public interface IPackageData
+    public interface IPackageData : IReadable
     {
-        public void Read(ByteReader reader);
         public bool Check(ByteReader reader);
         public int GetFusionBuild();
     }

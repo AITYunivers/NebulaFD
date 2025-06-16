@@ -1,5 +1,6 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
 using Nebula.Core.CTF25.CCN.ChunkData.Frame.Instance;
+using Nebula.Core.CTF25.CCN.ChunkData.Frame.Layer;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 using System.Collections;
@@ -33,7 +34,13 @@ namespace Nebula.Core.CTF25.CCN.ChunkData.Frame
                 EChunks.FRAME_NAME => new FrameNameChunk(),
                 EChunks.FRAME_PALETTE => new FramePaletteChunk(),
                 EChunks.FRAME_INSTANCES => new FrameInstanceBank(),
+                EChunks.FRAME_TRANSITION_IN => new FrameTransitionInChunk(),
+                EChunks.FRAME_TRANSITION_OUT => new FrameTransitionOutChunk(),
+                EChunks.FRAME_LAYERS => new FrameLayerBank(),
                 EChunks.FRAME_RECT => new FrameRectChunk(),
+                EChunks.FRAME_LAYER_EFFECTS => CreateLayerEffectBank(),
+                EChunks.FRAME_MOVEMENT_TIMER => new FrameMovementTimerChunk(),
+                EChunks.FRAME_EFFECTS => new FrameEffectsChunk(),
                 _ => null
             };
 
@@ -43,6 +50,15 @@ namespace Nebula.Core.CTF25.CCN.ChunkData.Frame
                 chunk.Read(reader);
                 Add(chunk);
             }
+        }
+
+        private CommonChunk? CreateLayerEffectBank()
+        {
+            FrameLayerBank? layerBank = GetFirstChunk<FrameLayerBank>();
+            if (layerBank == null)
+                return null;
+
+            return new FrameLayerEffectBank(layerBank.Count);
         }
 
         public override void WriteChunkData(ByteWriter writer)
