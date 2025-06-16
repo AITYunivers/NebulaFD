@@ -4,7 +4,7 @@ using Nebula.Core.Utilities;
 using System.Collections;
 using System.Collections.ObjectModel;
 
-namespace Nebula.Core.CTF25.CCN.Chunks.Objects
+namespace Nebula.Core.CTF25.CCN.ChunkData.Objects
 {
     internal class ObjectBankChunk : CommonChunk, ICollection<ObjectItem>
     {

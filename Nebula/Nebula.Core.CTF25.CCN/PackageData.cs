@@ -1,7 +1,7 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
-using Nebula.Core.CTF25.CCN.Chunks;
-using Nebula.Core.CTF25.CCN.Chunks.Extensions;
-using Nebula.Core.CTF25.CCN.Chunks.Objects;
+using Nebula.Core.CTF25.CCN.ChunkData;
+using Nebula.Core.CTF25.CCN.ChunkData.Extensions;
+using Nebula.Core.CTF25.CCN.ChunkData.Objects;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 using System.Collections.ObjectModel;
@@ -49,15 +49,19 @@ namespace Nebula.Core.CTF25.CCN
                 EChunks.APP_NAME => new AppNameChunk(),
                 EChunks.AUTHOR => new AuthorChunk(),
                 EChunks.OBJECT_BANK => new ObjectBankChunk(),
+                EChunks.FRAME_HANDLES => new FrameHandlesChunk(),
                 EChunks.EXTENSION_DATA => new ExtensionDataChunk(),
                 EChunks.EDITOR_FILENAME => new EditorFilenameChunk(),
                 EChunks.TARGET_FILENAME => new TargetFilenameChunk(),
                 EChunks.TRANSITION_FILENAME => new TransitionFilenameChunk(),
                 EChunks.EXTENSIONS => new ExtensionBankChunk(),
                 EChunks.APP_ICON => new AppIconChunk(),
+                EChunks.SERIAL_NUMBER => new SerialNumberChunk(),
                 EChunks.COPYRIGHT => new CopyrightChunk(),
+                EChunks.EXE_ONLY => new ExeOnlyChunk(),
                 EChunks.EXTENDED_HEADER => new ExtendedHeaderChunk(),
                 EChunks.APP_CODE_PAGE => new AppCodePageChunk(),
+                EChunks.CHAR_ENCODING => new CharEncodingChunk(),
                 EChunks.ENGINE_VERSION => new EngineVersionChunk(),
                 _ => null
             };

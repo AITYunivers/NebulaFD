@@ -4,7 +4,7 @@ using Nebula.Core.Utilities;
 using System.Collections;
 using System.Collections.ObjectModel;
 
-namespace Nebula.Core.CTF25.CCN.Chunks.Extensions
+namespace Nebula.Core.CTF25.CCN.ChunkData.Extensions
 {
     internal class ExtensionBankChunk : CommonChunk, ICollection<ExtensionItem>
     {

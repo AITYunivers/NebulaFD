@@ -1,7 +1,7 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
 using Nebula.Core.Memory;
 
-namespace Nebula.Core.CTF25.CCN.Chunks.Objects
+namespace Nebula.Core.CTF25.CCN.ChunkData.Objects
 {
     internal class ObjectNameChunk : CommonChunk
     {

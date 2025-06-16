@@ -1,23 +1,20 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
 using Nebula.Core.Memory;
-using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.CCN.ChunkData
 {
-    internal class AuthorChunk : CommonChunk
+    internal class ExeOnlyChunk : CommonChunk
     {
-        public string Author = string.Empty;
+        public bool Value;
 
         public override void ReadChunkData(ByteReader reader)
         {
-            Author = reader.ReadYuniversal();
-
-            this.Log("Author: " + Author, Logger.LogType.Debug);
+            Value = reader.ReadBool();
         }
 
         public override void WriteChunkData(ByteWriter writer)
         {
-            writer.WriteYunicode(Author);
+            writer.WriteBool(Value);
         }
     }
 }

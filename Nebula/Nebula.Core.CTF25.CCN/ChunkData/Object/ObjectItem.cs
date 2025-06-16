@@ -1,12 +1,12 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
-using Nebula.Core.CTF25.CCN.Chunks.Objects.Properties;
+using Nebula.Core.CTF25.CCN.ChunkData.Objects.Properties;
 using Nebula.Core.CTF25.CCN.Objects;
 using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 using System.Collections.ObjectModel;
 
-namespace Nebula.Core.CTF25.CCN.Chunks.Objects
+namespace Nebula.Core.CTF25.CCN.ChunkData.Objects
 {
     internal class ObjectItem : Collection<IChunk>, IReadable, IWritable, IChunkReader
     {

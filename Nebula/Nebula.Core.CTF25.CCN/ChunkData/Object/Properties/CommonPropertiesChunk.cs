@@ -8,7 +8,7 @@ using Nebula.Core.Data;
 using Nebula.Core.Memory;
 using System.Drawing;
 
-namespace Nebula.Core.CTF25.CCN.Chunks.Objects.Properties
+namespace Nebula.Core.CTF25.CCN.ChunkData.Objects.Properties
 {
     internal class CommonPropertiesChunk : CommonChunk
     {

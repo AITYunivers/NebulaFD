@@ -1,7 +1,7 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
 using Nebula.Core.Memory;
 
-namespace Nebula.Core.CTF25.CCN.Chunks.Objects.Properties
+namespace Nebula.Core.CTF25.CCN.ChunkData.Objects.Properties
 {
     internal class BackdropData : CommonChunk
     {

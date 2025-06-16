@@ -1,7 +1,7 @@
 ﻿using Nebula.Core.Data;
 using Nebula.Core.Memory;
 
-namespace Nebula.Core.CTF25.CCN.Chunks.Extensions
+namespace Nebula.Core.CTF25.CCN.ChunkData.Extensions
 {
     internal class ExtensionItem : IReadable, IWritable
     {

@@ -2,7 +2,7 @@
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 
-namespace Nebula.Core.CTF25.CCN.Chunks
+namespace Nebula.Core.CTF25.CCN.ChunkData
 {
     internal class AppNameChunk : CommonChunk
     {
