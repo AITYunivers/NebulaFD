@@ -1,5 +1,6 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
 using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.CCN.ChunkData
 {
@@ -10,6 +11,8 @@ namespace Nebula.Core.CTF25.CCN.ChunkData
         public override void ReadChunkData(ByteReader reader)
         {
             Value = reader.ReadBool();
+
+            this.Log("Exe Only: " + Value, Logger.LogType.Debug);
         }
 
         public override void WriteChunkData(ByteWriter writer)

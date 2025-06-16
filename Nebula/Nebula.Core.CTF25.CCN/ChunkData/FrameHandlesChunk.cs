@@ -1,5 +1,6 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
 using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 using System.Collections;
 using System.Collections.ObjectModel;
 
@@ -13,6 +14,8 @@ namespace Nebula.Core.CTF25.CCN.ChunkData
         {
             while (reader.HasMemory(2))
                 _frameHandles.Add(reader.ReadUShort());
+
+            this.Log($"Found {Count} Frame Handles", Logger.LogType.Debug);
         }
 
         public override void WriteChunkData(ByteWriter writer)

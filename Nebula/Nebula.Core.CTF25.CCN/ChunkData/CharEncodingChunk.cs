@@ -1,5 +1,6 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
 using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 
 namespace Nebula.Core.CTF25.CCN.ChunkData
 {
@@ -12,6 +13,8 @@ namespace Nebula.Core.CTF25.CCN.ChunkData
         {
             InputEncoding = reader.ReadUInt();
             OutputEncoding = reader.ReadUInt();
+
+            this.Log($"Character Encoding: (Input: {InputEncoding}) (Output: {OutputEncoding})", Logger.LogType.Debug);
         }
 
         public override void WriteChunkData(ByteWriter writer)

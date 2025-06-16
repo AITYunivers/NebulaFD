@@ -1,6 +1,7 @@
 ﻿using Nebula.Core.CTF25.CCN.Chunk;
 using Nebula.Core.CTF25.CCN.ChunkData;
 using Nebula.Core.CTF25.CCN.ChunkData.Extensions;
+using Nebula.Core.CTF25.CCN.ChunkData.Frame;
 using Nebula.Core.CTF25.CCN.ChunkData.Objects;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
@@ -63,6 +64,7 @@ namespace Nebula.Core.CTF25.CCN
                 EChunks.APP_CODE_PAGE => new AppCodePageChunk(),
                 EChunks.CHAR_ENCODING => new CharEncodingChunk(),
                 EChunks.ENGINE_VERSION => new EngineVersionChunk(),
+                EChunks.FRAME => new FrameChunk(),
                 _ => null
             };
 
