@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CTF25", "CTF25", "{8E16A537
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nebula.Core.CTF25.CCN", "Nebula\Nebula.Core.CTF25.CCN\Nebula.Core.CTF25.CCN.csproj", "{F9B1885B-6709-4AAA-95A0-0247B09BA160}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nebula.Core.ImageTranslation", "Nebula.Core.ImageTranslation\Nebula.Core.ImageTranslation.csproj", "{9AC87C3E-BC8E-4B61-AC34-2A09B9C7B90E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nebula.Core.ImageTranslation", "Nebula\Nebula.Core.ImageTranslation\Nebula.Core.ImageTranslation.csproj", "{9AC87C3E-BC8E-4B61-AC34-2A09B9C7B90E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
