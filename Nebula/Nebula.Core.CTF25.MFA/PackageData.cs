@@ -15,6 +15,7 @@ namespace Nebula.Core.CTF25.MFA
     public class PackageData : IPackageData
     {
         public int ProductBuild;
+        public ImageBank Images = [];
 
         public void Read(ByteReader reader)
         {
@@ -54,8 +55,7 @@ namespace Nebula.Core.CTF25.MFA
             ImageBank iconBank = [];
             iconBank.Read(reader);
 
-            ImageBank imageBank = [];
-            imageBank.Read(reader);
+            Images.Read(reader);
 
             /*
             AYS AppName

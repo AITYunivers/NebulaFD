@@ -15,7 +15,7 @@ namespace Nebula.Core.CTF25.MFA.Layer
                 throw new InvalidDataException("Invalid layer count. Expected greater than or equal to 0, got " + layerCount);
 
             foreach (LayerItem layerItem in reader.ReadIReadables<LayerItem>(layerCount))
-                layerItem.Read(reader);
+                Add(layerItem);
 
             for (int i = 0; i < layerCount; i++)
                 this.Log($"Layer {i}: {this[i].Name}", Logger.LogType.Debug);

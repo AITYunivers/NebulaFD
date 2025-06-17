@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Nebula.Core.Memory
 {
@@ -21,6 +22,21 @@ namespace Nebula.Core.Memory
         public static byte[] DecompressZlib(ByteReader reader, int size)
         {
             return DecompressZlibRaw(reader.ReadBytes(size));
+        }
+
+        public static void DecompressZlib(ByteReader reader, byte[] result, int length)
+        {
+            byte[] header = reader.ReadBytes(2);
+            reader.Skip(-2); // Go back
+            DecompressZlib(reader.BaseStream, result, length, IsZlib(header));
+        }
+
+        public static void DecompressZlib(Stream stream, byte[] result, int length, bool isZlib)
+        {
+            using Stream deflateStream = isZlib
+                ? new ZLibStream(stream, CompressionMode.Decompress, true)
+                : new DeflateStream(stream, CompressionMode.Decompress, true);
+            deflateStream.ReadExactly(result, 0, length);
         }
 
         public static byte[] DecompressZlibRaw(byte[] data)

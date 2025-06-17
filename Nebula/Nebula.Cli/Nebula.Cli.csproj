@@ -10,6 +10,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.10" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Nebula.Core.ImageTranslation\Nebula.Core.ImageTranslation.csproj" />
+    <ProjectReference Include="..\Nebula.Core.CTF25.CCN\Nebula.Core.CTF25.CCN.csproj" />
+    <ProjectReference Include="..\Nebula.Core.CTF25.MFA\Nebula.Core.CTF25.MFA.csproj" />
     <ProjectReference Include="..\Nebula.Core\Nebula.Core.csproj" />
   </ItemGroup>
 

@@ -63,12 +63,12 @@ namespace Nebula.Core.CTF25.MFA.Frame
                 TransitionOut = new Transition();
                 TransitionOut.Read(reader);
             }
+            return; // Event Skipping like this doesn't work, will need to fully implement them
 
             Objects.Read(reader);
             Folders.Read(reader);
             Instances.Read(reader);
 
-            return; // Event Skipping like this doesn't work, will need to fully implement them
             reader.Skip(reader.ReadInt()); // Events
 
             while (true)

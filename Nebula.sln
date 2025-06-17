@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CTF25", "CTF25", "{8E16A537
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nebula.Core.CTF25.CCN", "Nebula\Nebula.Core.CTF25.CCN\Nebula.Core.CTF25.CCN.csproj", "{F9B1885B-6709-4AAA-95A0-0247B09BA160}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nebula.Core.ImageTranslation", "Nebula.Core.ImageTranslation\Nebula.Core.ImageTranslation.csproj", "{9AC87C3E-BC8E-4B61-AC34-2A09B9C7B90E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{F9B1885B-6709-4AAA-95A0-0247B09BA160}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9B1885B-6709-4AAA-95A0-0247B09BA160}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9B1885B-6709-4AAA-95A0-0247B09BA160}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AC87C3E-BC8E-4B61-AC34-2A09B9C7B90E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AC87C3E-BC8E-4B61-AC34-2A09B9C7B90E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AC87C3E-BC8E-4B61-AC34-2A09B9C7B90E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AC87C3E-BC8E-4B61-AC34-2A09B9C7B90E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,6 +57,7 @@ Global
 		{9945A1D2-5E1C-45D5-8C62-D4311A0478EB} = {CDE8CF7C-9A6A-4801-8E6A-2588D28A1588}
 		{8E16A537-760E-4187-9BAC-A553A910C7DB} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{F9B1885B-6709-4AAA-95A0-0247B09BA160} = {8E16A537-760E-4187-9BAC-A553A910C7DB}
+		{9AC87C3E-BC8E-4B61-AC34-2A09B9C7B90E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {212E5F30-98B2-4313-B286-42B8A3DBA2F7}

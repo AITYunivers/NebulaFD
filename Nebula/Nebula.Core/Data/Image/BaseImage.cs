@@ -1,11 +1,17 @@
-﻿namespace Nebula.Core.Data.Image
+﻿using Nebula.Core.Memory;
+
+namespace Nebula.Core.Data.Image
 {
-    public class BaseImage
+    public abstract class BaseImage
     {
         public uint Handle;
 
         // Image Metadata
         public int Width;
         public int Height;
+        public EImageFlags Flags;
+        public EImageType Type = EImageType.RGBA;
+
+        public abstract byte[] GetImageData(ByteReader reader, out int dataSize);
     }
 }
