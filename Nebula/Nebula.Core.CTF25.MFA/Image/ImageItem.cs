@@ -29,8 +29,8 @@ namespace Nebula.Core.CTF25.MFA.Image
             i16 HotspotY    | 0x04
             i16 ActionX     | 0x06
             i16 ActionY     | 0x08
-            i32 Transparent | 0x0A
-            */ reader.Skip   (0x0E);
+            */ reader.Skip   (0x0A);
+            TransparentColor = reader.ReadUInt(); // ARGB
             _offset = reader.Tell();
             reader.Skip(_dataSize); // Image Data
         }

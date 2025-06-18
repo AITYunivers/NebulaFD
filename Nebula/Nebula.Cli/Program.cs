@@ -33,7 +33,7 @@ namespace Nebula.Cli
                     {
                         NebulaAPI.PackageData.Read(reader);
                         char key = Console.ReadKey().KeyChar;
-                        /*if (key == 'd' && NebulaAPI.PackageData is Core.CTF25.MFA.PackageData mfaData)
+                        if (key == 'd' && NebulaAPI.PackageData is Core.CTF25.MFA.PackageData mfaData)
                         {
                             Console.WriteLine("Dumping images from MFA");
                             if (!Directory.Exists("tempimgs"))
@@ -88,7 +88,7 @@ namespace Nebula.Cli
                             Console.WriteLine($"Took {imgSw2.Elapsed.TotalSeconds} seconds translating");
                             Console.WriteLine($"Took {imgSw3.Elapsed.TotalSeconds} seconds saving to file");
                             Console.ReadKey();
-                        }*/
+                        }
                         return;
                     }
                 }

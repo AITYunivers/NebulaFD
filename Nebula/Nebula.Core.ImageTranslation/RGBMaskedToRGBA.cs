@@ -1,6 +1,8 @@
 ﻿using Nebula.Core.Data.Image;
+using Nebula.Core.Utilities;
 using System.Buffers;
 using System.Diagnostics;
+using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
@@ -78,6 +80,24 @@ namespace Nebula.Core.ImageTranslation
             // Perform alpha premultiplication
             if (hasAlpha)
                 Premultiply(result);
+
+            // Apply Transparent Color
+            else
+            {
+                uint transparent = (baseImage.TransparentColor & 0x0000FF00) |
+                                   (baseImage.TransparentColor & 0x00FF0000) >> 16 |
+                                   (baseImage.TransparentColor & 0x000000FF) << 16;
+
+                for (int i = 0; i < width * height; i++)
+                {
+                    uint color = MemoryMarshal.Read<uint>(result.Slice(i * 4));
+                    int idx = i * 4 + 3;
+                    if (color == transparent)
+                        result[idx] = 0;
+                    else
+                        result[idx] = 255;
+                }
+            }
         }
 
         private static void Combine(Span<byte> combinedMemory, ReadOnlySpan<byte> colorMemory, ReadOnlySpan<byte> alphaMemory)

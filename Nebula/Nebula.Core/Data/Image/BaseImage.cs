@@ -11,6 +11,7 @@ namespace Nebula.Core.Data.Image
         public int Height;
         public EImageFlags Flags;
         public EImageType Type = EImageType.RGBA;
+        public uint TransparentColor;
 
         public abstract byte[] GetImageData(ByteReader reader, out int dataSize);
     }
