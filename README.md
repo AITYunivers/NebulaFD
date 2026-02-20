@@ -1,8 +1,6 @@
 ![Nebula Logo](https://raw.githubusercontent.com/AITYunivers/NebulaFD/master/.resources/NebulaLogo.png)
 # 
 **README is a Work In Progress.**
-**Nebula is currently in the middle of a rewrite!**
-**Please do not open issues about/ask in the Discord about temporarily removed features.**
 
 [Discord](https://discord.gg/aY2WFGPBBB)
 
