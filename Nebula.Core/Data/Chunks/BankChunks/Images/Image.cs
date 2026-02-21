@@ -70,7 +70,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                 return new ImageFlash();
             else if (NebulaCore.Fusion == 1.5f)
                 return new Image15();
-            else if (NebulaCore.PackageData.ExtendedHeader.CompressionFlags["OptimizeImageSize"])
+            else if (NebulaCore.PackageData.ExtendedHeader.CompressionFlags["OptimizeImageSize"] && !Parameters.ForceImageReader)
                 return new Image25Plus();
             return new Image25();
         }
