@@ -28,21 +28,45 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 ObjectType = reader.ReadShort();
                 Num = reader.ReadShort();
             }
-            ObjectInfo = reader.ReadUShort();
-            ObjectInfoList = reader.ReadShort();
-            EventFlags.Value = reader.ReadByte();
-            OtherFlags.Value = reader.ReadByte();
-            Parameters = new Parameter[reader.ReadByte()];
-            DefType = reader.ReadByte();
 
-            for (int i = 0; i < Parameters.Length; i++)
+            if (NebulaCore.Build < 296 || !NebulaCore.Windows)
             {
-                Parameters[i] = new Parameter();
-                Parameters[i].ReadCCN(reader);
-                Parameters[i].FrameEvents = Parent.Parent;
-            }
+                ObjectInfo = reader.ReadUShort();
+                ObjectInfoList = reader.ReadShort();
+                EventFlags.Value = reader.ReadByte();
+                OtherFlags.Value = reader.ReadByte();
+                Parameters = new Parameter[reader.ReadByte()];
+                DefType = reader.ReadByte();
 
-            reader.Seek(endPosition);
+                for (int i = 0; i < Parameters.Length; i++)
+                {
+                    Parameters[i] = new Parameter();
+                    Parameters[i].ReadCCN(reader);
+                    Parameters[i].FrameEvents = Parent.Parent;
+                }
+			}
+			else
+			{
+				Event296Checks checks = Event296Checks.GetFromAct(ObjectType, Num);
+				if (checks.HasObjectInfo)
+					ObjectInfo = reader.ReadUShort();
+				if (checks.HasEventFlags)
+					EventFlags.Value = reader.ReadByte();
+				if (checks.HasParameters)
+					Parameters = new Parameter[reader.ReadByte()];
+
+				if (checks.HasParameters)
+				{
+					for (int i = 0; i < Parameters.Length; i++)
+					{
+						Parameters[i] = new Parameter();
+						Parameters[i].ReadCCN(reader);
+						Parameters[i].FrameEvents = Parent.Parent;
+					}
+				}
+			}
+
+			reader.Seek(endPosition);
             Fix((List<Action>)extraInfo[0]);
         }
 

@@ -41,25 +41,33 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            long endPosition = reader.Tell() + Math.Abs(reader.ReadShort());
+            short size = Math.Abs(reader.PeekShort());
+            long endPosition = reader.Tell() + size;
+            DebugDumper.Dump("Event", reader, size, category: "Events", increment: true);
 
+            reader.Skip(2); // Size
             byte cndCnt = reader.ReadByte();
             byte actCnt = reader.ReadByte();
             EventFlags.Value = reader.ReadUShort();
 
-            if (NebulaCore.Build >= 284 && !(NebulaCore.Fusion == 1.5f || NebulaCore.MFA || NebulaCore.Android && NebulaCore.Build == 287))
-            {
-                reader.Skip(2);
-                Restricted = reader.ReadInt();
-                RestrictCpt = reader.ReadInt();
-            }
+            if (NebulaCore.Build < 296 || !NebulaCore.Windows)
+			{
+				if (NebulaCore.Build >= 284 && !(NebulaCore.Fusion == 1.5f || NebulaCore.MFA || NebulaCore.Android && NebulaCore.Build == 287))
+				{
+					reader.Skip(2);
+					Restricted = reader.ReadInt();
+					RestrictCpt = reader.ReadInt();
+				}
+				else
+				{
+					Restricted = reader.ReadShort();
+					RestrictCpt = reader.ReadShort();
+					Identifier = reader.ReadShort();
+					Undo = reader.ReadShort();
+				}
+			}
             else
-            {
-                Restricted = reader.ReadShort();
-                RestrictCpt = reader.ReadShort();
-                Identifier = reader.ReadShort();
-                Undo = reader.ReadShort();
-            }
+                reader.Skip(2);
 
             for (int i = 0; i < cndCnt; i++)
             {

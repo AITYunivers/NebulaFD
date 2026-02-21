@@ -29,20 +29,44 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             {
                 ObjectType = reader.ReadShort();
                 Num = reader.ReadShort();
-            }
-            ObjectInfo = reader.ReadUShort();
-            ObjectInfoList = reader.ReadShort();
-            EventFlags.Value = reader.ReadByte();
-            OtherFlags.Value = reader.ReadByte();
-            Parameters = new Parameter[reader.ReadByte()];
-            DefType = reader.ReadByte();
-            Identifier = reader.ReadShort();
+			}
 
-            for (int i = 0; i < Parameters.Length; i++)
+			if (NebulaCore.Build < 296 || !NebulaCore.Windows)
+			{
+                ObjectInfo = reader.ReadUShort();
+                ObjectInfoList = reader.ReadShort();
+                EventFlags.Value = reader.ReadByte();
+                OtherFlags.Value = reader.ReadByte();
+                Parameters = new Parameter[reader.ReadByte()];
+                DefType = reader.ReadByte();
+                Identifier = reader.ReadShort();
+
+				for (int i = 0; i < Parameters.Length; i++)
+				{
+					Parameters[i] = new Parameter();
+					Parameters[i].ReadCCN(reader);
+					Parameters[i].FrameEvents = Parent.Parent;
+				}
+			}
+            else
             {
-                Parameters[i] = new Parameter();
-                Parameters[i].ReadCCN(reader);
-                Parameters[i].FrameEvents = Parent.Parent;
+                Event296Checks checks = Event296Checks.GetFromCond(ObjectType, Num);
+                if (checks.HasObjectInfo)
+					ObjectInfo = reader.ReadUShort();
+                if (checks.HasEventFlags)
+					EventFlags.Value = reader.ReadByte();
+				if (checks.HasParameters)
+					Parameters = new Parameter[reader.ReadByte()];
+
+				if (checks.HasParameters)
+				{
+					for (int i = 0; i < Parameters.Length; i++)
+					{
+						Parameters[i] = new Parameter();
+						Parameters[i].ReadCCN(reader);
+						Parameters[i].FrameEvents = Parent.Parent;
+					}
+				}
             }
 
             reader.Seek(endPosition);
