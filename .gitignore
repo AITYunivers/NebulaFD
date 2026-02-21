@@ -369,3 +369,4 @@ FodyWeavers.xsd
 /Nebula.Core/Data/PackageReaders/INSTPackageData.cs
 /Nebula.Core/FileReaders/ChowdrenFileReader.cs
 /Nebula.Core/FileReaders/INSTFileReader.cs
+Nebula.Tests/

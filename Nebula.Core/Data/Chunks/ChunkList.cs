@@ -77,7 +77,7 @@ namespace Nebula.Core.Data.Chunks
             //0x225B
             //0x225C
             //0x225D         PlayerControls
-            //0x225E
+            //0x225E         AppIcon
             //0x225F
             //0x2260
             //0x2261

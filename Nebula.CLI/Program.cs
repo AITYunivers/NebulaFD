@@ -36,7 +36,8 @@ namespace Nebula
         static void SpectreMain()
         {
             WaitForFile();
-            SelectReader();
+			DebugDumper.Clean();
+			SelectReader();
             ReadPackage();
             SelectTool();
         }
