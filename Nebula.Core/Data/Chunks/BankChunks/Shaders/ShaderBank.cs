@@ -17,6 +17,9 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            if (NebulaCore.Build >= 296)
+                return;
+			
             int Count = reader.ReadInt();
             Offsets = new int[Count];
             for (int i = 0; i < Count; i++)

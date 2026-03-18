@@ -47,22 +47,20 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 			}
 			else
 			{
-				Event296Checks checks = Event296Checks.GetFromAct(ObjectType, Num);
-				if (checks.HasObjectInfo)
+				if (ObjectType == -7 || ObjectType >= 0)
 					ObjectInfo = reader.ReadUShort();
-				if (checks.HasEventFlags)
-					EventFlags.Value = reader.ReadByte();
-				if (checks.HasParameters)
-					Parameters = new Parameter[reader.ReadByte()];
 
-				if (checks.HasParameters)
+				Flags296.Value = reader.ReadByte();
+				EventFlags["Always"] = Flags296["Always"];
+				EventFlags["Repeat"] = Flags296["Repeat"];
+				OtherFlags["Negated"] = Flags296["Negated"];
+				Parameters = new Parameter[reader.ReadByte()];
+                    
+				for (int i = 0; i < Parameters.Length; i++)
 				{
-					for (int i = 0; i < Parameters.Length; i++)
-					{
-						Parameters[i] = new Parameter();
-						Parameters[i].ReadCCN(reader);
-						Parameters[i].FrameEvents = Parent.Parent;
-					}
+					Parameters[i] = new Parameter();
+					Parameters[i].ReadCCN(reader);
+					Parameters[i].FrameEvents = Parent.Parent;
 				}
 			}
 

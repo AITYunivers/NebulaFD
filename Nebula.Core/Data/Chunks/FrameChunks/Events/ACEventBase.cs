@@ -25,7 +25,15 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             "NoInterdependence"        // No Object Interdependence
         );
 
-        public short ObjectType;
+		public BitDict Flags296 = new BitDict( // 296 Flags
+            "Always",               // Always
+            "NoInterdependence",    // No Object Interdependence
+			"Repeat",               // Repeat
+			"", "", "", "",
+			"Negated"               // Not
+		);
+
+		public short ObjectType;
         public short Num;
         public ushort ObjectInfo;
         public short ObjectInfoList;

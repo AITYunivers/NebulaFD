@@ -11,7 +11,8 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
         public uint References;
         public BitDict Flags = new BitDict( // Flags
             "Check",                        // Will not compile exes if off
-            "", "", "", "", "Decompressed", // Decompressed
+            "", "", "", "LoadOnCall",       // Load on Call
+            "PlayFromDisk",                 // Play from Disk
             "", "", "HasName",              // Has Name (Android Only?)
             "", "", "", "", "", "NameCrop"  // Name Crop
         );
@@ -42,7 +43,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
                     Name = "S" + Handle.ToString("D4");
 
                 // Temp until reading from the apk is added
-                Flags["Decompressed"] = false;
+                Flags["PlayFromDisk"] = false;
                 return;
             }
             else if (NebulaCore.iOS)
@@ -99,7 +100,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             }
             else
             {
-                if (Compressed && !Flags["Decompressed"])
+                if (Compressed && !Flags["PlayFromDisk"])
                 {
                     int size = reader.ReadInt();
                     soundData = new ByteReader(Decompressor.DecompressBlock(reader, size));
@@ -107,7 +108,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
                 else
                     soundData = new ByteReader(reader.ReadBytes(decompressedSize));
                 Name = soundData.ReadYuniversalStop(nameLength);
-                if (Flags["Decompressed"]) soundData.Seek(0);
+                if (Flags["PlayFromDisk"]) soundData.Seek(0);
                 Data = soundData.ReadBytes();
             }
         }
@@ -124,7 +125,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             ByteReader soundData;
             soundData = new ByteReader(reader.ReadBytes(decompressedSize));
             Name = soundData.ReadYunicodeStop(nameLength);
-            if (Flags["Decompressed"]) soundData.Seek(0);
+            if (Flags["PlayFromDisk"]) soundData.Seek(0);
             Data = soundData.ReadBytes();
         }
 
@@ -140,12 +141,12 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             writer.WriteUInt(Handle + 1);
             writer.WriteInt(Checksum);
             writer.WriteUInt(References);
-            writer.WriteInt(Data.Length + (Flags["Decompressed"] ? 0 : Name.Length * 2 + 2));
+            writer.WriteInt(Data.Length + (Flags["PlayFromDisk"] ? 0 : Name.Length * 2 + 2));
             writer.WriteUInt(Flags.Value);
             writer.WriteInt(Frequency);
             writer.WriteInt(Name.Length + 1);
 
-            if (Flags["Decompressed"])
+            if (Flags["PlayFromDisk"])
                 writer.WriteBytes(Data);
             else
             {

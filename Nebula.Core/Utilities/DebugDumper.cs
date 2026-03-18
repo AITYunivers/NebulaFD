@@ -18,6 +18,7 @@ namespace Nebula.Core.Utilities
         public static void Dump(string fileName, ByteReader reader, int size, string category = "", bool increment = false)
 		{
 #if DEBUG
+            return;
             long pos = reader.Tell();
 			string dir = Path.Combine(Path.GetDirectoryName(NebulaCore.FilePath)!, "DebugDumps", category);
             if (!Directory.Exists(dir))

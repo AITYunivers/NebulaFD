@@ -19,6 +19,10 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
         {
             ShaderHandle = reader.ReadInt();
             int fakeN = reader.ReadInt();
+			if (NebulaCore.Build >= 296)
+				ShaderHandle = -1;
+			else
+            {
             if (ShaderHandle >= 0 && NebulaCore.PackageData.ShaderBank.ContainsKey(ShaderHandle))
             {
                 Shader shdr = NebulaCore.PackageData.ShaderBank[(int)ShaderHandle!];
@@ -30,7 +34,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
             }
             else
                 ShaderHandle = -1;
-
+            }
             ((ObjectInfo)extraInfo[0]).Shader = this;
         }
 

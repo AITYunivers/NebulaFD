@@ -84,10 +84,16 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
+            ShaderBank shaderBank = NebulaCore.PackageData.ShaderBank; 
             writer.WriteAutoYunicode(Name);
             writer.WriteInt(Parameters.Length);
-            foreach (var parameter in Parameters)
-                parameter.WriteMFA(writer);
+            for (int i = 0; i < Parameters.Length; i++)
+            {
+                if (Parameters[i] != null)
+                    Parameters[i].WriteMFA(writer);
+                else
+                    new ShaderParameter().WriteMFA(writer);
+            }
         }
 
         public string GetFXData()

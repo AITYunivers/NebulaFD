@@ -33,6 +33,13 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             ShaderParameters = new ShaderParameter[reader.ReadInt()];
             int paramOffset = reader.ReadInt();
 
+            if (NebulaCore.Build >= 296)
+			{
+				ShaderHandle = -1;
+				ShaderParameters = new ShaderParameter[0];
+			}
+            else
+            {
             if (ShaderHandle >= 0)
                 Shader = NebulaCore.PackageData.ShaderBank[ShaderHandle];
 
@@ -40,7 +47,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             if (paramOffset != 0)
             {
                 reader.Seek(startOffset + paramOffset);
-                for (int i = 0; i < Shader.Parameters.Length; i++)
+                    for (int i = 0; i < ShaderParameters.Length; i++)
                 {
                     ShaderParameters[i] = new ShaderParameter();
                     ShaderParameters[i].Name = Shader.Parameters[i].Name;
@@ -53,6 +60,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                 Array.Resize(ref ShaderParameters, Shader.Parameters.Length);
             }
             reader.Seek(returnOffset);
+        }
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

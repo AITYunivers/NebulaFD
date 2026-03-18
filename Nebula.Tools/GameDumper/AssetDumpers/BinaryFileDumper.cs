@@ -12,13 +12,12 @@ namespace GameDumper.AssetDumpers
         {
             ProgressTask? task = AssetDump.ProgressContext!.AddTask($"[{NebulaCore.ColorRules[4]}]Dumping Binary Files[/]", false);
             string path = "Dumps\\" + Utilities.ClearName(NebulaCore.PackageData.AppName) + "\\Binary Files\\";
-            task.MaxValue = NebulaCore.PackageData.BinaryFiles.Count;
+            task.MaxValue = NebulaCore.PackageData.BinaryFiles.Items.Count;
             Directory.CreateDirectory(path);
 
-            List<BinaryFile> binFiles = NebulaCore.PackageData.BinaryFiles.Items;
-            for (int i = 0; i < binFiles.Count; i++)
+            foreach (BinaryFile binFile in NebulaCore.PackageData.BinaryFiles.Items)
             {
-                File.WriteAllBytes(GetPath(path, binFiles[i].FileName), binFiles[i].FileData);
+                File.WriteAllBytes(GetPath(path, binFile.FileName), binFile.FileData);
                 task.Value++;
             }
             task.StopTask();
