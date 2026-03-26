@@ -135,7 +135,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
             BackColor = reader.ReadColor();
             TransitionInOffset = reader.ReadInt();
             TransitionOutOffset = reader.ReadInt();
-            AlterableNamesOffset = reader.ReadUShort();
+            GetOffset(reader, 10);
 
             if (AnimationOffset > 0)
             {
@@ -285,6 +285,9 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                     case 9:
                         PreferenceFlags.Value = (ushort)Offset;
                         break;
+                    case 10:
+						AlterableNamesOffset = Offset;
+                        break;
                 }
             }
             else if (NebulaCore.iOS)
@@ -332,7 +335,10 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                     case 9:
                         PreferenceFlags.Value = (ushort)Offset;
                         break;
-                }
+					case 10:
+						AlterableNamesOffset = Offset;
+						break;
+				}
             }
             else if (NebulaCore.HTML)
             {
@@ -359,7 +365,10 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                     case 9:
                         ExtensionOffset = Offset;
                         break;
-                }
+					case 10:
+						AlterableNamesOffset = Offset;
+						break;
+				}
             }
             else if (NebulaCore.Fusion == 1.5f)
             {
@@ -430,7 +439,10 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                     case 9:
                         PreferenceFlags.Value = (ushort)Offset;
                         break;
-                }
+					case 10:
+						AlterableNamesOffset = Offset;
+						break;
+				}
             }
             else
             {
@@ -460,7 +472,10 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                     case 9:
                         PreferenceFlags.Value = (ushort)Offset;
                         break;
-                }
+					case 10:
+						AlterableNamesOffset = Offset;
+						break;
+				}
             }
         }
     }
