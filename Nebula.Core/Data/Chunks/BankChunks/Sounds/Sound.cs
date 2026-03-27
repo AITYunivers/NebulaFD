@@ -96,7 +96,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             if (NebulaCore.Fusion == 1.5f)
             {
                 Name = reader.ReadYuniversalStop(nameLength);
-                Data = FixSoundData(reader.ReadBytes());
+                Data = FixSoundData(reader.ReadBytes(decompressedSize - nameLength * (NebulaCore.Yunicode ? 2 : 1)));
             }
             else
             {

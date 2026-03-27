@@ -55,7 +55,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Music
             Frequency = musicData.ReadInt();
             int nameLength = musicData.ReadInt();
             Name = musicData.ReadYuniversalStop(nameLength);
-            Data = musicData.ReadBytes(dataSize - nameLength * 2);
+            Data = musicData.ReadBytes(dataSize - nameLength * (NebulaCore.Yunicode ? 2 : 1));
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -68,7 +68,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Music
             Frequency = reader.ReadInt();
             int nameLength = reader.ReadInt();
             Name = reader.ReadYuniversalStop(nameLength);
-            Data = reader.ReadBytes(dataSize - nameLength * 2);
+            Data = reader.ReadBytes(dataSize - nameLength * (NebulaCore.Yunicode ? 2 : 1));
         }
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
