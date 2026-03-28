@@ -1,4 +1,5 @@
 ﻿using Nebula.Core.Memory;
+using System;
 using System.Diagnostics;
 using System.Text;
 
@@ -157,16 +158,27 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
 
         public static byte[] FixSoundData(byte[] data)
         {
-            byte[] output = new byte[data.Length + 44];
-            Array.Copy(Encoding.ASCII.GetBytes("RIFF"), 0, output, 0, 4);
-            Array.Copy(BitConverter.GetBytes(data.Length + 44 - 8), 0, output, 4, 4);
-            Array.Copy(Encoding.ASCII.GetBytes("WAVEfmt "), 0, output, 8, 8);
-            Array.Copy(BitConverter.GetBytes(16), 0, output, 16, 4);
-            Array.Copy(data, 0, output, 20, 16);
-            Array.Copy(Encoding.ASCII.GetBytes("data"), 0, output, 36, 4);
-            Array.Copy(BitConverter.GetBytes(data.Length - 16), 0, output, 40, 4);
-            Array.Copy(data, 16, output, 44, data.Length - 16);
-            return output;
+            ByteReader old_file = new ByteReader(data);
+            byte[] version = old_file.ReadBytes(2);
+            byte[] channels = old_file.ReadBytes(2);
+            byte[] header = old_file.ReadBytes(46);
+            byte[] adpcm = old_file.ReadBytes();
+
+            Int16 true_channels = BitConverter.ToInt16(channels);
+            ByteWriter writer = new ByteWriter(new MemoryStream());
+            writer.WriteAscii("RIFF");
+            writer.WriteInt32((data.Length + 44 - 8));
+            writer.WriteAscii("WAVEfmt ");
+            writer.WriteInt32(50);
+            writer.WriteBytes(version);
+            writer.WriteBytes(channels);
+            writer.WriteBytes(header);
+            writer.WriteAscii("fact");
+            writer.WriteInt32(4);
+            writer.WriteInt32((adpcm.Length - 6 * true_channels) * 2 / true_channels);
+            writer.WriteAscii("data");
+            writer.WriteBytes(adpcm);
+            return writer.ToArray();
         }
 
         public string GetSoundType()
