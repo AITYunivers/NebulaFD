@@ -1,14 +1,15 @@
-﻿using Nebula.Core.Memory;
+﻿using Nebula.Core.Data.Chunks.BankChunks.Sounds;
+using Nebula.Core.Memory;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 {
     public class ParameterSample : ParameterChunk
-    {
-        public BitDict SampleFlags = new BitDict( // Sample Flags
+	{
+		public BitDict SampleFlags = new BitDict( // Sample Flags
             "Uninteruptable" // Uninteruptable
-        );
+		);
 
-        public short Handle;
+		public short Handle;
         public string Name = string.Empty;
 
         public ParameterSample()
@@ -20,7 +21,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         {
             Handle = reader.ReadShort();
             SampleFlags.Value = reader.ReadUShort();
-            Name = reader.ReadYuniversal();
+            if (NebulaCore.Build >= 296 && NebulaCore.Windows)
+                SoundBank.SampleParameters.Add(this);
+            else
+                Name = reader.ReadYuniversal();
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)

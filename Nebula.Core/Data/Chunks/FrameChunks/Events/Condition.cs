@@ -65,10 +65,18 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 					Parameters[i].ReadCCN(reader);
 					Parameters[i].FrameEvents = Parent.Parent;
 				}
+
+                // Qualifier
+                if ((ObjectInfo & 0x8000) != 0)
+                    Parent.Parent.Qualifiers.Add(new Qualifier()
+                    {
+                        ObjectInfo = ObjectInfo,
+                        Type = ObjectType
+                    });
             }
 
+            Fix((List<Condition>)extraInfo[0], reader);
             reader.Seek(endPosition);
-            Fix((List<Condition>)extraInfo[0]);
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -126,7 +134,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             condWriter.Close();
         }
 
-        private void Fix(List<Condition> evntList)
+        private void Fix(List<Condition> evntList, ByteReader reader)
         {
             short oldNum = Num;
             bool ignoreOptimization = false;
@@ -148,7 +156,30 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                             DoAdd = false;
                             ignoreOptimization = true;
                             break;
-                        case -28: // Compare Global Integer Equals
+						case -16: // [296] On Inlined Loop
+							if (Parameters[0].Code == 11)
+							{
+								int loopId = ((ParameterShort)Parameters[0].Data).Value;
+								Parameters[0].Code = 22;
+								Parameters[0].Data = new ParameterExpressions()
+								{
+									Comparison = 0,
+									Expressions = new List<ParameterExpression>()
+									{
+										new ParameterExpression()
+										{
+											ObjectType = -1,
+											Num = 3,
+											Expression = new ExpressionString()
+											{
+												Value = "NebulaLoop#" + loopId
+											}
+										}
+									}
+								};
+							}
+							break;
+						case -28: // Compare Global Integer Equals
                         case -29: // Compare Global Integer Doesnt Equal
                         case -30: // Compare Global Integer Less Or Equal
                         case -31: // Compare Global Integer Less
@@ -161,8 +192,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case -38: // Compare Global Double Greater Or Equal
                         case -39: // Compare Global Double Greater
                             Num = -8; // Compare Global
-                            ignoreOptimization = true;
-                            break;
+							ignoreOptimization = CommonParameter296Fix(reader);
+							break;
                         case -43: // Start Child Event
                             DoAdd = false;
                             ignoreOptimization = true;
@@ -175,7 +206,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case -42: // Compare Alterable Integer
                         case -43: // Compare Alterable Double
                             Num = -27; // Compare Alterable
-                            ignoreOptimization = true;
+							ignoreOptimization = CommonParameter296Fix(reader);
                             break;
                     }
                     break;
@@ -268,9 +299,45 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             }
 
             FrameEvents.OptimizedEvents |= ((Num != oldNum) || (DoAdd == false)) && !ignoreOptimization;
-        }
+		}
 
-        public override string ToString()
+		public bool CommonParameter296Fix(ByteReader reader)
+        {
+            if (NebulaCore.Build != 296 || Parameters.Length > 0)
+                return true;
+
+			short comp = reader.ReadShort();
+			int altVal = reader.ReadInt();
+			int newVal = reader.ReadInt();
+			ParameterShort altValParam = new ParameterShort()
+			{
+				Value = (short)altVal
+			};
+			ParameterExpressions newValParam = new ParameterExpressions()
+			{
+				Comparison = comp,
+				Expressions = new List<ParameterExpression>()
+				{
+					new ParameterExpression()
+					{
+						ObjectType = -1,
+						Expression = new ExpressionInt()
+						{
+							Value = newVal
+						}
+					}
+				}
+			};
+			Parameters = new Parameter[2]
+			{
+				new() { Data = altValParam, Code = 50 },
+				new() { Data = newValParam, Code = 23 }
+			};
+            return true;
+		}
+
+
+		public override string ToString()
         {
             return (OtherFlags["Negated"] ? "NOT " : "") + GetString();
         }

@@ -1,6 +1,4 @@
-﻿using Nebula.Core.Data.Chunks.AppChunks;
-using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
-using Nebula.Core.Data.Chunks.ObjectChunks;
+﻿using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
 using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
@@ -62,10 +60,18 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 					Parameters[i].ReadCCN(reader);
 					Parameters[i].FrameEvents = Parent.Parent;
 				}
+
+				// Qualifier
+				if ((ObjectInfo & 0x8000) != 0)
+					Parent.Parent.Qualifiers.Add(new Qualifier()
+					{
+						ObjectInfo = ObjectInfo,
+						Type = ObjectType
+					});
 			}
 
+            Fix((List<Action>)extraInfo[0], reader, endPosition);
 			reader.Seek(endPosition);
-            Fix((List<Action>)extraInfo[0]);
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -121,7 +127,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             actWriter.Close();
         }
 
-        private void Fix(List<Action> evntList)
+        private void Fix(List<Action> evntList, ByteReader reader, long endPosition)
         {
             short oldNum = Num;
             bool ignoreOptimization = false;
@@ -151,27 +157,53 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 44: // Skip
                             // DoAdd = false;
                             break;
+                        case 14: // [296] Inlined Loop
+                            if (Parameters[0].Code == 11)
+                            {
+                                int loopId = ((ParameterShort)Parameters[0].Data).Value;
+                                Parameters[0].Code = 22;
+                                Parameters[0].Data = new ParameterExpressions()
+								{
+									Comparison = 0,
+									Expressions = new List<ParameterExpression>()
+				                    {
+					                    new ParameterExpression()
+					                    {
+						                    ObjectType = -1,
+						                    Num = 3,
+						                    Expression = new ExpressionString()
+                                            {
+                                                Value = "NebulaLoop#" + loopId
+											}
+					                    }
+				                    }
+								};
+                            }
+                            break;
                         case 27: // Set Global Integer
                         case 28: // Set Global
                         case 29: // Set Global Double
                         case 30: // Set Global
                             Num = 3; // Set Global
                             ignoreOptimization = true;
-                            break;
+							CommonParameter296Fix(reader, endPosition);
+							break;
                         case 31: // Add Global Integer
                         case 32: // Add Global
                         case 33: // Add Global Double
                         case 34: // Add Global
                             Num = 5; // Add Global
                             ignoreOptimization = true;
-                            break;
+							CommonParameter296Fix(reader, endPosition);
+							break;
                         case 35: // Subtract Global Integer
                         case 36: // Subtract Global
                         case 37: // Subtract Global Double
                         case 38: // Subtract Global
                             Num = 4; // Subtract Global
                             ignoreOptimization = true;
-                            break;
+							CommonParameter296Fix(reader, endPosition);
+							break;
                         case 43: // Execute Child Events
                             DoAdd = false;
                             ignoreOptimization = true;
@@ -207,12 +239,63 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                                 param.Name = string.IsNullOrEmpty(name) ? "Movement #" + param.ID : name;
                             }
                             break;
+                        case 31: // [296] Inlined Set Alterable Value
+                        case 32: // [296] Inlined Add to Alterable Value
+                            CommonParameter296Fix(reader, endPosition);
+							break;
                     }
                     break;
             }
 
             FrameEvents.OptimizedEvents |= ((Num != oldNum) || (DoAdd == false)) && !ignoreOptimization;
         }
+
+        public void CommonParameter296Fix(ByteReader reader, long endPosition)
+		{
+			if (NebulaCore.Build < 296 || Parameters.Length > 0)
+				return;
+			int altVal = reader.ReadInt();
+			ParameterShort altValParam = new ParameterShort()
+			{
+				Value = (short)altVal
+			};
+
+			ExpressionChunk newValExp;
+
+			long remains = endPosition - reader.Tell();
+            if (remains == 4)
+                newValExp = new ExpressionInt()
+                {
+                    Value = reader.ReadInt()
+                };
+            else if (remains == 8)
+                newValExp = new ExpressionDouble()
+                {
+                    Value = reader.ReadDouble()
+                };
+            else
+                throw new InvalidDataException("Excepted either 4 or 8 remaining bytes, got " + remains);
+
+			ParameterExpressions newValParam = new ParameterExpressions()
+			{
+				Comparison = 0,
+				Expressions = new List<ParameterExpression>()
+				{
+					new ParameterExpression()
+					{
+						ObjectType = -1,
+						Num = (short)(remains == 8 ? 23 : 0),
+						Expression = newValExp
+					}
+				}
+			};
+
+			Parameters = new Parameter[2]
+			{
+				new() { Data = altValParam, Code = 50 },
+				new() { Data = newValParam, Code = 22 }
+			};
+		}
 
         public override string ToString()
         {

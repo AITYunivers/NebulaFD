@@ -8,18 +8,20 @@ namespace Nebula.Core.Utilities
     {
         public static void Clean()
         {
-#if DEBUG
+            if (!Parameters.DumpAllChunks)
+                return;
+
             string dir = Path.Combine(Path.GetDirectoryName(NebulaCore.FilePath)!, "DebugDumps");
-			if (Directory.Exists(dir))
+            if (Directory.Exists(dir))
                 Directory.Delete(dir, true);
-#endif
         }
 
         public static void Dump(string fileName, ByteReader reader, int size, string category = "", bool increment = false)
 		{
-#if DEBUG
-            return;
-            long pos = reader.Tell();
+			if (!Parameters.DumpAllChunks)
+				return;
+
+			long pos = reader.Tell();
 			string dir = Path.Combine(Path.GetDirectoryName(NebulaCore.FilePath)!, "DebugDumps", category);
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
@@ -34,7 +36,6 @@ namespace Nebula.Core.Utilities
             using FileStream file = File.Open(path, FileMode.Create);
             file.Write(reader.ReadBytes(size));
             reader.Seek(pos);
-#endif
 		}
 	}
 }

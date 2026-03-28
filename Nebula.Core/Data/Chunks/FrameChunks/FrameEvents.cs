@@ -15,7 +15,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
         public short MaxObjectInfos;
         public short NumberOfPlayers;
         public short[] ConditionCount = new short[17];
-        public Qualifier[] Qualifiers = new Qualifier[0];
+        public List<Qualifier> Qualifiers = new();
 
         public int EventCount;
         public List<Event> Events = new();
@@ -63,7 +63,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             if (Parameters.DontIncludeEvents)
                 return;
 
-            while (true)
+			(Parent = (Frame)extraInfo[0]).FrameEvents = this;
+			while (true)
             {
                 string identifier = reader.ReadAscii(4);
 
@@ -76,12 +77,17 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     for (int i = 0; i < ConditionCount.Length; i++)
                         ConditionCount[i] = reader.ReadShort();
 
-                    Qualifiers = new Qualifier[reader.ReadShort()];
-                    for (int i = 0; i < Qualifiers.Length; i++)
+                    int qualifierCount = reader.ReadShort();
+                    for (int i = 0; i < qualifierCount; i++)
                     {
-                        Qualifiers[i] = new Qualifier();
-                        Qualifiers[i].ReadCCN(reader);
+                        Qualifier qualifier = new Qualifier();
+						qualifier.ReadCCN(reader);
+                        Qualifiers.Add(qualifier);
                     }
+
+                    // Just incase, 296 shouldnt be writing qualifiers anyway
+                    if (NebulaCore.Build >= 296)
+                        Qualifiers.Clear();
                 }
                 else if (identifier == "ERes")
                     EventCount = reader.ReadInt();
@@ -119,8 +125,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                 else if (identifier == "<<ER")
                     break;
             }
-
-            (Parent = (Frame)extraInfo[0]).FrameEvents = this;
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

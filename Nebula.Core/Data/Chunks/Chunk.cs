@@ -20,7 +20,7 @@ namespace Nebula.Core.Data.Chunks
         public int ChunkFlag;
         public byte[] ChunkData = new byte[0];
 
-        public static Chunk InitChunk(ByteReader byteReader)
+        public static Chunk InitChunk(ByteReader byteReader, string? frameName = null)
         {
             short id = byteReader.ReadShort();
             short flag = byteReader.ReadShort();
@@ -61,8 +61,10 @@ namespace Nebula.Core.Data.Chunks
 
             if (Parameters.DumpAllChunks || Parameters.DumpUnknownChunks && !ChunkList.ChunkJumpTable.ContainsKey(id))
             {
-                Directory.CreateDirectory("Chunks");
-                File.WriteAllBytes($"Chunks\\Chunk-{string.Format("0x{0:X}", id)}_{Utilities.Utilities.ClearName(NebulaCore.PackageData.AppName)}.bin", newChunk.ChunkData);
+                string folder = Path.Combine("Chunks", Utilities.Utilities.ClearName(NebulaCore.PackageData.AppName), frameName == null ? "" : frameName + "\\");
+
+				Directory.CreateDirectory(folder);
+                File.WriteAllBytes(Path.Combine(folder, $"Chunk-{string.Format("0x{0:X}", id)}.bin"), newChunk.ChunkData);
             }
 
             if (dataReader == null)

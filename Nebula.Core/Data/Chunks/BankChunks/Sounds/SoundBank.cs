@@ -1,3 +1,4 @@
+﻿using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
 ﻿using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
 
@@ -5,6 +6,8 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
 {
     public class SoundBank : Chunk
     {
+        public static List<ParameterSample> SampleParameters = new();
+        
         public int Count;
         public Dictionary<uint, Sound> Sounds = new();
 
@@ -37,6 +40,9 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
                 snd.ReadCCN(reader);
                 Sounds[snd.Handle] = snd;
             }
+
+            foreach (ParameterSample sample in SampleParameters)
+                sample.Name = NebulaCore.PackageData.SoundBank[sample.Handle].Name;
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

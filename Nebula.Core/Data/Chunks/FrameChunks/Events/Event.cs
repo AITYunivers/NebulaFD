@@ -43,7 +43,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
         {
             short size = Math.Abs(reader.PeekShort());
             long endPosition = reader.Tell() + size;
-            DebugDumper.Dump("Event", reader, size, category: "Events", increment: true);
+            DebugDumper.Dump("Event", reader, size, category: "Events\\" + Parent.Parent!.FrameName, increment: true);
 
             reader.Skip(2); // Size
             byte cndCnt = reader.ReadByte();

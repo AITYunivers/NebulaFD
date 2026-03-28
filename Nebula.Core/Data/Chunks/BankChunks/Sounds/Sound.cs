@@ -159,7 +159,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
         {
             byte[] output = new byte[data.Length + 44];
             Array.Copy(Encoding.ASCII.GetBytes("RIFF"), 0, output, 0, 4);
-            Array.Copy(BitConverter.GetBytes(8146), 0, output, 4, 4);
+            Array.Copy(BitConverter.GetBytes(data.Length + 44 - 8), 0, output, 4, 4);
             Array.Copy(Encoding.ASCII.GetBytes("WAVEfmt "), 0, output, 8, 8);
             Array.Copy(BitConverter.GetBytes(16), 0, output, 16, 4);
             Array.Copy(data, 0, output, 20, 16);
