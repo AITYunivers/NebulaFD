@@ -62,7 +62,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 				}
 
 				// Qualifier
-				if ((ObjectInfo & 0x8000) != 0)
+				if (NebulaCore.Build >= 296 && NebulaCore.Windows && (ObjectInfo & 0x8000) != 0)
 					Parent.Parent.Qualifiers.Add(new Qualifier()
 					{
 						ObjectInfo = ObjectInfo,
@@ -252,7 +252,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public void CommonParameter296Fix(ByteReader reader, long endPosition)
 		{
-			if (NebulaCore.Build < 296 || Parameters.Length > 0)
+			if (NebulaCore.Build < 296 || !NebulaCore.Windows || Parameters.Length > 0)
 				return;
 			int altVal = reader.ReadInt();
 			ParameterShort altValParam = new ParameterShort()

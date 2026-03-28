@@ -86,7 +86,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     }
 
                     // Just incase, 296 shouldnt be writing qualifiers anyway
-                    if (NebulaCore.Build >= 296)
+                    if (NebulaCore.Build >= 296 && NebulaCore.Windows)
                         Qualifiers.Clear();
                 }
                 else if (identifier == "ERes")
