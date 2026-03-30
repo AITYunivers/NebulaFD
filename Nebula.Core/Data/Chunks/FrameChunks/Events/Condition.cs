@@ -191,8 +191,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case -37: // Compare Global Double Less
                         case -38: // Compare Global Double Greater Or Equal
                         case -39: // Compare Global Double Greater
+                            short comp = (short)((Math.Abs(Num) - 28) % 6);
                             Num = -8; // Compare Global
-							ignoreOptimization = CommonParameter296Fix(reader);
+							ignoreOptimization = CommonParameter296Fix(reader, true, comp);
 							break;
                         case -43: // Start Child Event
                             DoAdd = false;
@@ -301,21 +302,25 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             FrameEvents.OptimizedEvents |= ((Num != oldNum) || (DoAdd == false)) && !ignoreOptimization;
 		}
 
-		public bool CommonParameter296Fix(ByteReader reader)
+		public bool CommonParameter296Fix(ByteReader reader, bool global = false, short? comp = null)
         {
             if (NebulaCore.Build != 296 || !NebulaCore.Windows || Parameters.Length > 0)
                 return true;
 
-			short comp = reader.ReadShort();
+            comp ??= reader.ReadShort();
 			int altVal = reader.ReadInt();
 			int newVal = reader.ReadInt();
 			ParameterShort altValParam = new ParameterShort()
 			{
 				Value = (short)altVal
 			};
+            ParameterInt gblValParam = new ParameterInt()
+            {
+                Value = altVal
+            };
 			ParameterExpressions newValParam = new ParameterExpressions()
 			{
-				Comparison = comp,
+				Comparison = comp.Value,
 				Expressions = new List<ParameterExpression>()
 				{
 					new ParameterExpression()
@@ -330,10 +335,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 			};
 			Parameters = new Parameter[2]
 			{
-				new() { Data = altValParam, Code = 50 },
+				new() { Data = global ? gblValParam : altValParam, Code = global ? 49 : 50 },
 				new() { Data = newValParam, Code = 23 }
 			};
-            return true;
+            return false;
 		}
 
 

@@ -105,7 +105,7 @@ namespace Nebula.Core.Data.PackageReaders
 
             GlobalValues.ReadMFA(reader, GlobalValueNames);
             GlobalStrings.ReadMFA(reader, GlobalStringNames);
-            GlobalEvents.ReadMFA(reader, true);
+			GlobalEvents.ReadMFA(reader, true);
 
             AppHeader.GraphicMode = (short)reader.ReadInt();
             {

@@ -134,7 +134,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             if (size == 0 && extraInfo.Length > 0)
                 return;
 
-            while (true)
+            if (extraInfo[0] is Frame parentFrame)
+			    Parent = parentFrame;
+
+			while (true)
             {
                 string identifier = reader.ReadAscii(4);
 
@@ -235,7 +238,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                     break;
             }
 
-            if (extraInfo.Length > 0)
+            if (Parent == null) // Global Events
                 reader.Seek(endOffset);
         }
 

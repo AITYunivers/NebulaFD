@@ -111,10 +111,13 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
-        {
-            long endPosition = reader.Tell() + Math.Abs(reader.ReadShort());
+		{
+			short size = Math.Abs(reader.PeekShort());
+			long endPosition = reader.Tell() + size;
+			DebugDumper.Dump("Event", reader, size, category: "MFA Events\\" + Parent.Parent?.FrameName ?? "Global Events", increment: true);
 
-            byte cndCnt = reader.ReadByte();
+			reader.Skip(2); // Size
+			byte cndCnt = reader.ReadByte();
             byte actCnt = reader.ReadByte();
             EventFlags.Value = reader.ReadUShort();
             Restricted = reader.ReadShort();

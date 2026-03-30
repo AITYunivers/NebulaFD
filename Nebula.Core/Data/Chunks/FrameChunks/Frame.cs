@@ -118,8 +118,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
             MFAFrameInfo.Folders.ReadMFA(reader);
             FrameInstances.ReadMFA(reader);
-            FrameEvents.ReadMFA(reader);
-            FrameEvents.Parent = this;
+            FrameEvents.ReadMFA(reader, this);
 
             while (true)
             {
