@@ -1,6 +1,7 @@
 ﻿using Nebula.Core.Memory;
 using System;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using System.Text;
 
 namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
@@ -158,26 +159,52 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
 
         public static byte[] FixSoundData(byte[] data)
         {
-            ByteReader old_file = new ByteReader(data);
-            byte[] version = old_file.ReadBytes(2);
-            byte[] channels = old_file.ReadBytes(2);
-            byte[] header = old_file.ReadBytes(46);
-            byte[] adpcm = old_file.ReadBytes();
+            using ByteReader old_file = new ByteReader(data);
+            short formatTag = old_file.ReadShort();
+            short channels = old_file.ReadShort();
+            
+            byte[] header;
+            byte[] audio;
 
-            Int16 true_channels = BitConverter.ToInt16(channels);
-            ByteWriter writer = new ByteWriter(new MemoryStream());
-            writer.WriteAscii("RIFF");
-            writer.WriteInt32((data.Length + 44 - 8));
-            writer.WriteAscii("WAVEfmt ");
-            writer.WriteInt32(50);
-            writer.WriteBytes(version);
-            writer.WriteBytes(channels);
-            writer.WriteBytes(header);
-            writer.WriteAscii("fact");
-            writer.WriteInt32(4);
-            writer.WriteInt32((adpcm.Length - 6 * true_channels) * 2 / true_channels);
-            writer.WriteAscii("data");
-            writer.WriteBytes(adpcm);
+
+            using ByteWriter writer = new ByteWriter(new MemoryStream());
+            switch (formatTag) {
+                //ADPCM
+                case 2:
+                    header = old_file.ReadBytes(46);
+                    audio = old_file.ReadBytes();
+
+                    writer.WriteAscii("RIFF");
+                    writer.WriteInt32((data.Length + 44 - 8));
+                    writer.WriteAscii("WAVEfmt ");
+                    writer.WriteInt32(50);
+                    writer.WriteShort(formatTag);
+                    writer.WriteShort(channels);
+                    writer.WriteBytes(header);
+                    writer.WriteAscii("fact");
+                    writer.WriteInt32(4);
+                    writer.WriteInt32((audio.Length - 6 * channels) * 2 / channels);
+                    writer.WriteAscii("data");
+                    writer.WriteBytes(audio);
+                    break;
+                //PCM (fallback)
+                default:
+                    header = old_file.ReadBytes(12);
+                    audio = old_file.ReadBytes();
+                    writer.WriteAscii("RIFF");
+                    writer.WriteInt32((data.Length + 44 - 8));
+                    writer.WriteAscii("WAVEfmt ");
+                    writer.WriteInt32(16);
+                    writer.WriteShort(formatTag);
+                    writer.WriteShort(channels);
+                    writer.WriteBytes(header);
+                    writer.WriteAscii("data");
+                    writer.WriteBytes(audio);
+                    //should probably print a warning if you go down this path
+                    //since i have not seen a mmf1.5 game not use ADPCM formated audio
+                    break;
+
+            }
             return writer.ToArray();
         }
 
