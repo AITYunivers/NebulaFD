@@ -1,5 +1,4 @@
 ﻿using Nebula.Core.Memory;
-using System.Diagnostics;
 using System.Text;
 
 namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
@@ -157,16 +156,51 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
 
         public static byte[] FixSoundData(byte[] data)
         {
-            byte[] output = new byte[data.Length + 44];
-            Array.Copy(Encoding.ASCII.GetBytes("RIFF"), 0, output, 0, 4);
-            Array.Copy(BitConverter.GetBytes(data.Length + 44 - 8), 0, output, 4, 4);
-            Array.Copy(Encoding.ASCII.GetBytes("WAVEfmt "), 0, output, 8, 8);
-            Array.Copy(BitConverter.GetBytes(16), 0, output, 16, 4);
-            Array.Copy(data, 0, output, 20, 16);
-            Array.Copy(Encoding.ASCII.GetBytes("data"), 0, output, 36, 4);
-            Array.Copy(BitConverter.GetBytes(data.Length - 16), 0, output, 40, 4);
-            Array.Copy(data, 16, output, 44, data.Length - 16);
-            return output;
+            using ByteReader old_file = new ByteReader(data);
+            short formatTag = old_file.ReadShort();
+            short channels = old_file.ReadShort();
+            
+            byte[] header;
+            byte[] audio;
+
+
+            using ByteWriter writer = new ByteWriter(new MemoryStream());
+            switch (formatTag) {
+                //ADPCM
+                case 2:
+                    header = old_file.ReadBytes(46);
+                    audio = old_file.ReadBytes();
+
+                    writer.WriteAscii("RIFF");
+                    writer.WriteInt32((data.Length + 44 - 8));
+                    writer.WriteAscii("WAVEfmt ");
+                    writer.WriteInt32(50);
+                    writer.WriteShort(formatTag);
+                    writer.WriteShort(channels);
+                    writer.WriteBytes(header);
+                    writer.WriteAscii("fact");
+                    writer.WriteInt32(4);
+                    writer.WriteInt32((audio.Length - 6 * channels) * 2 / channels);
+                    writer.WriteAscii("data");
+                    writer.WriteBytes(audio);
+                    break;
+                //PCM (fallback)
+                default:
+                    header = old_file.ReadBytes(12);
+                    audio = old_file.ReadBytes();
+                    writer.WriteAscii("RIFF");
+                    writer.WriteInt32((data.Length + 44 - 8));
+                    writer.WriteAscii("WAVEfmt ");
+                    writer.WriteInt32(16);
+                    writer.WriteShort(formatTag);
+                    writer.WriteShort(channels);
+                    writer.WriteBytes(header);
+                    writer.WriteAscii("data");
+                    writer.WriteBytes(audio);
+                    break;
+
+            }
+            return writer.ToArray();
         }
 
         public string GetSoundType()
