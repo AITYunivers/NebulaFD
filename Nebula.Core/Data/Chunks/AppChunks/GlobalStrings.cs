@@ -14,6 +14,9 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
+            if (NebulaCore.Fusion < 2)
+                return; // Global Strings chunk was seemingly used for AppIcon or something similar before MMF 2
+
             Strings = new string[reader.ReadInt()];
             for (int i = 0; i < Strings.Length; i++)
                 Strings[i] = reader.ReadYuniversal();
