@@ -1,7 +1,4 @@
 ﻿using Nebula.Core.Memory;
-using System;
-using System.Diagnostics;
-using System.Drawing.Printing;
 using System.Text;
 
 namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
@@ -200,8 +197,6 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
                     writer.WriteBytes(header);
                     writer.WriteAscii("data");
                     writer.WriteBytes(audio);
-                    //should probably print a warning if you go down this path
-                    //since i have not seen a mmf1.5 game not use ADPCM formated audio
                     break;
 
             }
