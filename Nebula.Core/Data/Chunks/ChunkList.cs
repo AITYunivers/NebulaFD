@@ -23,8 +23,8 @@ namespace Nebula.Core.Data.Chunks
             { 0x2225, typeof(Author)              },
             { 0x2226, typeof(MenuBar)             },
             { 0x2227, typeof(ExtensionsPath)      },
-            //0x2228         Extensions
-            { 0x2229, typeof(FrameItems)          },
+			{ 0x2228, typeof(Extensions)          },
+			{ 0x2229, typeof(FrameItems)          },
             //0x222A         GlobalEvents
             { 0x222B, typeof(FrameHandles)        },
             { 0x222C, typeof(ExtensionData)       },

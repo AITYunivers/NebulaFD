@@ -24,12 +24,17 @@ namespace Nebula.Core.Data.Chunks.AppChunks
 
             short size = Math.Abs(reader.ReadShort());
             Handle = reader.ReadShort();
-            MagicNumber = reader.ReadInt();
-            VersionLs = reader.ReadInt();
-            VersionMs = reader.ReadInt();
-            FileName = reader.ReadYuniversal();
+			MagicNumber = reader.ReadInt();
+
+			if (NebulaCore.Fusion > 1.5f)
+			{
+				VersionLs = reader.ReadInt();
+				VersionMs = reader.ReadInt();
+			}
+
+			FileName = reader.ReadYuniversal();
+			SubType = reader.ReadYuniversal();
             Name = FileName[..FileName.LastIndexOf('.')];
-            SubType = reader.ReadYuniversal();
             reader.Seek(start + size);
         }
 
