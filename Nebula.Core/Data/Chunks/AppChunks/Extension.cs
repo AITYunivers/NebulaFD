@@ -26,7 +26,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             Handle = reader.ReadShort();
 			MagicNumber = reader.ReadInt();
 
-			if (NebulaCore.Fusion > 1.5f)
+			if (extraInfo.Length == 0) // Extensions vs ExtensionsMini
 			{
 				VersionLs = reader.ReadInt();
 				VersionMs = reader.ReadInt();
