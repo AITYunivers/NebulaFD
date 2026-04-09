@@ -524,7 +524,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
                             group.Name = "Group " + group.ID;
                     }
                 foreach (Parameter param in checkParams.Where(x => x.Code == 39))
-                    if (param.Data is ParameterGroupPointer point)
+                    if (param.Data is ParameterGroupPointer point && point.CCNPointer != 0)
                     {
                         Debug.Assert(groupLookupTable.ContainsKey(point.CCNPointer),
                             "CCN Pointer is offset incorrectly for build " + NebulaCore.Build);

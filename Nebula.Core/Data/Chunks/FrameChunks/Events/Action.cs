@@ -157,7 +157,11 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 44: // Skip
                             // DoAdd = false;
                             break;
-                        case 14: // [296] Inlined Loop
+						case 6: // [296] Inlined Activate Group
+						case 7: // [296] Inlined Deactivate Group
+							GroupParameter296Fix(reader);
+							break;
+						case 14: // [296] Inlined Loop
                             if (Parameters[0].Code == 11)
                             {
                                 int loopId = ((ParameterShort)Parameters[0].Data).Value;
@@ -294,6 +298,22 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 			{
 				new() { Data = altValParam, Code = 50 },
 				new() { Data = newValParam, Code = 22 }
+			};
+		}
+
+        public void GroupParameter296Fix(ByteReader reader)
+		{
+			if (NebulaCore.Build < 296 || !NebulaCore.Windows || Parameters.Length > 0)
+				return;
+			int groupId = reader.ReadInt();
+			ParameterGroupPointer groupParam = new ParameterGroupPointer()
+			{
+				ID = groupId
+			};
+
+			Parameters = new Parameter[1]
+			{
+				new() { Data = groupParam, Code = 39 }
 			};
 		}
 
