@@ -63,11 +63,19 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
 				// Qualifier
 				if (NebulaCore.Build >= 296 && NebulaCore.Windows && (ObjectInfo & 0x8000) != 0)
+                {
+                    bool doAdd = true;
+                    foreach (Qualifier qualifier in Parent.Parent.Qualifiers)
+                        if (qualifier.ObjectInfo == ObjectInfo && qualifier.Type == ObjectType)
+                            doAdd = false; // throw new Exception("Adding duplicate qualifiers to the qualifier list!");
+
+                    if (doAdd)
 					Parent.Parent.Qualifiers.Add(new Qualifier()
 					{
 						ObjectInfo = ObjectInfo,
 						Type = ObjectType
 					});
+			}
 			}
 
             Fix((List<Action>)extraInfo[0], reader, endPosition);
@@ -245,8 +253,16 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                             break;
                         case 31: // [296] Inlined Set Alterable Value
                         case 32: // [296] Inlined Add to Alterable Value
+                        case 33: // [296] Inlined Subtract From Alterable Value
                             CommonParameter296Fix(reader, endPosition);
 							break;
+                        case 63: // [296] Set effect
+                            if (NebulaCore.Build >= 296)
+                            {
+                                reader.Skip(2); // Shader ID
+                                DoAdd = false; // Remove this event, as shaders aren't yet implemented in Nebula for 296+
+                            }
+                            break;
                     }
                     break;
             }
@@ -305,7 +321,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 		{
 			if (NebulaCore.Build < 296 || !NebulaCore.Windows || Parameters.Length > 0)
 				return;
-			int groupId = reader.ReadInt();
+			int groupId = reader.ReadUShort();
 			ParameterGroupPointer groupParam = new ParameterGroupPointer()
 			{
 				ID = groupId

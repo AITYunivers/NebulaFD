@@ -24,7 +24,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             {
                 1 => new ParameterObject(),
                 2 or 42 => new ParameterTimer(),
-                3 or 4 or 10 or 11 or 12 or 14 or 17 or 26 or
+                3 or 4 or 10 or 11 or 12 or 14 or 17 or
                 31 or 37 or 43 or 44 or 50 or 58 or 60 or 61 => new ParameterShort(),
                 5 or 25 or 29 or 34 or 48 or 49 or 56 or 67 or 70 => new ParameterInt(),
                 6 or 7 or 35 or 36 => new ParameterSample(),
@@ -36,6 +36,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 18 => new ParameterShoot(),
                 19 or 72 => new ParameterZone(),
                 24 => new ParameterColor(),
+                26 => NebulaCore.Build >= 296 ? new ParameterInt() : new ParameterShort(),
                 40 or 41 or 63 or 64 => new ParameterString(),
                 32 => new ParameterClick(),
                 33 => new ParameterFile(),

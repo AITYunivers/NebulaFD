@@ -68,12 +68,20 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
                 // Qualifier
                 if (NebulaCore.Build >= 296 && NebulaCore.Windows && (ObjectInfo & 0x8000) != 0)
+				{
+					bool doAdd = true;
+					foreach (Qualifier qualifier in Parent.Parent.Qualifiers)
+						if (qualifier.ObjectInfo == ObjectInfo && qualifier.Type == ObjectType)
+							doAdd = false; // throw new Exception("Adding duplicate qualifiers to the qualifier list!");
+
+					if (doAdd)
                     Parent.Parent.Qualifiers.Add(new Qualifier()
                     {
                         ObjectInfo = ObjectInfo,
                         Type = ObjectType
                     });
             }
+			}
 
             Fix((List<Condition>)extraInfo[0], reader);
             reader.Seek(endPosition);
