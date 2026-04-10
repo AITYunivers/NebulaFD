@@ -91,10 +91,12 @@ namespace Nebula.Core.Data.Chunks.AppChunks
                 case 28: // HTML5 Final Project
                     NebulaCore.HTML = true;
                     break;
-                case 74: // Nintendo Switch
-                case 75: // Xbox One
-                case 78: // Playstation 4
-                    if (NebulaCore.Fusion != 3.0f)
+				//case 74: // Nintendo Switch
+				//case 75: // Xbox One (2023)
+				//case 78: // Playstation 4
+				//case 81: // Xbox One (2025)
+				case >=70: // Modern Consoles
+					if (NebulaCore.Fusion != 3.0f)
                     {
                         this.Log($"Fusion 3 detected, correcting.", Spectre.Console.Color.Yellow3_1);
                         NebulaCore.Fusion = 3.0f;
