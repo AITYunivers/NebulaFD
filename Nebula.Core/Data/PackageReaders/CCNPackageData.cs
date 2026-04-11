@@ -1,4 +1,4 @@
-﻿using Nebula.Core.Data.Chunks;
+using Nebula.Core.Data.Chunks;
 using Nebula.Core.Data.Chunks.FrameChunks;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
@@ -37,6 +37,8 @@ namespace Nebula.Core.Data.PackageReaders
                 NebulaCore._yunicode = true;
 
             Frames = new List<Frame>();
+            bool HasExtendedHeader = false;
+
             while (reader.HasMemory(8))
             {
                 var newChunk = Chunk.InitChunk(reader);
@@ -46,6 +48,17 @@ namespace Nebula.Core.Data.PackageReaders
                     NebulaCore.Seeded = true;
                 if (newChunk.ChunkID == 8787)
                     NebulaCore.Plus = true;
+                if (newChunk.ChunkID == 0x2245)
+                    HasExtendedHeader = true;
+
+                if (newChunk.ChunkID == 0x3333 && !HasExtendedHeader)
+                {
+                    // We've parsed all the chunks we could before the Frame chunk
+                    // but could not find the ExtendedHeader, so we have no platform info
+                    // Default to a Windows build.
+                    this.Log("No ExtendedHeader chunk found, defaulting to a Windows build.");
+                    NebulaCore.Windows = true;
+                }
 
                 ByteReader chunkReader = new ByteReader(newChunk.ChunkData!);
                 newChunk.ReadCCN(chunkReader);
