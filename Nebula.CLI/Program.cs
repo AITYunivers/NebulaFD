@@ -94,7 +94,7 @@ namespace Nebula
             AnsiConsole.Write(NebulaCore.ConsoleRule);
             AnsiConsole.Status().Spinner(Spinner.Known.Dots2).Start("Loading file", ctx =>
             {
-                fileReader = new ByteReader(File.ReadAllBytes(NebulaCore.FilePath));
+                fileReader = new ByteReader(NebulaCore.FilePath, FileMode.Open);
             });
 
             if (NebulaCore.CurrentReader == null)

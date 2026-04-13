@@ -33,7 +33,7 @@ namespace Nebula.Core.Data.PackageReaders
                 this.Log("Fusion 1.5");
             }
 
-            if (Parameters.ForceUnicode)
+            if (Parameters.ForceUnicode || NebulaCore.Build >= 280)
                 NebulaCore._yunicode = true;
 
             Frames = new List<Frame>();

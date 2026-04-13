@@ -54,6 +54,14 @@ namespace Nebula.Core.Utilities
             bool rleLoop = false;
             bool rleCommander = false;
             bool rle = img.Flags["RLE"] || img.Flags["RLEW"] || img.Flags["RLET"];
+            // initial command for RLE
+            if (command > 128){
+                command -= 128;
+                rleCommander = true;
+            }
+            else if (command == 0)
+                rleLoop = true;
+            
             if (rle)
                 position++;
 
@@ -140,9 +148,16 @@ namespace Nebula.Core.Utilities
             bool rleLoop = false;
             bool rleCommander = false;
             bool rle = img.Flags["RLE"] || img.Flags["RLEW"] || img.Flags["RLET"];
+            // initial command for RLE
+            if (command > 128){
+                command -= 128;
+                rleCommander = true;
+            }
+            else if (command == 0)
+                rleLoop = true;
+            
             if (rle)
                 position++;
-
             byte r = 0;
             byte g = 0;
             byte b = 0;
@@ -222,6 +237,14 @@ namespace Nebula.Core.Utilities
             bool rleLoop = false;
             bool rleCommander = false;
             bool rle = img.Flags["RLE"] || img.Flags["RLEW"] || img.Flags["RLET"];
+            // initial command for RLE
+            if (command > 128){
+                command -= 128;
+                rleCommander = true;
+            }
+            else if (command == 0)
+                rleLoop = true;
+            
             if (rle)
                 position++;
             byte r = 0;
@@ -621,6 +644,14 @@ namespace Nebula.Core.Utilities
             bool rleLoop = false;
             bool rleCommander = false;
             bool rle = img.Flags["RLE"] || img.Flags["RLEW"] || img.Flags["RLET"];
+            // initial command for RLE
+            if (command > 128){
+                command -= 128;
+                rleCommander = true;
+            }
+            else if (command == 0)
+                rleLoop = true;
+            
             if (rle)
                 position++;
 

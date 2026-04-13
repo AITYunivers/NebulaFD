@@ -151,19 +151,6 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                                                         PixelFormat.Format32bppArgb);
 
                     byte[] colorArray = GetData();
-
-                    if (!IsMasked && colorArray != null)
-                    {
-                        ImageData = colorArray;
-                        if (!Parameters.GPUAcceleration)
-                            ImageData = ImageTranslatorCPU.RGBAToRGBMasked(this);
-                        else
-                            ImageData = ImageTranslatorGPU.RGBAToRGBMasked(this);
-
-                        GraphicMode = 4;
-                        IsMasked = true;
-                    }
-
                     Marshal.Copy(colorArray, 0, bmpData.Scan0, colorArray.Length);
                     BitmapCache.UnlockBits(bmpData);
                 }

@@ -22,7 +22,11 @@ namespace Nebula.Core.FileReaders
 
         public void LoadGame(ByteReader fileReader, string filePath)
         {
+            // Close and reopen quickly so iconextractor can read the file without locking issues 
+            fileReader.Close();
             loadIcons(_filePath = filePath);
+            fileReader = new ByteReader(filePath, FileMode.Open);
+
             calculateEntryPoint(fileReader);
 
             if (!fileReader.HasMemory(1)) // Check for Unpacked
