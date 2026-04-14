@@ -31,7 +31,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 Num = reader.ReadShort();
 			}
 
-			if (NebulaCore.Build < 296 || !NebulaCore.Windows || NebulaCore.Build < 2.5)
+			if (NebulaCore.Build < 296 || !NebulaCore.Windows || NebulaCore.Fusion < 2.5)
 			{
                 ObjectInfo = reader.ReadUShort();
                 ObjectInfoList = reader.ReadShort();
@@ -312,7 +312,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
 		public bool CommonParameter296Fix(ByteReader reader, bool global = false, short? comp = null)
         {
-            if (NebulaCore.Build != 296 || !NebulaCore.Windows || Parameters.Length > 0)
+            if (NebulaCore.Build < 296 || !NebulaCore.Windows || NebulaCore.Fusion < 2.5 || Parameters.Length > 0)
                 return true;
 
             comp ??= reader.ReadShort();

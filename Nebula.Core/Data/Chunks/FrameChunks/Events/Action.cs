@@ -27,7 +27,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 Num = reader.ReadShort();
             }
 
-            if (NebulaCore.Build < 296 || !NebulaCore.Windows || NebulaCore.Build < 2.5)
+            if (NebulaCore.Build < 296 || !NebulaCore.Windows || NebulaCore.Fusion < 2.5)
             {
                 ObjectInfo = reader.ReadUShort();
                 ObjectInfoList = reader.ReadShort();
@@ -272,7 +272,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public void CommonParameter296Fix(ByteReader reader, long endPosition)
 		{
-			if (NebulaCore.Build < 296 || !NebulaCore.Windows || Parameters.Length > 0 || NebulaCore.Build < 2.5)
+			if (NebulaCore.Build < 296 || !NebulaCore.Windows || Parameters.Length > 0 || NebulaCore.Fusion < 2.5)
 				return;
 			int altVal = reader.ReadInt();
 			ParameterShort altValParam = new ParameterShort()
@@ -319,7 +319,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public void GroupParameter296Fix(ByteReader reader)
 		{
-			if (NebulaCore.Build < 296 || !NebulaCore.Windows || Parameters.Length > 0 || NebulaCore.Build < 2.5)
+			if (NebulaCore.Build < 296 || !NebulaCore.Windows || Parameters.Length > 0 || NebulaCore.Fusion < 2.5)
 				return;
 			int groupId = reader.ReadUShort();
 			ParameterGroupPointer groupParam = new ParameterGroupPointer()

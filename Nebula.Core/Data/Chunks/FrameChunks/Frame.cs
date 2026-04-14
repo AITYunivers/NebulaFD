@@ -502,7 +502,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
         public void Fix()
         {
-            if (NebulaCore.Windows)
+            if (NebulaCore.Windows && NebulaCore.Fusion >= 2.0)
             {
                 Dictionary<long, ParameterGroup> groupLookupTable = new();
                 List<Parameter> checkParams = new List<Parameter>();

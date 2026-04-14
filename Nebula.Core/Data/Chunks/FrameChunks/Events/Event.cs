@@ -50,7 +50,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             byte actCnt = reader.ReadByte();
             EventFlags.Value = reader.ReadUShort();
 
-            if (NebulaCore.Build < 296 || !NebulaCore.Windows || NebulaCore.Build < 2.5)
+            if (NebulaCore.Build < 296 || !NebulaCore.Windows || NebulaCore.Fusion < 2.5)
 			{
 				if (NebulaCore.Build >= 284 && !(NebulaCore.Fusion == 1.5f || NebulaCore.MFA || NebulaCore.Android && NebulaCore.Build == 287))
 				{
