@@ -62,7 +62,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 				}
 
 				// Qualifier
-				if (NebulaCore.Build >= 296 && NebulaCore.Windows && (ObjectInfo & 0x8000) != 0)
+				if (NebulaCore.Build >= 296 && NebulaCore.Windows && NebulaCore.Fusion >= 2.5 && (ObjectInfo & 0x8000) != 0)
                 {
                     bool doAdd = true;
                     foreach (Qualifier qualifier in Parent.Parent.Qualifiers)
@@ -257,7 +257,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                             CommonParameter296Fix(reader, endPosition);
 							break;
                         case 63: // [296] Set effect
-                            if (NebulaCore.Build >= 296)
+                            if (NebulaCore.Build >= 296 && NebulaCore.Fusion >= 2.5)
                             {
                                 reader.Skip(2); // Shader ID
                                 DoAdd = false; // Remove this event, as shaders aren't yet implemented in Nebula for 296+
@@ -272,7 +272,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public void CommonParameter296Fix(ByteReader reader, long endPosition)
 		{
-			if (NebulaCore.Build < 296 || !NebulaCore.Windows || Parameters.Length > 0)
+			if (NebulaCore.Build < 296 || !NebulaCore.Windows || Parameters.Length > 0 || NebulaCore.Build < 2.5)
 				return;
 			int altVal = reader.ReadInt();
 			ParameterShort altValParam = new ParameterShort()
@@ -319,7 +319,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public void GroupParameter296Fix(ByteReader reader)
 		{
-			if (NebulaCore.Build < 296 || !NebulaCore.Windows || Parameters.Length > 0)
+			if (NebulaCore.Build < 296 || !NebulaCore.Windows || Parameters.Length > 0 || NebulaCore.Build < 2.5)
 				return;
 			int groupId = reader.ReadUShort();
 			ParameterGroupPointer groupParam = new ParameterGroupPointer()

@@ -15,7 +15,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-			if (NebulaCore.Build >= 296)
+			if (NebulaCore.Build >= 296 && NebulaCore.Fusion >= 2.5)
 				return;
 
             int Count = reader.ReadInt();

@@ -67,7 +67,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 				}
 
                 // Qualifier
-                if (NebulaCore.Build >= 296 && NebulaCore.Windows && (ObjectInfo & 0x8000) != 0)
+				if (NebulaCore.Build >= 296 && NebulaCore.Windows && NebulaCore.Fusion >= 2.5 && (ObjectInfo & 0x8000) != 0)
 				{
 					bool doAdd = true;
 					foreach (Qualifier qualifier in Parent.Parent.Qualifiers)

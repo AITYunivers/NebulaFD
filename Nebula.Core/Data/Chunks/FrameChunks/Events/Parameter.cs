@@ -36,7 +36,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 18 => new ParameterShoot(),
                 19 or 72 => new ParameterZone(),
                 24 => new ParameterColor(),
-                26 => NebulaCore.Build >= 296 ? new ParameterInt() : new ParameterShort(),
+                26 => NebulaCore.Build >= 296 && NebulaCore.Fusion >= 2.5 ? new ParameterInt() : new ParameterShort(),
                 40 or 41 or 63 or 64 => new ParameterString(),
                 32 => new ParameterClick(),
                 33 => new ParameterFile(),

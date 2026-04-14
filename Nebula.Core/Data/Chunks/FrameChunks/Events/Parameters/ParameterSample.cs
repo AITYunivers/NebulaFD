@@ -21,7 +21,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         {
             Handle = reader.ReadShort();
             SampleFlags.Value = reader.ReadUShort();
-            if (NebulaCore.Build >= 296 && NebulaCore.Windows)
+            if (NebulaCore.Build >= 296 && NebulaCore.Windows && NebulaCore.Fusion >= 2.5)
                 SoundBank.SampleParameters.Add(this);
             else
                 Name = reader.ReadYuniversal();

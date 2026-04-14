@@ -19,7 +19,7 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks
         {
             ShaderHandle = reader.ReadInt();
             int fakeN = reader.ReadInt();
-			if (NebulaCore.Build >= 296)
+			if (NebulaCore.Build >= 296 && NebulaCore.Fusion >= 2.5)
 				ShaderHandle = -1;
 			else
             {
