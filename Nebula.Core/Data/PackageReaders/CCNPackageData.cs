@@ -39,7 +39,7 @@ namespace Nebula.Core.Data.PackageReaders
                 NebulaCore._yunicode = Header != "PAME";
 
             Frames = new List<Frame>();
-            bool HasExtendedHeader = false;
+            bool hasExtendedHeader = false;
 
             while (reader.HasMemory(8))
             {
@@ -51,9 +51,9 @@ namespace Nebula.Core.Data.PackageReaders
                 if (newChunk.ChunkID == 8787)
                     NebulaCore.Plus = true;
                 if (newChunk.ChunkID == 0x2245)
-                    HasExtendedHeader = true;
+                    hasExtendedHeader = true;
 
-                if (newChunk.ChunkID == 0x3333 && !HasExtendedHeader)
+                if (newChunk.ChunkID == 0x3333 && !hasExtendedHeader && !NebulaCore.Windows)
                 {
                     // We've parsed all the chunks we could before the Frame chunk
                     // but could not find the ExtendedHeader, so we have no platform info
