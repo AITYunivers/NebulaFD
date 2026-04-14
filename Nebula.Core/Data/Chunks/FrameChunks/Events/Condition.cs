@@ -31,7 +31,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                 Num = reader.ReadShort();
 			}
 
-			if (NebulaCore.Build < 296 || !NebulaCore.Windows)
+			if (NebulaCore.Build < 296 || !NebulaCore.Windows || NebulaCore.Build < 2.5)
 			{
                 ObjectInfo = reader.ReadUShort();
                 ObjectInfoList = reader.ReadShort();
