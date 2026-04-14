@@ -35,6 +35,8 @@ namespace Nebula.Core.Data.PackageReaders
 
             if (Parameters.ForceUnicode)
                 NebulaCore._yunicode = true;
+            else if (!Parameters.IgnoreHeader)
+                NebulaCore._yunicode = Header != "PAME";
 
             Frames = new List<Frame>();
             bool HasExtendedHeader = false;

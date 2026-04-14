@@ -27,6 +27,8 @@ namespace Nebula.Core.Utilities
         public bool dump_all_chunks = false;
         public string comment_unicode = "Whether or not to force reading as unicode";
         public bool force_unicode = false;
+        public string comment_header = "Whether or not to avoid using the header for text encoding";
+        public bool ignore_header = false;
         public string comment_image_reader = "Whether or not to force reading images with the 2.5 reader rather than the 2.5+ reader";
         public bool force_image_reader = false;
         public string comment_gpu = "Whether or not to use the GPU to translate images (EXPERIMENTAL)";
@@ -60,6 +62,7 @@ namespace Nebula.Core.Utilities
         public static bool DumpUnknownChunks => Inst.dump_unk_chunks;
         public static bool DumpAllChunks => Inst.dump_all_chunks;
         public static bool ForceUnicode => Inst.force_unicode;
+        public static bool IgnoreHeader => Inst.ignore_header;
         public static bool GPUAcceleration => Inst.gpu_acceleration;
         public static bool ForceImageReader => Inst.force_image_reader;
         public static bool SilentLogEvents => Inst.silent_log_events;

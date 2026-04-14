@@ -151,7 +151,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                                                         PixelFormat.Format32bppArgb);
 
                     byte[] colorArray = GetData();
-
+                    
                     if (!IsMasked && colorArray != null)
                     {
                         ImageData = colorArray;
