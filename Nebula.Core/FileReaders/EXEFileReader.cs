@@ -140,24 +140,27 @@ namespace Nebula.Core.FileReaders
             exeReader.Skip(240);
 
             uint position = 0;
+            uint relocFallback = 0;
             for (var i = 0; i < numOfSections; i++)
             {
+                string sectionName = exeReader.ReadAsciiStop(8);
+                exeReader.Skip(8);
+                uint sectionStart = exeReader.ReadUInt();
+                uint sectionSize = exeReader.ReadUInt();
+                exeReader.Skip(16);
+
                 if (position == 0)
-                {
-                    exeReader.Skip(16);
-                    position += exeReader.ReadUInt();
-                    position += exeReader.ReadUInt();
-                    exeReader.Skip(16);
-                }
+                    position = sectionStart + sectionSize;
                 else
-                {
-                    exeReader.Skip(16);
-                    position += exeReader.ReadUInt();
-                    exeReader.Skip(20);
-                }
+                    position += sectionSize;
+
+                if (sectionName == ".reloc")
+                    relocFallback = sectionStart + sectionSize;
             }
 
             exeReader.Seek(position);
+            if (!exeReader.HasMemory(1) && relocFallback != position && relocFallback != 0)
+                exeReader.Seek(relocFallback);
         }
 
         public PackageData getPackageData() => Package!;

@@ -40,8 +40,9 @@ namespace Nebula.Core.Data.PackageReaders
 
             Frames = new List<Frame>();
             bool hasExtendedHeader = false;
+            bool pastLast = false;
 
-            while (reader.HasMemory(8))
+            while (reader.HasMemory(8) && !(pastLast && reader.PeekInt64() == 0))
             {
                 var newChunk = Chunk.InitChunk(reader);
                 this.Log($"Reading Chunk 0x{newChunk.ChunkID.ToString("X")} ({newChunk.ChunkName})");
@@ -52,8 +53,10 @@ namespace Nebula.Core.Data.PackageReaders
                     NebulaCore.Plus = true;
                 if (newChunk.ChunkID == 0x2245)
                     hasExtendedHeader = true;
+                if (newChunk.ChunkID == 0x7F7F)
+                    pastLast = true;
 
-                if (newChunk.ChunkID == 0x3333 && !hasExtendedHeader && !NebulaCore.Windows)
+				if (newChunk.ChunkID == 0x3333 && !hasExtendedHeader && !NebulaCore.Windows)
                 {
                     // We've parsed all the chunks we could before the Frame chunk
                     // but could not find the ExtendedHeader, so we have no platform info

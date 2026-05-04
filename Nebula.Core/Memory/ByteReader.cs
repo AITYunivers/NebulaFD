@@ -51,6 +51,13 @@ namespace Nebula.Core.Memory
             return value;
         }
 
+        public long PeekInt64()
+        {
+            long value = ReadInt64();
+            Skip(-8);
+            return value;
+        }
+
         public float PeekSingle()
         {
             float value = ReadFloat();
