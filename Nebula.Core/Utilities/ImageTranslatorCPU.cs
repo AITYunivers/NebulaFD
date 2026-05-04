@@ -655,6 +655,12 @@ namespace Nebula.Core.Utilities
             if (rle)
                 position++;
 
+            int pixelCount = img.Width * img.Height;
+            int extraBytes = img.ImageData.Length - pixelCount;
+            int padPerRow = 0;
+            if (!rle && extraBytes > 0 && extraBytes % img.Height == 0)
+                padPerRow = extraBytes / img.Height;
+
             Color rgb = Color.White;
             for (int y = 0; y < img.Height; y++)
             {
@@ -691,6 +697,7 @@ namespace Nebula.Core.Utilities
                             rleLoop = true;
                     }
                 }
+                position += padPerRow;
             }
 
             return colorArray;
