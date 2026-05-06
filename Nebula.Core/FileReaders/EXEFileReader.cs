@@ -152,7 +152,7 @@ namespace Nebula.Core.FileReaders
                 if (position == 0)
                     position = sectionStart + sectionSize;
                 else
-                    position += sectionSize;
+                    position += sectionStart;
 
                 if (sectionName == ".reloc")
                     relocFallback = sectionStart + sectionSize;
