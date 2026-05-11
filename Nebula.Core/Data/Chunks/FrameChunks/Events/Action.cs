@@ -80,16 +80,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
             Fix((List<Action>)extraInfo[0], reader, endPosition);
 			reader.Seek(endPosition);
-            string actionNameAfter;
-            try
-            {
-                actionNameAfter = ToString();
-            }
-            catch (Exception ex)
-            {
-                actionNameAfter = $"[Error in ToString: {ex.Message}]";
-            }
-            this.SilentLog($"[DEBUG ACT] ObjectType: {ObjectType}, Num: {Num}, Action Name: {actionNameAfter}, Parameters: {Parameters.Length}");
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
