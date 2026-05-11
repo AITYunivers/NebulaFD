@@ -80,6 +80,16 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
             Fix((List<Action>)extraInfo[0], reader, endPosition);
 			reader.Seek(endPosition);
+            string actionNameAfter;
+            try
+            {
+                actionNameAfter = ToString();
+            }
+            catch (Exception ex)
+            {
+                actionNameAfter = $"[Error in ToString: {ex.Message}]";
+            }
+            this.SilentLog($"[DEBUG ACT] ObjectType: {ObjectType}, Num: {Num}, Action Name: {actionNameAfter}, Parameters: {Parameters.Length}");
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)
@@ -156,21 +166,19 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 32: // [296] Set effect to Frame
                             if (NebulaCore.Build >= 296 && NebulaCore.Fusion >= 2.5)
                             {
-                                var shaderID = reader.ReadUShort();
+                                ushort shaderID = reader.ReadUShort();
                                 int actualID = 0;
-                                this.SilentLog($"ShaderID: {shaderID}");
-                                if (shaderID >= 4096) // [296] shaderID in actions starts from 4096 which is shaderID = 0 (sometimes shaderID can be 0)
+                                if (shaderID >= 4096) // [296] shaderID in actions starts from 4096 which is actual ID for shader starts from 0
                                     actualID = shaderID - 4096;
-                                else
-                                    actualID = shaderID; // [296] incase if shaderID won't be higher than 4096
-                                var shaderName = "Unknown";
-                                if (NebulaCore.PackageData.ShaderBank.Shaders.ContainsKey(actualID))
-                                {
+                                else if (shaderID == 0)
+                                    actualID = -1; // [296] if shaderID = 0, then Set effect to "None"
+                                string shaderName = "";
+                                if (NebulaCore.PackageData.ShaderBank.Shaders.ContainsKey(actualID) && actualID != 0)
                                     shaderName = NebulaCore.PackageData.ShaderBank.Shaders[actualID].Name; // [296] Recieving shader name from shader bank
-                                }
+                                else if (actualID == -1)
+                                    shaderName = string.Empty;
                                 ParameterString paramString = new ParameterString()
                                 {
-                                    Code = 64,
                                     Value = shaderName,
                                 };
                                 Parameters = new Parameter[1]
@@ -290,21 +298,20 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 63: // [296] Set effect
                             if (NebulaCore.Build >= 296 && NebulaCore.Fusion >= 2.5)
                             {
-                                var shaderID = reader.ReadUShort();
+                                ushort shaderID = reader.ReadUShort();
                                 int actualID = 0;
-                                this.SilentLog($"ShaderID: {shaderID}");
-                                if (shaderID >= 4096) // [296] shaderID in actions starts from 4096 which is shaderID = 0 (sometimes shaderID can be 0)
+                                if (shaderID >= 4096) // [296] shaderID in actions starts from 4096 which is actual ID for shader starts from 0
                                     actualID = shaderID - 4096;
-                                else
-                                    actualID = shaderID; // [296] incase if shaderID won't be higher than 4096
-                                var shaderName = "Unknown";
-                                if (NebulaCore.PackageData.ShaderBank.Shaders.ContainsKey(actualID))
-                                {
+                                else if (shaderID == 0)
+                                    actualID = -1; // [296] if shaderID = 0, then Set effect to "None"
+                                string shaderName = "";
+                                if (NebulaCore.PackageData.ShaderBank.Shaders.ContainsKey(actualID) && actualID != 0)
                                     shaderName = NebulaCore.PackageData.ShaderBank.Shaders[actualID].Name; // [296] Recieving shader name from shader bank
-                                }
+                                else if (actualID == -1)
+                                    shaderName = string.Empty;
                                 ParameterString paramString = new ParameterString()
                                 {
-                                    Value = shaderName
+                                    Value = shaderName,
                                 };
                                 Parameters = new Parameter[1]
                                 {
