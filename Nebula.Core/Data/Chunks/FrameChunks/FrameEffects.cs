@@ -32,12 +32,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             ShaderHandle = reader.ReadInt();
             ShaderParameters = new ShaderParameter[reader.ReadInt()];
 
-            if (NebulaCore.Build >= 296 && NebulaCore.Fusion >= 2.5)
-            {
-                ShaderHandle = -1;
-                ShaderParameters = new ShaderParameter[0];
-            }
-            else if (ShaderParameters.Length > 0)
+            if (ShaderParameters.Length > 0)
             {
                 Shader = NebulaCore.PackageData.ShaderBank[ShaderHandle];
                 for (int i = 0; i < ShaderParameters.Length; i++)

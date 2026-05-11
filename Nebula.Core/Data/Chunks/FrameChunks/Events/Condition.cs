@@ -1,5 +1,4 @@
-﻿using Nebula.Core.Data.Chunks.AppChunks;
-using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
+﻿using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
 using Nebula.Core.Data.Chunks.ObjectChunks;
 using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using Nebula.Core.Memory;
@@ -207,6 +206,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                             DoAdd = false;
                             ignoreOptimization = true;
                             break;
+                        case -12: // [296] Group "Group" is activated
+                            GroupParameter296Fix(reader);
+                            break;
                     }
                     break;
                 case >= 0:
@@ -217,10 +219,41 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                             Num = -27; // Compare Alterable
 							ignoreOptimization = CommonParameter296Fix(reader);
                             break;
+                        case -41: // [296] On each Object, loop name
+                            if (Parameters[0].Code == 11)
+                            {
+                                int loopId = ((ParameterShort)Parameters[0].Data).Value;
+                                Parameters[0].Code = 22;
+                                Parameters[0].Data = new ParameterExpressions()
+                                {
+                                    Comparison = 0,
+                                    Expressions = new List<ParameterExpression>()
+                                    {
+                                        new ParameterExpression()
+                                        {
+                                            ObjectType = -1,
+                                            Num = 3,
+                                            Expression = new ExpressionString()
+                                            {
+                                                Value = "NebulaLoop#" + loopId
+                                            }
+                                        }
+                                    }
+                                };
+                            }
+                            break;
+                        case -23: // [for all versions] Parameters Length check for Num -23 (-51 is -23, but with parameters)
+                            if (Parameters.Length >= 2)
+                                Num = -51;
+                            break;
+                        case -4: // [for all versions] Parameters Length check for Num -4 (-50 is -4, but with parameters)
+                            if (Parameters.Length >= 3)
+                                Num = -50;
+                            break;
+
                     }
                     break;
             }
-
 
             for (int i = 0; i < Parameters.Length; i++)
             {
@@ -349,8 +382,23 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             return false;
 		}
 
+        public void GroupParameter296Fix(ByteReader reader)
+        {
+            if (NebulaCore.Build < 296 || !NebulaCore.Windows || Parameters.Length > 0 || NebulaCore.Fusion < 2.5)
+                return;
+            int groupId = reader.ReadUShort();
+            ParameterGroupPointer groupParam = new ParameterGroupPointer()
+            {
+                ID = groupId
+            };
 
-		public override string ToString()
+            Parameters = new Parameter[1]
+            {
+                new() { Data = groupParam, Code = 39 }
+            };
+        }
+
+        public override string ToString()
         {
             return (OtherFlags["Negated"] ? "NOT " : "") + GetString();
         }
@@ -520,10 +568,13 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                             return $"Is music paused?";
                         case -6:
                             return $"Is sample {Parameters[0]} paused?";
+                        case -5:
+                            return $"{Parameters[0]} has just finished";
                         case -4:
                             return "No music is playing";
                         case -3:
                             return "No sample is playing";
+                        case -2:
                         case -1:
                             return $"{Parameters[0]} is not playing";
                     }
@@ -570,9 +621,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case -21:
                             return "Close window has been selected";
                         case -20:
-                            return "Menu bar is visible";
+                            return $"{GetGlobalStringName(Parameters[0].Data)} {GetComparison(((ParameterExpressions)Parameters[1].Data).Comparison)} {Parameters[1]}";
                         case -19:
-                            return $"Menu option {GetMenuItemName(((ParameterInt)Parameters[0].Data).Value)} is enabled";
+                            return "Menu bar is visible";
                         case -18:
                             return $"Menu option {GetMenuItemName(((ParameterInt)Parameters[0].Data).Value)} is enabled";
                         case -17:
