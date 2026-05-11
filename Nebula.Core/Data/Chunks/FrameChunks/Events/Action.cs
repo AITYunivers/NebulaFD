@@ -150,6 +150,37 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
             switch (ObjectType)
             {
+                case -3:
+                    switch (Num)
+                    {
+                        case 32: // [296] Set effect to Frame
+                            if (NebulaCore.Build >= 296 && NebulaCore.Fusion >= 2.5)
+                            {
+                                var shaderID = reader.ReadUShort();
+                                int actualID = 0;
+                                this.SilentLog($"ShaderID: {shaderID}");
+                                if (shaderID >= 4096) // [296] shaderID in actions starts from 4096 which is shaderID = 0 (sometimes shaderID can be 0)
+                                    actualID = shaderID - 4096;
+                                else
+                                    actualID = shaderID; // [296] incase if shaderID won't be higher than 4096
+                                var shaderName = "Unknown";
+                                if (NebulaCore.PackageData.ShaderBank.Shaders.ContainsKey(actualID))
+                                {
+                                    shaderName = NebulaCore.PackageData.ShaderBank.Shaders[actualID].Name; // [296] Recieving shader name from shader bank
+                                }
+                                ParameterString paramString = new ParameterString()
+                                {
+                                    Code = 64,
+                                    Value = shaderName,
+                                };
+                                Parameters = new Parameter[1]
+                                {
+                                    new() { Data = paramString, Code = 64 }
+                                };
+                            }
+                            break;
+                    }
+                break;
                 case -1:
                     switch (Num)
                     {
@@ -165,31 +196,31 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 44: // Skip
                             // DoAdd = false;
                             break;
-						case 6: // [296] Inlined Activate Group
-						case 7: // [296] Inlined Deactivate Group
-							GroupParameter296Fix(reader);
-							break;
-						case 14: // [296] Inlined Loop
+                        case 6: // [296] Inlined Activate Group
+                        case 7: // [296] Inlined Deactivate Group
+                            GroupParameter296Fix(reader);
+                            break;
+                        case 14: // [296] Inlined Loop
                             if (Parameters[0].Code == 11)
                             {
                                 int loopId = ((ParameterShort)Parameters[0].Data).Value;
                                 Parameters[0].Code = 22;
                                 Parameters[0].Data = new ParameterExpressions()
-								{
-									Comparison = 0,
-									Expressions = new List<ParameterExpression>()
-				                    {
-					                    new ParameterExpression()
-					                    {
-						                    ObjectType = -1,
-						                    Num = 3,
-						                    Expression = new ExpressionString()
+                                {
+                                    Comparison = 0,
+                                    Expressions = new List<ParameterExpression>()
+                                    {
+                                        new ParameterExpression()
+                                        {
+                                            ObjectType = -1,
+                                            Num = 3,
+                                            Expression = new ExpressionString()
                                             {
                                                 Value = "NebulaLoop#" + loopId
-											}
-					                    }
-				                    }
-								};
+                                            }
+                                        }
+                                    }
+                                };
                             }
                             break;
                         case 27: // Set Global Integer
@@ -198,24 +229,24 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 30: // Set Global
                             Num = 3; // Set Global
                             ignoreOptimization = true;
-							CommonParameter296Fix(reader, endPosition);
-							break;
+                            CommonParameter296Fix(reader, endPosition);
+                            break;
                         case 31: // Add Global Integer
                         case 32: // Add Global
                         case 33: // Add Global Double
                         case 34: // Add Global
                             Num = 5; // Add Global
                             ignoreOptimization = true;
-							CommonParameter296Fix(reader, endPosition);
-							break;
+                            CommonParameter296Fix(reader, endPosition);
+                            break;
                         case 35: // Subtract Global Integer
                         case 36: // Subtract Global
                         case 37: // Subtract Global Double
                         case 38: // Subtract Global
                             Num = 4; // Subtract Global
                             ignoreOptimization = true;
-							CommonParameter296Fix(reader, endPosition);
-							break;
+                            CommonParameter296Fix(reader, endPosition);
+                            break;
                         case 43: // Execute Child Events
                             DoAdd = false;
                             ignoreOptimization = true;
@@ -255,12 +286,76 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 32: // [296] Inlined Add to Alterable Value
                         case 33: // [296] Inlined Subtract From Alterable Value
                             CommonParameter296Fix(reader, endPosition);
-							break;
+                            break;
                         case 63: // [296] Set effect
                             if (NebulaCore.Build >= 296 && NebulaCore.Fusion >= 2.5)
                             {
-                                reader.Skip(2); // Shader ID
-                                DoAdd = false; // Remove this event, as shaders aren't yet implemented in Nebula for 296+
+                                var shaderID = reader.ReadUShort();
+                                int actualID = 0;
+                                this.SilentLog($"ShaderID: {shaderID}");
+                                if (shaderID >= 4096) // [296] shaderID in actions starts from 4096 which is shaderID = 0 (sometimes shaderID can be 0)
+                                    actualID = shaderID - 4096;
+                                else
+                                    actualID = shaderID; // [296] incase if shaderID won't be higher than 4096
+                                var shaderName = "Unknown";
+                                if (NebulaCore.PackageData.ShaderBank.Shaders.ContainsKey(actualID))
+                                {
+                                    shaderName = NebulaCore.PackageData.ShaderBank.Shaders[actualID].Name; // [296] Recieving shader name from shader bank
+                                }
+                                ParameterString paramString = new ParameterString()
+                                {
+                                    Value = shaderName
+                                };
+                                Parameters = new Parameter[1]
+                                {
+                                    new() { Data = paramString, Code = 64 }
+                                };
+                            }
+                            break;
+                        case 76:  // [296] Start loop for each one of Object, loop name
+                            if (Parameters[0].Code == 11)
+                            {
+                                int loopId = ((ParameterShort)Parameters[0].Data).Value;
+                                Parameters[0].Code = 22;
+                                Parameters[0].Data = new ParameterExpressions()
+                                {
+                                    Comparison = 0,
+                                    Expressions = new List<ParameterExpression>()
+                                    {
+                                        new ParameterExpression()
+                                        {
+                                            ObjectType = -1,
+                                            Num = 3,
+                                            Expression = new ExpressionString()
+                                            {
+                                                Value = "NebulaLoop#" + loopId
+                                            }
+                                        }
+                                    }
+                                };
+                            }
+                            break;
+                        case 77:  // [296] Start loop for each one of Object and Parameter, loop name
+                            if (Parameters[1].Code == 11)
+                            {
+                                int loopId = ((ParameterShort)Parameters[1].Data).Value;
+                                Parameters[1].Code = 22;
+                                Parameters[1].Data = new ParameterExpressions()
+                                {
+                                    Comparison = 0,
+                                    Expressions = new List<ParameterExpression>()
+                                    {
+                                        new ParameterExpression()
+                                        {
+                                            ObjectType = -1,
+                                            Num = 3,
+                                            Expression = new ExpressionString()
+                                            {
+                                                Value = "NebulaLoop#" + loopId
+                                            }
+                                        }
+                                    }
+                                };
                             }
                             break;
                     }
@@ -495,10 +590,14 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                             return Header + $"Play sample {Parameters[0]}";
                         case 1:
                             return Header + "Stop any sample";
+                        case 2:
+                            return Header + $"Play music {Parameters[0]}";
                         case 3:
                             return Header + "Stop any music";
                         case 4:
                             return Header + $"Play sample {Parameters[0]} {Parameters[1]} times";
+                        case 5:
+                            return Header + $"Play music {Parameters[0]} {Parameters[1]} times";
                         case 6:
                             return Header + $"Stop sample {Parameters[0]}";
                         case 7:

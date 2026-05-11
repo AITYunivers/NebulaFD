@@ -25,11 +25,20 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
             int OptionsOffset = reader.ReadInt();
             int FXDataSize = reader.ReadInt();
 
-            if (NameOffset != 0)
+            if (NebulaCore.Build >= 296 && NebulaCore.Fusion == 2.5)
             {
-                reader.Seek(StartOffset + NameOffset);
-                Name = reader.ReadAscii();
+                int shaderIndex = extraInfo.Length > 0 ? (int)extraInfo[0] : 0; // [296] Recieving index for naming it
+                Name = $"Shader_{shaderIndex}.fx"; // [296] Temporary name for implementation
             }
+            else
+            {
+                if (NameOffset != 0)
+                {
+                    reader.Seek(StartOffset + NameOffset);
+                    Name = reader.ReadAscii();
+                }
+            }
+            
 
             if (FXDataOffset != 0)
             {
