@@ -75,7 +75,7 @@
             byte key_pos = 0;
             for (uint i = 0; i < 256; i++)
             {
-                if (!key[key_pos]) key_pos = 0;
+                if (key[key_pos] == 0) key_pos = 0;
                 i2 += (byte)(key[key_pos++] + decodeBuffer[i]);
                 (decodeBuffer[i2], decodeBuffer[i]) = (decodeBuffer[i], decodeBuffer[i2]);
             }
