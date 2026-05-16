@@ -44,23 +44,31 @@ namespace Nebula.Core.FileReaders
                         // TODO
                     }
                 }
-                else if ((Directory.GetParent(entry.FullName)?.Name == "mipmap-hdpi-v4" ||
-                         Directory.GetParent(entry.FullName)?.Name == "mipmap-mdpi-v4" ||
-                         Directory.GetParent(entry.FullName)?.Name == "mipmap-xhdpi-v4" ||
-                         Directory.GetParent(entry.FullName)?.Name == "mipmap-xxhdpi-v4" ||
-                         Directory.GetParent(entry.FullName)?.Name == "mipmap-xxxhdpi-v4") &&
-                         entry.Name == "ic_launcher.png")
+                else if (NebulaCore.Build >= 296)
                 {
-                    loadIcons(new Bitmap(Bitmap.FromStream(entry.Open())));
+                        if ((Directory.GetParent(entry.FullName)?.Name == "mipmap-xxhdpi-v4" ||
+                            Directory.GetParent(entry.FullName)?.Name == "mipmap-xxxhdpi-v4") &&
+                            entry.Name == "ic_launcher.png") // only for 296
+                        {
+                        loadIcons(new Bitmap(Bitmap.FromStream(entry.Open())));
+                        }
                 }
+                else
+                {
+                    if ((Directory.GetParent(entry.FullName)?.Name == "drawable-xhdpi" ||
+                        Directory.GetParent(entry.FullName)?.Name == "drawable-xxhdpi-v4" ||
+                         Directory.GetParent(entry.FullName)?.Name == "drawable-xxxhdpi-v4") && 
+                         entry.Name == "launcher.png") // loading icons from 282 version and above
+                    {
+                        loadIcons(new Bitmap(Bitmap.FromStream(entry.Open())));
+                    }
+
+                }
+                
             }
 
             if (ccnReader != null)
-            {
-                NebulaCore.Android = true;
                 Package.Read(ccnReader);
-            }
-                
         }
 
         private void loadIcons(Bitmap bmp)
