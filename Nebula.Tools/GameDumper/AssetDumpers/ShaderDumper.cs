@@ -26,7 +26,11 @@ namespace GameDumper.AssetDumpers
             int[] keys = shdBnk.Shaders.Keys.ToArray();
             for (int i = 0; i < shdrs.Length; i++)
             {
-                string filePath = path + Path.GetFileNameWithoutExtension(shdrs[i].Name) + (shdrs[i].Compiled ? ".fxc" : ".fx");
+                string filePath = "";
+                if (NebulaCore.Android)
+		    filePath = path + Path.GetFileNameWithoutExtension(shdrs[i].Name) + ".fxao"; // Android has only OpenGL shader, there's no DX9 and DX11 (so you need to find them somewhere else)
+                else
+                    filePath = path + Path.GetFileNameWithoutExtension(shdrs[i].Name) + (shdrs[i].Compiled ? ".fxc" : ".fx");
                 File.WriteAllBytes(filePath, shdrs[i].FXData);
                 filePath = path + Path.GetFileNameWithoutExtension(shdrs[i].Name) + ".xml";
 

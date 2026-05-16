@@ -23,10 +23,12 @@ namespace Nebula.Core.FileReaders
         public void LoadGame(ByteReader fileReader, string filePath)
         {
             ByteReader? ccnReader = null;
-            ZipArchive archive = ZipFile.OpenRead(_filePath = filePath);
+
+            FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            ZipArchive archive = new ZipArchive(fs, ZipArchiveMode.Read);
             foreach (ZipArchiveEntry entry in archive.Entries)
             {
-                if (Directory.GetParent(entry.FullName)?.Name == "raw")
+                if (Directory.GetParent(entry.Name)?.Name == "assets" || Directory.GetParent(entry.FullName)?.Name == "raw")
                 {
                     if (Path.GetExtension(entry.Name) == ".ccn")
                     {
@@ -42,14 +44,28 @@ namespace Nebula.Core.FileReaders
                         // TODO
                     }
                 }
-                else if ((Directory.GetParent(entry.FullName)?.Name == "drawable-xhdpi" ||
-                         Directory.GetParent(entry.FullName)?.Name == "drawable-xxxhdpi-v4") &&
-                         entry.Name == "launcher.png")
+                else if (NebulaCore.Build >= 296)
                 {
-                    loadIcons(new Bitmap(Bitmap.FromStream(entry.Open())));
+                        if ((Directory.GetParent(entry.FullName)?.Name == "mipmap-xxhdpi-v4" ||
+                            Directory.GetParent(entry.FullName)?.Name == "mipmap-xxxhdpi-v4") &&
+                            entry.Name == "ic_launcher.png") // only for 296
+                        {
+                        loadIcons(new Bitmap(Bitmap.FromStream(entry.Open())));
+                        }
                 }
+                else
+                {
+                    if ((Directory.GetParent(entry.FullName)?.Name == "drawable-xhdpi" ||
+                        Directory.GetParent(entry.FullName)?.Name == "drawable-xxhdpi-v4" ||
+                         Directory.GetParent(entry.FullName)?.Name == "drawable-xxxhdpi-v4") && 
+                         entry.Name == "launcher.png") // loading icons from 282 version and above
+                    {
+                        loadIcons(new Bitmap(Bitmap.FromStream(entry.Open())));
+                    }
+
+                }
+                
             }
-            archive.Dispose();
 
             if (ccnReader != null)
                 Package.Read(ccnReader);
@@ -57,6 +73,9 @@ namespace Nebula.Core.FileReaders
 
         private void loadIcons(Bitmap bmp)
         {
+            if (_icons.Count > 0) 
+                return;
+
             _icons.Add(16,  bmp.ResizeImage(new Size(16, 16)));
             _icons.Add(32,  bmp.ResizeImage(new Size(32, 32)));
             _icons.Add(64,  bmp.ResizeImage(new Size(48, 48)));

@@ -32,6 +32,12 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             ShaderHandle = reader.ReadInt();
             ShaderParameters = new ShaderParameter[reader.ReadInt()];
 
+            if (NebulaCore.Android && NebulaCore.Build < 296)
+            {
+                ShaderHandle = -1;
+                ShaderParameters = new ShaderParameter[0];
+            }
+
             if (ShaderParameters.Length > 0)
             {
                 Shader = NebulaCore.PackageData.ShaderBank[ShaderHandle];

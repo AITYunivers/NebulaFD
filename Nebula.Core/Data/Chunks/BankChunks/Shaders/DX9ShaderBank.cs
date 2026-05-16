@@ -15,7 +15,6 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-
             int Count = reader.ReadInt();
             Offsets = new int[Count];
             for (int i = 0; i < Count; i++)
@@ -28,7 +27,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
                 {
                     reader.Seek(Offsets[i]);
                     Shader shd = new Shader();
-                    if (NebulaCore.Build >= 296 && NebulaCore.Fusion >= 2.5)
+                    if (NebulaCore.Build >= 296 && NebulaCore.Fusion >= 2.5 && NebulaCore.Windows)
                         shd.ReadCCN(reader, i); // [296] i is needed for sending shader index to Shader.cs
                     else
                         shd.ReadCCN(reader);
@@ -53,7 +52,6 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
         {
 
         }
-
         public Shader this[int key]
         {
             get => Shaders[key];

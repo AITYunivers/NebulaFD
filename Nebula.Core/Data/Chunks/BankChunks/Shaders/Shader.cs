@@ -25,7 +25,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Shaders
             int OptionsOffset = reader.ReadInt();
             int FXDataSize = reader.ReadInt();
 
-            if (NebulaCore.Build >= 296 && NebulaCore.Fusion == 2.5)
+            if (NebulaCore.Build >= 296 && NebulaCore.Fusion == 2.5 && NebulaCore.Windows) // Android still contains real shader's name up to 296
             {
                 int shaderIndex = extraInfo.Length > 0 ? (int)extraInfo[0] : 0; // [296] Recieving index for naming it
                 Name = $"Shader_{shaderIndex}.fx"; // [296] Temporary name for implementation

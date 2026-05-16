@@ -33,7 +33,12 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             ShaderParameters = new ShaderParameter[reader.ReadInt()];
             int paramOffset = reader.ReadInt();
 
-            if (ShaderHandle >= 0)
+            if (NebulaCore.Android && NebulaCore.Build < 296)
+            {
+                ShaderHandle = -1;
+                ShaderParameters = new ShaderParameter[0];
+            }
+            else if (ShaderHandle >= 0)
                 Shader = NebulaCore.PackageData.ShaderBank[ShaderHandle];
 
             long returnOffset = reader.Tell();
@@ -41,16 +46,17 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             {
                 reader.Seek(startOffset + paramOffset);
                     for (int i = 0; i < ShaderParameters.Length; i++)
-                {
-                    ShaderParameters[i] = new ShaderParameter();
-                    ShaderParameters[i].Name = Shader.Parameters[i].Name;
-                    ShaderParameters[i].Type = Shader.Parameters[i].Type;
-                    if (ShaderParameters[i].Type == 1)
-                        ShaderParameters[i].FloatValue = reader.ReadFloat();
-                    else
-                        ShaderParameters[i].Value = reader.ReadInt();
-                }
-                Array.Resize(ref ShaderParameters, Shader.Parameters.Length);
+                        ShaderParameters[i] = new ShaderParameter();
+                    for (int i = 0; i < Shader.Parameters.Length; i++)
+                    {
+                        ShaderParameters[i].Name = Shader.Parameters[i].Name;
+                        ShaderParameters[i].Type = Shader.Parameters[i].Type;
+                        if (ShaderParameters[i].Type == 1)
+                            ShaderParameters[i].FloatValue = reader.ReadFloat();
+                        else
+                            ShaderParameters[i].Value = reader.ReadInt();
+                    }
+                    Array.Resize(ref ShaderParameters, Shader.Parameters.Length);
             }
             reader.Seek(returnOffset);
         }
