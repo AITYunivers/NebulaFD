@@ -1,34 +1,36 @@
-﻿using Nebula.Core.Memory;
+using Nebula.Core.Memory;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks
 {
     public class FrameLayer : Chunk
     {
-        public BitDict LayerFlags = new BitDict(16, // Layer Flags
+        private const float MobileCoefficientsScale = 9.18355E-41f;
+
+        public BitDict LayerFlags = new BitDict(16,
             "", "",
-            "DontSaveBackground", "", "", // Save Background Disabled
-            "WrapHorizontally",           // Wrap Horizontally
-            "WrapVertically",             // Wrap Vertically
-            "PrevEffect", "", "", "",     // Same effect as previous layer
+            "DontSaveBackground", "", "",
+            "WrapHorizontally",
+            "WrapVertically",
+            "PrevEffect", "", "", "",
             "", "", "", "", "", "",
-            "HiddenAtStart"               // Visible at start Disabled
+            "HiddenAtStart"
         );
 
-        public BitDict MFALayerFlags = new BitDict(1, // Layer Flags
-            "Visible",            // Visible
-            "Locked", "",         // Locked
-            "HiddenAtStart",      // Visible at start Disabled
-            "DontSaveBackground", // Save Background Disabled
-            "WrapHorizontally",   // Wrap Horizontally
-            "WrapVertically",     // Wrap Vertically
-            "PrevEffect"          // Same effect as previous layer
+        public BitDict MFALayerFlags = new BitDict(8,
+            "Visible",
+            "Locked", "",
+            "HiddenAtStart",
+            "DontSaveBackground",
+            "WrapHorizontally",
+            "WrapVertically",
+            "PrevEffect"
         );
 
-        public float XCoefficient = 1.0f;
-        public float YCoefficient = 1.0f;
+        public float XCoefficient { get; set; } = 1.0f;
+        public float YCoefficient { get; set; } = 1.0f;
         public int BackdropCount;
         public int BackdropIndex;
-        public string Name = string.Empty;
+        public string Name { get; set; } = string.Empty;
         public FrameLayerEffect Effect = new FrameLayerEffect();
 
         public FrameLayer()
@@ -47,8 +49,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
             if (NebulaCore.Android || NebulaCore.iOS)
             {
-                XCoefficient /= 9.18355E-41f;
-                YCoefficient /= 9.18355E-41f;
+                XCoefficient /= MobileCoefficientsScale;
+                YCoefficient /= MobileCoefficientsScale;
             }
         }
 
@@ -62,7 +64,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
         public override void WriteCCN(ByteWriter writer, params object[] extraInfo)
         {
-
+            throw new NotSupportedException("Writing FrameLayer to CCN is not supported.");
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
@@ -75,27 +77,19 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 
         public void SyncFlags(bool fromMFA = false)
         {
-            if (!fromMFA)
-            {
-                MFALayerFlags["HiddenAtStart"] = LayerFlags["HiddenAtStart"];
-                MFALayerFlags["DontSaveBackground"] = LayerFlags["DontSaveBackground"];
-                MFALayerFlags["WrapHorizontally"] = LayerFlags["WrapHorizontally"];
-                MFALayerFlags["WrapVertically"] = LayerFlags["WrapVertically"];
-                MFALayerFlags["PrevEffect"] = LayerFlags["PrevEffect"];
-            }
-            else
-            {
-                LayerFlags["DontSaveBackground"] = MFALayerFlags["DontSaveBackground"];
-                LayerFlags["WrapHorizontally"] = MFALayerFlags["WrapHorizontally"];
-                LayerFlags["WrapVertically"] = MFALayerFlags["WrapVertically"];
-                LayerFlags["PrevEffect"] = MFALayerFlags["PrevEffect"];
-                LayerFlags["HiddenAtStart"] = MFALayerFlags["HiddenAtStart"];
-            }
+            SyncFlag("HiddenAtStart", fromMFA);
+            SyncFlag("DontSaveBackground", fromMFA);
+            SyncFlag("WrapHorizontally", fromMFA);
+            SyncFlag("WrapVertically", fromMFA);
+            SyncFlag("PrevEffect", fromMFA);
+        }
 
-            /*public BitDict MFALayerFlags = new BitDict( // Layer Flags
-                "Visible",            // Visible
-                "Locked", "",         // Locked
-            );*/
+        private void SyncFlag(string flagName, bool fromMFA)
+        {
+            if (fromMFA)
+                LayerFlags[flagName] = MFALayerFlags[flagName];
+            else
+                MFALayerFlags[flagName] = LayerFlags[flagName];
         }
     }
 }
