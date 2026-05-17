@@ -1,37 +1,43 @@
-﻿using Nebula.Core.Data;
+using Nebula.Core.Data;
 using Nebula.Core.Data.PackageReaders;
 using Nebula.Core.Memory;
 using System.Drawing;
 
 namespace Nebula.Core.FileReaders
 {
-    public class MFAFileReader : IFileReader
+    public class MFAFileReader : IFileReader, IDisposable
     {
         public string Name => "MFA";
-        public Dictionary<int, Bitmap> Icons { get { return _icons; } set { _icons = value; } }
-        private Dictionary<int, Bitmap> _icons = new Dictionary<int, Bitmap>();
+        public Dictionary<int, Bitmap> Icons { get; set; } = new();
+        public string FilePath { get; set; } = string.Empty;
+        public MFAPackageData Package { get; private set; } = new();
 
-        public string FilePath { get { return _filePath; } set { _filePath = value; } }
-        public string _filePath = string.Empty;
-
-        public MFAPackageData Package = new();
+        private bool _disposed;
 
         public void LoadGame(ByteReader fileReader, string filePath)
         {
-            _filePath = filePath;
+            ArgumentNullException.ThrowIfNull(fileReader);
+            ArgumentException.ThrowIfNullOrEmpty(filePath);
+            FilePath = filePath;
             Package.Read(fileReader);
         }
 
-        public PackageData getPackageData() => Package!;
+        public PackageData GetPackageData() => Package;
 
-        public IFileReader Copy()
+        public IFileReader Copy() => new MFAFileReader
         {
-            MFAFileReader fileReader = new()
-            {
-                Package = Package,
-                Icons = _icons
-            };
-            return fileReader;
+            Package = Package,
+            Icons = new Dictionary<int, Bitmap>(Icons),
+            FilePath = FilePath
+        };
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+            foreach (var bmp in Icons.Values)
+                bmp?.Dispose();
+            Icons.Clear();
+            _disposed = true;
         }
     }
 }
