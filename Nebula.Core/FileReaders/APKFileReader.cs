@@ -1,11 +1,8 @@
 ﻿using Nebula.Core.Data;
-using Nebula.Core.Data.Chunks.BankChunks.Fonts;
-using Nebula.Core.Data.Chunks.BankChunks.Sounds;
 using Nebula.Core.Data.Chunks.BankChunks.TrueTypeFonts;
 using Nebula.Core.Data.PackageReaders;
 using Nebula.Core.Memory;
 using Nebula.Core.Utilities;
-using System.ComponentModel.Design;
 using System.Drawing;
 using System.IO.Compression;
 
@@ -101,7 +98,7 @@ namespace Nebula.Core.FileReaders
             foreach (var soundFile in soundFiles)
             {
                 // getting file's name without extension
-                string fileName = Path.GetFileNameWithoutExtension(soundFile.Key);
+                string fileName = Path.GetFileNameWithoutExtension(soundFile.Key).ToLower();
                 // since Android sound names are s0001, s0002 and etc, we'll try to find its real name in sound bank from its handle in file's name
                 if (fileName.StartsWith('s') && fileName.Length >= 5 && uint.TryParse(fileName.Substring(1), out uint fileHandle))
                 {
