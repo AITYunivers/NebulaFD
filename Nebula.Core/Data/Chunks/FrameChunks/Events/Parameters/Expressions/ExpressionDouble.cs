@@ -7,7 +7,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
     {
         public double Value;
         public float Value2;
-        public double Value3;
 
         public ExpressionDouble()
         {
