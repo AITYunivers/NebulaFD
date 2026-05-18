@@ -12,7 +12,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             "Check",                        // Will not compile exes if off
             "", "", "", "LoadOnCall",       // Load on Call
             "PlayFromDisk",                 // Play from Disk
-            "", "", "HasName",              // Has Name (Android Only?)
+            "", "", "HasName",              // Has Name (At least it's for Android, or else it will give dictionary key not found)
             "", "", "", "", "", "NameCrop"  // Name Crop
         );
         public int Frequency;
@@ -41,8 +41,6 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
                 else
                     Name = "S" + Handle.ToString("D4");
 
-                // Temp until reading from the apk is added
-                Flags["PlayFromDisk"] = false;
                 return;
             }
             else if (NebulaCore.iOS)

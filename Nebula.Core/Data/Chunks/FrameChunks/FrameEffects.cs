@@ -1,5 +1,6 @@
 ﻿using Nebula.Core.Data.Chunks.BankChunks.Shaders;
 using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 using System.Drawing;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks
@@ -32,15 +33,26 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             ShaderHandle = reader.ReadInt();
             ShaderParameters = new ShaderParameter[reader.ReadInt()];
 
-            if (NebulaCore.Android && NebulaCore.Build < 296)
+            if (ShaderHandle >= 0)
             {
-                ShaderHandle = -1;
-                ShaderParameters = new ShaderParameter[0];
+                if (NebulaCore.Windows)
+                    Shader = NebulaCore.PackageData.ShaderBank[ShaderHandle];
+                else
+                {
+                    if (NebulaCore.PackageData.ShaderBank.ContainsKey(ShaderHandle))
+                    {
+                        Shader = NebulaCore.PackageData.ShaderBank[ShaderHandle];
+                    }
+                    else
+                    {
+                        ShaderHandle = -1;
+                        ShaderParameters = new ShaderParameter[0];
+                    }
+                }
             }
 
             if (ShaderParameters.Length > 0)
             {
-                Shader = NebulaCore.PackageData.ShaderBank[ShaderHandle];
                 for (int i = 0; i < ShaderParameters.Length; i++)
                     ShaderParameters[i] = new ShaderParameter();
                 for (int i = 0; i < Shader.Parameters.Length; i++)
