@@ -1,5 +1,6 @@
 ﻿using Nebula.Core.Data.Chunks.BankChunks.Shaders;
 using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 using System.Drawing;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks
@@ -33,30 +34,41 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
             ShaderParameters = new ShaderParameter[reader.ReadInt()];
             int paramOffset = reader.ReadInt();
 
-            if (NebulaCore.Android && NebulaCore.Build < 296)
+            if (ShaderHandle >= 0)
             {
-                ShaderHandle = -1;
-                ShaderParameters = new ShaderParameter[0];
+                if (NebulaCore.Windows)
+                    Shader = NebulaCore.PackageData.ShaderBank[ShaderHandle];
+                else
+                {
+                    if (NebulaCore.PackageData.ShaderBank.ContainsKey(ShaderHandle))
+                    {
+                        Shader = NebulaCore.PackageData.ShaderBank[ShaderHandle];
+                    }
+                    else
+                    {
+                        ShaderHandle = -1;
+                        ShaderParameters = new ShaderParameter[0];
+                    }
+                } 
             }
-            else if (ShaderHandle >= 0)
-                Shader = NebulaCore.PackageData.ShaderBank[ShaderHandle];
-
+                
+            
             long returnOffset = reader.Tell();
             if (paramOffset != 0)
             {
                 reader.Seek(startOffset + paramOffset);
-                    for (int i = 0; i < ShaderParameters.Length; i++)
-                        ShaderParameters[i] = new ShaderParameter();
-                    for (int i = 0; i < Shader.Parameters.Length; i++)
-                    {
-                        ShaderParameters[i].Name = Shader.Parameters[i].Name;
-                        ShaderParameters[i].Type = Shader.Parameters[i].Type;
-                        if (ShaderParameters[i].Type == 1)
-                            ShaderParameters[i].FloatValue = reader.ReadFloat();
-                        else
-                            ShaderParameters[i].Value = reader.ReadInt();
-                    }
-                    Array.Resize(ref ShaderParameters, Shader.Parameters.Length);
+                for (int i = 0; i < ShaderParameters.Length; i++)
+                    ShaderParameters[i] = new ShaderParameter();
+                for (int i = 0; i < Shader.Parameters.Length; i++)
+                {
+                    ShaderParameters[i].Name = Shader.Parameters[i].Name;
+                    ShaderParameters[i].Type = Shader.Parameters[i].Type;
+                    if (ShaderParameters[i].Type == 1)
+                        ShaderParameters[i].FloatValue = reader.ReadFloat();
+                    else
+                        ShaderParameters[i].Value = reader.ReadInt();
+                }
+                Array.Resize(ref ShaderParameters, Shader.Parameters.Length);
             }
             reader.Seek(returnOffset);
         }
