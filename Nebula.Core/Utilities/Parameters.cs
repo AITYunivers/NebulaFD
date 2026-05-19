@@ -39,6 +39,8 @@ namespace Nebula.Core.Utilities
         public bool invert_ignore_frames = false;
         public string comment_frames = "An array of frame ids to ignore reading, index starts at 0";
         public int[] ignore_frames = new int[0];
+        public string comment_override_runtime_version = "Override the runtime version";
+        public int override_runtime_version = -1;
 
         public Parameters()
         {
@@ -68,5 +70,6 @@ namespace Nebula.Core.Utilities
         public static bool SilentLogEvents => Inst.silent_log_events;
         public static bool InvertFrameMask => Inst.invert_ignore_frames;
         public static int[] DontIncludeFrames => Inst.ignore_frames;
+        public static int OverrideRuntimeVersion => Inst.override_runtime_version;
     }
 }
