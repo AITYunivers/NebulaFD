@@ -1,5 +1,6 @@
 ﻿using Nebula.Core.Data.Chunks.BankChunks.Sounds;
 using Nebula.Core.Memory;
+using Nebula.Core.Utilities;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 {
@@ -21,10 +22,12 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         {
             Handle = reader.ReadShort();
             SampleFlags.Value = reader.ReadUShort();
-            if (NebulaCore.Build >= 296 && (NebulaCore.Windows || NebulaCore.Android) && NebulaCore.Fusion >= 2.5 || NebulaCore.Android && NebulaCore.Build <= 290)
+            if (NebulaCore.Build >= 296 && (NebulaCore.Windows || NebulaCore.Android) && NebulaCore.Fusion >= 2.5)
                 SoundBank.SampleParameters.Add(this);
-            else
+            else {
                 Name = reader.ReadYuniversal();
+                SoundBank.ExternalFiles[Handle.ToString()] = Name;
+            }
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)

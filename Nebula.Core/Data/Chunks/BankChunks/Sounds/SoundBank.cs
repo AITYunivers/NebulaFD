@@ -6,6 +6,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
 {
     public class SoundBank : Chunk
     {
+        public static Dictionary<string, object> ExternalFiles = new(); // dictionary for saving each founded sound
         public static List<ParameterSample> SampleParameters = new();
         
         public int Count;

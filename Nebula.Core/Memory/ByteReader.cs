@@ -58,6 +58,13 @@ namespace Nebula.Core.Memory
             return value;
         }
 
+        public ulong PeekUInt64()
+        {
+            ulong value = ReadULong();
+            Skip(-8);
+            return value;
+        }
+
         public float PeekSingle()
         {
             float value = ReadFloat();
@@ -70,13 +77,24 @@ namespace Nebula.Core.Memory
         public uint PeekUInt() => PeekUInt32();
         public int PeekInt() => PeekInt32();
         public float PeekFloat() => PeekSingle();
+        public long PeekLong() => PeekInt64();
+        public ulong PeekULong() => PeekUInt64();
 
         public ushort ReadUShort() => ReadUInt16();
         public short ReadShort() => ReadInt16();
         public uint ReadUInt() => ReadUInt32();
         public int ReadInt() => ReadInt32();
+        public long ReadLong() => ReadInt64();
+        public ulong ReadULong() => ReadUInt64();
         public float ReadFloat() => ReadSingle();
         public bool ReadBool() => ReadByte() == 1;
+
+        public override double ReadDouble()
+        {
+            if (!NebulaCore.Windows)
+                return ReadLong() / 4294967296.0;
+            return base.ReadDouble();
+        }
 
         public string ReadAscii(int length = -1)
         {

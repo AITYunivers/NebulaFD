@@ -21,6 +21,13 @@ namespace Nebula.Core.Data.PackageReaders
             ProductVersion = reader.ReadInt();
             ProductBuild = reader.ReadInt();
             NebulaCore.Build = ProductBuild;
+
+            if (Parameters.OverrideRuntimeVersion != -1)
+            {
+                this.Log($"Overriding build version from {NebulaCore.Build} to {Parameters.OverrideRuntimeVersion}", Spectre.Console.Color.Yellow3_1);
+                NebulaCore.Build = Parameters.OverrideRuntimeVersion;
+            }
+
             if (RuntimeVersion != 769)
             {
                 if (NebulaCore.Build < 280)

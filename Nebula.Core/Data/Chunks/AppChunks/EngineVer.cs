@@ -26,7 +26,7 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             EngineSubversion = reader.ReadInt();
             EngineInfo.Value = reader.ReadUInt();
 
-            if (NebulaCore.Build != EngineVersion)
+            if (NebulaCore.Build != EngineVersion && Parameters.OverrideRuntimeVersion == -1)
             {
                 this.Log($"Build was modified from {EngineVersion}.{EngineSubversion} to {NebulaCore.Build}, reverting.", Spectre.Console.Color.Yellow3_1);
                 NebulaCore.Build = EngineVersion;
