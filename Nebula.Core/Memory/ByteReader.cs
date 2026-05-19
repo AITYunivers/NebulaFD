@@ -58,6 +58,13 @@ namespace Nebula.Core.Memory
             return value;
         }
 
+        public ulong PeekUInt64()
+        {
+            ulong value = ReadULong();
+            Skip(-8);
+            return value;
+        }
+
         public float PeekSingle()
         {
             float value = ReadFloat();
@@ -70,33 +77,19 @@ namespace Nebula.Core.Memory
         public uint PeekUInt() => PeekUInt32();
         public int PeekInt() => PeekInt32();
         public float PeekFloat() => PeekSingle();
+        public long PeekLong() => PeekInt64();
+        public ulong PeekULong() => PeekUInt64();
 
         public ushort ReadUShort() => ReadUInt16();
         public short ReadShort() => ReadInt16();
         public uint ReadUInt() => ReadUInt32();
         public int ReadInt() => ReadInt32();
+        public long ReadLong() => ReadInt64();
+        public ulong ReadULong() => ReadUInt64();
         public float ReadFloat() => ReadSingle();
         public bool ReadBool() => ReadByte() == 1;
 
-        public override double ReadDouble()
-        {
-            // Copied from XNA / Other runtime implementations
-            int b1 = ReadByte();
-            int b2 = ReadByte();
-            int b3 = ReadByte();
-            int b4 = ReadByte();
-            int b5 = ReadByte();
-            int b6 = ReadByte();
-            int b7 = ReadByte();
-            int b8 = ReadByte();
-
-            long total1 = ((long)b4 << 24) | ((long)b3 << 16) | ((long)b2 << 8) | b1;
-            long total2 = ((long)b8 << 24) | ((long)b7 << 16) | ((long)b6 << 8) | b5;
-
-            long total = (total2 << 32) | (total1 & 0xFFFFFFFFL);
-
-            return total / 4294967296.0; // 2^32
-        }
+        public override double ReadDouble() => ReadLong() / 4294967296.0;
 
         public string ReadAscii(int length = -1)
         {
