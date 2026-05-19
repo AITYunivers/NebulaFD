@@ -242,16 +242,13 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
             if (NebulaCore.Android)
             {
-                // fixes 1 game, cannot be right
-                bool isEditedLayout = NebulaCore.Build == 284 || NebulaCore.Build >= 292;
-                
                 switch (index)
                 {
                     case 0:
                         MovementsOffset = Offset;
                         break;
                     case 1:
-                        if (isEditedLayout)
+                        if (NebulaCore.Build >= 284)
                             AlterableValuesOffset = Offset;
                         else
                             AnimationOffset = Offset;
@@ -263,24 +260,24 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
                         DataOffset = Offset;
                         break;
                     case 5:
-                        if (isEditedLayout)
+                        if (NebulaCore.Build >= 284)
                             ExtensionOffset = Offset;
                         else return;
                         break;
                     case 6:
-                        if (isEditedLayout)
+                        if (NebulaCore.Build >= 284)
                             AnimationOffset = Offset;
                         else
                             ExtensionOffset = Offset;
                         break;
                     case 7:
-                        if (isEditedLayout)
+                        if (NebulaCore.Build >= 284)
                             return;
                         else
                             AlterableValuesOffset = Offset;
                         break;
                     case 8:
-                        if (isEditedLayout)
+                        if (NebulaCore.Build >= 284)
                             return;
                         else
                             AlterableStringsOffset = Offset;
