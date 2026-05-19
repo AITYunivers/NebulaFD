@@ -89,7 +89,12 @@ namespace Nebula.Core.Memory
         public float ReadFloat() => ReadSingle();
         public bool ReadBool() => ReadByte() == 1;
 
-        public override double ReadDouble() => ReadLong() / 4294967296.0;
+        public override double ReadDouble()
+        {
+            if (!NebulaCore.Windows)
+                return ReadLong() / 4294967296.0;
+            return base.ReadDouble();
+        }
 
         public string ReadAscii(int length = -1)
         {
