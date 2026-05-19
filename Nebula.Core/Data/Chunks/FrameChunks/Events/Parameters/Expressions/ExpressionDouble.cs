@@ -15,17 +15,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
-            if (NebulaCore.Windows)
-            {
-                Value = reader.ReadDouble();
-                Value2 = reader.ReadFloat();
-            }
-            else
-            {
-                reader.Skip(8); // skipping 8 bytes for getting real value
-                Value2 = reader.ReadFloat(); // fully reads float expression
-                Value = Math.Round((double)Value2, 5); // rounding the value for preventing a lot of floating-point numbers
-            }
+            Value = Math.Round(reader.ReadDouble(), 5);
+            Value2 = (float)Math.Round(reader.ReadFloat(), 5);
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)

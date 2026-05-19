@@ -83,10 +83,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Fonts
             ClipPrecision = dataReader.ReadByte();
             Quality = dataReader.ReadByte();
             PitchAndFamily = dataReader.ReadByte();
-            if (NebulaCore.Android)
-                Name = dataReader.ReadYuniversal(32); // fixed length for Android font names
-            else
-                Name = dataReader.ReadYuniversal();
+            Name = dataReader.ReadYuniversal(32);
         }
 
         public override void ReadMFA(ByteReader reader, params object[] extraInfo)

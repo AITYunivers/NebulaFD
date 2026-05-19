@@ -33,14 +33,22 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             if (NebulaCore.Android)
             {
                 Handle = reader.ReadUShort();
+                string internalFilename = "s" + Handle.ToString("D4");
+                
                 Flags.Value = reader.ReadUShort();
                 reader.Skip(4);
                 Frequency = reader.ReadInt();
+                
                 if (Flags["HasName"])
                     Name = reader.ReadYuniversal(reader.ReadShort());
-                else
-                    Name = "S" + Handle.ToString("D4");
+                
+                if (string.IsNullOrEmpty(Name) && SoundBank.ExternalFiles.TryGetValue(Handle.ToString(), out var nameEntry))
+                    Name = (string)nameEntry;
 
+                if (SoundBank.ExternalFiles.TryGetValue(internalFilename, out var dataEntry)) {
+                    Data = (byte[])dataEntry;
+                    SoundBank.ExternalFiles.Remove(internalFilename);
+                }
                 return;
             }
             else if (NebulaCore.iOS)
@@ -138,18 +146,13 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             writer.WriteUInt(Handle + 1);
             writer.WriteInt(Checksum);
             writer.WriteUInt(References);
-            writer.WriteInt(Data.Length + (Flags["PlayFromDisk"] ? 0 : Name.Length * 2 + 2));
+            //writer.WriteInt(Data.Length + (Flags["PlayFromDisk"] ? 0 : Name.Length * 2 + 2));
+            writer.WriteInt(Data.Length + (Name.Length * 2 + 2));
             writer.WriteUInt(Flags.Value);
             writer.WriteInt(Frequency);
             writer.WriteInt(Name.Length + 1);
-
-            if (Flags["PlayFromDisk"])
-                writer.WriteBytes(Data);
-            else
-            {
-                writer.WriteYunicode(Name, true);
-                writer.WriteBytes(Data);
-            }
+            writer.WriteYunicode(Name, true);
+            writer.WriteBytes(Data);
         }
 
         public static byte[] FixSoundData(byte[] data)
