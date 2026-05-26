@@ -129,6 +129,7 @@ namespace Nebula
                 case ".zip":
                     NebulaCore.CurrentReader = new OpenFileReader();
                     break;
+                case ".xapk":
                 case ".apk":
                     NebulaCore.CurrentReader = new APKFileReader();
                     break;

@@ -11,7 +11,7 @@ namespace Nebula.Core.FileReaders
 {
     public class APKFileReader : IFileReader
     {
-        public string Name => "APK";
+        public string Name => "APK/XAPK";
         public Dictionary<int, Bitmap> Icons { get { return _icons; } set { _icons = value; } }
         private Dictionary<int, Bitmap> _icons = new Dictionary<int, Bitmap>();
 
@@ -46,6 +46,21 @@ namespace Nebula.Core.FileReaders
                         using MemoryStream ms = new();
                         entry.Open().CopyTo(ms);
                         SoundBank.ExternalFiles[Path.GetFileNameWithoutExtension(entry.Name)] = ms.ToArray(); // saving it to dictionary
+                    }
+                    else if (Path.GetExtension(entry.Name) == ".mp4") // for unpacking video files saved by Video Android extension
+                    {
+                        using var stream = entry.Open();
+                        using var memoryStream = new MemoryStream();
+                        stream.CopyTo(memoryStream);
+                        byte[] fileData = memoryStream.ToArray();
+
+                        // add videos to binary files list for dumping
+                        BinaryFile binFile = new BinaryFile
+                        {
+                            FileName = entry.Name,
+                            FileData = fileData
+                        };
+                        NebulaCore.PackageData.BinaryFiles.Items.Add(binFile);
                     }
                 }
                 if (Directory.GetParent(entry.FullName)?.Name == "fonts" && Path.GetExtension(entry.Name) == ".ttf")

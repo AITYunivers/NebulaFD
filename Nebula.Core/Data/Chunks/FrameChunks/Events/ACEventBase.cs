@@ -42,6 +42,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public Event Parent = null;
         public bool DoAdd = true;
+        public bool Fusion296PC = NebulaCore.Build >= 296 && NebulaCore.Windows && NebulaCore.Fusion >= 2.5; // needed for checkings here and in ParameterObject.cs for qualifiers
 
         public override void ReadCCN(ByteReader reader, params object[] extraInfo)
         {
@@ -65,6 +66,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public ObjectInfo? GetObject()
         {
+	    // same as in ParameterObject.cs
+            if (Fusion296PC && (ObjectInfo & 0x8000) != 0)
+                return null;
             if (Parent?.Parent.Qualifiers.Where(x => x.ObjectInfo == ObjectInfo).Any() == true)
                 return null;
             else if (NebulaCore.MFA && Parent?.Parent.EventObjects.Count > 0)
@@ -292,6 +296,13 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             Qualifier[] qualifier = Parent?.Parent.Qualifiers.Where(x => x.ObjectInfo == ObjectInfo && x.Type == ObjectType).ToArray()!;
             if (qualifier.Length > 0)
                 return GetQualifierName(qualifier.First());
+            // same thing as in ParameterObject.cs, also fixes for not finding some other qualifiers in some actions and conditions
+            if (Fusion296PC && (ObjectInfo & 0x8000) != 0)
+            {
+                Qualifier? newQualifier = new Qualifier() { ObjectInfo = ObjectInfo, Type = ObjectType };
+                Parent?.Parent.Qualifiers.Add(newQualifier);
+                return GetQualifierName(newQualifier);
+            }
             return "Unknown Object";
         }
 

@@ -64,22 +64,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 					Parameters[i].ReadCCN(reader);
 					Parameters[i].FrameEvents = Parent.Parent;
 				}
-
-                // Qualifier
-				if (NebulaCore.Build >= 296 && NebulaCore.Windows && NebulaCore.Fusion >= 2.5 && (ObjectInfo & 0x8000) != 0)
-				{
-					bool doAdd = true;
-					foreach (Qualifier qualifier in Parent.Parent.Qualifiers)
-						if (qualifier.ObjectInfo == ObjectInfo && qualifier.Type == ObjectType)
-							doAdd = false; // throw new Exception("Adding duplicate qualifiers to the qualifier list!");
-
-					if (doAdd)
-                    Parent.Parent.Qualifiers.Add(new Qualifier()
-                    {
-                        ObjectInfo = ObjectInfo,
-                        Type = ObjectType
-                    });
-            }
 			}
 
             Fix((List<Condition>)extraInfo[0], reader);

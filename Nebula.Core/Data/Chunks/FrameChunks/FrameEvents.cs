@@ -84,10 +84,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks
 						qualifier.ReadCCN(reader);
                         Qualifiers.Add(qualifier);
                     }
-
-                    // Just incase, 296 shouldnt be writing qualifiers anyway
-                    if (NebulaCore.Build >= 296 && NebulaCore.Windows && NebulaCore.Fusion >= 2.5)
-                        Qualifiers.Clear();
                 }
                 else if (identifier == "ERes")
                     EventCount = reader.ReadInt();
