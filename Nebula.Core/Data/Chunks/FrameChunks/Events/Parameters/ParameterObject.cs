@@ -20,7 +20,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             ObjectInfoList = reader.ReadShort();
             ObjectInfo = reader.ReadUShort();
             ObjectType = reader.ReadShort();
-            }
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
