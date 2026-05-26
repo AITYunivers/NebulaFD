@@ -45,30 +45,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 			}
 			else
 			{
-                if (ObjectType == -7 || ObjectType >= 0)
-                {
-                    ObjectInfo = reader.ReadUShort();
-                    if (NebulaCore.Build >= 296 && NebulaCore.Windows && NebulaCore.Fusion >= 2.5 && (ObjectInfo & 0x8000) != 0)
-                    {
-                        bool exists = Parent?.Parent?.Qualifiers.Where(q => q.ObjectInfo == ObjectInfo && q.Type == ObjectType).Any() == true;
-                        if (!exists)
-                            Parent?.Parent?.Qualifiers.Add(new Qualifier() { ObjectInfo = ObjectInfo, Type = ObjectType });
-                        bool doAdd = true;
-                        foreach (Qualifier qualifier in Parent.Parent.Qualifiers)
-                            if (qualifier.ObjectInfo == ObjectInfo && qualifier.Type == ObjectType)
-                                doAdd = false; // throw new Exception("Adding duplicate qualifiers to the qualifier list!");
+				if (ObjectType == -7 || ObjectType >= 0)
+					ObjectInfo = reader.ReadUShort();
 
-                        if (doAdd)
-                            Parent.Parent.Qualifiers.Add(new Qualifier()
-                            {
-                                ObjectInfo = ObjectInfo,
-                                Type = ObjectType
-                            });
-                    }
-                }
-                    
-
-                Flags296.Value = reader.ReadByte();
+				Flags296.Value = reader.ReadByte();
 				EventFlags["Always"] = Flags296["Always"];
 				EventFlags["Repeat"] = Flags296["Repeat"];
 				OtherFlags["Negated"] = Flags296["Negated"];
@@ -79,8 +59,24 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 					Parameters[i] = new Parameter();
 					Parameters[i].ReadCCN(reader);
 					Parameters[i].FrameEvents = Parent.Parent;
-                }
-            }
+				}
+
+				// Qualifier
+				if (NebulaCore.Build >= 296 && NebulaCore.Windows && NebulaCore.Fusion >= 2.5 && (ObjectInfo & 0x8000) != 0)
+                {
+                    bool doAdd = true;
+                    foreach (Qualifier qualifier in Parent.Parent.Qualifiers)
+                        if (qualifier.ObjectInfo == ObjectInfo && qualifier.Type == ObjectType)
+                            doAdd = false; // throw new Exception("Adding duplicate qualifiers to the qualifier list!");
+
+                    if (doAdd)
+					Parent.Parent.Qualifiers.Add(new Qualifier()
+					{
+						ObjectInfo = ObjectInfo,
+						Type = ObjectType
+					});
+			    }
+			}
 
             Fix((List<Action>)extraInfo[0], reader, endPosition);
 			reader.Seek(endPosition);
