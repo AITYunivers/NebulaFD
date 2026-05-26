@@ -11,9 +11,19 @@ namespace Nebula.Core.FileReaders
 {
     public class APKFileReader : IFileReader
     {
-        public string Name => "APK/XAPK";
+        public string Name => "Android";
         public Dictionary<int, Bitmap> Icons { get { return _icons; } set { _icons = value; } }
         private Dictionary<int, Bitmap> _icons = new Dictionary<int, Bitmap>();
+
+        private static readonly List<string> VideoExtensions = new List<string>
+        {
+            ".mp4",
+            ".mkv",
+            ".m4a",
+            ".mov",
+            ".webm",
+            ".avi"
+        };
 
         public string FilePath { get { return _filePath; } set { _filePath = value; } }
         public string _filePath = string.Empty;
@@ -47,7 +57,7 @@ namespace Nebula.Core.FileReaders
                         entry.Open().CopyTo(ms);
                         SoundBank.ExternalFiles[Path.GetFileNameWithoutExtension(entry.Name)] = ms.ToArray(); // saving it to dictionary
                     }
-                    else if (Path.GetExtension(entry.Name) == ".mp4") // for unpacking video files saved by Video Android extension
+                    else if (VideoExtensions.Contains(Path.GetExtension(entry.Name))) // for unpacking video files saved by Video Android extension
                     {
                         using var stream = entry.Open();
                         using var memoryStream = new MemoryStream();

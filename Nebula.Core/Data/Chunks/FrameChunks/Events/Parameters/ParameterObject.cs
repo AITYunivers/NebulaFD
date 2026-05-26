@@ -10,8 +10,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         public ushort ObjectInfo;
         public short ObjectType;
 
-	ACEventBase ace = new ACEventBase(); // for getting public bool Fusion296PC
-
         public ParameterObject()
         {
             ChunkName = "ParameterObject";
@@ -24,7 +22,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             ObjectType = reader.ReadShort();
 
             // adds qualifiers if it couldn't find any for Windows, Build >= 296 and Fusion >= 2.5 with 0x8000 bit mask
-            if (ace.Fusion296PC && (ObjectInfo & 0x8000) != 0)
+            if (NebulaCore.Build >= 296 && NebulaCore.Windows && NebulaCore.Fusion >= 2.5 && (ObjectInfo & 0x8000) != 0)
             {
                 bool exists = Parent?.FrameEvents?.Qualifiers.Where(q => q.ObjectInfo == ObjectInfo && q.Type == ObjectType).Any() == true;
                 if (!exists)
@@ -51,7 +49,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             if (qualifier.Length > 0)
                 return GetQualifierName(qualifier.First());
             // if Build >= 296, Windows and Fusion >= 2.5, has 0x8000 bit mask with qualifiers, but didn't find qualifiers, add current qualifier
-            if (ace.Fusion296PC && (ObjectInfo & 0x8000) != 0)
+            if (NebulaCore.Build >= 296 && NebulaCore.Windows && NebulaCore.Fusion >= 2.5 && (ObjectInfo & 0x8000) != 0)
             {
                 Qualifier? newQualifier = new Qualifier() { ObjectInfo = ObjectInfo, Type = ObjectType };
                 Parent?.FrameEvents?.Qualifiers.Add(newQualifier);
@@ -63,7 +61,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
         public ObjectInfo? GetObject()
         {
             // if Build >= 296, Windows and Fusion >= 2.5, has 0x8000 bit mask with qualifiers, return null
-            if (ace.Fusion296PC && (ObjectInfo & 0x8000) != 0)
+            if (NebulaCore.Build >= 296 && NebulaCore.Windows && NebulaCore.Fusion >= 2.5 && (ObjectInfo & 0x8000) != 0)
                 return null;
             if (Parent?.FrameEvents?.Qualifiers.Where(x => x.ObjectInfo == ObjectInfo).Any() == true)
                 return null;
