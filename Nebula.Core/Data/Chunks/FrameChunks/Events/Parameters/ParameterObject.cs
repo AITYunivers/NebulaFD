@@ -20,13 +20,6 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             ObjectInfoList = reader.ReadShort();
             ObjectInfo = reader.ReadUShort();
             ObjectType = reader.ReadShort();
-
-            // adds qualifiers if it couldn't find any for Windows, Build >= 296 and Fusion >= 2.5 with 0x8000 bit mask
-            if (NebulaCore.Build >= 296 && NebulaCore.Windows && NebulaCore.Fusion >= 2.5 && (ObjectInfo & 0x8000) != 0)
-            {
-                bool exists = Parent?.FrameEvents?.Qualifiers.Where(q => q.ObjectInfo == ObjectInfo && q.Type == ObjectType).Any() == true;
-                if (!exists)
-                    Parent?.FrameEvents?.Qualifiers.Add(new Qualifier() { ObjectInfo = ObjectInfo, Type = ObjectType });
             }
         }
 
@@ -48,21 +41,16 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             Qualifier[] qualifier = Parent?.FrameEvents?.Qualifiers.Where(x => x.ObjectInfo == ObjectInfo && x.Type == ObjectType).ToArray()!;
             if (qualifier.Length > 0)
                 return GetQualifierName(qualifier.First());
-            // if Build >= 296, Windows and Fusion >= 2.5, has 0x8000 bit mask with qualifiers, but didn't find qualifiers, add current qualifier
-            if (NebulaCore.Build >= 296 && NebulaCore.Windows && NebulaCore.Fusion >= 2.5 && (ObjectInfo & 0x8000) != 0)
-            {
-                Qualifier? newQualifier = new Qualifier() { ObjectInfo = ObjectInfo, Type = ObjectType };
-                Parent?.FrameEvents?.Qualifiers.Add(newQualifier);
-                return GetQualifierName(newQualifier);
-            }
             return "Unknown Object";
         }
 
         public ObjectInfo? GetObject()
         {
-            // if Build >= 296, Windows and Fusion >= 2.5, has 0x8000 bit mask with qualifiers, return null
             if (NebulaCore.Build >= 296 && NebulaCore.Windows && NebulaCore.Fusion >= 2.5 && (ObjectInfo & 0x8000) != 0)
-                return null;
+            {
+                if (Parent?.FrameEvents?.Qualifiers.Where(x => x.ObjectInfo == ObjectInfo && x.Type == ObjectType).Any() != true)
+                    Parent?.FrameEvents?.Qualifiers.Add(new Qualifier() { ObjectInfo = ObjectInfo, Type = ObjectType });
+            }
             if (Parent?.FrameEvents?.Qualifiers.Where(x => x.ObjectInfo == ObjectInfo).Any() == true)
                 return null;
             else if (NebulaCore.MFA && Parent?.FrameEvents?.EventObjects.Count > 0)
