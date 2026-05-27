@@ -65,12 +65,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
         public ObjectInfo? GetObject()
         {
-            if (Parent?.Parent.Qualifiers.Where(x => x.ObjectInfo == ObjectInfo).Any() == true)
-                return null;
-            else if (NebulaCore.MFA && Parent?.Parent.EventObjects.Count > 0)
-                return NebulaCore.PackageData.FrameItems.Items[(int)Parent.Parent.EventObjects[ObjectInfo].ItemHandle];
-            else
-                return NebulaCore.PackageData.FrameItems.Items[ObjectInfo];
+            return ObjectCommon.GetObjectACEventBase(ObjectInfo, ObjectType, this);
         }
 
         public string GetGlobalValueName(ParameterChunk param)

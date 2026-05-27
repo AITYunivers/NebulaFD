@@ -1,6 +1,7 @@
 ﻿using ILGPU.IR.Types;
 using Nebula.Core.Data.Chunks.AppChunks;
 using Nebula.Core.Data.Chunks.ObjectChunks;
+using Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon;
 using Nebula.Core.Memory;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
@@ -96,12 +97,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public ObjectInfo? GetObject()
         {
-            if (Parent?.FrameEvents?.Qualifiers.Where(x => x.ObjectInfo == ObjectInfoParent).Any() == true)
-                return null;
-            else if (NebulaCore.MFA && Parent?.FrameEvents?.EventObjects.Count > 0)
-                return NebulaCore.PackageData.FrameItems.Items[(int)Parent.FrameEvents.EventObjects[ObjectInfoParent].ItemHandle];
-            else
-                return NebulaCore.PackageData.FrameItems.Items[ObjectInfoParent];
+            return ObjectCommon.GetObject(ObjectInfoParent, TypeParent, this);
         }
 
         public string GetObjectName()

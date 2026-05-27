@@ -1,4 +1,6 @@
 ﻿using Nebula.Core.Data.Chunks.ChunkTypes;
+using Nebula.Core.Data.Chunks.FrameChunks.Events;
+using Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters;
 using Nebula.Core.Memory;
 using System.Diagnostics;
 using System.Drawing;
@@ -234,6 +236,38 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
         {
 
+        }
+
+        // method for getting object/qualifier in ACEventBase
+        public static ObjectInfo? GetObjectACEventBase(ushort ObjectInfo, short ObjectType, ACEventBase ace)
+        {
+            if (NebulaCore.Windows && NebulaCore.Build >= 296 && NebulaCore.Fusion >= 2.5 && (ObjectInfo & 0x8000) != 0)
+            {
+                if (ace.Parent?.Parent.Qualifiers.Where(x => x.ObjectInfo == ObjectInfo && x.Type == ObjectType).Any() != true)
+                    ace.Parent?.Parent.Qualifiers.Add(new Qualifier() { ObjectInfo = ObjectInfo, Type = ObjectType });
+            }
+            if (ace.Parent?.Parent.Qualifiers.Where(x => x.ObjectInfo == ObjectInfo).Any() == true)
+                return null;
+            else if (NebulaCore.MFA && ace.Parent?.Parent.EventObjects.Count > 0)
+                return NebulaCore.PackageData.FrameItems.Items[(int)ace.Parent.Parent.EventObjects[ObjectInfo].ItemHandle];
+            else
+                return NebulaCore.PackageData.FrameItems.Items[ObjectInfo];
+        }
+
+        //method for getting object/qualifier in different places
+        public static ObjectInfo? GetObject(ushort ObjectInfo, short ObjectType, ParameterChunk paramChunk)
+        {
+            if (NebulaCore.Windows && NebulaCore.Build >= 296 && NebulaCore.Fusion >= 2.5 && (ObjectInfo & 0x8000) != 0)
+            {
+                if (paramChunk.Parent?.FrameEvents?.Qualifiers.Where(x => x.ObjectInfo == ObjectInfo && x.Type == ObjectType).Any() != true)
+                    paramChunk.Parent?.FrameEvents?.Qualifiers.Add(new Qualifier() { ObjectInfo = ObjectInfo, Type = ObjectType });
+            }
+            if (paramChunk.Parent?.FrameEvents?.Qualifiers.Where(x => x.ObjectInfo == ObjectInfo).Any() == true)
+                return null;
+            else if (NebulaCore.MFA && paramChunk.Parent?.FrameEvents?.EventObjects.Count > 0)
+                return NebulaCore.PackageData.FrameItems.Items[(int)paramChunk.Parent.FrameEvents.EventObjects[ObjectInfo].ItemHandle];
+            else
+                return NebulaCore.PackageData.FrameItems.Items[ObjectInfo];
         }
 
         public void GetOffset(ByteReader reader, int index, bool check = false)
