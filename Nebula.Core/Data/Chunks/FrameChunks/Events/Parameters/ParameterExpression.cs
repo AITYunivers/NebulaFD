@@ -553,7 +553,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public ObjectInfo? GetObject()
         {
-            return ObjectCommon.GetObject(ObjectInfo, ObjectType, this);
+            return ObjectCommon.GetObject(ObjectInfo, ObjectType, null, this);
         }
 
         public string GetGlobalValueName()
