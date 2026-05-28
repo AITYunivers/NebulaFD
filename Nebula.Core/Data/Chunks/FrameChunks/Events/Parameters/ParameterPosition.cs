@@ -97,7 +97,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public ObjectInfo? GetObject()
         {
-            return ObjectCommon.GetObject(ObjectInfoParent, TypeParent, null, this);
+            return ObjectCommon.GetObject(ObjectInfoParent, TypeParent, this);
         }
 
         public string GetObjectName()

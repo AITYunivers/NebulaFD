@@ -46,7 +46,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public ObjectInfo? GetObject()
         {
-            return ObjectCommon.GetObject(ObjectInfo, ObjectType, null, this);
+            return ObjectCommon.GetObject(ObjectInfo, ObjectType, this);
         }
 
         public string GetQualifierName(Qualifier qualifier)
