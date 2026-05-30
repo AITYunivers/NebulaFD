@@ -239,20 +239,6 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
 
         }
 
-        // method for getting qualifiers in ACE
-        public static string TryGetQualifierACE(ACEventBase ace, ushort ObjectInfo, short ObjectType)
-        {
-            if (ace.Parent?.Parent.Qualifiers.Where(q => q.ObjectInfo == ObjectInfo && q.Type == ObjectType).Any() != true)
-            {
-                if ((ObjectInfo & 0x8000) != 0)
-                    ace.Parent?.Parent.Qualifiers.Add(new Qualifier() { ObjectInfo = ObjectInfo, Type = ObjectType}); 
-            }
-            Qualifier[] qualifiers = ace.Parent?.Parent.Qualifiers.Where(x => x.ObjectInfo == ObjectInfo && x.Type == ObjectType).ToArray()!;
-            if (qualifiers.Length > 0)
-                return GetQualifierName(qualifiers.First());
-            return "Unknown Object";
-        }
-
         // method for getting qualifiers in different places
         public static string TryGetQualifier(ParameterChunk paramChunk, ushort ObjectInfo, short ObjectType)
         {

@@ -553,7 +553,8 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
 
         public ObjectInfo? GetObject()
         {
-            if (Parent?.FrameEvents?.Qualifiers.Where(x => x.ObjectInfo == ObjectInfo).Any() == true)
+            // added here just because without it - any other changes with qualifiers won't do anything (will still get KeyNotFoundException, means that it won't get added)
+            if (Parent?.FrameEvents?.Qualifiers.Where(x => x.ObjectInfo == ObjectInfo).Any() == true || (NebulaCore.Windows && NebulaCore.Build >= 296 && NebulaCore.Fusion >= 2.5 && (ObjectInfo & 0x8000) != 0))
                 return null;
             else if (NebulaCore.MFA && Parent?.FrameEvents?.EventObjects.Count > 0)
                 return NebulaCore.PackageData.FrameItems.Items[(int)Parent.FrameEvents.EventObjects[ObjectInfo].ItemHandle];
