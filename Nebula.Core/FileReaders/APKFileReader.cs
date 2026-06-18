@@ -1,4 +1,5 @@
 ﻿using Nebula.Core.Data;
+using Nebula.Core.Data.Chunks.AppChunks;
 using Nebula.Core.Data.Chunks.BankChunks.Sounds;
 using Nebula.Core.Data.Chunks.BankChunks.TrueTypeFonts;
 using Nebula.Core.Data.PackageReaders;
@@ -17,14 +18,16 @@ namespace Nebula.Core.FileReaders
 
         private static readonly List<string> VideoExtensions = new List<string>
         {
+            // list of supported video extensions by Video Android extension, not adding .ogg tho because there's also .ogg file as a sound
             ".mp4",
-            ".mkv",
-            ".m4a",
-            ".mov",
             ".webm",
-            ".avi"
+            ".mpeg",
+            ".ogv",
+            ".ts",
+            ".dat",
+            ".m4v",
         };
-
+            
         public string FilePath { get { return _filePath; } set { _filePath = value; } }
         public string _filePath = string.Empty;
 
@@ -111,7 +114,6 @@ namespace Nebula.Core.FileReaders
             };
             NebulaCore.PackageData.TrueTypeFontBank.Fonts.Add(ttf); // then add font to the bank
         }
-
 
         private void loadIcons(Bitmap bmp)
         {
