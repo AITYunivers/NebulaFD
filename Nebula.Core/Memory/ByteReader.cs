@@ -91,7 +91,7 @@ namespace Nebula.Core.Memory
 
         public override double ReadDouble()
         {
-            if (!NebulaCore.Windows)
+            if (NebulaCore.Android) // changed for android only because this could break values for iOS
                 return ReadLong() / 4294967296.0;
             return base.ReadDouble();
         }

@@ -22,7 +22,9 @@ namespace Nebula.Core.FileReaders
         public void LoadGame(ByteReader fileReader, string filePath)
         {
             ByteReader? ccnReader = null;
-            ZipArchive archive = ZipFile.OpenRead(_filePath = filePath);
+
+            FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            ZipArchive archive = new ZipArchive(fs, ZipArchiveMode.Read);
             string appName = string.Empty;
             foreach (ZipArchiveEntry entry in archive.Entries)
             {
