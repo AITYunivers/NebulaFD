@@ -30,14 +30,18 @@ namespace Nebula.Core.FileReaders
             ZipArchive archive = new ZipArchive(fs, ZipArchiveMode.Read);
             foreach (ZipArchiveEntry entry in archive.Entries)
             {
-                if (Directory.GetParent(entry.FullName)?.Name == "assets" || Directory.GetParent(entry.FullName)?.Name == "raw")
+                if (Directory.GetParent(entry.FullName)?.Name == "assets" || Directory.GetParent(entry.FullName)?.Name == "res" || Directory.GetParent(entry.FullName)?.Name == "raw")
                 {
                     if (Path.GetExtension(entry.Name) == ".ccn")
                     {
-                        File.Delete("open.ccj");
-                        entry.ExtractToFile("open.ccj");
-                        ccnReader = new ByteReader(File.ReadAllBytes("open.ccj"));
-                        File.Delete("open.ccj");
+                        // to prevent re-reading ccn file from different folders if it was located in assets or res
+                        if (ccnReader == null)
+                        {
+                            File.Delete("open.ccj");
+                            entry.ExtractToFile("open.ccj");
+                            ccnReader = new ByteReader(File.ReadAllBytes("open.ccj"));
+                            File.Delete("open.ccj");
+                        }
                     }
                     else if (Path.GetExtension(entry.Name) == ".mp3" ||
                              Path.GetExtension(entry.Name) == ".ogg" ||
@@ -50,7 +54,7 @@ namespace Nebula.Core.FileReaders
                 }
                 if (Directory.GetParent(entry.FullName)?.Name == "fonts" && Path.GetExtension(entry.Name) == ".ttf")
                 {
-                    loadFonts(entry); 
+                    loadFonts(entry);
                 }
 
                 if ((Directory.GetParent(entry.FullName)?.Name == "mipmap-xxhdpi-v4" || Directory.GetParent(entry.FullName)?.Name == "mipmap-xxxhdpi-v4") &&
@@ -86,7 +90,6 @@ namespace Nebula.Core.FileReaders
             };
             NebulaCore.PackageData.TrueTypeFontBank.Fonts.Add(ttf); // then add font to the bank
         }
-
 
         private void loadIcons(Bitmap bmp)
         {
