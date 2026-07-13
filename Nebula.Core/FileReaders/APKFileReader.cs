@@ -35,7 +35,7 @@ namespace Nebula.Core.FileReaders
                     if (Path.GetExtension(entry.Name) == ".ccn")
                     {
                         // to prevent re-reading ccn file from different folders if it was located in assets or res
-                        if (ccnReader == null)
+                        if (ccnReader == null && (Path.GetFileName(entry.Name) == "application.ccn" || Path.GetFileName(entry.Name) == "MJ.ccn"))
                         {
                             File.Delete("open.ccj");
                             entry.ExtractToFile("open.ccj");
