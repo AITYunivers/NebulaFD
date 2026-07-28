@@ -1,4 +1,4 @@
-﻿using Nebula.Core.Memory;
+﻿﻿using Nebula.Core.Memory;
 using System.Drawing;
 
 namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
@@ -19,7 +19,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             Pointer = reader.ReadInt();
             ID = reader.ReadInt();
 
-            CCNPointer = reader.Tell() - 12 + Pointer;
+            if (Pointer == 0)
+                CCNPointer = 0;
+            else
+                CCNPointer = reader.Tell() - 12 + Pointer;
 
             if (NebulaCore.Build < 284)
                 CCNPointer -= 2;
