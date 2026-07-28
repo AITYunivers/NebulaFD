@@ -22,10 +22,13 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             if (Pointer == 0)
                 CCNPointer = 0;
             else
+            {
                 CCNPointer = reader.Tell() - 12 + Pointer;
 
-            if (NebulaCore.Build < 284)
-                CCNPointer -= 2;
+                if (NebulaCore.Build < 284)
+                    CCNPointer -= 2;
+            }
+                
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
