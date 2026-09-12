@@ -18,9 +18,9 @@ namespace Nebula.Core.Data.Chunks.ObjectChunks.ObjectCommon
             reader.ReadShort();
             short Count = reader.ReadShort();
 
-            short[] Offsets = new short[Count];
+            ushort[] Offsets = new ushort[Count];
             for (int i = 0; i < Count; i++)
-                Offsets[i] = reader.ReadShort();
+                Offsets[i] = reader.ReadUShort();
 
             Animations = new Dictionary<int, ObjectAnimation>();
             for (int i = 0; i < Count; i++)
