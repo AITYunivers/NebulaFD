@@ -29,7 +29,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events.Parameters
             reader.Skip(4); // Checksum
             reader.Skip(2);
 
-            if (NebulaCore.Plus)
+            if (NebulaCore.Plus || (NebulaCore.Build >= 296 && NebulaCore.Windows && NebulaCore.Fusion >= 2.5))
                 Name = "Group " + ID;
         }
 
