@@ -198,7 +198,9 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 7: // [296] Inlined Deactivate Group
                             GroupParameter296Fix(reader);
                             break;
-                        case 14: // [296] Inlined Loop
+                        case 14: // [296] Inlined Loop (Start)
+                        case 15: // [296] Inlined Loop (Stop)
+                        case 16: // [296] Inlined Loop (Set Index)
                             if (Parameters[0].Code == 11)
                             {
                                 int loopId = ((ParameterShort)Parameters[0].Data).Value;
@@ -227,7 +229,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 30: // Set Global
                             Num = 3; // Set Global
                             ignoreOptimization = true;
-                            CommonParameter296Fix(reader, endPosition);
+                            CommonParameter296Fix(reader, endPosition, true);
                             break;
                         case 31: // Add Global Integer
                         case 32: // Add Global
@@ -235,7 +237,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 34: // Add Global
                             Num = 5; // Add Global
                             ignoreOptimization = true;
-                            CommonParameter296Fix(reader, endPosition);
+                            CommonParameter296Fix(reader, endPosition, true);
                             break;
                         case 35: // Subtract Global Integer
                         case 36: // Subtract Global
@@ -243,7 +245,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
                         case 38: // Subtract Global
                             Num = 4; // Subtract Global
                             ignoreOptimization = true;
-                            CommonParameter296Fix(reader, endPosition);
+                            CommonParameter296Fix(reader, endPosition, true);
                             break;
                         case 43: // Execute Child Events
                             DoAdd = false;
@@ -362,7 +364,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
             FrameEvents.OptimizedEvents |= ((Num != oldNum) || (DoAdd == false)) && !ignoreOptimization;
         }
 
-        public void CommonParameter296Fix(ByteReader reader, long endPosition)
+        public void CommonParameter296Fix(ByteReader reader, long endPosition, bool global = false)
 		{
 			if (NebulaCore.Build < 296 || !NebulaCore.Windows || Parameters.Length > 0 || NebulaCore.Fusion < 2.5)
 				return;
@@ -371,6 +373,10 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 			{
 				Value = (short)altVal
 			};
+            ParameterInt gblValParam = new ParameterInt()
+            {
+                Value = altVal
+            };
 
 			ExpressionChunk newValExp;
 
@@ -404,7 +410,7 @@ namespace Nebula.Core.Data.Chunks.FrameChunks.Events
 
 			Parameters = new Parameter[2]
 			{
-				new() { Data = altValParam, Code = 50 },
+				new() { Data = global ? gblValParam : altValParam, Code = global ? 49 : 50 },
 				new() { Data = newValParam, Code = 22 }
 			};
 		}
