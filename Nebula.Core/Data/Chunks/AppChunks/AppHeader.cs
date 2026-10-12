@@ -63,9 +63,11 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             "NoThickFrame",          // No Thick frame
             "DontCenterFrame",       // Do not center frame area in window
             "DisableCloseButton",    // Disable Close button
-            "HiddenAtStart", "",     // Hidden at start
+            "HiddenAtStart",         // Hidden at start
+            "MDI",                   // Mutiple Document Interface
             "KeepScreenRatio",       // Keep screen ratio
-            "AntiAliasing", "",      // Anti-aliasing when resizing
+            "AntiAliasing",          // Anti-aliasing when resizing
+            "ForceGlobalRefresh",    // Force global refresh
             "RightToLeftReading",    // Right-to-left reading
             "RightToLeftLayout", "", // Right-to-left layout
             "FitInside"              // Fit inside (black bars)
@@ -88,7 +90,8 @@ namespace Nebula.Core.Data.Chunks.AppChunks
             "Direct3D8", "", "", "", "", "", // Display Mode: Direct3D 8
             "DontIgnoreDestroyFar",          // Ignore "Destroy if too far" option if "Inactivate if too far" is set to No Disabled
             "DisableIME",                    // Disable IME
-            "ReduceCPUUsage", "", "",        // Reduce CPU usage
+            "ReduceCPUUsage", "",            // Reduce CPU usage
+            "UseHighPerformanceGPU",         // Use high performance GPU
             "EnableProfiling",               // Enable profiling
             "DontStartProfiling",            // Start profiling at start of frame Disabled
             "Direct3D11",                    // Display Mode: Direct3D 11

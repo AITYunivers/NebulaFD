@@ -25,7 +25,7 @@ namespace Nebula.Core.Data.Chunks.MFAChunks.MFAObjectChunks
             "DontInactivateIfTooFar", // Inactivate if too far from window: No
             "InactivateIfTooFar",     // Inactivate if too far from window: Yes
             "HasText",                // Uses Text
-            "CreateAtStart",          // Create at start
+            "DontCreateAtStart",      // Create at start Disabled
             "CCNCheck", "",           // Only on for CCNs
             "DontResetFrameDuration"  // Do not reset current frame duration when the animation is modified
         );
@@ -33,7 +33,7 @@ namespace Nebula.Core.Data.Chunks.MFAChunks.MFAObjectChunks
         public BitDict NewObjectFlags = new BitDict( // New Object Flags
             "DontSaveBackground",     // Save background Disabled
             "WipeWithColor",          // Wipe with color
-            "DontUseFineDetection",   // Use fine detection Disabled / Collision with Box 
+            "DontUseFineDetection",   // Use fine detection Disabled / Collision with Box
             "VisibleAtStart",         // Visible at start
             "SolidObstacle",          // Obstacle Type: Obstacle
             "PlatformObstacle",       // Obstacle Type: Platform

@@ -36,15 +36,15 @@ namespace Nebula.Core.Data.PackageReaders
             RuntimeSubversion = (short)reader.ReadUShort();
             ProductVersion = reader.ReadInt();
             ProductBuild = reader.ReadInt();
-            reader.Skip(4); // Stamp
+            reader.Skip(4); // Language
             NebulaCore.Build = ProductBuild;
             this.Log("Fusion Build: " + ProductBuild);
 
             AppName = reader.ReadAutoYuniversal();
-            reader.ReadAutoYuniversal();
+            Description = reader.ReadAutoYuniversal();
             EditorFilename = reader.ReadAutoYuniversal();
 
-            int stampLength = reader.ReadInt();
+            int stampLength = reader.ReadInt(); // Preview Image
             byte[] stamp = reader.ReadBytes(stampLength);
 
             reader.Skip(4); // ATNF
@@ -75,16 +75,16 @@ namespace Nebula.Core.Data.PackageReaders
             AppHeader.GraphicFlags.Value = reader.ReadUInt();
             AppHeader.SyncFlags(true);
             HelpFile = reader.ReadAutoYuniversal();
-            reader.ReadAutoYuniversal();
+            reader.ReadAutoYuniversal(); // Vitalize Preview File (Deprecated)
             AppHeader.InitScore = (reader.ReadInt() + 1) * -1;
             AppHeader.InitLives = (reader.ReadInt() + 1) * -1;
             AppHeader.FrameRate = reader.ReadInt();
             reader.Skip(4); // Build Type
             TargetFilename = reader.ReadAutoYuniversal();
-            reader.ReadAutoYuniversal();
-            reader.ReadAutoYuniversal();
+            reader.ReadAutoYuniversal(); // Effects Folder
+            reader.ReadAutoYuniversal(); // Command Line
             About = reader.ReadAutoYuniversal();
-            reader.Skip(4);
+            reader.Skip(reader.ReadUInt32()); // Installer
             BinaryFiles.ReadMFA(reader);
 
             AppHeader.ControlType = new int[reader.ReadInt()];

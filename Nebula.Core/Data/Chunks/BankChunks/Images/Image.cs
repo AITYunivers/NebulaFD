@@ -48,9 +48,9 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
             "RLET",
             "LZX",
             "Alpha",
+            "",
             "ACE",
-            "Mac",
-            "RGBA"
+            "Mac"
         );
 
         public Image()
@@ -151,7 +151,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Images
                                                         PixelFormat.Format32bppArgb);
 
                     byte[] colorArray = GetData();
-                    
+
                     if (!IsMasked && colorArray != null)
                     {
                         ImageData = colorArray;

@@ -9,11 +9,15 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
         public int Checksum;
         public uint References;
         public BitDict Flags = new BitDict( // Flags
-            "Check",                        // Will not compile exes if off
-            "", "", "", "LoadOnCall",       // Load on Call
+            "WAVE",                         // Will not compile exes if off
+            "MIDI",
+            "", "", "LoadOnCall",           // Load on Call
             "PlayFromDisk",                 // Play from Disk
-            "", "", "HasName",              // Has Name (At least it's for Android, or else it will give dictionary key not found)
-            "", "", "", "", "", "NameCrop"  // Name Crop
+            "File",
+            "UnicodeFile",
+            "HasName",                      // Has Name (At least it's for Android, or else it will give dictionary key not found)
+            "", "", "", "Loaded",
+            "", "NameCrop"                  // Name Crop
         );
         public int Frequency;
         public string Name = string.Empty;
@@ -34,14 +38,14 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             {
                 Handle = reader.ReadUShort();
                 string internalFilename = "s" + Handle.ToString("D4");
-                
+
                 Flags.Value = reader.ReadUShort();
                 reader.Skip(4);
                 Frequency = reader.ReadInt();
-                
+
                 if (Flags["HasName"])
                     Name = reader.ReadYuniversal(reader.ReadShort());
-                
+
                 if (string.IsNullOrEmpty(Name) && SoundBank.ExternalFiles.TryGetValue(Handle.ToString(), out var nameEntry))
                     Name = (string)nameEntry;
 
@@ -160,7 +164,7 @@ namespace Nebula.Core.Data.Chunks.BankChunks.Sounds
             using ByteReader old_file = new ByteReader(data);
             short formatTag = old_file.ReadShort();
             short channels = old_file.ReadShort();
-            
+
             byte[] header;
             byte[] audio;
 

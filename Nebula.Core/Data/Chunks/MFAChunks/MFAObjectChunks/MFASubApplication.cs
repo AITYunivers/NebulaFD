@@ -29,10 +29,10 @@ namespace Nebula.Core.Data.Chunks.MFAChunks.MFAObjectChunks
             "SharePlayerControls",   // Share with parent application: Player Controls
             "MDI",                   // MDI Child
             "Docked",                // Docked
-            "MFACheck",              // MFA Check
             "DockedVertical",        // Docked Top
             "DockedHorizontal",      // Docked Right
             "Reopen",                // Reopen (Unused?)
+            "RunEvenIfNotActive",    // Run even if not active
             "Sprite",                // Display as sprite
             "IgnoreResize"           // Windows: ignore parent's 'Resize Display' option
         );
@@ -58,7 +58,7 @@ namespace Nebula.Core.Data.Chunks.MFAChunks.MFAObjectChunks
             SubAppFlags.Value = reader.ReadUInt();
             if (SubAppFlags["Internal"])
                 StartFrame = reader.ReadInt();
-            reader.Skip(4);
+            reader.Skip(4); // Window Icon
         }
 
         public override void WriteMFA(ByteWriter writer, params object[] extraInfo)
